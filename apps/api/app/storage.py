@@ -12,6 +12,7 @@ from app.models import (
     AuditEvent,
     FeedbackRecord,
     ProjectRecord,
+    SourceChunk,
     SourceRegistryEntry,
 )
 
@@ -67,6 +68,14 @@ class SQLiteStore:
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL
                 );
+
+                CREATE TABLE IF NOT EXISTS source_chunks (
+                    chunk_id TEXT PRIMARY KEY,
+                    source_id TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
                 """
             )
 
@@ -79,6 +88,7 @@ class SQLiteStore:
                 DELETE FROM analyses;
                 DELETE FROM projects;
                 DELETE FROM sources;
+                DELETE FROM source_chunks;
                 """
             )
 
@@ -228,6 +238,49 @@ class SQLiteStore:
     def get_source_count(self) -> int:
         with self._connect() as connection:
             row = connection.execute("SELECT COUNT(*) AS count FROM sources").fetchone()
+        return int(row["count"]) if row else 0
+
+    def replace_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]:
+        now = datetime.now(timezone.utc).isoformat()
+        with self._connect() as connection:
+            connection.execute("DELETE FROM source_chunks")
+            connection.executemany(
+                """
+                INSERT INTO source_chunks (chunk_id, source_id, payload_json, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                [
+                    (
+                        chunk.chunk_id,
+                        chunk.source_id,
+                        json.dumps(chunk.model_dump(mode="json")),
+                        now,
+                        now,
+                    )
+                    for chunk in chunks
+                ],
+            )
+        self.audit("source.chunks.reindexed", f"{len(chunks)} chunks")
+        return chunks
+
+    def list_source_chunks(self) -> list[SourceChunk]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT payload_json
+                FROM source_chunks
+                ORDER BY chunk_id ASC
+                """
+            ).fetchall()
+
+        return [
+            SourceChunk.model_validate(json.loads(row["payload_json"]))
+            for row in rows
+        ]
+
+    def get_source_chunk_count(self) -> int:
+        with self._connect() as connection:
+            row = connection.execute("SELECT COUNT(*) AS count FROM source_chunks").fetchone()
         return int(row["count"]) if row else 0
 
 

@@ -55,6 +55,20 @@ class SourceRegistryEntry(BaseModel):
     uses: list[str] = Field(default_factory=list)
 
 
+class SourceChunk(BaseModel):
+    chunk_id: str = Field(min_length=2, max_length=240)
+    source_id: str = Field(min_length=2, max_length=200)
+    title: str = Field(min_length=3, max_length=500)
+    chunk_text: str = Field(min_length=10, max_length=1200)
+    chunk_index: int = Field(ge=0)
+    source_text_hash: str = Field(min_length=64, max_length=64)
+    section_ref: str = Field(min_length=1, max_length=200)
+    url: str | None = Field(default=None, max_length=2000)
+    effective_date: str | None = Field(default=None, max_length=50)
+    districts: list[str] = Field(default_factory=list)
+    uses: list[str] = Field(default_factory=list)
+
+
 class SourceRegistryUpsertRequest(BaseModel):
     source: SourceRegistryEntry
 
@@ -64,8 +78,9 @@ class SourceRegistryListResponse(BaseModel):
 
 
 class ReindexResponse(BaseModel):
-    status: str
+    status: Literal["completed"]
     source_count: int
+    chunk_count: int
 
 
 class LocalDocumentImportRequest(BaseModel):

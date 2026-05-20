@@ -538,7 +538,7 @@ export function App() {
       setReindexMessage("");
       const summary = await reindexSources();
       setReindexMessage(
-        `Reindex ${summary.status}. ${summary.sourceCount} sources are currently registered.`,
+        `Reindex ${summary.status}. ${summary.sourceCount} sources produced ${summary.chunkCount} chunks.`,
       );
       await refreshSources();
     } catch (reindexError) {

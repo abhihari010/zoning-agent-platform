@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from app.ingestion import import_source_documents
+from app.ingestion import build_source_chunks, import_source_documents
 from app.models import (
     AnalysisRecord,
     AnalyzeRequest,
@@ -158,8 +158,15 @@ def upsert_source(payload: SourceRegistryUpsertRequest) -> SourceRegistryListRes
 @router.post("/ingestion/reindex", response_model=ReindexResponse)
 def reindex_sources() -> ReindexResponse:
     ensure_seed_sources()
-    store.audit("source.reindex.requested", "source-registry")
-    return ReindexResponse(status="queued", source_count=store.get_source_count())
+    sources = store.list_sources()
+    chunks = build_source_chunks(sources)
+    store.replace_source_chunks(chunks)
+    store.audit("source.reindex.completed", "source-registry")
+    return ReindexResponse(
+        status="completed",
+        source_count=len(sources),
+        chunk_count=len(chunks),
+    )
 
 
 @router.post("/ingestion/import-local-docs", response_model=LocalDocumentImportResponse)

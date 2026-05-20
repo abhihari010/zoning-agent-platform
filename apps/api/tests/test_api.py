@@ -231,8 +231,10 @@ def test_ingestion_reindex_reports_source_count():
 
     response = client.post("/api/v1/ingestion/reindex")
     assert response.status_code == 200
-    assert response.json()["status"] == "queued"
+    assert response.json()["status"] == "completed"
     assert response.json()["source_count"] >= 3
+    assert response.json()["chunk_count"] >= 3
+    assert store.get_source_chunk_count() >= 3
 
 
 def test_import_local_docs_endpoint():
@@ -269,5 +271,66 @@ def test_import_local_docs_endpoint():
         assert body["status"] == "completed"
         assert body["imported_count"] == 1
         assert "local-rule" in body["imported_source_ids"]
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_import_local_docs_reindex_creates_stable_chunks_with_metadata():
+    client = TestClient(app)
+
+    temp_dir = Path(__file__).resolve().parent / "_tmp_api_reindex"
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
+    temp_dir.mkdir(parents=True)
+
+    try:
+        doc_path = temp_dir / "bakery-rule.md"
+        doc_path.write_text(
+            "\n".join(
+                [
+                    "source_id: bakery-rule",
+                    "title: Bakery Rule",
+                    "section_ref: Sec 12.4.2",
+                    "url: https://example.gov/zoning/12.4",
+                    "effective_date: 2026-01-15",
+                    "districts: mixed-use-core, residential-low-density",
+                    "uses: home-based-food-business",
+                    "",
+                    (
+                        "Home occupation bakeries may be conditionally permitted when parking, "
+                        "signage, and fire-safety impacts are reviewed by the planning office."
+                    ),
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+        import_response = client.post(
+            "/api/v1/ingestion/import-local-docs",
+            json={"directory": str(temp_dir)},
+        )
+        assert import_response.status_code == 200
+
+        first_response = client.post("/api/v1/ingestion/reindex")
+        assert first_response.status_code == 200
+        assert first_response.json()["status"] == "completed"
+        assert first_response.json()["source_count"] == 1
+        assert first_response.json()["chunk_count"] == 1
+
+        first_chunks = store.list_source_chunks()
+        assert len(first_chunks) == 1
+        chunk = first_chunks[0]
+        assert chunk.source_id == "bakery-rule"
+        assert chunk.section_ref == "Sec 12.4.2"
+        assert chunk.url == "https://example.gov/zoning/12.4"
+        assert chunk.effective_date == "2026-01-15"
+        assert chunk.districts == ["mixed-use-core", "residential-low-density"]
+        assert chunk.uses == ["home-based-food-business"]
+        assert "Home occupation bakeries" in chunk.chunk_text
+
+        first_chunk_id = chunk.chunk_id
+        second_response = client.post("/api/v1/ingestion/reindex")
+        assert second_response.status_code == 200
+        assert [stored.chunk_id for stored in store.list_source_chunks()] == [first_chunk_id]
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)

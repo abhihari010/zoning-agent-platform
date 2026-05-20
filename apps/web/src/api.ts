@@ -332,6 +332,7 @@ export async function saveSource(
 export async function reindexSources(): Promise<{
   status: string;
   sourceCount: number;
+  chunkCount: number;
 }> {
   const response = await fetch(`${API_BASE}/ingestion/reindex`, {
     method: "POST",
@@ -343,8 +344,13 @@ export async function reindexSources(): Promise<{
   const payload = (await response.json()) as {
     status: string;
     source_count: number;
+    chunk_count: number;
   };
-  return { status: payload.status, sourceCount: payload.source_count };
+  return {
+    status: payload.status,
+    sourceCount: payload.source_count,
+    chunkCount: payload.chunk_count,
+  };
 }
 
 export async function importLocalDocuments(
