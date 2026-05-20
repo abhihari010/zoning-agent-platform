@@ -7,13 +7,30 @@ from pathlib import Path
 import pytest
 
 from app import services
+from app.ai.deterministic_provider import DeterministicAnalysisProvider
 from app.ai.interfaces import (
     AnalysisProviderRequest,
     AnalysisProviderResult,
     RetrievalProviderRequest,
     RetrievalProviderResult,
 )
+from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider
 from app.ingestion import import_source_documents, parse_source_file
+from app.models import SourceRegistryEntry
+from app.storage import SQLiteStore, store
+
+
+def _clear_external_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in [
+        "AI_PROVIDER",
+        "RAG_PROVIDER",
+        "WATSONX_ENABLED",
+        "WATSONX_API_KEY",
+        "WATSONX_PROJECT_ID",
+        "WATSONX_MODEL_ID",
+        "WATSONX_VECTOR_INDEX_ID",
+    ]:
+        monkeypatch.delenv(name, raising=False)
 
 
 def test_normalize_address_success(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -184,6 +201,71 @@ def test_analyze_project_watsonx_fallback(monkeypatch: pytest.MonkeyPatch) -> No
 
     assert result.feasibility.decision in {"conditional", "likely_allowed", "unknown"}
     assert any("watsonx analysis fallback engaged" in warning for warning in result.warnings)
+
+
+def test_analyze_project_runs_with_offline_default_providers(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_external_provider_env(monkeypatch)
+    store.reset()
+
+    from app import watsonx_client
+
+    monkeypatch.setattr(
+        watsonx_client,
+        "search_ordinances",
+        lambda *_args, **_kwargs: pytest.fail("Default retrieval should not call WatsonX."),
+    )
+    monkeypatch.setattr(
+        watsonx_client,
+        "generate_watsonx_analysis",
+        lambda *_args, **_kwargs: pytest.fail("Default analysis should not call WatsonX."),
+    )
+
+    result = services.analyze_project(
+        project_description="Convert garage to bakery with employees, hours, and renovation plans.",
+        district="mixed-use-core",
+    )
+
+    assert result.feasibility.decision == "conditional"
+    assert result.citations
+    assert not any("watsonx" in warning.lower() for warning in result.warnings)
+
+
+def test_analyze_project_without_matching_citations_is_unknown_low_confidence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    temp_dir = Path(__file__).resolve().parent / "_tmp_no_matching_sources"
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
+    temp_dir.mkdir(parents=True)
+
+    try:
+        source_store = SQLiteStore(temp_dir / "sources.sqlite3")
+        source_store.upsert_source(
+            SourceRegistryEntry(
+                source_id="industrial-only",
+                title="Industrial Only Rule",
+                excerpt="Industrial operations are reviewed in industrial districts.",
+                section_ref="Sec 4.1",
+                districts=["industrial-zone"],
+                uses=["industrial-use"],
+            )
+        )
+        retriever = SourceRegistryRetrievalProvider(source_store)
+
+        monkeypatch.setattr(services, "get_analysis_provider", lambda: DeterministicAnalysisProvider())
+        monkeypatch.setattr(services, "get_retrieval_provider", lambda: retriever)
+        result = services.analyze_project(
+            project_description="Open a drone repair studio with employees, hours, and renovation plans.",
+            district="mixed-use-core",
+        )
+
+        assert result.feasibility.decision == "unknown"
+        assert result.status == "low_confidence"
+        assert result.citations == []
+        assert result.feasibility.confidence < 0.6
+        assert any("No relevant ordinances" in warning for warning in result.warnings)
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 def test_dedupe_follow_up_questions_prefers_specific_prompt() -> None:
