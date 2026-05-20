@@ -7,12 +7,14 @@ from typing import Any
 
 import httpx
 
+from app.settings import get_settings
+
 WATSONX_API_VERSION = "2023-05-29"
 UTILITY_TOOLS_API_VERSION = "2024-05-01"
 
 
 def is_watsonx_enabled() -> bool:
-    return os.getenv("WATSONX_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
+    return get_settings().uses_watsonx
 
 
 def _required_env(name: str) -> str:

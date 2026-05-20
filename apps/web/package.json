@@ -1,5 +1,5 @@
 {
-  "name": "@ibm-zoning/web",
+  "name": "@zoning-agent/web",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ibm-zoning/shared-schema": "0.1.0",
+    "@zoning-agent/shared-schema": "0.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

@@ -6,9 +6,12 @@ __pycache__/
 .env
 .env.local
 .env.*
+!.env.example
 **/.env
 **/.env.local
 **/.env.*
+!**/.env.example
 *.pyc
 *.sqlite3
+*.tsbuildinfo
 

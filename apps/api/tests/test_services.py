@@ -7,6 +7,12 @@ from pathlib import Path
 import pytest
 
 from app import services
+from app.ai.interfaces import (
+    AnalysisProviderRequest,
+    AnalysisProviderResult,
+    RetrievalProviderRequest,
+    RetrievalProviderResult,
+)
 from app.ingestion import import_source_documents, parse_source_file
 
 
@@ -106,30 +112,35 @@ def test_keyword_district_rules_from_env(monkeypatch: pytest.MonkeyPatch) -> Non
 
 
 def test_analyze_project_watsonx_success_override(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(services, "is_watsonx_enabled", lambda: True)
-    monkeypatch.setattr(
-        services,
-        "retrieve_zoning_context",
-        lambda **_: [
-            services.SourceCitation(
-                source_id="wx-1",
-                title="Blacksburg Ordinance",
-                excerpt="Home occupation bakeries require review in mixed-use-core.",
-                section_ref="Sec 10.1",
+    class FakeWatsonXRetriever:
+        name = "watsonx"
+
+        def retrieve(self, request: RetrievalProviderRequest) -> RetrievalProviderResult:
+            return RetrievalProviderResult(
+                citations=[
+                    services.SourceCitation(
+                        source_id="wx-1",
+                        title="Blacksburg Ordinance",
+                        excerpt="Home occupation bakeries require review in mixed-use-core.",
+                        section_ref="Sec 10.1",
+                    )
+                ]
             )
-        ],
-    )
-    monkeypatch.setattr(
-        services,
-        "generate_watsonx_analysis",
-        lambda **_: {
-            "decision": "restricted",
-            "summary": "Model indicates restrictions based on district code.",
-            "required_permits": ["Special Use Permit"],
-            "follow_up_questions": ["Provide parcel lot size."],
-            "warnings": ["Cross-check recent amendments."],
-        },
-    )
+
+    class FakeWatsonXAnalysis:
+        name = "watsonx"
+
+        def generate_analysis(self, request: AnalysisProviderRequest) -> AnalysisProviderResult:
+            return AnalysisProviderResult(
+                decision="restricted",
+                summary="Model indicates restrictions based on district code.",
+                required_permits=["Special Use Permit"],
+                follow_up_questions=["Provide parcel lot size."],
+                warnings=["Cross-check recent amendments."],
+            )
+
+    monkeypatch.setattr(services, "get_retrieval_provider", lambda: FakeWatsonXRetriever())
+    monkeypatch.setattr(services, "get_analysis_provider", lambda: FakeWatsonXAnalysis())
 
     result = services.analyze_project(
         project_description="Convert garage to bakery with employees and renovation plans.",
@@ -142,24 +153,29 @@ def test_analyze_project_watsonx_success_override(monkeypatch: pytest.MonkeyPatc
 
 
 def test_analyze_project_watsonx_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(services, "is_watsonx_enabled", lambda: True)
-    monkeypatch.setattr(
-        services,
-        "retrieve_zoning_context",
-        lambda **_: [
-            services.SourceCitation(
-                source_id="wx-1",
-                title="Blacksburg Ordinance",
-                excerpt="Home occupation bakeries require review in mixed-use-core.",
-                section_ref="Sec 10.1",
+    class FakeWatsonXRetriever:
+        name = "watsonx"
+
+        def retrieve(self, request: RetrievalProviderRequest) -> RetrievalProviderResult:
+            return RetrievalProviderResult(
+                citations=[
+                    services.SourceCitation(
+                        source_id="wx-1",
+                        title="Blacksburg Ordinance",
+                        excerpt="Home occupation bakeries require review in mixed-use-core.",
+                        section_ref="Sec 10.1",
+                    )
+                ]
             )
-        ],
-    )
 
-    def _raise_error(**_):
-        raise RuntimeError("watsonx unavailable")
+    class FailingWatsonXAnalysis:
+        name = "watsonx"
 
-    monkeypatch.setattr(services, "generate_watsonx_analysis", _raise_error)
+        def generate_analysis(self, request: AnalysisProviderRequest) -> AnalysisProviderResult:
+            raise RuntimeError("watsonx unavailable")
+
+    monkeypatch.setattr(services, "get_retrieval_provider", lambda: FakeWatsonXRetriever())
+    monkeypatch.setattr(services, "get_analysis_provider", lambda: FailingWatsonXAnalysis())
 
     result = services.analyze_project(
         project_description="Convert garage to bakery with employees and renovation plans.",

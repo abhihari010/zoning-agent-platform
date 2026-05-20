@@ -4,7 +4,7 @@ import type {
   AnalyzeResponse,
   AuditEvent,
   FollowUpQuestion,
-} from "@ibm-zoning/shared-schema";
+} from "@zoning-agent/shared-schema";
 import {
   analyzeProject,
   createSession,
@@ -96,7 +96,7 @@ function buildChecklistDownload(
   projectDescription: string,
 ): string {
   return [
-    "IBMinds Zoning Agent Checklist",
+    "Zoning Agent Checklist",
     "",
     `Project: ${projectDescription.trim()}`,
     `Address: ${intake?.normalizedAddress ?? "Not available"}`,
@@ -609,7 +609,7 @@ export function App() {
         <section className="mb-5 grid gap-5 rounded-[28px] border border-pine/10 bg-white/90 p-6 shadow-card backdrop-blur lg:grid-cols-[minmax(0,1.5fr)_320px]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
-              IBMinds Zoning Agent
+              Zoning Agent Platform
             </p>
             <h1 className="mt-3 max-w-4xl font-heading text-3xl leading-tight text-pine md:text-[2.75rem]">
               Check whether a project is allowed on a property and get the next permit steps.

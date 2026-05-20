@@ -1,4 +1,4 @@
-# IBM Zoning App
+# Zoning Agent Platform
 
 Monorepo for a zoning feasibility assistant that helps a resident or business owner ask, in plain English, whether a project is likely allowed at a property and what permits or reviews come next.
 
@@ -254,14 +254,17 @@ Set environment variables before starting the API:
 
 - `GOOGLE_MAPS_API_KEY`: required Google Maps API key with Geocoding and Places enabled
 - `GOOGLE_MAPS_TIMEOUT_SECONDS`: optional timeout (default `8`)
-- `IBM_ZONING_DB_PATH`: optional SQLite database path for persistent API storage (default `apps/api/app/data/app.sqlite3`)
+- `ZONING_DB_PATH`: optional SQLite database path for persistent API storage (default `apps/api/app/data/app.sqlite3`)
+- `AI_PROVIDER`: optional analysis provider (`deterministic` or `watsonx`, default `deterministic`)
+- `RAG_PROVIDER`: optional retrieval provider (`source_registry` or `watsonx`, default `source_registry`)
 - `GOOGLE_DISTRICT_KEYWORD_MAP`: optional JSON mapping used when district cannot be inferred from components, example:
   - `{"downtown":"mixed-use-core","industrial":"industrial-zone"}`
-- `WATSONX_ENABLED`: optional (`true` or `false`, default `false`)
-- `WATSONX_API_KEY`: required when `WATSONX_ENABLED=true`
-- `WATSONX_URL`: required when `WATSONX_ENABLED=true` (example `https://us-south.ml.cloud.ibm.com`)
-- `WATSONX_PROJECT_ID`: required when `WATSONX_ENABLED=true`
-- `WATSONX_MODEL_ID`: required when `WATSONX_ENABLED=true`
+- `IBM_ZONING_DB_PATH`: legacy fallback for `ZONING_DB_PATH` during migration
+- `WATSONX_API_KEY`: required when `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`
+- `WATSONX_URL`: required when `AI_PROVIDER=watsonx` (example `https://us-south.ml.cloud.ibm.com`)
+- `WATSONX_PROJECT_ID`: required when `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`
+- `WATSONX_VECTOR_INDEX_ID`: required when `RAG_PROVIDER=watsonx`
+- `WATSONX_MODEL_ID`: required when `AI_PROVIDER=watsonx`
 - `WATSONX_TIMEOUT_SECONDS`: optional timeout for IAM + inference (default `20`)
 
 `.env` loading:
@@ -288,7 +291,7 @@ Available API additions:
 
 Analysis behavior:
 
-- If `WATSONX_ENABLED=true`, analysis attempts watsonx model inference.
+- If `AI_PROVIDER=watsonx`, analysis attempts watsonx model inference.
 - If watsonx call fails, backend falls back to deterministic analysis and records a warning.
 - `POST /api/v1/projects/{project_id}/analyze` also accepts `clarification_answers`, allowing the frontend to pause for follow-up questions and re-run the orchestration with added user detail.
 
@@ -307,16 +310,12 @@ This repo includes a root `vercel.json` for the Vite frontend:
 - Output directory: `apps/web/dist`
 - Install command: `npm install`
 
-Production builds use the Hugging Face Space backend by default:
+Production builds should set the deployed API URL explicitly:
 
-- `https://advaithmalka-zoning-agent-api.hf.space`
+- `VITE_API_URL=https://your-api-host.example`
 
-You can override that in Vercel with:
-
-- `VITE_API_URL=https://advaithmalka-zoning-agent-api.hf.space`
-
-To avoid browser CORS failures, set this variable in the Hugging Face Space after Vercel gives you a deployment URL:
+To avoid browser CORS failures, set this variable in the API host after Vercel gives you a deployment URL:
 
 - `CORS_ALLOW_ORIGINS=https://your-vercel-project.vercel.app`
 
-For a quick smoke test, the Space can temporarily use `CORS_ALLOW_ORIGINS=*`, but the deployed app should use the exact Vercel origin.
+For a quick smoke test, the API can temporarily use `CORS_ALLOW_ORIGINS=*`, but the deployed app should use the exact Vercel origin.
