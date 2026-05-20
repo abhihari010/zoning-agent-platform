@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import json
-import os
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import UUID
 
+from app.settings import get_settings
 from app.models import (
     AnalysisRecord,
     AuditEvent,
@@ -21,7 +21,7 @@ DEFAULT_DB_PATH = Path(__file__).resolve().parent / "data" / "app.sqlite3"
 
 class SQLiteStore:
     def __init__(self, db_path: str | Path | None = None) -> None:
-        configured_path = db_path or os.getenv("IBM_ZONING_DB_PATH") or DEFAULT_DB_PATH
+        configured_path = db_path or get_settings().database_path or DEFAULT_DB_PATH
         self.db_path = Path(configured_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._initialize()

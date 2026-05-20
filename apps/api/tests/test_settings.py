@@ -1,0 +1,64 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from app.settings import ConfigurationError, get_settings, require_watsonx_settings
+
+
+def _clear_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in [
+        "AI_PROVIDER",
+        "RAG_PROVIDER",
+        "ZONING_DB_PATH",
+        "IBM_ZONING_DB_PATH",
+        "WATSONX_ENABLED",
+        "WATSONX_API_KEY",
+        "WATSONX_PROJECT_ID",
+        "WATSONX_MODEL_ID",
+        "WATSONX_VECTOR_INDEX_ID",
+    ]:
+        monkeypatch.delenv(name, raising=False)
+
+
+def test_settings_default_to_offline_providers(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+
+    settings = get_settings()
+
+    assert settings.ai_provider == "deterministic"
+    assert settings.rag_provider == "source_registry"
+    assert not settings.uses_watsonx
+
+
+def test_settings_prefers_new_database_path(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("ZONING_DB_PATH", "tmp/new.sqlite3")
+    monkeypatch.setenv("IBM_ZONING_DB_PATH", "tmp/legacy.sqlite3")
+
+    assert get_settings().database_path == Path("tmp/new.sqlite3")
+
+
+def test_settings_keeps_legacy_database_path_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("IBM_ZONING_DB_PATH", "tmp/legacy.sqlite3")
+
+    assert get_settings().database_path == Path("tmp/legacy.sqlite3")
+
+
+def test_unknown_provider_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("AI_PROVIDER", "mystery")
+
+    with pytest.raises(ConfigurationError, match="AI_PROVIDER must be one of"):
+        get_settings()
+
+
+def test_watsonx_credentials_only_required_when_selected(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    require_watsonx_settings(get_settings())
+
+    monkeypatch.setenv("AI_PROVIDER", "watsonx")
+    with pytest.raises(ConfigurationError, match="WATSONX_API_KEY"):
+        require_watsonx_settings(get_settings())
