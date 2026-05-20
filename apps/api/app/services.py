@@ -4,13 +4,15 @@ import json
 import os
 import re
 from dataclasses import dataclass
-from functools import lru_cache
-from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
 import httpx
 
+from app.ai import get_analysis_provider, get_retrieval_provider
+from app.ai.deterministic_provider import deterministic_feasibility
+from app.ai.interfaces import AnalysisProviderRequest, RetrievalProviderRequest
+from app.ai.source_registry_retriever import ensure_seed_sources
 from app.district_mapping import map_district_from_components
 from app.models import (
     AgentReport,
@@ -19,13 +21,7 @@ from app.models import (
     ChecklistStep,
     Feasibility,
     SourceCitation,
-    SourceRegistryEntry,
 )
-from app.storage import store
-from app.watsonx_client import generate_watsonx_analysis, is_watsonx_enabled, search_ordinances
-
-
-SOURCE_REGISTRY_PATH = Path(__file__).resolve().parent / "data" / "source_registry.json"
 
 
 DISCLAIMER_TEXT = [
@@ -91,28 +87,6 @@ def _extract_district_from_components(address_components: list[dict[str, Any]]) 
             if long_name:
                 return f"district-{_slugify(long_name)}"
     return "unknown"
-
-
-@lru_cache(maxsize=1)
-def _load_seed_source_registry() -> list[dict[str, Any]]:
-    if not SOURCE_REGISTRY_PATH.exists():
-        return []
-
-    with SOURCE_REGISTRY_PATH.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
-    return payload if isinstance(payload, list) else []
-
-
-def ensure_seed_sources() -> None:
-    if store.get_source_count() > 0:
-        return
-
-    for source in _load_seed_source_registry():
-        try:
-            entry = SourceRegistryEntry.model_validate(source)
-        except Exception:
-            continue
-        store.upsert_source(entry)
 
 
 def _district_from_keywords(normalized_address: str, rules: dict[str, str]) -> str:
@@ -346,45 +320,14 @@ def retrieve_zoning_context(
     inferred_use: str,
     project_description: str = "",
 ) -> list[SourceCitation]:
-    if is_watsonx_enabled():
-        query = f"{inferred_use} {district} {project_description}".strip()
-        passages = search_ordinances(query)
-        citations: list[SourceCitation] = []
-        for i, passage in enumerate(passages[:5]):
-            text = passage.get("text") or passage.get("content") or passage.get("excerpt") or str(passage)
-            title = passage.get("title") or passage.get("document_title") or "Blacksburg Code of Ordinances"
-            section = passage.get("section_ref") or passage.get("section") or passage.get("chunk_id") or f"Sec {i + 1}"
-            source_id = passage.get("source_id") or passage.get("id") or f"blacksburg-ordinance-{i + 1}"
-            url = passage.get("url") or None
-            citations.append(
-                SourceCitation(
-                    source_id=str(source_id),
-                    title=str(title),
-                    excerpt=str(text),
-                    section_ref=str(section),
-                    url=url,
-                )
-            )
-        return citations
-
-    ensure_seed_sources()
-    hits: list[SourceCitation] = []
-    for source in store.list_sources():
-        district_ok = district in source.districts or "*" in source.districts or district == "unknown"
-        use_ok = inferred_use in source.uses or "general" in source.uses
-        if not district_ok or not use_ok:
-            continue
-        hits.append(
-            SourceCitation(
-                source_id=source.source_id,
-                title=source.title,
-                excerpt=source.excerpt,
-                section_ref=source.section_ref,
-                url=source.url,
-                effective_date=source.effective_date,
-            )
+    result = get_retrieval_provider().retrieve(
+        RetrievalProviderRequest(
+            district=district,
+            inferred_use=inferred_use,
+            project_description=project_description,
         )
-    return hits[:5]
+    )
+    return result.citations
 
 
 def _confidence_score(missing_fields: list[str], citations: list[SourceCitation]) -> float:
@@ -395,17 +338,6 @@ def _confidence_score(missing_fields: list[str], citations: list[SourceCitation]
     score = base - coverage_penalty + citation_bonus
     score -= retrieval_penalty
     return max(0.1, min(0.98, score))
-
-
-def _deterministic_feasibility(project_description: str, district: str) -> tuple[str, str]:
-    if district == "unknown":
-        return "unknown", "District could not be confidently mapped. Additional parcel verification is required."
-    if "bakery" in project_description.lower() and "garage" in project_description.lower():
-        return (
-            "conditional",
-            "Garage-to-bakery conversion appears conditionally feasible with fire, health, and parking approvals.",
-        )
-    return "likely_allowed", "Proposed use appears likely allowed, subject to standard permit review."
 
 
 def _merge_project_context(
@@ -482,31 +414,50 @@ def analyze_project(
 ) -> AnalyzeResult:
     combined_description = _merge_project_context(project_description, clarification_answers)
     intent = extract_intent(combined_description)
-    watsonx_active = is_watsonx_enabled()
+    analysis_provider = get_analysis_provider()
+    retrieval_provider = get_retrieval_provider()
+    analysis_provider_name = analysis_provider.name
+    retrieval_provider_name = retrieval_provider.name
     retrieval_error: str | None = None
     try:
-        citations = retrieve_zoning_context(
-            district=district,
-            inferred_use=intent.inferred_use,
-            project_description=combined_description,
-        )
+        citations = retrieval_provider.retrieve(
+            RetrievalProviderRequest(
+                district=district,
+                inferred_use=intent.inferred_use,
+                project_description=combined_description,
+            )
+        ).citations
     except Exception as exc:
         citations = []
         retrieval_error = str(exc)
 
     confidence = _confidence_score(intent.missing_fields, citations)
 
-    decision, summary = _deterministic_feasibility(combined_description, district)
-    if watsonx_active:
-        decision = "unknown"
-        summary = (
-            "Waiting on watsonx ordinance retrieval and compliance reasoning before making a zoning call."
+    try:
+        provider_output = analysis_provider.generate_analysis(
+            AnalysisProviderRequest(
+                project_description=combined_description,
+                district=district,
+                citation_excerpts=[citation.excerpt for citation in citations],
+                missing_fields=intent.missing_fields,
+            )
         )
+    except Exception as exc:
+        warnings_from_provider = [f"{analysis_provider_name} analysis fallback engaged: {exc}"]
+        fallback_decision, fallback_summary = deterministic_feasibility(combined_description, district)
+        decision = fallback_decision
+        summary = fallback_summary
+        permits_override: list[str] = []
+        follow_up: list[str] = []
+        warnings: list[str] = warnings_from_provider
+    else:
+        decision = provider_output.decision
+        summary = provider_output.summary
+        permits_override = provider_output.required_permits
+        follow_up = list(provider_output.follow_up_questions)
+        warnings = list(provider_output.warnings)
 
     status = "success"
-    warnings: list[str] = []
-    follow_up: list[str] = []
-    permits_override: list[str] = []
     agent_reports: list[AgentReport] = [
         AgentReport(
             key="intent",
@@ -522,29 +473,10 @@ def analyze_project(
     ]
 
     if retrieval_error:
-        if watsonx_active:
+        if retrieval_provider_name == "watsonx":
             warnings.append(f"watsonx retrieval failed: {retrieval_error}")
         else:
             warnings.append(f"Local source retrieval failed: {retrieval_error}")
-
-    if watsonx_active:
-        try:
-            model_output = generate_watsonx_analysis(
-                project_description=combined_description,
-                district=district,
-                citation_excerpts=[citation.excerpt for citation in citations],
-                missing_fields=intent.missing_fields,
-            )
-            model_decision = str(model_output.get("decision", decision))
-            if model_decision in {"likely_allowed", "conditional", "restricted", "unknown"}:
-                decision = model_decision
-            summary = str(model_output.get("summary", summary))
-            permits_override = [str(item) for item in model_output.get("required_permits", [])]
-            follow_up.extend([str(item) for item in model_output.get("follow_up_questions", [])])
-            warnings.extend([str(item) for item in model_output.get("warnings", [])])
-        except Exception as exc:
-            warnings.append(f"watsonx analysis fallback engaged: {exc}")
-            decision, summary = _deterministic_feasibility(combined_description, district)
 
     if citations:
         agent_reports.append(
@@ -554,7 +486,7 @@ def analyze_project(
                 status="completed",
                 headline=(
                     f"Retrieved {len(citations)} ordinance passages from the watsonx knowledge index."
-                    if watsonx_active
+                    if retrieval_provider_name == "watsonx"
                     else f"Retrieved {len(citations)} relevant zoning source excerpts for review."
                 ),
                 details=[
@@ -572,13 +504,13 @@ def analyze_project(
                 status="warning",
                 headline=(
                     "watsonx retrieval did not return matching Blacksburg ordinance passages for this request."
-                    if watsonx_active
+                    if retrieval_provider_name == "watsonx"
                     else "No relevant municipal ordinances were found in the current source registry."
                 ),
                 details=[
                     (
                         "The watsonx ordinance index did not return enough zoning text for this district and use."
-                        if watsonx_active
+                        if retrieval_provider_name == "watsonx"
                         else "The system could not retrieve matching zoning text for this district and use."
                     ),
                     "A human review with the planning department is recommended before acting.",
@@ -592,7 +524,7 @@ def analyze_project(
         warnings.append(
             (
                 "No relevant ordinances were returned by watsonx retrieval for this request. Please contact the planning office."
-                if watsonx_active
+                if retrieval_provider_name == "watsonx"
                 else "No relevant ordinances were found in the current zoning source registry. Please contact the planning office."
             )
         )

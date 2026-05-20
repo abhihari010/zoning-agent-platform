@@ -6,7 +6,7 @@ from app.ai.interfaces import (
     RetrievalProviderRequest,
     RetrievalProviderResult,
 )
-from app.ai.registry import configured_provider_names
+from app.ai.registry import configured_provider_names, get_analysis_provider, get_retrieval_provider
 
 __all__ = [
     "AnalysisProvider",
@@ -16,4 +16,6 @@ __all__ = [
     "RetrievalProviderRequest",
     "RetrievalProviderResult",
     "configured_provider_names",
+    "get_analysis_provider",
+    "get_retrieval_provider",
 ]
