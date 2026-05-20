@@ -100,6 +100,7 @@ def test_intake_success_persists_geodata(monkeypatch):
     project = store.get_project(UUID(project_id))
     assert project is not None
     assert project.place_id == "place-123"
+    assert project.jurisdiction_id is None
 
 
 def test_address_suggest_returns_suggestions(monkeypatch):

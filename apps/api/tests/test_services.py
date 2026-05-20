@@ -91,6 +91,9 @@ def test_normalize_address_success(monkeypatch: pytest.MonkeyPatch) -> None:
     assert result.latitude == 40.1
     assert result.longitude == -74.5
     assert result.district == "mixed-use-core"
+    assert result.support_status == "supported"
+    assert result.jurisdiction_id == "blacksburg-va"
+    assert result.jurisdiction_name == "Blacksburg, VA"
 
 
 def test_normalize_address_zero_results(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -117,7 +120,62 @@ def test_normalize_address_zero_results(monkeypatch: pytest.MonkeyPatch) -> None
 
     assert result.is_valid is False
     assert result.district == "unknown"
+    assert result.support_status == "invalid"
     assert "could not be validated" in result.warnings[0].lower()
+
+
+def test_normalize_address_valid_unsupported_jurisdiction(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("GOOGLE_MAPS_API_KEY", "demo-key")
+
+    payload = {
+        "status": "OK",
+        "candidates": [
+            {
+                "formatted_address": "100 Main St, Christiansburg, VA 24073, USA",
+                "place_id": "place-unsupported",
+                "address_components": [
+                    {"long_name": "Christiansburg", "types": ["locality"]},
+                    {"long_name": "VA", "types": ["administrative_area_level_1"]},
+                ],
+                "geometry": {"location": {"lat": 37.1, "lng": -80.4}},
+            }
+        ],
+        "results": [
+            {
+                "formatted_address": "100 Main St, Christiansburg, VA 24073, USA",
+                "place_id": "place-unsupported",
+                "address_components": [
+                    {"long_name": "Christiansburg", "types": ["locality"]},
+                    {"long_name": "VA", "types": ["administrative_area_level_1"]},
+                ],
+                "geometry": {"location": {"lat": 37.1, "lng": -80.4}},
+            }
+        ],
+    }
+
+    class FakeResponse:
+        def __init__(self, response_payload: dict) -> None:
+            self._payload = response_payload
+
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict:
+            return self._payload
+
+    def fake_get(url: str, params: dict, timeout: float):
+        if "findplacefromtext" in url:
+            return FakeResponse({"status": "OK", "candidates": payload["candidates"]})
+        return FakeResponse({"status": "OK", "results": payload["results"]})
+
+    monkeypatch.setattr(services.httpx, "get", fake_get)
+
+    result = services.normalize_address("100 Main St Christiansburg VA")
+
+    assert result.is_valid is False
+    assert result.support_status == "unsupported"
+    assert result.jurisdiction_id is None
+    assert "does not yet support zoning review" in result.warnings[0]
 
 
 def test_keyword_district_rules_from_env(monkeypatch: pytest.MonkeyPatch) -> None:

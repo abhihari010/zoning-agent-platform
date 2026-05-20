@@ -4,7 +4,7 @@ import json
 import os
 import re
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 from uuid import uuid4
 
 import httpx
@@ -14,6 +14,7 @@ from app.ai.deterministic_provider import deterministic_feasibility
 from app.ai.interfaces import AnalysisProviderRequest, RetrievalProviderRequest
 from app.ai.source_registry_retriever import ensure_seed_sources
 from app.district_mapping import map_district_from_components
+from app.jurisdictions import detect_jurisdiction
 from app.models import (
     AgentReport,
     AnalyzeResult,
@@ -47,6 +48,9 @@ class AddressNormalizationResult:
     longitude: float | None
     is_valid: bool
     warnings: list[str]
+    support_status: Literal["supported", "unsupported", "invalid"] = "supported"
+    jurisdiction_id: str | None = None
+    jurisdiction_name: str | None = None
 
 
 def _slugify(text: str) -> str:
@@ -198,6 +202,7 @@ def normalize_address(address: str) -> AddressNormalizationResult:
             longitude=None,
             is_valid=False,
             warnings=["Address appears incomplete."],
+            support_status="invalid",
         )
 
     api_key = os.getenv("GOOGLE_MAPS_API_KEY")
@@ -219,6 +224,7 @@ def normalize_address(address: str) -> AddressNormalizationResult:
             longitude=None,
             is_valid=False,
             warnings=["Address could not be validated with Google Maps APIs."],
+            support_status="invalid",
         )
 
     formatted_address = (
@@ -227,11 +233,14 @@ def normalize_address(address: str) -> AddressNormalizationResult:
         or cleaned_input
     )
 
-    # Restrict to Blacksburg, VA only
-    address_upper = formatted_address.upper()
-    if "BLACKSBURG" not in address_upper or (
-        ", VA " not in formatted_address and ", Virginia" not in formatted_address
-    ):
+    address_components = (
+        (place_candidate or {}).get("address_components")
+        or (geocode_result or {}).get("address_components")
+        or []
+    )
+    jurisdiction = detect_jurisdiction(formatted_address, address_components)
+    if not jurisdiction.supported:
+        jurisdiction_name = jurisdiction.name or "this jurisdiction"
         return AddressNormalizationResult(
             normalized_address=formatted_address,
             district="unknown",
@@ -239,7 +248,10 @@ def normalize_address(address: str) -> AddressNormalizationResult:
             latitude=None,
             longitude=None,
             is_valid=False,
-            warnings=["This tool only supports addresses in Blacksburg, VA."],
+            warnings=[f"This tool does not yet support zoning review for {jurisdiction_name}."],
+            support_status="unsupported",
+            jurisdiction_id=jurisdiction.jurisdiction_id,
+            jurisdiction_name=jurisdiction.name,
         )
 
     place_id = (place_candidate or {}).get("place_id") or (geocode_result or {}).get("place_id")
@@ -248,12 +260,6 @@ def normalize_address(address: str) -> AddressNormalizationResult:
     location = geometry.get("location", {})
     lat = location.get("lat")
     lng = location.get("lng")
-
-    address_components = (
-        (place_candidate or {}).get("address_components")
-        or (geocode_result or {}).get("address_components")
-        or []
-    )
 
     district = _extract_district_from_components(address_components)
     if district == "unknown":
@@ -271,6 +277,9 @@ def normalize_address(address: str) -> AddressNormalizationResult:
         longitude=float(lng) if isinstance(lng, (float, int)) else None,
         is_valid=True,
         warnings=warnings,
+        support_status="supported",
+        jurisdiction_id=jurisdiction.jurisdiction_id,
+        jurisdiction_name=jurisdiction.name,
     )
 
 

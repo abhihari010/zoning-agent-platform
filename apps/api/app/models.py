@@ -165,6 +165,8 @@ class ProjectRecord(BaseModel):
     input_address: str
     normalized_address: str
     district: str
+    jurisdiction_id: str | None = None
+    jurisdiction_name: str | None = None
     place_id: str | None = None
     latitude: float | None = None
     longitude: float | None = None

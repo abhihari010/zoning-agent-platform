@@ -1,0 +1,9 @@
+[
+  {
+    "jurisdiction_id": "blacksburg-va",
+    "name": "Blacksburg, VA",
+    "supported": true,
+    "locality_names": ["Blacksburg"],
+    "state_names": ["VA", "Virginia"]
+  }
+]

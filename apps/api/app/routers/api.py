@@ -48,7 +48,12 @@ def intake_project(payload: IntakeRequest) -> IntakeResponse:
 
     if not address_result.is_valid:
         invalid_project_id = uuid4()
-        store.audit("project.intake.invalid_address", str(invalid_project_id))
+        audit_stage = (
+            "project.intake.unsupported_jurisdiction"
+            if address_result.support_status == "unsupported"
+            else "project.intake.invalid_address"
+        )
+        store.audit(audit_stage, str(invalid_project_id))
         return IntakeResponse(
             project_id=invalid_project_id,
             normalized_address=address_result.normalized_address,
@@ -69,6 +74,8 @@ def intake_project(payload: IntakeRequest) -> IntakeResponse:
         input_address=payload.address,
         normalized_address=address_result.normalized_address,
         district=address_result.district,
+        jurisdiction_id=address_result.jurisdiction_id,
+        jurisdiction_name=address_result.jurisdiction_name,
         place_id=address_result.place_id,
         latitude=address_result.latitude,
         longitude=address_result.longitude,
