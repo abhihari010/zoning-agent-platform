@@ -77,6 +77,20 @@ class SourceRegistryListResponse(BaseModel):
     sources: list[SourceRegistryEntry]
 
 
+class SourceMetadataHealth(BaseModel):
+    source_id: str
+    missing_fields: list[str]
+
+
+class SourceIndexStatusResponse(BaseModel):
+    source_count: int
+    chunk_count: int
+    has_index: bool
+    last_import_at: datetime | None = None
+    last_reindex_at: datetime | None = None
+    sources_missing_metadata: list[SourceMetadataHealth] = Field(default_factory=list)
+
+
 class ReindexResponse(BaseModel):
     status: Literal["completed"]
     source_count: int

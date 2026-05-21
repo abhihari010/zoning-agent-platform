@@ -2,18 +2,26 @@
 
 ## Current Status
 
-Phase 1 created the provider seam, but the app still does not include:
+The app now has the first production-safe seams for future AI/RAG expansion:
+
+- optional OpenAI analysis provider selected with `AI_PROVIDER=openai`
+- embedding provider interface selected with `EMBEDDING_PROVIDER=none|local|openai`
+- hybrid local retrieval selected with `RAG_PROVIDER=hybrid_local`
+- chunked local source indexing through `/api/v1/ingestion/reindex`
+
+The app still does not include:
 
 - embeddings
 - vector search
 - hybrid keyword/vector retrieval
-- OpenAI, Anthropic, Ollama, or other non-WatsonX LLM providers
-- production-grade document chunk indexing
+- Anthropic, Ollama, or other non-WatsonX LLM providers
+- production-grade vector persistence beyond local chunk retrieval
 
-The current defaults are intentionally local and deterministic:
+The current defaults remain intentionally local and deterministic:
 
 - `AI_PROVIDER=deterministic`
 - `RAG_PROVIDER=source_registry`
+- `EMBEDDING_PROVIDER=none`
 
 WatsonX remains available only as an optional legacy adapter.
 
@@ -144,13 +152,11 @@ Implementation requirements:
 
 ## Suggested Future Tickets
 
-1. Add embedding provider interface and settings.
-2. Add chunk model and deterministic document chunking.
-3. Store chunks and embeddings locally.
-4. Add hybrid local retrieval provider.
-5. Add OpenAI analysis provider with structured output validation.
-6. Add mocked provider tests for external LLM and embedding behavior.
-7. Add admin UI indicators for chunk/index status.
+1. Persist embeddings for indexed chunks.
+2. Add vector similarity storage/querying beyond in-memory local ranking.
+3. Add mocked provider tests for additional external providers.
+4. Add richer source/jurisdiction metadata filters to hybrid retrieval.
+5. Add admin controls for provider/index diagnostics.
 
 ## Out of Scope For The Next Immediate Step
 

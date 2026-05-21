@@ -238,6 +238,38 @@ def test_ingestion_reindex_reports_source_count():
     assert store.get_source_chunk_count() >= 3
 
 
+def test_ingestion_status_reports_index_and_source_health():
+    client = TestClient(app)
+
+    client.post(
+        "/api/v1/ingestion/sources",
+        json={
+            "source": {
+                "source_id": "incomplete-source",
+                "title": "Incomplete Source",
+                "excerpt": "A valid excerpt without optional metadata.",
+                "section_ref": "Sec 1",
+                "districts": [],
+                "uses": [],
+            }
+        },
+    )
+    reindex_response = client.post("/api/v1/ingestion/reindex")
+    assert reindex_response.status_code == 200
+
+    status_response = client.get("/api/v1/ingestion/status")
+    assert status_response.status_code == 200
+    body = status_response.json()
+    assert body["source_count"] >= 1
+    assert body["chunk_count"] >= 1
+    assert body["has_index"] is True
+    assert body["last_reindex_at"] is not None
+    incomplete = next(
+        source for source in body["sources_missing_metadata"] if source["source_id"] == "incomplete-source"
+    )
+    assert set(incomplete["missing_fields"]) == {"url", "effective_date", "districts", "uses"}
+
+
 def test_import_local_docs_endpoint():
     client = TestClient(app)
 
