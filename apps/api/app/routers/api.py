@@ -6,7 +6,7 @@ from uuid import UUID, uuid4
 import httpx
 from fastapi import APIRouter, HTTPException
 
-from app.ingestion import import_source_documents
+from app.ingestion import build_source_chunks, import_source_documents
 from app.models import (
     AnalysisRecord,
     AnalyzeRequest,
@@ -48,7 +48,12 @@ def intake_project(payload: IntakeRequest) -> IntakeResponse:
 
     if not address_result.is_valid:
         invalid_project_id = uuid4()
-        store.audit("project.intake.invalid_address", str(invalid_project_id))
+        audit_stage = (
+            "project.intake.unsupported_jurisdiction"
+            if address_result.support_status == "unsupported"
+            else "project.intake.invalid_address"
+        )
+        store.audit(audit_stage, str(invalid_project_id))
         return IntakeResponse(
             project_id=invalid_project_id,
             normalized_address=address_result.normalized_address,
@@ -69,6 +74,8 @@ def intake_project(payload: IntakeRequest) -> IntakeResponse:
         input_address=payload.address,
         normalized_address=address_result.normalized_address,
         district=address_result.district,
+        jurisdiction_id=address_result.jurisdiction_id,
+        jurisdiction_name=address_result.jurisdiction_name,
         place_id=address_result.place_id,
         latitude=address_result.latitude,
         longitude=address_result.longitude,
@@ -158,8 +165,15 @@ def upsert_source(payload: SourceRegistryUpsertRequest) -> SourceRegistryListRes
 @router.post("/ingestion/reindex", response_model=ReindexResponse)
 def reindex_sources() -> ReindexResponse:
     ensure_seed_sources()
-    store.audit("source.reindex.requested", "source-registry")
-    return ReindexResponse(status="queued", source_count=store.get_source_count())
+    sources = store.list_sources()
+    chunks = build_source_chunks(sources)
+    store.replace_source_chunks(chunks)
+    store.audit("source.reindex.completed", "source-registry")
+    return ReindexResponse(
+        status="completed",
+        source_count=len(sources),
+        chunk_count=len(chunks),
+    )
 
 
 @router.post("/ingestion/import-local-docs", response_model=LocalDocumentImportResponse)

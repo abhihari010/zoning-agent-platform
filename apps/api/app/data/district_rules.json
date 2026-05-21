@@ -1,8 +1,7 @@
 {
   "city_defaults": {
     "default": "unknown",
-    "Springfield": "mixed-use-core",
-    "Oakridge": "residential-low-density"
+    "Blacksburg": "mixed-use-core"
   },
   "component_rules": [
     {

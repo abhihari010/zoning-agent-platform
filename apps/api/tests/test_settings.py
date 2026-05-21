@@ -55,6 +55,14 @@ def test_unknown_provider_raises_clear_error(monkeypatch: pytest.MonkeyPatch) ->
         get_settings()
 
 
+def test_unknown_rag_provider_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("RAG_PROVIDER", "mystery")
+
+    with pytest.raises(ConfigurationError, match="RAG_PROVIDER must be one of"):
+        get_settings()
+
+
 def test_watsonx_credentials_only_required_when_selected(monkeypatch: pytest.MonkeyPatch) -> None:
     _clear_provider_env(monkeypatch)
     require_watsonx_settings(get_settings())

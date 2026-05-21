@@ -7,13 +7,30 @@ from pathlib import Path
 import pytest
 
 from app import services
+from app.ai.deterministic_provider import DeterministicAnalysisProvider
 from app.ai.interfaces import (
     AnalysisProviderRequest,
     AnalysisProviderResult,
     RetrievalProviderRequest,
     RetrievalProviderResult,
 )
+from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider
 from app.ingestion import import_source_documents, parse_source_file
+from app.models import SourceRegistryEntry
+from app.storage import SQLiteStore, store
+
+
+def _clear_external_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in [
+        "AI_PROVIDER",
+        "RAG_PROVIDER",
+        "WATSONX_ENABLED",
+        "WATSONX_API_KEY",
+        "WATSONX_PROJECT_ID",
+        "WATSONX_MODEL_ID",
+        "WATSONX_VECTOR_INDEX_ID",
+    ]:
+        monkeypatch.delenv(name, raising=False)
 
 
 def test_normalize_address_success(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -74,6 +91,9 @@ def test_normalize_address_success(monkeypatch: pytest.MonkeyPatch) -> None:
     assert result.latitude == 40.1
     assert result.longitude == -74.5
     assert result.district == "mixed-use-core"
+    assert result.support_status == "supported"
+    assert result.jurisdiction_id == "blacksburg-va"
+    assert result.jurisdiction_name == "Blacksburg, VA"
 
 
 def test_normalize_address_zero_results(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -100,7 +120,62 @@ def test_normalize_address_zero_results(monkeypatch: pytest.MonkeyPatch) -> None
 
     assert result.is_valid is False
     assert result.district == "unknown"
+    assert result.support_status == "invalid"
     assert "could not be validated" in result.warnings[0].lower()
+
+
+def test_normalize_address_valid_unsupported_jurisdiction(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("GOOGLE_MAPS_API_KEY", "demo-key")
+
+    payload = {
+        "status": "OK",
+        "candidates": [
+            {
+                "formatted_address": "100 Main St, Christiansburg, VA 24073, USA",
+                "place_id": "place-unsupported",
+                "address_components": [
+                    {"long_name": "Christiansburg", "types": ["locality"]},
+                    {"long_name": "VA", "types": ["administrative_area_level_1"]},
+                ],
+                "geometry": {"location": {"lat": 37.1, "lng": -80.4}},
+            }
+        ],
+        "results": [
+            {
+                "formatted_address": "100 Main St, Christiansburg, VA 24073, USA",
+                "place_id": "place-unsupported",
+                "address_components": [
+                    {"long_name": "Christiansburg", "types": ["locality"]},
+                    {"long_name": "VA", "types": ["administrative_area_level_1"]},
+                ],
+                "geometry": {"location": {"lat": 37.1, "lng": -80.4}},
+            }
+        ],
+    }
+
+    class FakeResponse:
+        def __init__(self, response_payload: dict) -> None:
+            self._payload = response_payload
+
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict:
+            return self._payload
+
+    def fake_get(url: str, params: dict, timeout: float):
+        if "findplacefromtext" in url:
+            return FakeResponse({"status": "OK", "candidates": payload["candidates"]})
+        return FakeResponse({"status": "OK", "results": payload["results"]})
+
+    monkeypatch.setattr(services.httpx, "get", fake_get)
+
+    result = services.normalize_address("100 Main St Christiansburg VA")
+
+    assert result.is_valid is False
+    assert result.support_status == "unsupported"
+    assert result.jurisdiction_id is None
+    assert "does not yet support zoning review" in result.warnings[0]
 
 
 def test_keyword_district_rules_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -184,6 +259,71 @@ def test_analyze_project_watsonx_fallback(monkeypatch: pytest.MonkeyPatch) -> No
 
     assert result.feasibility.decision in {"conditional", "likely_allowed", "unknown"}
     assert any("watsonx analysis fallback engaged" in warning for warning in result.warnings)
+
+
+def test_analyze_project_runs_with_offline_default_providers(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_external_provider_env(monkeypatch)
+    store.reset()
+
+    from app import watsonx_client
+
+    monkeypatch.setattr(
+        watsonx_client,
+        "search_ordinances",
+        lambda *_args, **_kwargs: pytest.fail("Default retrieval should not call WatsonX."),
+    )
+    monkeypatch.setattr(
+        watsonx_client,
+        "generate_watsonx_analysis",
+        lambda *_args, **_kwargs: pytest.fail("Default analysis should not call WatsonX."),
+    )
+
+    result = services.analyze_project(
+        project_description="Convert garage to bakery with employees, hours, and renovation plans.",
+        district="mixed-use-core",
+    )
+
+    assert result.feasibility.decision == "conditional"
+    assert result.citations
+    assert not any("watsonx" in warning.lower() for warning in result.warnings)
+
+
+def test_analyze_project_without_matching_citations_is_unknown_low_confidence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    temp_dir = Path(__file__).resolve().parent / "_tmp_no_matching_sources"
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
+    temp_dir.mkdir(parents=True)
+
+    try:
+        source_store = SQLiteStore(temp_dir / "sources.sqlite3")
+        source_store.upsert_source(
+            SourceRegistryEntry(
+                source_id="industrial-only",
+                title="Industrial Only Rule",
+                excerpt="Industrial operations are reviewed in industrial districts.",
+                section_ref="Sec 4.1",
+                districts=["industrial-zone"],
+                uses=["industrial-use"],
+            )
+        )
+        retriever = SourceRegistryRetrievalProvider(source_store)
+
+        monkeypatch.setattr(services, "get_analysis_provider", lambda: DeterministicAnalysisProvider())
+        monkeypatch.setattr(services, "get_retrieval_provider", lambda: retriever)
+        result = services.analyze_project(
+            project_description="Open a drone repair studio with employees, hours, and renovation plans.",
+            district="mixed-use-core",
+        )
+
+        assert result.feasibility.decision == "unknown"
+        assert result.status == "low_confidence"
+        assert result.citations == []
+        assert result.feasibility.confidence < 0.6
+        assert any("No relevant ordinances" in warning for warning in result.warnings)
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 def test_dedupe_follow_up_questions_prefers_specific_prompt() -> None:

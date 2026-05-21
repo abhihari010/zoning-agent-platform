@@ -8,7 +8,7 @@ Planned stages:
 2. Document fetch and versioning
 3. Parsing and OCR fallback
 4. Chunking and metadata tagging
-5. Embedding and ChromaDB indexing
+5. Optional embedding and vector indexing after deterministic chunks exist
 
 Current helpers:
 
@@ -30,3 +30,9 @@ Document parsing format:
 - `uses: use-a, use-b`
 
 After the metadata header, the remaining body text is condensed into the source excerpt.
+
+Provider notes:
+
+- The API default retrieval provider is `source_registry`, which is local and deterministic.
+- WatsonX retrieval is optional legacy support selected with `RAG_PROVIDER=watsonx`.
+- Embeddings and vector databases are not required for the current default path.

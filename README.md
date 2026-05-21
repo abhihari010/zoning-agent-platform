@@ -17,15 +17,17 @@ The frontend is designed to connect those stages together visibly for the user, 
 - downloadable permit checklist
 - prominent legal disclaimer
 
-## Roadmap: Moving Beyond IBM watsonx
+## Provider-Agnostic Operation and Roadmap
 
-The next version should keep the useful shape of the original system, but remove the hard dependency on IBM watsonx. The goal is to make the app a provider-agnostic zoning assistant: it should support local source ingestion, pluggable LLM providers, richer retrieval, broader geography, and a more polished user workflow.
+The current backend defaults to a provider-agnostic local mode: deterministic analysis with source-registry retrieval. That default does not require IBM watsonx credentials or any other external AI provider. WatsonX support remains available only as an optional legacy adapter selected with `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`.
+
+The roadmap keeps the useful shape of the original system while expanding beyond a single provider. The goal is a zoning assistant that supports local source ingestion, pluggable LLM providers, richer retrieval, broader geography, and a more polished user workflow.
 
 ### Guiding Principles
 
 - Keep zoning answers citation-first. Every recommendation should link back to source text, effective dates, jurisdiction, and section references.
 - Treat AI output as assisted drafting, not legal authority. The app should always explain uncertainty and route low-confidence cases to human review.
-- Separate the agent workflow from the model provider. The same three-agent flow should work with OpenAI, Anthropic, local models, or deterministic fallback logic.
+- Separate the agent workflow from the model provider. The same three-agent flow should work with future hosted providers, local models, or deterministic fallback logic.
 - Make geography configurable. Blacksburg should become the first supported jurisdiction, not a hard-coded boundary.
 - Design for expansion through source data, not one-off conditionals. Adding a city should mostly mean adding jurisdiction metadata, parcel/district mapping, and ordinance documents.
 
@@ -54,31 +56,32 @@ The next version should keep the useful shape of the original system, but remove
    - Shows confidence, source coverage, unresolved questions, and user feedback.
    - Stores traces so bad answers can be debugged and improved.
 
-### Phase 1: Decouple watsonx From the Backend
+### Phase 1: Provider Boundary Foundation
 
-Current code routes Watson-specific retrieval and generation through `apps/api/app/watsonx_client.py`. The first migration should introduce a provider-neutral interface instead of directly calling watsonx from `services.py`.
+Phase 1 is implemented in the current codebase. The backend now routes analysis and retrieval through provider-neutral interfaces in `apps/api/app/ai/`, while `apps/api/app/services.py` preserves the existing `AnalyzeResult` response shape consumed by the frontend.
 
-Recommended steps:
+Implemented provider settings:
 
-1. Create an `app/ai/` module with interfaces such as:
-   - `LLMClient.generate_structured_analysis(...)`
-   - `Retriever.search(query, filters)`
-   - `EmbeddingClient.embed(texts)`
-2. Move the existing watsonx code behind a `WatsonXProvider`.
-3. Add at least one new provider:
-   - `OpenAIProvider` for hosted LLM calls, or
-   - `LocalProvider` for local/Ollama-style development, or
-   - `MockProvider` for tests and offline demos.
-4. Replace `WATSONX_ENABLED` with a generic setting:
-   - `AI_PROVIDER=deterministic|openai|watsonx|local`
-   - `RAG_PROVIDER=local|watsonx|chroma|pgvector`
-5. Keep deterministic analysis as the offline safety net.
+- `AI_PROVIDER=deterministic|watsonx`
+- `RAG_PROVIDER=source_registry|watsonx`
 
-Success criteria:
+Default behavior:
 
-- The app runs with no IBM credentials.
-- Tests can run without network calls.
-- The frontend still receives the same `AnalyzeResult` response shape.
+- `AI_PROVIDER=deterministic`
+- `RAG_PROVIDER=source_registry`
+- no WatsonX credentials required
+- missing citations force an `unknown` or low-confidence result instead of a high-confidence zoning conclusion
+
+WatsonX behavior:
+
+- WatsonX is optional legacy support behind `apps/api/app/ai/watsonx_provider.py`.
+- Missing WatsonX credentials only matter when `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`.
+- If WatsonX analysis fails after retrieval, the backend falls back to deterministic analysis and adds a warning.
+
+Phase 1 reference docs:
+
+- `docs/agent-agnostic-zoning-platform/spec.md`
+- `docs/agent-agnostic-zoning-platform/plan.md`
 
 ### Phase 2: Build a Real Local RAG Pipeline
 
@@ -193,17 +196,15 @@ Success criteria:
 - Admins can see what source coverage exists before trusting the assistant.
 - The experience works for incomplete or unsupported cases, not just happy paths.
 
-### Suggested First Sprint
+### Suggested Next Sprint
 
-Start with a narrow, useful sprint that removes the biggest blocker: needing watsonx credentials.
+The provider boundary foundation is in place. The next narrow sprint should improve deterministic local retrieval before adding embeddings or hosted model providers.
 
-1. Add provider-neutral AI interfaces.
-2. Add a mock/local LLM provider for development.
-3. Replace direct `is_watsonx_enabled()` checks in `services.py` with provider selection.
-4. Add ChromaDB or another local vector store behind a retrieval interface.
-5. Ingest the existing sample documents into the new retrieval path.
-6. Update tests so they prove the app works without IBM credentials.
-7. Rename visible "IBM" product copy after the backend no longer depends on IBM services.
+1. Make `/api/v1/ingestion/reindex` build stable local chunk records from registered sources.
+2. Store chunk metadata such as source ID, section reference, district tags, use tags, URL, and effective date.
+3. Keep retrieval deterministic and local while the chunk model settles.
+4. Add tests for stable chunk IDs and source metadata.
+5. Defer embeddings, vector search, and new LLM providers until the chunked source index exists.
 
 ### Open Technical Decisions
 
@@ -215,15 +216,15 @@ Start with a narrow, useful sprint that removes the biggest blocker: needing wat
 
 ### Near-Term Implementation Checklist
 
-- [ ] Create `apps/api/app/ai/` provider interfaces.
-- [ ] Add `AI_PROVIDER` and `RAG_PROVIDER` settings.
-- [ ] Wrap the existing watsonx client as one optional provider.
-- [ ] Add an offline mock provider for tests and development.
+- [x] Create `apps/api/app/ai/` provider interfaces.
+- [x] Add `AI_PROVIDER` and `RAG_PROVIDER` settings.
+- [x] Wrap the existing watsonx client as one optional legacy provider.
+- [x] Add deterministic/local providers for tests and development.
+- [x] Update tests so the backend works without external AI credentials.
+- [x] Rework package and user-facing copy away from IBM-specific product naming.
+- [ ] Implement real document chunking and indexing.
 - [ ] Replace hard-coded Blacksburg-only validation with jurisdiction support states.
 - [ ] Add jurisdiction metadata to source registry entries.
-- [ ] Implement real document chunking and indexing.
-- [ ] Add retrieval tests with sample zoning documents.
-- [ ] Rework UI copy and branding away from IBM-specific naming.
 - [ ] Add UI indicators for jurisdiction, source coverage, and confidence.
 
 ## Structure
@@ -247,10 +248,17 @@ Start with a narrow, useful sprint that removes the biggest blocker: needing wat
 2. `python -m venv .venv`
 3. `.venv\\Scripts\\activate`
 4. `pip install -e .[dev]`
-5. From the repo root, copy `.env.example` to `.env` and fill in your credentials
+5. Optional: from the repo root, copy `.env.example` to `.env` if you want persistent local settings
 6. `uvicorn app.main:app --reload --port 8000`
 
-Set environment variables before starting the API:
+The default backend provider mode runs without WatsonX credentials:
+
+- `AI_PROVIDER=deterministic`
+- `RAG_PROVIDER=source_registry`
+
+Google Maps is still required for live address intake and suggestions. Backend tests can run without a `.env` file because they mock external calls.
+
+Set environment variables before starting the API when needed:
 
 - `GOOGLE_MAPS_API_KEY`: required Google Maps API key with Geocoding and Places enabled
 - `GOOGLE_MAPS_TIMEOUT_SECONDS`: optional timeout (default `8`)
@@ -260,12 +268,16 @@ Set environment variables before starting the API:
 - `GOOGLE_DISTRICT_KEYWORD_MAP`: optional JSON mapping used when district cannot be inferred from components, example:
   - `{"downtown":"mixed-use-core","industrial":"industrial-zone"}`
 - `IBM_ZONING_DB_PATH`: legacy fallback for `ZONING_DB_PATH` during migration
+- `WATSONX_ENABLED`: legacy compatibility flag that selects WatsonX providers when set to a truthy value; prefer `AI_PROVIDER` and `RAG_PROVIDER` for new setup
 - `WATSONX_API_KEY`: required when `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`
 - `WATSONX_URL`: required when `AI_PROVIDER=watsonx` (example `https://us-south.ml.cloud.ibm.com`)
+- `WATSONX_PLATFORM_URL`: optional IBM Cloud IAM URL override for WatsonX retrieval
 - `WATSONX_PROJECT_ID`: required when `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`
 - `WATSONX_VECTOR_INDEX_ID`: required when `RAG_PROVIDER=watsonx`
 - `WATSONX_MODEL_ID`: required when `AI_PROVIDER=watsonx`
 - `WATSONX_TIMEOUT_SECONDS`: optional timeout for IAM + inference (default `20`)
+- `WATSONX_MAX_ATTEMPTS`: optional retry attempts for WatsonX HTTP calls (default `3`)
+- `WATSONX_RETRY_DELAY_SECONDS`: optional backoff base delay for WatsonX retries (default `0.6`)
 
 `.env` loading:
 
@@ -291,8 +303,11 @@ Available API additions:
 
 Analysis behavior:
 
+- If no provider variables are set, analysis uses deterministic local logic and retrieval uses the source registry.
 - If `AI_PROVIDER=watsonx`, analysis attempts watsonx model inference.
+- If `RAG_PROVIDER=watsonx`, retrieval attempts the WatsonX vector index.
 - If watsonx call fails, backend falls back to deterministic analysis and records a warning.
+- If retrieval returns no citations, the backend returns an `unknown` or low-confidence result and recommends human planning review.
 - `POST /api/v1/projects/{project_id}/analyze` also accepts `clarification_answers`, allowing the frontend to pause for follow-up questions and re-run the orchestration with added user detail.
 
 Run backend tests:

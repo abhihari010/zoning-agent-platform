@@ -1,6 +1,12 @@
 node_modules/
 dist/
 .venv/
+
+# Local agent/skill configuration should stay private.
+.agents/
+.codex/
+skills-lock.json
+
 __pycache__/
 .pytest_cache/
 .env

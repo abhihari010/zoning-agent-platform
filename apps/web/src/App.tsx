@@ -90,6 +90,46 @@ function statusTone(status: AgentReport["status"], isActive: boolean): string {
   return "border-slate-200 bg-white";
 }
 
+function confidenceLabel(confidence: number): string {
+  if (confidence >= 0.75) {
+    return "Strong";
+  }
+  if (confidence >= 0.6) {
+    return "Moderate";
+  }
+  return "Needs review";
+}
+
+function confidenceTone(confidence: number, citationCount: number): string {
+  if (citationCount === 0 || confidence < 0.6) {
+    return "border-red-200 bg-red-50 text-red-900";
+  }
+  if (confidence < 0.75) {
+    return "border-amber-200 bg-amber-50 text-amber-900";
+  }
+  return "border-emerald-200 bg-emerald-50 text-emerald-900";
+}
+
+function evidenceTone(citationCount: number): string {
+  if (citationCount === 0) {
+    return "border-red-200 bg-red-50 text-red-900";
+  }
+  if (citationCount < 2) {
+    return "border-amber-200 bg-amber-50 text-amber-900";
+  }
+  return "border-emerald-200 bg-emerald-50 text-emerald-900";
+}
+
+function evidenceLabel(citationCount: number): string {
+  if (citationCount === 0) {
+    return "No cited sources";
+  }
+  if (citationCount === 1) {
+    return "1 cited source";
+  }
+  return `${citationCount} cited sources`;
+}
+
 function buildChecklistDownload(
   intake: IntakeResponse | null,
   result: AnalyzeResponse,
@@ -538,7 +578,7 @@ export function App() {
       setReindexMessage("");
       const summary = await reindexSources();
       setReindexMessage(
-        `Reindex ${summary.status}. ${summary.sourceCount} sources are currently registered.`,
+        `Reindex ${summary.status}. ${summary.sourceCount} sources produced ${summary.chunkCount} chunks.`,
       );
       await refreshSources();
     } catch (reindexError) {
@@ -868,30 +908,54 @@ export function App() {
                         </div>
                       </div>
 
-                      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                      <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                           <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Status</p>
                           <p className="mt-2 font-semibold text-slate-900">
                             {result.status.replace("_", " ")}
                           </p>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">District</p>
-                          <p className="mt-2 font-semibold text-slate-900">
-                            {intake?.district.replace(/-/g, " ") ?? "Unknown"}
+                        <div
+                          className={`rounded-2xl border p-4 ${confidenceTone(
+                            result.feasibility.confidence,
+                            result.citations.length,
+                          )}`}
+                        >
+                          <p className="text-xs uppercase tracking-[0.18em] opacity-75">Reliability</p>
+                          <p className="mt-2 font-semibold">
+                            {confidenceLabel(result.feasibility.confidence)}
                           </p>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Trace</p>
-                          <p className="mt-2 break-all text-xs text-slate-700">{result.traceId}</p>
+                        <div className={`rounded-2xl border p-4 ${evidenceTone(result.citations.length)}`}>
+                          <p className="text-xs uppercase tracking-[0.18em] opacity-75">Evidence</p>
+                          <p className="mt-2 font-semibold">{evidenceLabel(result.citations.length)}</p>
+                        </div>
+                        <div
+                          className={`rounded-2xl border p-4 ${
+                            result.warnings.length > 0
+                              ? "border-amber-200 bg-amber-50 text-amber-900"
+                              : "border-slate-200 bg-slate-50 text-slate-900"
+                          }`}
+                        >
+                          <p className="text-xs uppercase tracking-[0.18em] opacity-75">Warnings</p>
+                          <p className="mt-2 font-semibold">
+                            {result.warnings.length === 0
+                              ? "None"
+                              : `${result.warnings.length} signal${result.warnings.length === 1 ? "" : "s"}`}
+                          </p>
                         </div>
                       </div>
 
                       {result.warnings.length > 0 && (
-                        <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                          {result.warnings.slice(0, 2).map((warning) => (
-                            <p key={warning}>{warning}</p>
-                          ))}
+                        <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+                          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-800">
+                            Review before relying
+                          </p>
+                          <ul className="mt-3 space-y-2 leading-6">
+                            {result.warnings.map((warning) => (
+                              <li key={warning}>{warning}</li>
+                            ))}
+                          </ul>
                         </div>
                       )}
 
@@ -906,19 +970,34 @@ export function App() {
 
                     <section className="rounded-[28px] border border-pine/10 bg-slate-50/80 p-6 shadow-card">
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-                        Next Move
+                        Evidence Snapshot
                       </p>
                       <p className="mt-3 text-sm leading-6 text-slate-700">
-                        Save the current permit path and bring it into the next planning conversation.
+                        The answer is only as strong as the source coverage returned for this district and use.
                       </p>
-                      <button
-                        type="button"
-                        onClick={downloadChecklist}
-                        className="mt-5 w-full rounded-2xl bg-pine px-4 py-3 font-semibold text-white"
-                      >
-                        Download checklist
-                      </button>
-                      <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
+                      <div className={`mt-5 rounded-2xl border p-4 ${evidenceTone(result.citations.length)}`}>
+                        <p className="text-xs uppercase tracking-[0.18em] opacity-75">Source coverage</p>
+                        <p className="mt-2 text-lg font-semibold">{evidenceLabel(result.citations.length)}</p>
+                        <p className="mt-2 text-sm leading-6">
+                          {result.citations.length === 0
+                            ? "No ordinance excerpts were retrieved, so the result should be treated as a planning-office handoff."
+                            : "Each cited source is available in the Evidence tab for review."}
+                        </p>
+                      </div>
+                      {result.citations.length > 0 && (
+                        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+                          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
+                            Primary citation
+                          </p>
+                          <p className="mt-2 text-sm font-semibold text-slate-900">
+                            {result.citations[0].title}
+                          </p>
+                          <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                            {result.citations[0].sectionRef}
+                          </p>
+                        </div>
+                      )}
+                      <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
                         <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Permit path</p>
                         <p className="mt-2 text-sm font-semibold text-slate-900">
                           {result.checklist.steps.length} step{result.checklist.steps.length === 1 ? "" : "s"}
@@ -929,6 +1008,13 @@ export function App() {
                             : "No explicit permit names were returned."}
                         </p>
                       </div>
+                      <button
+                        type="button"
+                        onClick={downloadChecklist}
+                        className="mt-5 w-full rounded-2xl bg-pine px-4 py-3 font-semibold text-white"
+                      >
+                        Download checklist
+                      </button>
                     </section>
                   </div>
 
@@ -1032,8 +1118,12 @@ export function App() {
                               </article>
                             ))
                           ) : (
-                            <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
-                              No source excerpts were retrieved for this request.
+                            <div className="rounded-[24px] border border-red-200 bg-red-50 p-5 text-sm text-red-900">
+                              <p className="font-semibold">No source excerpts were retrieved.</p>
+                              <p className="mt-2 leading-6">
+                                The zoning answer should stay unknown or low confidence until a planner verifies the parcel,
+                                district, permitted use table, and recent amendments.
+                              </p>
                             </div>
                           )}
                         </div>

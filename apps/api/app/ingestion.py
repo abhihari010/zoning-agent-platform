@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
 
-from app.models import SourceRegistryEntry
+from app.models import SourceChunk, SourceRegistryEntry
 
 
 def _resolve_default_docs_path() -> Path:
@@ -16,6 +17,7 @@ def _resolve_default_docs_path() -> Path:
 
 DEFAULT_INGESTION_DOCS_PATH = _resolve_default_docs_path()
 SUPPORTED_FILE_SUFFIXES = {".md", ".txt", ".json"}
+DEFAULT_CHUNK_MAX_CHARS = 900
 
 
 def _slugify(text: str) -> str:
@@ -29,6 +31,57 @@ def _parse_csv_field(value: str) -> list[str]:
 def _extract_excerpt(body: str) -> str:
     normalized = " ".join(body.split())
     return normalized[:500]
+
+
+def _chunk_text(text: str, max_chars: int = DEFAULT_CHUNK_MAX_CHARS) -> list[str]:
+    normalized = " ".join(text.split())
+    if len(normalized) <= max_chars:
+        return [normalized] if normalized else []
+
+    chunks: list[str] = []
+    words = normalized.split()
+    current: list[str] = []
+
+    for word in words:
+        candidate = " ".join([*current, word])
+        if current and len(candidate) > max_chars:
+            chunks.append(" ".join(current))
+            current = [word]
+        else:
+            current.append(word)
+
+    if current:
+        chunks.append(" ".join(current))
+    return chunks
+
+
+def build_source_chunks(sources: list[SourceRegistryEntry]) -> list[SourceChunk]:
+    chunks: list[SourceChunk] = []
+
+    for source in sorted(sources, key=lambda item: item.source_id):
+        source_text = " ".join(source.excerpt.split())
+        source_text_hash = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
+
+        for index, chunk_text in enumerate(_chunk_text(source_text)):
+            stable_key = f"{source.source_id}|{source.section_ref}|{index}"
+            digest = hashlib.sha256(stable_key.encode("utf-8")).hexdigest()[:16]
+            chunks.append(
+                SourceChunk(
+                    chunk_id=f"{source.source_id}:chunk:{digest}",
+                    source_id=source.source_id,
+                    title=source.title,
+                    chunk_text=chunk_text,
+                    chunk_index=index,
+                    source_text_hash=source_text_hash,
+                    section_ref=source.section_ref,
+                    url=source.url,
+                    effective_date=source.effective_date,
+                    districts=source.districts,
+                    uses=source.uses,
+                )
+            )
+
+    return chunks
 
 
 def _parse_text_document(path: Path) -> SourceRegistryEntry:
