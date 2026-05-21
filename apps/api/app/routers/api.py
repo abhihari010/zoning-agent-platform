@@ -18,6 +18,8 @@ from app.models import (
     LocalDocumentImportResponse,
     ProjectRecord,
     ReindexResponse,
+    SourceIndexStatusResponse,
+    SourceMetadataHealth,
     SourceRegistryListResponse,
     SourceRegistryUpsertRequest,
     SessionCreateResponse,
@@ -162,6 +164,28 @@ def upsert_source(payload: SourceRegistryUpsertRequest) -> SourceRegistryListRes
     return SourceRegistryListResponse(sources=store.list_sources())
 
 
+@router.get("/ingestion/status", response_model=SourceIndexStatusResponse)
+def ingestion_status() -> SourceIndexStatusResponse:
+    ensure_seed_sources()
+    sources = store.list_sources()
+    chunk_count = store.get_source_chunk_count()
+    return SourceIndexStatusResponse(
+        source_count=len(sources),
+        chunk_count=chunk_count,
+        has_index=chunk_count > 0,
+        last_import_at=store.get_latest_audit_timestamp("source.import.completed"),
+        last_reindex_at=store.get_latest_audit_timestamp("source.reindex.completed"),
+        sources_missing_metadata=[
+            SourceMetadataHealth(
+                source_id=source.source_id,
+                missing_fields=_missing_source_metadata(source),
+            )
+            for source in sources
+            if _missing_source_metadata(source)
+        ],
+    )
+
+
 @router.post("/ingestion/reindex", response_model=ReindexResponse)
 def reindex_sources() -> ReindexResponse:
     ensure_seed_sources()
@@ -219,3 +243,16 @@ def feedback(project_id: UUID, payload: FeedbackRequest):
 @router.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+def _missing_source_metadata(source) -> list[str]:
+    missing: list[str] = []
+    if not source.url:
+        missing.append("url")
+    if not source.effective_date:
+        missing.append("effective_date")
+    if not source.districts:
+        missing.append("districts")
+    if not source.uses:
+        missing.append("uses")
+    return missing

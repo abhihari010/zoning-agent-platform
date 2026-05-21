@@ -30,6 +30,18 @@ export interface SourceRegistryEntry {
   uses: string[];
 }
 
+export interface SourceIndexStatus {
+  sourceCount: number;
+  chunkCount: number;
+  hasIndex: boolean;
+  lastImportAt?: string | null;
+  lastReindexAt?: string | null;
+  sourcesMissingMetadata: Array<{
+    sourceId: string;
+    missingFields: string[];
+  }>;
+}
+
 export interface LocalDocumentImportResult {
   status: string;
   importedCount: number;
@@ -289,6 +301,37 @@ export async function listSources(): Promise<SourceRegistryEntry[]> {
     }>;
   };
   return payload.sources.map(mapSourceEntry);
+}
+
+export async function fetchSourceIndexStatus(): Promise<SourceIndexStatus> {
+  const response = await fetch(`${API_BASE}/ingestion/status`);
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Failed to load source index status"));
+  }
+
+  const payload = (await response.json()) as {
+    source_count: number;
+    chunk_count: number;
+    has_index: boolean;
+    last_import_at?: string | null;
+    last_reindex_at?: string | null;
+    sources_missing_metadata: Array<{
+      source_id: string;
+      missing_fields: string[];
+    }>;
+  };
+
+  return {
+    sourceCount: payload.source_count,
+    chunkCount: payload.chunk_count,
+    hasIndex: payload.has_index,
+    lastImportAt: payload.last_import_at,
+    lastReindexAt: payload.last_reindex_at,
+    sourcesMissingMetadata: payload.sources_missing_metadata.map((source) => ({
+      sourceId: source.source_id,
+      missingFields: source.missing_fields,
+    })),
+  };
 }
 
 export async function saveSource(

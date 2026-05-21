@@ -283,5 +283,22 @@ class SQLiteStore:
             row = connection.execute("SELECT COUNT(*) AS count FROM source_chunks").fetchone()
         return int(row["count"]) if row else 0
 
+    def get_latest_audit_timestamp(self, stage: str) -> datetime | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT created_at
+                FROM audit_events
+                WHERE stage = ?
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (stage,),
+            ).fetchone()
+
+        if not row:
+            return None
+        return datetime.fromisoformat(row["created_at"])
+
 
 store = SQLiteStore()

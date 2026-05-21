@@ -62,8 +62,9 @@ Phase 1 is implemented in the current codebase. The backend now routes analysis 
 
 Implemented provider settings:
 
-- `AI_PROVIDER=deterministic|watsonx`
-- `RAG_PROVIDER=source_registry|watsonx`
+- `AI_PROVIDER=deterministic|openai|watsonx`
+- `RAG_PROVIDER=source_registry|hybrid_local|watsonx`
+- `EMBEDDING_PROVIDER=none|local|openai`
 
 Default behavior:
 
@@ -71,12 +72,19 @@ Default behavior:
 - `RAG_PROVIDER=source_registry`
 - no WatsonX credentials required
 - missing citations force an `unknown` or low-confidence result instead of a high-confidence zoning conclusion
+- `hybrid_local` can retrieve from indexed chunks with deterministic local embeddings when enabled
 
 WatsonX behavior:
 
 - WatsonX is optional legacy support behind `apps/api/app/ai/watsonx_provider.py`.
 - Missing WatsonX credentials only matter when `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`.
 - If WatsonX analysis fails after retrieval, the backend falls back to deterministic analysis and adds a warning.
+
+OpenAI behavior:
+
+- OpenAI analysis is optional and selected with `AI_PROVIDER=openai`.
+- OpenAI embeddings are optional and selected with `EMBEDDING_PROVIDER=openai`.
+- Tests and local defaults do not require OpenAI credentials.
 
 Phase 1 reference docs:
 
@@ -222,10 +230,12 @@ The provider boundary foundation is in place. The next narrow sprint should impr
 - [x] Add deterministic/local providers for tests and development.
 - [x] Update tests so the backend works without external AI credentials.
 - [x] Rework package and user-facing copy away from IBM-specific product naming.
-- [ ] Implement real document chunking and indexing.
-- [ ] Replace hard-coded Blacksburg-only validation with jurisdiction support states.
+- [x] Implement real document chunking and indexing.
+- [x] Replace hard-coded Blacksburg-only validation with jurisdiction support states.
+- [x] Add UI indicators for source coverage, index status, and confidence.
+- [x] Add structured zoning fact intake fields.
+- [x] Add optional external provider seams for OpenAI analysis and embeddings.
 - [ ] Add jurisdiction metadata to source registry entries.
-- [ ] Add UI indicators for jurisdiction, source coverage, and confidence.
 
 ## Structure
 
@@ -263,8 +273,14 @@ Set environment variables before starting the API when needed:
 - `GOOGLE_MAPS_API_KEY`: required Google Maps API key with Geocoding and Places enabled
 - `GOOGLE_MAPS_TIMEOUT_SECONDS`: optional timeout (default `8`)
 - `ZONING_DB_PATH`: optional SQLite database path for persistent API storage (default `apps/api/app/data/app.sqlite3`)
-- `AI_PROVIDER`: optional analysis provider (`deterministic` or `watsonx`, default `deterministic`)
-- `RAG_PROVIDER`: optional retrieval provider (`source_registry` or `watsonx`, default `source_registry`)
+- `AI_PROVIDER`: optional analysis provider (`deterministic`, `openai`, or `watsonx`, default `deterministic`)
+- `RAG_PROVIDER`: optional retrieval provider (`source_registry`, `hybrid_local`, or `watsonx`, default `source_registry`)
+- `EMBEDDING_PROVIDER`: optional embedding provider (`none`, `local`, or `openai`, default `none`)
+- `EMBEDDING_MODEL`: model name used when `EMBEDDING_PROVIDER=openai`
+- `OPENAI_API_KEY`: required when `AI_PROVIDER=openai` or `EMBEDDING_PROVIDER=openai`
+- `OPENAI_MODEL`: model name used when `AI_PROVIDER=openai`
+- `OPENAI_BASE_URL`: optional OpenAI-compatible API base URL
+- `OPENAI_TIMEOUT_SECONDS`: optional timeout for OpenAI HTTP calls
 - `GOOGLE_DISTRICT_KEYWORD_MAP`: optional JSON mapping used when district cannot be inferred from components, example:
   - `{"downtown":"mixed-use-core","industrial":"industrial-zone"}`
 - `IBM_ZONING_DB_PATH`: legacy fallback for `ZONING_DB_PATH` during migration
@@ -299,11 +315,14 @@ Available API additions:
 - `GET /api/v1/ingestion/sources`: list persistent source registry entries
 - `POST /api/v1/ingestion/sources`: create or update a source registry entry
 - `POST /api/v1/ingestion/reindex`: request source reindex
+- `GET /api/v1/ingestion/status`: inspect source count, chunk count, index status, and source metadata health
 - `POST /api/v1/ingestion/import-local-docs`: parse local `.md`, `.txt`, or `.json` documents into source entries
 
 Analysis behavior:
 
 - If no provider variables are set, analysis uses deterministic local logic and retrieval uses the source registry.
+- If `AI_PROVIDER=openai`, analysis attempts an OpenAI Responses API structured-output call.
+- If `RAG_PROVIDER=hybrid_local`, retrieval ranks indexed chunks with metadata, keyword overlap, and optional embeddings.
 - If `AI_PROVIDER=watsonx`, analysis attempts watsonx model inference.
 - If `RAG_PROVIDER=watsonx`, retrieval attempts the WatsonX vector index.
 - If watsonx call fails, backend falls back to deterministic analysis and records a warning.

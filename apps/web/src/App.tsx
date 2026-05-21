@@ -8,6 +8,7 @@ import type {
 import {
   analyzeProject,
   createSession,
+  fetchSourceIndexStatus,
   fetchTrace,
   importLocalDocuments,
   intakeProject,
@@ -17,6 +18,7 @@ import {
   suggestAddresses,
   submitFeedback,
   type IntakeResponse,
+  type SourceIndexStatus,
   type SourceRegistryEntry,
 } from "./api";
 
@@ -27,6 +29,15 @@ type Workspace = "assistant" | "admin";
 type Phase = "idle" | "intake" | "analyzing" | "done" | "error";
 type FeedbackState = "idle" | "submitting" | "submitted";
 type ResultView = "checklist" | "evidence" | "trace";
+
+interface IntakeFacts {
+  useType: string;
+  constructionScope: string;
+  operatingHours: string;
+  employeeCount: string;
+  parkingLoading: string;
+  foodFireHealth: boolean;
+}
 
 function emptySourceForm(): SourceRegistryEntry {
   return {
@@ -46,6 +57,48 @@ function parseTagList(value: string): string[] {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function emptyIntakeFacts(): IntakeFacts {
+  return {
+    useType: "",
+    constructionScope: "",
+    operatingHours: "",
+    employeeCount: "",
+    parkingLoading: "",
+    foodFireHealth: false,
+  };
+}
+
+function buildProjectContext(projectDescription: string, facts: IntakeFacts): string {
+  const factLines = [
+    ["Use type", facts.useType],
+    ["Construction scope", facts.constructionScope],
+    ["Operating hours", facts.operatingHours],
+    ["Number of employees", facts.employeeCount],
+    ["Parking/loading", facts.parkingLoading],
+    ["Food/fire/health triggers", facts.foodFireHealth ? "Yes" : ""],
+  ]
+    .filter(([, value]) => value.trim())
+    .map(([label, value]) => `- ${label}: ${value.trim()}`);
+
+  if (factLines.length === 0) {
+    return projectDescription.trim();
+  }
+
+  return [
+    projectDescription.trim(),
+    "",
+    "Structured zoning facts:",
+    ...factLines,
+  ].join("\n");
+}
+
+function formatDateTime(value?: string | null): string {
+  if (!value) {
+    return "Not recorded";
+  }
+  return new Date(value).toLocaleString();
 }
 
 function decisionLabel(decision: AnalyzeResponse["feasibility"]["decision"]): string {
@@ -168,6 +221,7 @@ export function App() {
   const [workspace, setWorkspace] = useState<Workspace>("assistant");
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
   const [projectDescription, setProjectDescription] = useState("");
+  const [intakeFacts, setIntakeFacts] = useState<IntakeFacts>(emptyIntakeFacts);
   const [address, setAddress] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
@@ -189,6 +243,7 @@ export function App() {
   const [clarificationAnswers, setClarificationAnswers] = useState<Record<string, string>>({});
   const [clarificationSubmitting, setClarificationSubmitting] = useState(false);
   const [sources, setSources] = useState<SourceRegistryEntry[]>([]);
+  const [indexStatus, setIndexStatus] = useState<SourceIndexStatus | null>(null);
   const [sourcesLoading, setSourcesLoading] = useState(false);
   const [sourceForm, setSourceForm] = useState<SourceRegistryEntry>(emptySourceForm);
   const [sourceMessage, setSourceMessage] = useState("");
@@ -285,9 +340,13 @@ export function App() {
     async function loadSources() {
       try {
         setSourcesLoading(true);
-        const nextSources = await listSources();
+        const [nextSources, nextIndexStatus] = await Promise.all([
+          listSources(),
+          fetchSourceIndexStatus(),
+        ]);
         if (!cancelled) {
           setSources(nextSources);
+          setIndexStatus(nextIndexStatus);
         }
       } catch (loadError) {
         if (!cancelled) {
@@ -356,6 +415,11 @@ export function App() {
     return Array.from(new Set(prompts));
   }, [intake, result]);
 
+  const sourceHealthById = useMemo(() => {
+    const entries = indexStatus?.sourcesMissingMetadata ?? [];
+    return new Map(entries.map((source) => [source.sourceId, source.missingFields]));
+  }, [indexStatus]);
+
   function selectSuggestion(option: string) {
     setAddress(option);
     setSuggestions([]);
@@ -394,8 +458,12 @@ export function App() {
   }
 
   async function refreshSources(message?: string) {
-    const nextSources = await listSources();
+    const [nextSources, nextIndexStatus] = await Promise.all([
+      listSources(),
+      fetchSourceIndexStatus(),
+    ]);
     setSources(nextSources);
+    setIndexStatus(nextIndexStatus);
     if (message) {
       setSourceMessage(message);
     }
@@ -442,9 +510,10 @@ export function App() {
     try {
       setPhase("intake");
       const sessionId = await createSession();
+      const projectContext = buildProjectContext(projectDescription, intakeFacts);
       const intakeResult = await intakeProject({
         session_id: sessionId,
-        project_description: projectDescription.trim(),
+        project_description: projectContext,
         address: address.trim(),
       });
       setIntake(intakeResult);
@@ -529,9 +598,10 @@ export function App() {
       return;
     }
 
-    const blob = new Blob([buildChecklistDownload(intake, result, projectDescription)], {
-      type: "text/plain;charset=utf-8",
-    });
+    const blob = new Blob(
+      [buildChecklistDownload(intake, result, buildProjectContext(projectDescription, intakeFacts))],
+      { type: "text/plain;charset=utf-8" },
+    );
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -562,6 +632,7 @@ export function App() {
         sectionRef: sourceForm.sectionRef.trim(),
       });
       setSources(saved);
+      setIndexStatus(await fetchSourceIndexStatus());
       setSourceForm(emptySourceForm());
       setSourceMessage("Source saved.");
     } catch (saveError) {
@@ -623,6 +694,7 @@ export function App() {
   function resetWorkspace() {
     setAcceptedDisclaimer(false);
     setProjectDescription("");
+    setIntakeFacts(emptyIntakeFacts());
     setAddress("");
     setSuggestions([]);
     setActiveSuggestionIndex(-1);
@@ -758,6 +830,96 @@ export function App() {
                     placeholder="Example: Can I open a bakery out of my attached garage with two employees, weekday pickup hours, and limited interior renovation?"
                   />
                 </label>
+
+                <div className="mb-4 grid gap-4 rounded-3xl border border-slate-200 bg-slate-50/70 p-4 md:grid-cols-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Use type
+                    <select
+                      className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
+                      value={intakeFacts.useType}
+                      onChange={(event) =>
+                        setIntakeFacts((current) => ({ ...current, useType: event.target.value }))
+                      }
+                    >
+                      <option value="">Select if known</option>
+                      <option value="Home-based food business">Home-based food business</option>
+                      <option value="Retail or service business">Retail or service business</option>
+                      <option value="Restaurant or cafe">Restaurant or cafe</option>
+                      <option value="Residential addition">Residential addition</option>
+                      <option value="General construction">General construction</option>
+                    </select>
+                  </label>
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Construction scope
+                    <input
+                      className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
+                      value={intakeFacts.constructionScope}
+                      onChange={(event) =>
+                        setIntakeFacts((current) => ({
+                          ...current,
+                          constructionScope: event.target.value,
+                        }))
+                      }
+                      placeholder="Interior renovation, addition, no construction"
+                    />
+                  </label>
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Operating hours
+                    <input
+                      className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
+                      value={intakeFacts.operatingHours}
+                      onChange={(event) =>
+                        setIntakeFacts((current) => ({
+                          ...current,
+                          operatingHours: event.target.value,
+                        }))
+                      }
+                      placeholder="Weekdays 8 AM to 5 PM"
+                    />
+                  </label>
+                  <label className="block text-sm font-semibold text-slate-700">
+                    Employees
+                    <input
+                      className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
+                      value={intakeFacts.employeeCount}
+                      onChange={(event) =>
+                        setIntakeFacts((current) => ({
+                          ...current,
+                          employeeCount: event.target.value,
+                        }))
+                      }
+                      placeholder="Owner only, 2 employees, unknown"
+                    />
+                  </label>
+                  <label className="block text-sm font-semibold text-slate-700 md:col-span-2">
+                    Parking/loading
+                    <input
+                      className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
+                      value={intakeFacts.parkingLoading}
+                      onChange={(event) =>
+                        setIntakeFacts((current) => ({
+                          ...current,
+                          parkingLoading: event.target.value,
+                        }))
+                      }
+                      placeholder="Existing driveway, deliveries twice weekly, customer pickup"
+                    />
+                  </label>
+                  <label className="flex items-start gap-3 text-sm font-semibold text-slate-700 md:col-span-2">
+                    <input
+                      className="mt-1 h-4 w-4 accent-clay"
+                      type="checkbox"
+                      checked={intakeFacts.foodFireHealth}
+                      onChange={(event) =>
+                        setIntakeFacts((current) => ({
+                          ...current,
+                          foodFireHealth: event.target.checked,
+                        }))
+                      }
+                    />
+                    Food, fire, or health department review may be triggered.
+                  </label>
+                </div>
 
                 <div ref={addressSectionRef}>
                   <label className="block text-sm font-semibold text-slate-700" htmlFor="address">
@@ -1375,6 +1537,51 @@ export function App() {
             <div className="space-y-6">
               <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                  Source Health
+                </p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Sources</p>
+                    <p className="mt-2 text-2xl font-semibold text-pine">
+                      {indexStatus?.sourceCount ?? sources.length}
+                    </p>
+                  </div>
+                  <div
+                    className={`rounded-2xl border p-4 ${
+                      indexStatus?.hasIndex
+                        ? "border-emerald-200 bg-emerald-50"
+                        : "border-amber-200 bg-amber-50"
+                    }`}
+                  >
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Index</p>
+                    <p className="mt-2 text-2xl font-semibold text-slate-900">
+                      {indexStatus?.chunkCount ?? 0} chunks
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Last import</p>
+                    <p className="mt-2 text-sm font-semibold text-slate-900">
+                      {formatDateTime(indexStatus?.lastImportAt)}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Last reindex</p>
+                    <p className="mt-2 text-sm font-semibold text-slate-900">
+                      {formatDateTime(indexStatus?.lastReindexAt)}
+                    </p>
+                  </div>
+                </div>
+                {indexStatus && indexStatus.sourcesMissingMetadata.length > 0 && (
+                  <p className="mt-4 text-sm leading-6 text-amber-900">
+                    {indexStatus.sourcesMissingMetadata.length} source
+                    {indexStatus.sourcesMissingMetadata.length === 1 ? "" : "s"} need metadata before the
+                    index is fully auditable.
+                  </p>
+                )}
+              </div>
+
+              <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
                   Source Editor
                 </p>
                 <div className="mt-4 space-y-4">
@@ -1543,6 +1750,25 @@ export function App() {
                       key={source.sourceId}
                       className="rounded-3xl border border-slate-200 bg-slate-50 p-5"
                     >
+                      {(() => {
+                        const missingFields = sourceHealthById.get(source.sourceId) ?? [];
+                        return missingFields.length > 0 ? (
+                          <div className="mb-3 flex flex-wrap gap-2">
+                            {missingFields.map((field) => (
+                              <span
+                                key={field}
+                                className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900"
+                              >
+                                Missing {field.replace(/_/g, " ")}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="mb-3 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900">
+                            Metadata complete
+                          </div>
+                        );
+                      })()}
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold text-slate-900">{source.title}</p>

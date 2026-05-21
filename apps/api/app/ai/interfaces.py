@@ -39,6 +39,16 @@ class RetrievalProviderResult:
     citations: list[SourceCitation]
 
 
+@dataclass(frozen=True)
+class EmbeddingProviderRequest:
+    texts: list[str]
+
+
+@dataclass(frozen=True)
+class EmbeddingProviderResult:
+    embeddings: list[list[float]]
+
+
 class AnalysisProvider(Protocol):
     name: str
 
@@ -51,3 +61,10 @@ class RetrievalProvider(Protocol):
 
     def retrieve(self, request: RetrievalProviderRequest) -> RetrievalProviderResult:
         """Retrieve zoning evidence for the project and jurisdiction context."""
+
+
+class EmbeddingProvider(Protocol):
+    name: str
+
+    def embed(self, request: EmbeddingProviderRequest) -> EmbeddingProviderResult:
+        """Return vector embeddings for text input, or an empty list when disabled."""

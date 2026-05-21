@@ -6,7 +6,10 @@ from pathlib import Path
 import pytest
 
 from app.ai.deterministic_provider import DeterministicAnalysisProvider
-from app.ai.interfaces import AnalysisProviderRequest, RetrievalProviderRequest
+from app.ai.embedding_provider import LocalHashEmbeddingProvider
+from app.ai.hybrid_local_retriever import HybridLocalRetrievalProvider
+from app.ai.interfaces import AnalysisProviderRequest, EmbeddingProviderRequest, RetrievalProviderRequest
+from app.ingestion import build_source_chunks
 from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider
 from app.ai.watsonx_provider import WatsonXAnalysisProvider, WatsonXRetrievalProvider
 from app.models import SourceRegistryEntry
@@ -68,6 +71,54 @@ def test_source_registry_retriever_filters_by_district_and_use() -> None:
         )
 
         assert [citation.source_id for citation in result.citations] == ["home-business"]
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_local_embedding_provider_is_deterministic() -> None:
+    provider = LocalHashEmbeddingProvider(dimensions=8)
+
+    first = provider.embed(EmbeddingProviderRequest(texts=["home bakery parking"])).embeddings[0]
+    second = provider.embed(EmbeddingProviderRequest(texts=["home bakery parking"])).embeddings[0]
+
+    assert first == second
+    assert len(first) == 8
+
+
+def test_hybrid_local_retriever_uses_indexed_chunks() -> None:
+    temp_dir = Path(__file__).resolve().parent / "_tmp_hybrid_sources"
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
+    temp_dir.mkdir(parents=True)
+
+    try:
+        source_store = SQLiteStore(temp_dir / "sources.sqlite3")
+        source_store.upsert_source(
+            SourceRegistryEntry(
+                source_id="bakery-rule",
+                title="Bakery Rule",
+                excerpt="Home occupation bakeries require parking and fire review.",
+                section_ref="Sec 10.2",
+                districts=["mixed-use-core"],
+                uses=["home-based-food-business"],
+            )
+        )
+        source_store.replace_source_chunks(build_source_chunks(source_store.list_sources()))
+
+        result = HybridLocalRetrievalProvider(
+            source_store,
+            embedding_provider=LocalHashEmbeddingProvider(),
+        ).retrieve(
+            RetrievalProviderRequest(
+                district="mixed-use-core",
+                inferred_use="home-based-food-business",
+                project_description="garage bakery parking",
+            )
+        )
+
+        assert result.citations
+        assert result.citations[0].source_id == "bakery-rule"
+        assert "parking" in result.citations[0].excerpt
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
