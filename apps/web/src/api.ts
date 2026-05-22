@@ -4,7 +4,9 @@ import type {
   FollowUpQuestion,
 } from "@zoning-agent/shared-schema";
 
-const DEFAULT_API_URL = "http://localhost:8000";
+const DEFAULT_API_URL = import.meta.env.PROD
+  ? "https://zoning-agent-api.onrender.com"
+  : "http://localhost:8000";
 
 const API_ORIGIN = (import.meta.env.VITE_API_URL ?? DEFAULT_API_URL).replace(/\/$/, "");
 const API_BASE = `${API_ORIGIN}/api/v1`;
