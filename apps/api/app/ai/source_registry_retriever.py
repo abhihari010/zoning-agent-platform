@@ -1,16 +1,29 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 from app.ai.interfaces import RetrievalProviderRequest, RetrievalProviderResult
-from app.models import SourceCitation, SourceRegistryEntry
+from app.ingestion import build_source_chunks
+from app.models import SourceChunk, SourceCitation, SourceRegistryEntry
+from app.settings import get_settings
 from app.storage import SQLiteStore, store
 
 
 SOURCE_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "data" / "source_registry.json"
+
+
+@dataclass(frozen=True)
+class SourceIndexReadiness:
+    source_count: int
+    chunk_count: int
+    index_ready: bool
+    stale_source_ids: list[str] = field(default_factory=list)
+    missing_chunk_source_ids: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
 
 
 @lru_cache(maxsize=1)
@@ -24,15 +37,118 @@ def _load_seed_source_registry() -> list[dict[str, Any]]:
 
 
 def ensure_seed_sources(source_store: SQLiteStore = store) -> None:
-    if source_store.get_source_count() > 0:
+    settings = get_settings()
+    if not settings.auto_seed_sources:
         return
 
+    version_stage = (
+        f"source.seed.registry_version.{settings.source_registry_version}"
+        if settings.source_registry_version
+        else ""
+    )
+    should_seed = source_store.get_source_count() == 0 or (
+        bool(version_stage) and source_store.get_latest_audit_timestamp(version_stage) is None
+    )
+    if not should_seed:
+        return
+
+    seeded_count = 0
     for source in _load_seed_source_registry():
         try:
             entry = SourceRegistryEntry.model_validate(source)
         except Exception:
             continue
         source_store.upsert_source(entry)
+        seeded_count += 1
+
+    if seeded_count:
+        source_store.audit("source.seed.completed", f"{seeded_count} sources")
+        if version_stage:
+            source_store.audit(version_stage, "source-registry")
+
+
+def ensure_source_index_ready(source_store: SQLiteStore = store) -> SourceIndexReadiness:
+    ensure_seed_sources(source_store)
+    sources = source_store.list_sources()
+    chunks = source_store.list_source_chunks()
+    expected_chunks = build_source_chunks(sources)
+    stale_source_ids = _stale_source_ids(expected_chunks, chunks)
+    missing_chunk_source_ids = _missing_chunk_source_ids(sources, chunks)
+    settings = get_settings()
+    should_reindex = bool(sources) and (
+        stale_source_ids
+        or (bool(missing_chunk_source_ids) and (bool(chunks) or settings.auto_reindex_on_empty))
+        or (settings.auto_reindex_on_empty and not chunks)
+    )
+
+    if should_reindex:
+        chunks = source_store.replace_source_chunks(expected_chunks)
+        source_store.audit(
+            "source.index.auto_reindex.completed",
+            _auto_reindex_reason(stale_source_ids, missing_chunk_source_ids),
+        )
+        stale_source_ids = _stale_source_ids(expected_chunks, chunks)
+        missing_chunk_source_ids = _missing_chunk_source_ids(sources, chunks)
+
+    warnings: list[str] = []
+    if not sources:
+        warnings.append("No source registry entries are available.")
+    if sources and not chunks:
+        warnings.append("No indexed source chunks are available.")
+    if stale_source_ids:
+        warnings.append("Some indexed source chunks are stale.")
+    if missing_chunk_source_ids:
+        warnings.append("Some source registry entries do not have indexed chunks.")
+
+    return SourceIndexReadiness(
+        source_count=len(sources),
+        chunk_count=len(chunks),
+        index_ready=bool(sources) and bool(chunks) and not stale_source_ids and not missing_chunk_source_ids,
+        stale_source_ids=stale_source_ids,
+        missing_chunk_source_ids=missing_chunk_source_ids,
+        warnings=warnings,
+    )
+
+
+def _expected_hash_by_source(chunks: list[SourceChunk]) -> dict[str, str]:
+    hashes: dict[str, str] = {}
+    for chunk in chunks:
+        hashes.setdefault(chunk.source_id, chunk.source_text_hash)
+    return hashes
+
+
+def _actual_hashes_by_source(chunks: list[SourceChunk]) -> dict[str, set[str]]:
+    hashes: dict[str, set[str]] = {}
+    for chunk in chunks:
+        hashes.setdefault(chunk.source_id, set()).add(chunk.source_text_hash)
+    return hashes
+
+
+def _stale_source_ids(expected_chunks: list[SourceChunk], chunks: list[SourceChunk]) -> list[str]:
+    expected = _expected_hash_by_source(expected_chunks)
+    actual = _actual_hashes_by_source(chunks)
+    return sorted(
+        source_id
+        for source_id, expected_hash in expected.items()
+        if source_id in actual and actual[source_id] != {expected_hash}
+    )
+
+
+def _missing_chunk_source_ids(
+    sources: list[SourceRegistryEntry],
+    chunks: list[SourceChunk],
+) -> list[str]:
+    chunk_source_ids = {chunk.source_id for chunk in chunks}
+    return sorted(source.source_id for source in sources if source.source_id not in chunk_source_ids)
+
+
+def _auto_reindex_reason(stale_source_ids: list[str], missing_chunk_source_ids: list[str]) -> str:
+    reasons: list[str] = []
+    if stale_source_ids:
+        reasons.append(f"stale={','.join(stale_source_ids)}")
+    if missing_chunk_source_ids:
+        reasons.append(f"missing={','.join(missing_chunk_source_ids)}")
+    return "; ".join(reasons) or "empty-index"
 
 
 class SourceRegistryRetrievalProvider:
@@ -42,7 +158,7 @@ class SourceRegistryRetrievalProvider:
         self.source_store = source_store
 
     def retrieve(self, request: RetrievalProviderRequest) -> RetrievalProviderResult:
-        ensure_seed_sources(self.source_store)
+        ensure_source_index_ready(self.source_store)
         hits: list[SourceCitation] = []
 
         for source in self.source_store.list_sources():

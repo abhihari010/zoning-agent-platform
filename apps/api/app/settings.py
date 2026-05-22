@@ -25,6 +25,13 @@ def _env(name: str, default: str = "") -> str:
     return os.getenv(name, default).strip()
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    value = _env(name)
+    if not value:
+        return default
+    return value.lower() in {"1", "true", "yes", "on"}
+
+
 def _provider_name(name: str, default: str, valid_values: set[str]) -> str:
     value = _env(name, default).lower()
     if value not in valid_values:
@@ -54,6 +61,9 @@ class Settings:
     watsonx_vector_index_id: str
     watsonx_timeout_seconds: float
     beta_access_key: str
+    auto_seed_sources: bool
+    auto_reindex_on_empty: bool
+    source_registry_version: str
 
     @property
     def uses_watsonx(self) -> bool:
@@ -105,6 +115,9 @@ def get_settings() -> Settings:
         watsonx_vector_index_id=_env("WATSONX_VECTOR_INDEX_ID"),
         watsonx_timeout_seconds=float(_env("WATSONX_TIMEOUT_SECONDS", "20")),
         beta_access_key=_env("BETA_ACCESS_KEY"),
+        auto_seed_sources=_env_bool("AUTO_SEED_SOURCES", True),
+        auto_reindex_on_empty=_env_bool("AUTO_REINDEX_ON_EMPTY", True),
+        source_registry_version=_env("SOURCE_REGISTRY_VERSION"),
     )
 
 

@@ -311,6 +311,67 @@ def test_ingestion_status_reports_index_and_source_health():
         "districts",
         "uses",
     }
+    assert body["index_ready"] is True
+    assert body["stale_source_ids"] == []
+    assert body["missing_chunk_source_ids"] == []
+
+
+def test_ingestion_status_auto_seeds_and_indexes_empty_database():
+    client = TestClient(app)
+
+    response = client.get("/api/v1/ingestion/status")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["source_count"] >= 3
+    assert body["chunk_count"] >= 3
+    assert body["has_index"] is True
+    assert body["index_ready"] is True
+    assert body["auto_seed_sources"] is True
+    assert body["auto_reindex_on_empty"] is True
+    assert body["readiness_warnings"] == []
+
+
+def test_ingestion_status_rebuilds_stale_chunks_after_source_change():
+    client = TestClient(app)
+
+    source_payload = {
+        "source": {
+            "source_id": "bakery-stale-rule",
+            "title": "Bakery Stale Rule",
+            "excerpt": "Home occupation bakeries require planning review and parking review.",
+            "section_ref": "Sec 4.2",
+            "jurisdiction_id": "blacksburg-va",
+            "url": "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
+            "effective_date": "2026-01-15",
+            "districts": ["mixed-use-core"],
+            "uses": ["home-based-food-business"],
+        }
+    }
+    upsert_response = client.post("/api/v1/ingestion/sources", json=source_payload)
+    assert upsert_response.status_code == 200
+    reindex_response = client.post("/api/v1/ingestion/reindex")
+    assert reindex_response.status_code == 200
+    first_hash = next(
+        chunk.source_text_hash for chunk in store.list_source_chunks() if chunk.source_id == "bakery-stale-rule"
+    )
+
+    source_payload["source"]["excerpt"] = (
+        "Home occupation bakeries require planning review, parking review, and fire-safety review."
+    )
+    update_response = client.post("/api/v1/ingestion/sources", json=source_payload)
+    assert update_response.status_code == 200
+
+    status_response = client.get("/api/v1/ingestion/status")
+
+    assert status_response.status_code == 200
+    body = status_response.json()
+    assert body["index_ready"] is True
+    assert body["stale_source_ids"] == []
+    second_hash = next(
+        chunk.source_text_hash for chunk in store.list_source_chunks() if chunk.source_id == "bakery-stale-rule"
+    )
+    assert second_hash != first_hash
 
 
 def test_import_local_docs_endpoint():

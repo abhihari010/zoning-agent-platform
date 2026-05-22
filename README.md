@@ -421,6 +421,32 @@ To avoid browser CORS failures, set this variable in the API host after Vercel g
 
 - `CORS_ALLOW_ORIGINS=https://zoning-agent-platform.vercel.app`
 
+### Deployed API Smoke Test
+
+Run the production beta smoke script after Render deploys, database migrations, or source registry changes. It uses only Python's standard library and never prints the beta key.
+
+```powershell
+$env:BETA_BASE_API_URL="https://zoning-agent-api.onrender.com"
+$env:BETA_ACCESS_KEY="<private beta key>"
+$env:BETA_TEST_SUPPORTED_ADDRESS="<supported Blacksburg, VA test address>"
+$env:BETA_TEST_UNSUPPORTED_ADDRESS="<valid address in a recognized but unsupported jurisdiction>"
+python scripts/smoke_beta_api.py
+```
+
+The script verifies:
+
+- unauthenticated `GET /health`
+- missing beta key returns `401`
+- invalid beta key returns `403`
+- valid beta key can call `/api/v1/ingestion/status`
+- source count is nonzero
+- chunk count is nonzero, or `/api/v1/ingestion/reindex` succeeds and creates chunks
+- supported intake and analysis complete
+- stored result, citations/evidence, and trace events are available after analysis
+- unsupported-jurisdiction intake is distinguishable from a clearly invalid address probe
+
+`BETA_BASE_API_URL` defaults to `https://zoning-agent-api.onrender.com` if omitted. The supported and unsupported address values should be harmless non-user test addresses; do not use real customer data.
+
 ### Launch Checklist
 
 1. Deploy the API and confirm `GET /health` returns `{"status":"ok"}`.
@@ -429,5 +455,5 @@ To avoid browser CORS failures, set this variable in the API host after Vercel g
 4. Open the Vercel app, enter the private beta key, and confirm the source admin loads.
 5. In Source Admin, import local documents if needed, then run `Reindex sources`.
 6. Confirm `/api/v1/ingestion/status` reports nonzero sources and chunks.
-7. Run one supported Blacksburg analysis and one unsupported-jurisdiction flow.
+7. Run `python scripts/smoke_beta_api.py` with the smoke-test environment variables above.
 8. Roll back by redeploying the previous Render/Vercel deployment and restoring from the database provider's backup when production is on a paid plan.

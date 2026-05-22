@@ -91,6 +91,13 @@ class SourceIndexStatusResponse(BaseModel):
     last_import_at: datetime | None = None
     last_reindex_at: datetime | None = None
     sources_missing_metadata: list[SourceMetadataHealth] = Field(default_factory=list)
+    index_ready: bool = False
+    auto_seed_sources: bool = True
+    auto_reindex_on_empty: bool = True
+    source_registry_version: str | None = None
+    stale_source_ids: list[str] = Field(default_factory=list)
+    missing_chunk_source_ids: list[str] = Field(default_factory=list)
+    readiness_warnings: list[str] = Field(default_factory=list)
 
 
 class ReindexResponse(BaseModel):
