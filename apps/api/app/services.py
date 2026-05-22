@@ -12,7 +12,7 @@ import httpx
 from app.ai import get_analysis_provider, get_retrieval_provider
 from app.ai.deterministic_provider import deterministic_feasibility
 from app.ai.interfaces import AnalysisProviderRequest, RetrievalProviderRequest
-from app.ai.source_registry_retriever import ensure_seed_sources
+from app.ai.source_registry_retriever import ensure_seed_sources, ensure_source_index_ready
 from app.district_mapping import map_district_from_components
 from app.jurisdictions import detect_jurisdiction
 from app.models import (
@@ -431,6 +431,12 @@ def analyze_project(
     analysis_provider_name = analysis_provider.name
     retrieval_provider_name = retrieval_provider.name
     retrieval_error: str | None = None
+    retrieval_source_store = getattr(retrieval_provider, "source_store", None)
+    source_readiness = (
+        ensure_source_index_ready(retrieval_source_store)
+        if retrieval_source_store
+        else ensure_source_index_ready()
+    )
     try:
         citations = retrieval_provider.retrieve(
             RetrievalProviderRequest(
@@ -445,6 +451,8 @@ def analyze_project(
         retrieval_error = str(exc)
 
     confidence = _confidence_score(intent.missing_fields, citations)
+    if not source_readiness.index_ready:
+        confidence = max(0.1, min(confidence, 0.55))
 
     try:
         provider_output = analysis_provider.generate_analysis(
@@ -490,6 +498,10 @@ def analyze_project(
             warnings.append(f"watsonx retrieval failed: {retrieval_error}")
         else:
             warnings.append(f"Local source retrieval failed: {retrieval_error}")
+
+    if not source_readiness.index_ready:
+        warnings.extend(source_readiness.warnings)
+        warnings.append("Source index readiness is incomplete; verify this result with the planning office.")
 
     if citations:
         agent_reports.append(

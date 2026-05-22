@@ -20,6 +20,12 @@ Current helpers:
   `.txt`, and `.json` source files from this directory or from another directory
   you provide.
 
+Bundled Blacksburg coverage currently uses official Town/Municode/State source
+URLs for home occupation standards, business zoning guidance, off-street parking,
+building safety review, and food-establishment permitting. Keep `jurisdiction_id`
+set to `blacksburg-va` and preserve district/use tags when refreshing these
+curated excerpts.
+
 Document parsing format:
 
 - `title: ...`

@@ -1,11 +1,11 @@
 {
-  "source_id": "parking-code-2.9",
-  "title": "Parking Code 2.9",
-  "excerpt": "Small commercial conversions must maintain two off-street spaces and preserve emergency access clearances.",
-  "section_ref": "Sec 2.9",
+  "source_id": "blacksburg-off-street-parking-home-occupation",
+  "title": "Blacksburg Zoning Ordinance Off-Street Parking Schedule for Home Occupations",
+  "excerpt": "The Blacksburg Zoning Ordinance off-street parking schedule lists Home occupation under residential use types and points minimum parking review to section 4211(B)(8), with no maximum parking standard stated in the schedule.",
+  "section_ref": "Zoning Ordinance Sec. 5210; Sec. 4211(B)(8)",
   "jurisdiction_id": "blacksburg-va",
-  "url": "https://example.gov/parking/2.9",
-  "effective_date": "2025-02-01",
-  "districts": ["mixed-use-core"],
+  "url": "https://library.municode.com/va/blacksburg/codes/code_of_ordinances?nodeId=CO_APXAORNO1137BLZOOR_ARTVDEST_DIV2OREPASTLO_S5200PU",
+  "effective_date": "2026-03-19",
+  "districts": ["mixed-use-core", "residential-low-density"],
   "uses": ["home-based-food-business", "general"]
 }

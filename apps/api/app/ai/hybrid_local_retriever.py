@@ -9,7 +9,7 @@ from app.ai.interfaces import (
     RetrievalProviderRequest,
     RetrievalProviderResult,
 )
-from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider, ensure_seed_sources
+from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider, ensure_source_index_ready
 from app.models import SourceChunk, SourceCitation
 from app.storage import SQLiteStore, store
 
@@ -29,7 +29,7 @@ class HybridLocalRetrievalProvider:
         self.embedding_provider = embedding_provider
 
     def retrieve(self, request: RetrievalProviderRequest) -> RetrievalProviderResult:
-        ensure_seed_sources(self.source_store)
+        ensure_source_index_ready(self.source_store)
         chunks = self.source_store.list_source_chunks()
         if not chunks:
             return SourceRegistryRetrievalProvider(self.source_store).retrieve(request)

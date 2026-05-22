@@ -25,6 +25,13 @@ def _env(name: str, default: str = "") -> str:
     return os.getenv(name, default).strip()
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    value = _env(name)
+    if not value:
+        return default
+    return value.lower() in {"1", "true", "yes", "on"}
+
+
 def _provider_name(name: str, default: str, valid_values: set[str]) -> str:
     value = _env(name, default).lower()
     if value not in valid_values:
@@ -39,6 +46,7 @@ class Settings:
     rag_provider: RAGProviderName
     embedding_provider: EmbeddingProviderName
     embedding_model: str
+    database_url: str
     database_path: Path
     google_maps_api_key: str
     google_maps_timeout_seconds: float
@@ -53,6 +61,9 @@ class Settings:
     watsonx_vector_index_id: str
     watsonx_timeout_seconds: float
     beta_access_key: str
+    auto_seed_sources: bool
+    auto_reindex_on_empty: bool
+    source_registry_version: str
 
     @property
     def uses_watsonx(self) -> bool:
@@ -72,6 +83,7 @@ def get_settings() -> Settings:
     }
     default_ai_provider = "watsonx" if legacy_watsonx_enabled else "deterministic"
     default_rag_provider = "watsonx" if legacy_watsonx_enabled else "source_registry"
+    database_url = _env("DATABASE_URL")
     database_path = _env("ZONING_DB_PATH") or _env("IBM_ZONING_DB_PATH")
 
     return Settings(
@@ -88,6 +100,7 @@ def get_settings() -> Settings:
             _provider_name("EMBEDDING_PROVIDER", "none", VALID_EMBEDDING_PROVIDERS),
         ),
         embedding_model=_env("EMBEDDING_MODEL", "text-embedding-3-small"),
+        database_url=database_url,
         database_path=Path(database_path) if database_path else DEFAULT_DB_PATH,
         google_maps_api_key=_env("GOOGLE_MAPS_API_KEY"),
         google_maps_timeout_seconds=float(_env("GOOGLE_MAPS_TIMEOUT_SECONDS", "8")),
@@ -102,6 +115,9 @@ def get_settings() -> Settings:
         watsonx_vector_index_id=_env("WATSONX_VECTOR_INDEX_ID"),
         watsonx_timeout_seconds=float(_env("WATSONX_TIMEOUT_SECONDS", "20")),
         beta_access_key=_env("BETA_ACCESS_KEY"),
+        auto_seed_sources=_env_bool("AUTO_SEED_SOURCES", True),
+        auto_reindex_on_empty=_env_bool("AUTO_REINDEX_ON_EMPTY", True),
+        source_registry_version=_env("SOURCE_REGISTRY_VERSION"),
     )
 
 

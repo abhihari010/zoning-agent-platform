@@ -6,6 +6,7 @@ from uuid import UUID, uuid4
 import httpx
 from fastapi import APIRouter, HTTPException
 
+from app.ai.source_registry_retriever import ensure_source_index_ready
 from app.ingestion import build_source_chunks, import_source_documents
 from app.models import (
     AnalysisRecord,
@@ -24,6 +25,7 @@ from app.models import (
     SourceRegistryUpsertRequest,
     SessionCreateResponse,
 )
+from app.settings import get_settings
 from app.services import analyze_project, ensure_seed_sources, normalize_address, suggest_addresses
 from app.storage import store
 
@@ -167,13 +169,13 @@ def upsert_source(payload: SourceRegistryUpsertRequest) -> SourceRegistryListRes
 
 @router.get("/ingestion/status", response_model=SourceIndexStatusResponse)
 def ingestion_status() -> SourceIndexStatusResponse:
-    ensure_seed_sources()
+    readiness = ensure_source_index_ready()
+    settings = get_settings()
     sources = store.list_sources()
-    chunk_count = store.get_source_chunk_count()
     return SourceIndexStatusResponse(
         source_count=len(sources),
-        chunk_count=chunk_count,
-        has_index=chunk_count > 0,
+        chunk_count=readiness.chunk_count,
+        has_index=readiness.chunk_count > 0,
         last_import_at=store.get_latest_audit_timestamp("source.import.completed"),
         last_reindex_at=store.get_latest_audit_timestamp("source.reindex.completed"),
         sources_missing_metadata=[
@@ -184,6 +186,13 @@ def ingestion_status() -> SourceIndexStatusResponse:
             for source in sources
             if _missing_source_metadata(source)
         ],
+        index_ready=readiness.index_ready,
+        auto_seed_sources=settings.auto_seed_sources,
+        auto_reindex_on_empty=settings.auto_reindex_on_empty,
+        source_registry_version=settings.source_registry_version or None,
+        stale_source_ids=readiness.stale_source_ids,
+        missing_chunk_source_ids=readiness.missing_chunk_source_ids,
+        readiness_warnings=readiness.warnings,
     )
 
 

@@ -208,7 +208,7 @@ Success criteria:
 
 The production beta foundation is in place. The next narrow sprint should validate deployed behavior with real configuration before adding accounts, billing, or broader jurisdiction coverage.
 
-1. Deploy the API to Render with a persistent SQLite disk and private beta key.
+1. Deploy the API to Render with `DATABASE_URL` pointed at staging Postgres and a private beta key.
 2. Deploy the web app to Vercel with `VITE_API_URL` pointed at Render.
 3. Seed/import source documents, reindex, and confirm nonzero chunk counts.
 4. Run the supported and unsupported jurisdiction smoke tests.
@@ -217,7 +217,7 @@ The production beta foundation is in place. The next narrow sprint should valida
 ### Open Technical Decisions
 
 - Which LLM provider should be the first non-IBM provider?
-- Should the production database stay SQLite for now, or move to Postgres/pgvector?
+- Should production add pgvector on top of Postgres for retrieval, or keep the current relational schema plus local embeddings?
 - Should document ingestion fetch official URLs automatically, or should admins upload curated documents first?
 - How much parcel-level GIS data should the app attempt to handle in the first expansion?
 - Should jurisdiction expansion start regionally around Virginia, or support arbitrary uploaded jurisdictions?
@@ -273,7 +273,8 @@ Set environment variables before starting the API when needed:
 
 - `GOOGLE_MAPS_API_KEY`: required Google Maps API key with Geocoding and Places enabled
 - `GOOGLE_MAPS_TIMEOUT_SECONDS`: optional timeout (default `8`)
-- `ZONING_DB_PATH`: optional SQLite database path for persistent API storage (default `apps/api/app/data/app.sqlite3`)
+- `DATABASE_URL`: optional SQLAlchemy-compatible database URL. Render staging and production must set this to Postgres.
+- `ZONING_DB_PATH`: optional SQLite database path for local fallback only (default `apps/api/app/data/app.sqlite3`)
 - `BETA_ACCESS_KEY`: optional private beta key; when set, every `/api/v1/*` request must include `X-Beta-Access-Key`
 - `AI_PROVIDER`: optional analysis provider (`deterministic`, `openai`, or `watsonx`, default `deterministic`)
 - `RAG_PROVIDER`: optional retrieval provider (`source_registry`, `hybrid_local`, or `watsonx`, default `source_registry`)
@@ -285,7 +286,7 @@ Set environment variables before starting the API when needed:
 - `OPENAI_TIMEOUT_SECONDS`: optional timeout for OpenAI HTTP calls
 - `GOOGLE_DISTRICT_KEYWORD_MAP`: optional JSON mapping used when district cannot be inferred from components, example:
   - `{"downtown":"mixed-use-core","industrial":"industrial-zone"}`
-- `IBM_ZONING_DB_PATH`: legacy fallback for `ZONING_DB_PATH` during migration
+- `IBM_ZONING_DB_PATH`: legacy local fallback for `ZONING_DB_PATH` during migration
 - `WATSONX_ENABLED`: legacy compatibility flag that selects WatsonX providers when set to a truthy value; prefer `AI_PROVIDER` and `RAG_PROVIDER` for new setup
 - `WATSONX_API_KEY`: required when `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`
 - `WATSONX_URL`: required when `AI_PROVIDER=watsonx` (example `https://us-south.ml.cloud.ibm.com`)
@@ -345,26 +346,62 @@ Target beta shape:
 
 - Vercel hosts the Vite frontend.
 - Render hosts the FastAPI backend from `apps/api/Dockerfile`.
-- SQLite persists on a Render disk mounted at `/data`.
+- Render staging and production use Postgres through `DATABASE_URL`.
+- The current free staging database is Supabase project `tzstkgifmftqcdguhshn` in `us-east-2`.
+- `ZONING_DB_PATH` is local fallback only and should not be set on Render.
 - Private beta access is enforced by `BETA_ACCESS_KEY`.
+
+Current deployed targets:
+
+- Frontend: `https://zoning-agent-platform.vercel.app`
+- API: `https://zoning-agent-api.onrender.com`
+
+### Free Staging Database
+
+Use the Supabase session pooler connection string for Render because it works over IPv4 for a persistent web service. Keep the password only in the Supabase and Render dashboards:
+
+```text
+postgresql://postgres.tzstkgifmftqcdguhshn:[PASSWORD]@aws-1-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require
+```
+
+If SQLAlchemy receives a `postgres://` URL, the API normalizes it to `postgresql+psycopg://` internally. Do not commit the real password or a full secret connection string. If the Supabase database password is exposed or shared too broadly, rotate it in Supabase and immediately update Render's `DATABASE_URL`.
+
+Free Supabase staging is for pre-user validation only. Before inviting real testers or storing real beta data, move production to a paid database plan with backups/retention and a documented restore path.
 
 ### Deploy API to Render
 
-1. Create a Render Web Service from this repo.
+1. Create or update the Render Web Service from this repo.
 2. Use Docker deployment with root directory `apps/api`.
-3. Mount a persistent disk at `/data`.
+3. Do not mount or depend on a Render disk for database persistence.
 4. Set health check path to `/health`.
 5. Set API environment variables:
-   - `ZONING_DB_PATH=/data/app.sqlite3`
-   - `CORS_ALLOW_ORIGINS=https://your-vercel-project.vercel.app`
+   - `DATABASE_URL=<Supabase session pooler URL with password from dashboard>`
+   - `CORS_ALLOW_ORIGINS=https://zoning-agent-platform.vercel.app`
    - `BETA_ACCESS_KEY=<long random beta key>`
    - `GOOGLE_MAPS_API_KEY=<restricted server key>`
    - `AI_PROVIDER=deterministic`
    - `RAG_PROVIDER=hybrid_local`
    - `EMBEDDING_PROVIDER=local`
-6. Leave `OPENAI_*` and `WATSONX_*` unset unless intentionally testing those providers.
+6. Leave `ZONING_DB_PATH`, `OPENAI_*`, and `WATSONX_*` unset unless intentionally testing local fallback or those providers.
+7. Apply database migrations before or during the first deploy:
 
-Restrict the Google Maps key in Google Cloud to the Geocoding and Places APIs. Use exact CORS origins for deployed beta; do not use `*` outside a temporary smoke test.
+```powershell
+cd apps/api
+$env:DATABASE_URL="postgresql://postgres.tzstkgifmftqcdguhshn:[PASSWORD]@aws-1-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require"
+alembic upgrade head
+```
+
+Restrict the Google Maps key in Google Cloud to the Geocoding and Places APIs. Keep production CORS locked to `https://zoning-agent-platform.vercel.app`.
+
+### Paid Production Switch
+
+Before real users are onboarded:
+
+1. Upgrade the web service plan if free-service cold starts are no longer acceptable.
+2. Move the production database to a paid Supabase or Render Postgres plan with backups enabled.
+3. Rotate the database password during the cutover and update only the Render dashboard `DATABASE_URL`.
+4. Run `alembic upgrade head` against the paid production database.
+5. Keep staging and production on separate database projects or instances.
 
 ### Deploy Web to Vercel
 
@@ -382,17 +419,41 @@ When `VITE_API_URL` points at a non-localhost API, the frontend shows the privat
 
 To avoid browser CORS failures, set this variable in the API host after Vercel gives you a deployment URL:
 
-- `CORS_ALLOW_ORIGINS=https://your-vercel-project.vercel.app`
+- `CORS_ALLOW_ORIGINS=https://zoning-agent-platform.vercel.app`
 
-For a quick smoke test, the API can temporarily use `CORS_ALLOW_ORIGINS=*`, but the deployed app should use the exact Vercel origin.
+### Deployed API Smoke Test
+
+Run the production beta smoke script after Render deploys, database migrations, or source registry changes. It uses only Python's standard library and never prints the beta key.
+
+```powershell
+$env:BETA_BASE_API_URL="https://zoning-agent-api.onrender.com"
+$env:BETA_ACCESS_KEY="<private beta key>"
+$env:BETA_TEST_SUPPORTED_ADDRESS="<supported Blacksburg, VA test address>"
+$env:BETA_TEST_UNSUPPORTED_ADDRESS="<valid address in a recognized but unsupported jurisdiction>"
+python scripts/smoke_beta_api.py
+```
+
+The script verifies:
+
+- unauthenticated `GET /health`
+- missing beta key returns `401`
+- invalid beta key returns `403`
+- valid beta key can call `/api/v1/ingestion/status`
+- source count is nonzero
+- chunk count is nonzero, or `/api/v1/ingestion/reindex` succeeds and creates chunks
+- supported intake and analysis complete
+- stored result, citations/evidence, and trace events are available after analysis
+- unsupported-jurisdiction intake is distinguishable from a clearly invalid address probe
+
+`BETA_BASE_API_URL` defaults to `https://zoning-agent-api.onrender.com` if omitted. The supported and unsupported address values should be harmless non-user test addresses; do not use real customer data.
 
 ### Launch Checklist
 
 1. Deploy the API and confirm `GET /health` returns `{"status":"ok"}`.
 2. Deploy the web app with `VITE_API_URL` set to the Render API URL.
-3. Open the Vercel app, enter the private beta key, and confirm the source admin loads.
-4. In Source Admin, import local documents if needed, then run `Reindex sources`.
-5. Confirm `/api/v1/ingestion/status` reports nonzero sources and chunks.
-6. Run one supported Blacksburg analysis and one unsupported-jurisdiction flow.
-7. Back up `/data/app.sqlite3` before risky source edits or provider changes.
-8. Roll back by redeploying the previous Render/Vercel deployment and restoring the last SQLite backup if needed.
+3. Run `alembic upgrade head` against the staging or production `DATABASE_URL`.
+4. Open the Vercel app, enter the private beta key, and confirm the source admin loads.
+5. In Source Admin, import local documents if needed, then run `Reindex sources`.
+6. Confirm `/api/v1/ingestion/status` reports nonzero sources and chunks.
+7. Run `python scripts/smoke_beta_api.py` with the smoke-test environment variables above.
+8. Roll back by redeploying the previous Render/Vercel deployment and restoring from the database provider's backup when production is on a paid plan.
