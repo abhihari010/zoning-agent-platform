@@ -124,35 +124,7 @@ def test_normalize_address_zero_results(monkeypatch: pytest.MonkeyPatch) -> None
     assert "could not be validated" in result.warnings[0].lower()
 
 
-def test_normalize_address_valid_unsupported_jurisdiction(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setenv("GOOGLE_MAPS_API_KEY", "demo-key")
-
-    payload = {
-        "status": "OK",
-        "candidates": [
-            {
-                "formatted_address": "100 Main St, Christiansburg, VA 24073, USA",
-                "place_id": "place-unsupported",
-                "address_components": [
-                    {"long_name": "Christiansburg", "types": ["locality"]},
-                    {"long_name": "VA", "types": ["administrative_area_level_1"]},
-                ],
-                "geometry": {"location": {"lat": 37.1, "lng": -80.4}},
-            }
-        ],
-        "results": [
-            {
-                "formatted_address": "100 Main St, Christiansburg, VA 24073, USA",
-                "place_id": "place-unsupported",
-                "address_components": [
-                    {"long_name": "Christiansburg", "types": ["locality"]},
-                    {"long_name": "VA", "types": ["administrative_area_level_1"]},
-                ],
-                "geometry": {"location": {"lat": 37.1, "lng": -80.4}},
-            }
-        ],
-    }
-
+def _mock_google_address(monkeypatch: pytest.MonkeyPatch, payload: dict) -> None:
     class FakeResponse:
         def __init__(self, response_payload: dict) -> None:
             self._payload = response_payload
@@ -165,17 +137,108 @@ def test_normalize_address_valid_unsupported_jurisdiction(monkeypatch: pytest.Mo
 
     def fake_get(url: str, params: dict, timeout: float):
         if "findplacefromtext" in url:
-            return FakeResponse({"status": "OK", "candidates": payload["candidates"]})
-        return FakeResponse({"status": "OK", "results": payload["results"]})
+            return FakeResponse({"status": "OK", "candidates": [payload]})
+        return FakeResponse({"status": "OK", "results": [payload]})
 
     monkeypatch.setattr(services.httpx, "get", fake_get)
 
-    result = services.normalize_address("100 Main St Christiansburg VA")
+
+@pytest.mark.parametrize(
+    ("formatted_address", "components", "expected_id", "expected_name"),
+    [
+        (
+            "100 Main St, Christiansburg, VA 24073, USA",
+            [
+                {"long_name": "Christiansburg", "types": ["locality"]},
+                {"long_name": "Montgomery County", "types": ["administrative_area_level_2"]},
+                {"long_name": "VA", "types": ["administrative_area_level_1"]},
+            ],
+            "christiansburg-va",
+            "Christiansburg, VA",
+        ),
+        (
+            "755 Roanoke St, Christiansburg, VA 24073, USA",
+            [
+                {"long_name": "Merrimac", "types": ["locality"]},
+                {"long_name": "Montgomery County", "types": ["administrative_area_level_2"]},
+                {"long_name": "Virginia", "types": ["administrative_area_level_1"]},
+            ],
+            "montgomery-county-va",
+            "Montgomery County, VA",
+        ),
+        (
+            "215 Church Ave SW, Roanoke, VA 24011, USA",
+            [
+                {"long_name": "Roanoke", "types": ["locality"]},
+                {"long_name": "Roanoke City", "types": ["administrative_area_level_2"]},
+                {"long_name": "VA", "types": ["administrative_area_level_1"]},
+            ],
+            "roanoke-va",
+            "Roanoke, VA",
+        ),
+        (
+            "5204 Bernard Dr, Roanoke, VA 24018, USA",
+            [
+                {"long_name": "Cave Spring", "types": ["locality"]},
+                {"long_name": "Roanoke County", "types": ["administrative_area_level_2"]},
+                {"long_name": "VA", "types": ["administrative_area_level_1"]},
+            ],
+            "roanoke-county-va",
+            "Roanoke County, VA",
+        ),
+    ],
+)
+def test_normalize_address_recognized_unsupported_jurisdictions(
+    monkeypatch: pytest.MonkeyPatch,
+    formatted_address: str,
+    components: list[dict],
+    expected_id: str,
+    expected_name: str,
+) -> None:
+    monkeypatch.setenv("GOOGLE_MAPS_API_KEY", "demo-key")
+    _mock_google_address(
+        monkeypatch,
+        {
+            "formatted_address": formatted_address,
+            "place_id": "place-unsupported",
+            "address_components": components,
+            "geometry": {"location": {"lat": 37.1, "lng": -80.4}},
+        },
+    )
+
+    result = services.normalize_address(formatted_address)
+
+    assert result.is_valid is False
+    assert result.support_status == "unsupported"
+    assert result.jurisdiction_id == expected_id
+    assert result.jurisdiction_name == expected_name
+    assert "does not yet support zoning review" in result.warnings[0]
+
+
+def test_normalize_address_valid_unrecognized_jurisdiction_is_not_invalid(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("GOOGLE_MAPS_API_KEY", "demo-key")
+    _mock_google_address(
+        monkeypatch,
+        {
+            "formatted_address": "1 Main St, Richmond, VA 23219, USA",
+            "place_id": "place-unrecognized",
+            "address_components": [
+                {"long_name": "Richmond", "types": ["locality"]},
+                {"long_name": "Richmond City", "types": ["administrative_area_level_2"]},
+                {"long_name": "VA", "types": ["administrative_area_level_1"]},
+            ],
+            "geometry": {"location": {"lat": 37.5, "lng": -77.4}},
+        },
+    )
+
+    result = services.normalize_address("1 Main St Richmond VA")
 
     assert result.is_valid is False
     assert result.support_status == "unsupported"
     assert result.jurisdiction_id is None
-    assert "does not yet support zoning review" in result.warnings[0]
+    assert "this jurisdiction" in result.warnings[0]
 
 
 def test_keyword_district_rules_from_env(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import hashlib
+import secrets
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 
 from app.ai.source_registry_retriever import ensure_source_index_ready
 from app.ingestion import build_source_chunks, import_source_documents
@@ -30,6 +32,20 @@ from app.services import analyze_project, ensure_seed_sources, normalize_address
 from app.storage import store
 
 router = APIRouter(prefix="/api/v1")
+
+
+def require_admin_access(
+    x_admin_access_key: str | None = Header(default=None, alias="X-Admin-Access-Key"),
+) -> None:
+    settings = get_settings()
+    if not settings.admin_access_key_hash:
+        return
+    if not x_admin_access_key:
+        raise HTTPException(status_code=401, detail="Admin access key required.")
+
+    provided_key_hash = hashlib.sha256(x_admin_access_key.strip().encode("utf-8")).hexdigest()
+    if not secrets.compare_digest(provided_key_hash, settings.admin_access_key_hash):
+        raise HTTPException(status_code=403, detail="Invalid admin access key.")
 
 
 @router.post("/sessions", response_model=SessionCreateResponse)
@@ -66,6 +82,9 @@ def intake_project(payload: IntakeRequest) -> IntakeResponse:
             latitude=address_result.latitude,
             longitude=address_result.longitude,
             status="invalid_address",
+            support_status=address_result.support_status,
+            jurisdiction_id=address_result.jurisdiction_id,
+            jurisdiction_name=address_result.jurisdiction_name,
             follow_up_questions=[
                 "Please provide a complete street address with city.",
                 *address_result.warnings,
@@ -100,6 +119,9 @@ def intake_project(payload: IntakeRequest) -> IntakeResponse:
         latitude=project.latitude,
         longitude=project.longitude,
         status="created",
+        support_status=address_result.support_status,
+        jurisdiction_id=project.jurisdiction_id,
+        jurisdiction_name=project.jurisdiction_name,
         follow_up_questions=follow_up_questions,
     )
 
@@ -161,7 +183,11 @@ def list_sources() -> SourceRegistryListResponse:
     return SourceRegistryListResponse(sources=store.list_sources())
 
 
-@router.post("/ingestion/sources", response_model=SourceRegistryListResponse)
+@router.post(
+    "/ingestion/sources",
+    response_model=SourceRegistryListResponse,
+    dependencies=[Depends(require_admin_access)],
+)
 def upsert_source(payload: SourceRegistryUpsertRequest) -> SourceRegistryListResponse:
     store.upsert_source(payload.source)
     return SourceRegistryListResponse(sources=store.list_sources())
@@ -196,7 +222,11 @@ def ingestion_status() -> SourceIndexStatusResponse:
     )
 
 
-@router.post("/ingestion/reindex", response_model=ReindexResponse)
+@router.post(
+    "/ingestion/reindex",
+    response_model=ReindexResponse,
+    dependencies=[Depends(require_admin_access)],
+)
 def reindex_sources() -> ReindexResponse:
     ensure_seed_sources()
     sources = store.list_sources()
@@ -210,7 +240,11 @@ def reindex_sources() -> ReindexResponse:
     )
 
 
-@router.post("/ingestion/import-local-docs", response_model=LocalDocumentImportResponse)
+@router.post(
+    "/ingestion/import-local-docs",
+    response_model=LocalDocumentImportResponse,
+    dependencies=[Depends(require_admin_access)],
+)
 def import_local_docs(payload: LocalDocumentImportRequest) -> LocalDocumentImportResponse:
     try:
         entries = import_source_documents(payload.directory)

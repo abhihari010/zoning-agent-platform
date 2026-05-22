@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import hashlib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, cast
@@ -21,6 +22,12 @@ class ConfigurationError(RuntimeError):
     """Raised when environment configuration is invalid."""
 
 
+@dataclass(frozen=True)
+class AccessKey:
+    label: str
+    key_hash: str
+
+
 def _env(name: str, default: str = "") -> str:
     return os.getenv(name, default).strip()
 
@@ -38,6 +45,29 @@ def _provider_name(name: str, default: str, valid_values: set[str]) -> str:
         expected = ", ".join(sorted(valid_values))
         raise ConfigurationError(f"{name} must be one of: {expected}. Got: {value or '<empty>'}")
     return value
+
+
+def _hash_access_key(key: str) -> str:
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()
+
+
+def _parse_labeled_access_keys(raw_value: str) -> tuple[AccessKey, ...]:
+    keys: list[AccessKey] = []
+    for index, entry in enumerate(raw_value.split(","), start=1):
+        entry = entry.strip()
+        if not entry:
+            continue
+        if ":" in entry:
+            label, key = entry.split(":", 1)
+            label = label.strip()
+            key = key.strip()
+        else:
+            label = f"beta-{index}"
+            key = entry
+        if not key:
+            raise ConfigurationError("BETA_ACCESS_KEYS entries must include a non-empty key")
+        keys.append(AccessKey(label=label or f"beta-{index}", key_hash=_hash_access_key(key)))
+    return tuple(keys)
 
 
 @dataclass(frozen=True)
@@ -61,6 +91,9 @@ class Settings:
     watsonx_vector_index_id: str
     watsonx_timeout_seconds: float
     beta_access_key: str
+    beta_access_keys: tuple[AccessKey, ...]
+    admin_access_key: str
+    admin_access_key_hash: str
     auto_seed_sources: bool
     auto_reindex_on_empty: bool
     source_registry_version: str
@@ -85,6 +118,13 @@ def get_settings() -> Settings:
     default_rag_provider = "watsonx" if legacy_watsonx_enabled else "source_registry"
     database_url = _env("DATABASE_URL")
     database_path = _env("ZONING_DB_PATH") or _env("IBM_ZONING_DB_PATH")
+    beta_access_key = _env("BETA_ACCESS_KEY")
+    beta_access_keys = (
+        (AccessKey(label="legacy", key_hash=_hash_access_key(beta_access_key)),)
+        if beta_access_key
+        else ()
+    ) + _parse_labeled_access_keys(_env("BETA_ACCESS_KEYS"))
+    admin_access_key = _env("ADMIN_ACCESS_KEY")
 
     return Settings(
         ai_provider=cast(
@@ -114,7 +154,10 @@ def get_settings() -> Settings:
         watsonx_model_id=_env("WATSONX_MODEL_ID"),
         watsonx_vector_index_id=_env("WATSONX_VECTOR_INDEX_ID"),
         watsonx_timeout_seconds=float(_env("WATSONX_TIMEOUT_SECONDS", "20")),
-        beta_access_key=_env("BETA_ACCESS_KEY"),
+        beta_access_key=beta_access_key,
+        beta_access_keys=beta_access_keys,
+        admin_access_key=admin_access_key,
+        admin_access_key_hash=_hash_access_key(admin_access_key) if admin_access_key else "",
         auto_seed_sources=_env_bool("AUTO_SEED_SOURCES", True),
         auto_reindex_on_empty=_env_bool("AUTO_REINDEX_ON_EMPTY", True),
         source_registry_version=_env("SOURCE_REGISTRY_VERSION"),
