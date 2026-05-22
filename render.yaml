@@ -6,8 +6,8 @@ services:
     region: ohio
     branch: main
     rootDir: apps/api
-    dockerfilePath: apps/api/Dockerfile
-    dockerContext: apps/api
+    dockerfilePath: Dockerfile
+    dockerContext: .
     healthCheckPath: /health
     autoDeploy: true
     envVars:
