@@ -81,6 +81,13 @@ def _score_chunk(
     request: RetrievalProviderRequest,
     query_tokens: set[str],
 ) -> float:
+    if (
+        request.jurisdiction_id
+        and chunk.jurisdiction_id
+        and chunk.jurisdiction_id not in {request.jurisdiction_id, "*"}
+    ):
+        return 0.0
+
     score = 0.0
     if request.district in chunk.districts or "*" in chunk.districts or request.district == "unknown":
         score += 2.0

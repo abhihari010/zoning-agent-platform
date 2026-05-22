@@ -28,6 +28,7 @@ class RetrievalProviderRequest:
     district: str
     inferred_use: str
     project_description: str = ""
+    jurisdiction_id: str | None = None
 
     @property
     def query(self) -> str:

@@ -206,13 +206,13 @@ Success criteria:
 
 ### Suggested Next Sprint
 
-The provider boundary foundation is in place. The next narrow sprint should improve deterministic local retrieval before adding embeddings or hosted model providers.
+The production beta foundation is in place. The next narrow sprint should validate deployed behavior with real configuration before adding accounts, billing, or broader jurisdiction coverage.
 
-1. Make `/api/v1/ingestion/reindex` build stable local chunk records from registered sources.
-2. Store chunk metadata such as source ID, section reference, district tags, use tags, URL, and effective date.
-3. Keep retrieval deterministic and local while the chunk model settles.
-4. Add tests for stable chunk IDs and source metadata.
-5. Defer embeddings, vector search, and new LLM providers until the chunked source index exists.
+1. Deploy the API to Render with a persistent SQLite disk and private beta key.
+2. Deploy the web app to Vercel with `VITE_API_URL` pointed at Render.
+3. Seed/import source documents, reindex, and confirm nonzero chunk counts.
+4. Run the supported and unsupported jurisdiction smoke tests.
+5. Collect early beta feedback before expanding providers or jurisdictions.
 
 ### Open Technical Decisions
 
@@ -235,7 +235,8 @@ The provider boundary foundation is in place. The next narrow sprint should impr
 - [x] Add UI indicators for source coverage, index status, and confidence.
 - [x] Add structured zoning fact intake fields.
 - [x] Add optional external provider seams for OpenAI analysis and embeddings.
-- [ ] Add jurisdiction metadata to source registry entries.
+- [x] Add jurisdiction metadata to source registry entries.
+- [x] Add private beta API access gate and deployment runbook.
 
 ## Structure
 
@@ -273,6 +274,7 @@ Set environment variables before starting the API when needed:
 - `GOOGLE_MAPS_API_KEY`: required Google Maps API key with Geocoding and Places enabled
 - `GOOGLE_MAPS_TIMEOUT_SECONDS`: optional timeout (default `8`)
 - `ZONING_DB_PATH`: optional SQLite database path for persistent API storage (default `apps/api/app/data/app.sqlite3`)
+- `BETA_ACCESS_KEY`: optional private beta key; when set, every `/api/v1/*` request must include `X-Beta-Access-Key`
 - `AI_PROVIDER`: optional analysis provider (`deterministic`, `openai`, or `watsonx`, default `deterministic`)
 - `RAG_PROVIDER`: optional retrieval provider (`source_registry`, `hybrid_local`, or `watsonx`, default `source_registry`)
 - `EMBEDDING_PROVIDER`: optional embedding provider (`none`, `local`, or `openai`, default `none`)
@@ -317,6 +319,7 @@ Available API additions:
 - `POST /api/v1/ingestion/reindex`: request source reindex
 - `GET /api/v1/ingestion/status`: inspect source count, chunk count, index status, and source metadata health
 - `POST /api/v1/ingestion/import-local-docs`: parse local `.md`, `.txt`, or `.json` documents into source entries
+- `GET /health`: unauthenticated backend health check for deployment platforms
 
 Analysis behavior:
 
@@ -336,7 +339,34 @@ Run backend tests:
 
 Frontend expects backend at `http://localhost:8000`.
 
-## Deploy Web to Vercel
+## Production Beta Runbook
+
+Target beta shape:
+
+- Vercel hosts the Vite frontend.
+- Render hosts the FastAPI backend from `apps/api/Dockerfile`.
+- SQLite persists on a Render disk mounted at `/data`.
+- Private beta access is enforced by `BETA_ACCESS_KEY`.
+
+### Deploy API to Render
+
+1. Create a Render Web Service from this repo.
+2. Use Docker deployment with root directory `apps/api`.
+3. Mount a persistent disk at `/data`.
+4. Set health check path to `/health`.
+5. Set API environment variables:
+   - `ZONING_DB_PATH=/data/app.sqlite3`
+   - `CORS_ALLOW_ORIGINS=https://your-vercel-project.vercel.app`
+   - `BETA_ACCESS_KEY=<long random beta key>`
+   - `GOOGLE_MAPS_API_KEY=<restricted server key>`
+   - `AI_PROVIDER=deterministic`
+   - `RAG_PROVIDER=hybrid_local`
+   - `EMBEDDING_PROVIDER=local`
+6. Leave `OPENAI_*` and `WATSONX_*` unset unless intentionally testing those providers.
+
+Restrict the Google Maps key in Google Cloud to the Geocoding and Places APIs. Use exact CORS origins for deployed beta; do not use `*` outside a temporary smoke test.
+
+### Deploy Web to Vercel
 
 This repo includes a root `vercel.json` for the Vite frontend:
 
@@ -346,10 +376,23 @@ This repo includes a root `vercel.json` for the Vite frontend:
 
 Production builds should set the deployed API URL explicitly:
 
-- `VITE_API_URL=https://your-api-host.example`
+- `VITE_API_URL=https://your-render-api.onrender.com`
+
+When `VITE_API_URL` points at a non-localhost API, the frontend shows the private beta access screen and stores the entered key in `sessionStorage`.
 
 To avoid browser CORS failures, set this variable in the API host after Vercel gives you a deployment URL:
 
 - `CORS_ALLOW_ORIGINS=https://your-vercel-project.vercel.app`
 
 For a quick smoke test, the API can temporarily use `CORS_ALLOW_ORIGINS=*`, but the deployed app should use the exact Vercel origin.
+
+### Launch Checklist
+
+1. Deploy the API and confirm `GET /health` returns `{"status":"ok"}`.
+2. Deploy the web app with `VITE_API_URL` set to the Render API URL.
+3. Open the Vercel app, enter the private beta key, and confirm the source admin loads.
+4. In Source Admin, import local documents if needed, then run `Reindex sources`.
+5. Confirm `/api/v1/ingestion/status` reports nonzero sources and chunks.
+6. Run one supported Blacksburg analysis and one unsupported-jurisdiction flow.
+7. Back up `/data/app.sqlite3` before risky source edits or provider changes.
+8. Roll back by redeploying the previous Render/Vercel deployment and restoring the last SQLite backup if needed.

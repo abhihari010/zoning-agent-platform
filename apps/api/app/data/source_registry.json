@@ -4,6 +4,7 @@
     "title": "Municipal Zoning Ordinance 12.4",
     "excerpt": "Home occupation businesses may be conditionally permitted in low-density districts with parking and signage limits.",
     "section_ref": "Sec 12.4.2",
+    "jurisdiction_id": "blacksburg-va",
     "url": "https://example.gov/zoning/12.4",
     "effective_date": "2024-01-01",
     "districts": ["residential-low-density", "mixed-use-core"],
@@ -14,6 +15,7 @@
     "title": "Local Fire and Safety Code 8.2",
     "excerpt": "Commercial food preparation requires ventilation review and fire suppression verification before permit issuance.",
     "section_ref": "Sec 8.2.1",
+    "jurisdiction_id": "blacksburg-va",
     "url": "https://example.gov/fire/8.2",
     "effective_date": "2023-09-15",
     "districts": [
@@ -29,6 +31,7 @@
     "title": "Industrial and Employment Use Code 4.1",
     "excerpt": "Light manufacturing and high-impact kitchen equipment require special review in industrial and employment districts.",
     "section_ref": "Sec 4.1.7",
+    "jurisdiction_id": "blacksburg-va",
     "url": "https://example.gov/zoning/4.1",
     "effective_date": "2022-06-10",
     "districts": ["industrial-zone", "commercial-employment"],

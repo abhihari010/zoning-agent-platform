@@ -1,5 +1,6 @@
 title: Fire and Kitchen Safety Code
 section_ref: Sec 8.2.1
+jurisdiction_id: blacksburg-va
 url: https://example.gov/fire/8.2
 effective_date: 2023-09-15
 districts: residential-low-density, mixed-use-core, commercial-employment, industrial-zone

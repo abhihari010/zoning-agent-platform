@@ -52,6 +52,7 @@ class Settings:
     watsonx_model_id: str
     watsonx_vector_index_id: str
     watsonx_timeout_seconds: float
+    beta_access_key: str
 
     @property
     def uses_watsonx(self) -> bool:
@@ -100,6 +101,7 @@ def get_settings() -> Settings:
         watsonx_model_id=_env("WATSONX_MODEL_ID"),
         watsonx_vector_index_id=_env("WATSONX_VECTOR_INDEX_ID"),
         watsonx_timeout_seconds=float(_env("WATSONX_TIMEOUT_SECONDS", "20")),
+        beta_access_key=_env("BETA_ACCESS_KEY"),
     )
 
 

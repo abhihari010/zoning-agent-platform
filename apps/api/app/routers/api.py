@@ -129,6 +129,7 @@ def analyze(project_id: UUID, payload: AnalyzeRequest):
     result = analyze_project(
         project_description=project.project_description,
         district=project.district,
+        jurisdiction_id=project.jurisdiction_id,
         clarification_answers=payload.clarification_answers,
     )
     store.save_analysis(AnalysisRecord(project_id=project_id, result=result))
@@ -251,6 +252,8 @@ def _missing_source_metadata(source) -> list[str]:
         missing.append("url")
     if not source.effective_date:
         missing.append("effective_date")
+    if not source.jurisdiction_id:
+        missing.append("jurisdiction_id")
     if not source.districts:
         missing.append("districts")
     if not source.uses:

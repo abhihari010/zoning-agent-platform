@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
@@ -37,5 +38,34 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def require_beta_access_key(request: Request, call_next):
+    beta_access_key = os.getenv("BETA_ACCESS_KEY", "").strip()
+    if (
+        beta_access_key
+        and request.url.path.startswith("/api/v1/")
+        and request.method != "OPTIONS"
+    ):
+        provided_key = request.headers.get("X-Beta-Access-Key", "").strip()
+        if not provided_key:
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Beta access key required."},
+            )
+        if provided_key != beta_access_key:
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Invalid beta access key."},
+            )
+
+    return await call_next(request)
+
+
+@app.get("/health")
+def render_health() -> dict[str, str]:
+    return {"status": "ok"}
+
 
 app.include_router(api_router)

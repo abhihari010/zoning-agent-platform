@@ -6,7 +6,42 @@ import type {
 
 const DEFAULT_API_URL = "http://localhost:8000";
 
-const API_BASE = `${(import.meta.env.VITE_API_URL ?? DEFAULT_API_URL).replace(/\/$/, "")}/api/v1`;
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? DEFAULT_API_URL).replace(/\/$/, "");
+const API_BASE = `${API_ORIGIN}/api/v1`;
+const BETA_ACCESS_STORAGE_KEY = "zoning-agent.betaAccessKey";
+
+function isLocalApiUrl(): boolean {
+  try {
+    const hostname = new URL(API_ORIGIN).hostname;
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+  } catch {
+    return true;
+  }
+}
+
+export const requiresBetaAccess = !isLocalApiUrl();
+
+export function getBetaAccessKey(): string {
+  return window.sessionStorage.getItem(BETA_ACCESS_STORAGE_KEY) ?? "";
+}
+
+export function setBetaAccessKey(value: string): void {
+  const trimmed = value.trim();
+  if (trimmed) {
+    window.sessionStorage.setItem(BETA_ACCESS_STORAGE_KEY, trimmed);
+  } else {
+    window.sessionStorage.removeItem(BETA_ACCESS_STORAGE_KEY);
+  }
+}
+
+export function clearBetaAccessKey(): void {
+  window.sessionStorage.removeItem(BETA_ACCESS_STORAGE_KEY);
+}
+
+function requestHeaders(headers: Record<string, string> = {}): HeadersInit {
+  const betaAccessKey = getBetaAccessKey();
+  return betaAccessKey ? { ...headers, "X-Beta-Access-Key": betaAccessKey } : headers;
+}
 
 export interface IntakeResponse {
   projectId: string;
@@ -24,6 +59,7 @@ export interface SourceRegistryEntry {
   title: string;
   excerpt: string;
   sectionRef: string;
+  jurisdictionId?: string | null;
   url?: string | null;
   effectiveDate?: string | null;
   districts: string[];
@@ -84,6 +120,7 @@ export async function suggestAddresses(
 
   const response = await fetch(
     `${API_BASE}/address/suggest?${params.toString()}`,
+    { headers: requestHeaders() },
   );
   if (!response.ok) {
     return [];
@@ -94,7 +131,10 @@ export async function suggestAddresses(
 }
 
 export async function createSession(): Promise<string> {
-  const response = await fetch(`${API_BASE}/sessions`, { method: "POST" });
+  const response = await fetch(`${API_BASE}/sessions`, {
+    method: "POST",
+    headers: requestHeaders(),
+  });
   if (!response.ok) {
     throw new Error(await parseError(response, "Failed to create session"));
   }
@@ -109,7 +149,7 @@ export async function intakeProject(input: {
 }): Promise<IntakeResponse> {
   const response = await fetch(`${API_BASE}/projects/intake`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: requestHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(input),
   });
   if (!response.ok) {
@@ -145,7 +185,7 @@ export async function analyzeProject(
 ): Promise<AnalyzeResponse> {
   const response = await fetch(`${API_BASE}/projects/${projectId}/analyze`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: requestHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({
       project_id: projectId,
       clarification_answers: clarificationAnswers ?? {},
@@ -220,7 +260,9 @@ export async function analyzeProject(
 }
 
 export async function fetchTrace(projectId: string): Promise<AuditEvent[]> {
-  const response = await fetch(`${API_BASE}/projects/${projectId}/trace`);
+  const response = await fetch(`${API_BASE}/projects/${projectId}/trace`, {
+    headers: requestHeaders(),
+  });
   if (!response.ok) {
     throw new Error(await parseError(response, "Failed to load trace"));
   }
@@ -247,7 +289,7 @@ export async function submitFeedback(input: {
 }): Promise<void> {
   const response = await fetch(`${API_BASE}/projects/${input.projectId}/feedback`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: requestHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({
       project_id: input.projectId,
       helpful: input.helpful,
@@ -265,6 +307,7 @@ function mapSourceEntry(payload: {
   title: string;
   excerpt: string;
   section_ref: string;
+  jurisdiction_id?: string | null;
   url?: string | null;
   effective_date?: string | null;
   districts: string[];
@@ -275,6 +318,7 @@ function mapSourceEntry(payload: {
     title: payload.title,
     excerpt: payload.excerpt,
     sectionRef: payload.section_ref,
+    jurisdictionId: payload.jurisdiction_id,
     url: payload.url,
     effectiveDate: payload.effective_date,
     districts: payload.districts,
@@ -283,7 +327,9 @@ function mapSourceEntry(payload: {
 }
 
 export async function listSources(): Promise<SourceRegistryEntry[]> {
-  const response = await fetch(`${API_BASE}/ingestion/sources`);
+  const response = await fetch(`${API_BASE}/ingestion/sources`, {
+    headers: requestHeaders(),
+  });
   if (!response.ok) {
     throw new Error(await parseError(response, "Failed to load sources"));
   }
@@ -294,6 +340,7 @@ export async function listSources(): Promise<SourceRegistryEntry[]> {
       title: string;
       excerpt: string;
       section_ref: string;
+      jurisdiction_id?: string | null;
       url?: string | null;
       effective_date?: string | null;
       districts: string[];
@@ -304,7 +351,9 @@ export async function listSources(): Promise<SourceRegistryEntry[]> {
 }
 
 export async function fetchSourceIndexStatus(): Promise<SourceIndexStatus> {
-  const response = await fetch(`${API_BASE}/ingestion/status`);
+  const response = await fetch(`${API_BASE}/ingestion/status`, {
+    headers: requestHeaders(),
+  });
   if (!response.ok) {
     throw new Error(await parseError(response, "Failed to load source index status"));
   }
@@ -339,13 +388,14 @@ export async function saveSource(
 ): Promise<SourceRegistryEntry[]> {
   const response = await fetch(`${API_BASE}/ingestion/sources`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: requestHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({
       source: {
         source_id: source.sourceId,
         title: source.title,
         excerpt: source.excerpt,
         section_ref: source.sectionRef,
+        jurisdiction_id: source.jurisdictionId?.trim() || null,
         url: source.url?.trim() || null,
         effective_date: source.effectiveDate?.trim() || null,
         districts: source.districts,
@@ -363,6 +413,7 @@ export async function saveSource(
       title: string;
       excerpt: string;
       section_ref: string;
+      jurisdiction_id?: string | null;
       url?: string | null;
       effective_date?: string | null;
       districts: string[];
@@ -379,6 +430,7 @@ export async function reindexSources(): Promise<{
 }> {
   const response = await fetch(`${API_BASE}/ingestion/reindex`, {
     method: "POST",
+    headers: requestHeaders(),
   });
   if (!response.ok) {
     throw new Error(await parseError(response, "Failed to reindex sources"));
@@ -401,7 +453,7 @@ export async function importLocalDocuments(
 ): Promise<LocalDocumentImportResult> {
   const response = await fetch(`${API_BASE}/ingestion/import-local-docs`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: requestHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({ directory: directory?.trim() || null }),
   });
   if (!response.ok) {

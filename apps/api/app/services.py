@@ -328,12 +328,14 @@ def retrieve_zoning_context(
     district: str,
     inferred_use: str,
     project_description: str = "",
+    jurisdiction_id: str | None = None,
 ) -> list[SourceCitation]:
     result = get_retrieval_provider().retrieve(
         RetrievalProviderRequest(
             district=district,
             inferred_use=inferred_use,
             project_description=project_description,
+            jurisdiction_id=jurisdiction_id,
         )
     )
     return result.citations
@@ -419,6 +421,7 @@ def _dedupe_follow_up_questions(questions: list[str]) -> list[str]:
 def analyze_project(
     project_description: str,
     district: str,
+    jurisdiction_id: str | None = None,
     clarification_answers: dict[str, str] | None = None,
 ) -> AnalyzeResult:
     combined_description = _merge_project_context(project_description, clarification_answers)
@@ -434,6 +437,7 @@ def analyze_project(
                 district=district,
                 inferred_use=intent.inferred_use,
                 project_description=combined_description,
+                jurisdiction_id=jurisdiction_id,
             )
         ).citations
     except Exception as exc:

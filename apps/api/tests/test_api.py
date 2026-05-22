@@ -32,6 +32,35 @@ def test_intake_missing_google_key_returns_503(monkeypatch):
     assert "GOOGLE_MAPS_API_KEY" in response.json()["detail"]
 
 
+def test_health_endpoint_does_not_require_beta_key(monkeypatch):
+    monkeypatch.setenv("BETA_ACCESS_KEY", "secret-beta-key")
+    client = TestClient(app)
+
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+
+
+def test_beta_access_key_protects_api_routes(monkeypatch):
+    monkeypatch.setenv("BETA_ACCESS_KEY", "secret-beta-key")
+    client = TestClient(app)
+
+    missing_response = client.post("/api/v1/sessions")
+    wrong_response = client.post(
+        "/api/v1/sessions",
+        headers={"X-Beta-Access-Key": "wrong-key"},
+    )
+    accepted_response = client.post(
+        "/api/v1/sessions",
+        headers={"X-Beta-Access-Key": "secret-beta-key"},
+    )
+
+    assert missing_response.status_code == 401
+    assert wrong_response.status_code == 403
+    assert accepted_response.status_code == 200
+
+
 def test_intake_invalid_address_returns_invalid_status(monkeypatch):
     client = TestClient(app)
 
@@ -206,6 +235,7 @@ def test_ingestion_sources_seed_and_upsert():
     assert list_response.status_code == 200
     sources = list_response.json()["sources"]
     assert len(sources) >= 3
+    assert all(source["jurisdiction_id"] == "blacksburg-va" for source in sources)
 
     upsert_response = client.post(
         "/api/v1/ingestion/sources",
@@ -215,6 +245,7 @@ def test_ingestion_sources_seed_and_upsert():
                 "title": "Parking Code 2.9",
                 "excerpt": "Small commercial conversions must maintain two off-street spaces.",
                 "section_ref": "Sec 2.9",
+                "jurisdiction_id": "blacksburg-va",
                 "url": "https://example.gov/parking/2.9",
                 "effective_date": "2025-02-01",
                 "districts": ["mixed-use-core"],
@@ -225,6 +256,10 @@ def test_ingestion_sources_seed_and_upsert():
     assert upsert_response.status_code == 200
     updated_sources = upsert_response.json()["sources"]
     assert any(source["source_id"] == "parking-code-2.9" for source in updated_sources)
+    assert any(
+        source["source_id"] == "parking-code-2.9" and source["jurisdiction_id"] == "blacksburg-va"
+        for source in updated_sources
+    )
 
 
 def test_ingestion_reindex_reports_source_count():
@@ -267,7 +302,13 @@ def test_ingestion_status_reports_index_and_source_health():
     incomplete = next(
         source for source in body["sources_missing_metadata"] if source["source_id"] == "incomplete-source"
     )
-    assert set(incomplete["missing_fields"]) == {"url", "effective_date", "districts", "uses"}
+    assert set(incomplete["missing_fields"]) == {
+        "url",
+        "effective_date",
+        "jurisdiction_id",
+        "districts",
+        "uses",
+    }
 
 
 def test_import_local_docs_endpoint():
@@ -324,6 +365,7 @@ def test_import_local_docs_reindex_creates_stable_chunks_with_metadata():
                     "source_id: bakery-rule",
                     "title: Bakery Rule",
                     "section_ref: Sec 12.4.2",
+                    "jurisdiction_id: blacksburg-va",
                     "url: https://example.gov/zoning/12.4",
                     "effective_date: 2026-01-15",
                     "districts: mixed-use-core, residential-low-density",
@@ -355,6 +397,7 @@ def test_import_local_docs_reindex_creates_stable_chunks_with_metadata():
         chunk = first_chunks[0]
         assert chunk.source_id == "bakery-rule"
         assert chunk.section_ref == "Sec 12.4.2"
+        assert chunk.jurisdiction_id == "blacksburg-va"
         assert chunk.url == "https://example.gov/zoning/12.4"
         assert chunk.effective_date == "2026-01-15"
         assert chunk.districts == ["mixed-use-core", "residential-low-density"]

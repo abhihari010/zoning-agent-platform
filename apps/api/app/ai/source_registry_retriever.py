@@ -46,13 +46,19 @@ class SourceRegistryRetrievalProvider:
         hits: list[SourceCitation] = []
 
         for source in self.source_store.list_sources():
+            jurisdiction_ok = (
+                not request.jurisdiction_id
+                or not source.jurisdiction_id
+                or source.jurisdiction_id == request.jurisdiction_id
+                or source.jurisdiction_id == "*"
+            )
             district_ok = (
                 request.district in source.districts
                 or "*" in source.districts
                 or request.district == "unknown"
             )
             use_ok = request.inferred_use in source.uses or "general" in source.uses
-            if not district_ok or not use_ok:
+            if not jurisdiction_ok or not district_ok or not use_ok:
                 continue
             hits.append(
                 SourceCitation(

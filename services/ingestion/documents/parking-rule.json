@@ -3,6 +3,7 @@
   "title": "Parking Code 2.9",
   "excerpt": "Small commercial conversions must maintain two off-street spaces and preserve emergency access clearances.",
   "section_ref": "Sec 2.9",
+  "jurisdiction_id": "blacksburg-va",
   "url": "https://example.gov/parking/2.9",
   "effective_date": "2025-02-01",
   "districts": ["mixed-use-core"],

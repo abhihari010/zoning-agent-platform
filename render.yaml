@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: zoning-agent-api
+    runtime: docker
+    plan: starter
+    region: ohio
+    branch: main
+    rootDir: apps/api
+    dockerfilePath: apps/api/Dockerfile
+    dockerContext: apps/api
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: zoning-agent-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: ZONING_DB_PATH
+        value: /data/app.sqlite3
+      - key: AI_PROVIDER
+        value: deterministic
+      - key: RAG_PROVIDER
+        value: hybrid_local
+      - key: EMBEDDING_PROVIDER
+        value: local
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: BETA_ACCESS_KEY
+        sync: false
+      - key: CORS_ALLOW_ORIGINS
+        sync: false

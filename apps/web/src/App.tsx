@@ -7,14 +7,18 @@ import type {
 } from "@zoning-agent/shared-schema";
 import {
   analyzeProject,
+  clearBetaAccessKey,
   createSession,
   fetchSourceIndexStatus,
   fetchTrace,
+  getBetaAccessKey,
   importLocalDocuments,
   intakeProject,
   listSources,
   reindexSources,
+  requiresBetaAccess,
   saveSource,
+  setBetaAccessKey,
   suggestAddresses,
   submitFeedback,
   type IntakeResponse,
@@ -45,6 +49,7 @@ function emptySourceForm(): SourceRegistryEntry {
     title: "",
     excerpt: "",
     sectionRef: "",
+    jurisdictionId: "blacksburg-va",
     url: "",
     effectiveDate: "",
     districts: [],
@@ -218,6 +223,9 @@ function buildChecklistDownload(
 }
 
 export function App() {
+  const [betaAccessKey, setStoredBetaAccessKey] = useState(() => getBetaAccessKey());
+  const [betaAccessInput, setBetaAccessInput] = useState("");
+  const [betaAccessError, setBetaAccessError] = useState("");
   const [workspace, setWorkspace] = useState<Workspace>("assistant");
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
   const [projectDescription, setProjectDescription] = useState("");
@@ -335,6 +343,10 @@ export function App() {
   }, [intake, result, phase]);
 
   useEffect(() => {
+    if (requiresBetaAccess && !betaAccessKey) {
+      return;
+    }
+
     let cancelled = false;
 
     async function loadSources() {
@@ -365,7 +377,7 @@ export function App() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [betaAccessKey]);
 
   const canSubmit = useMemo(
     () =>
@@ -467,6 +479,28 @@ export function App() {
     if (message) {
       setSourceMessage(message);
     }
+  }
+
+  function unlockPrivateBeta() {
+    if (!betaAccessInput.trim()) {
+      setBetaAccessError("Enter the private beta access key.");
+      return;
+    }
+
+    setBetaAccessKey(betaAccessInput);
+    setStoredBetaAccessKey(betaAccessInput.trim());
+    setBetaAccessInput("");
+    setBetaAccessError("");
+    setSourceMessage("");
+  }
+
+  function changePrivateBetaKey() {
+    clearBetaAccessKey();
+    setStoredBetaAccessKey("");
+    setBetaAccessInput("");
+    setBetaAccessError("");
+    setSources([]);
+    setIndexStatus(null);
   }
 
   async function runAnalysis(projectId: string, answers?: Record<string, string>) {
@@ -715,6 +749,48 @@ export function App() {
   const showHumanFallback =
     result?.status === "low_confidence" || result?.feasibility.decision === "unknown";
 
+  if (requiresBetaAccess && !betaAccessKey) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#f8f3ea_0%,#efe5d5_100%)] px-4 text-slate-900">
+        <section className="w-full max-w-md rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+            Private Beta
+          </p>
+          <h1 className="mt-3 font-heading text-3xl text-pine">Zoning Agent Platform</h1>
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            Enter your beta access key to open the zoning review workspace.
+          </p>
+          <label className="mt-6 block text-sm font-semibold text-slate-700">
+            Access key
+            <input
+              className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-clay focus:ring-2 focus:ring-clay"
+              type="password"
+              value={betaAccessInput}
+              onChange={(event) => setBetaAccessInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  unlockPrivateBeta();
+                }
+              }}
+            />
+          </label>
+          {betaAccessError && (
+            <p className="mt-3 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              {betaAccessError}
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={unlockPrivateBeta}
+            className="mt-5 w-full rounded-2xl bg-pine px-4 py-3 font-semibold text-white"
+          >
+            Unlock beta
+          </button>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(217,120,85,0.10),transparent_24%),linear-gradient(180deg,#f8f3ea_0%,#efe5d5_100%)] text-slate-900">
       <div className="mx-auto max-w-6xl px-4 py-5 md:px-8 md:py-8">
@@ -761,6 +837,15 @@ export function App() {
                 Source Admin
               </button>
             </div>
+            {requiresBetaAccess && (
+              <button
+                type="button"
+                onClick={changePrivateBetaKey}
+                className="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+              >
+                Change beta key
+              </button>
+            )}
           </div>
         </section>
 
@@ -1626,6 +1711,20 @@ export function App() {
                     />
                   </label>
                   <label className="block text-sm font-semibold text-slate-700">
+                    Jurisdiction ID
+                    <input
+                      className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+                      value={sourceForm.jurisdictionId ?? ""}
+                      onChange={(event) =>
+                        setSourceForm((current) => ({
+                          ...current,
+                          jurisdictionId: event.target.value,
+                        }))
+                      }
+                      placeholder="blacksburg-va"
+                    />
+                  </label>
+                  <label className="block text-sm font-semibold text-slate-700">
                     URL
                     <input
                       className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
@@ -1772,6 +1871,9 @@ export function App() {
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold text-slate-900">{source.title}</p>
+                          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                            {source.jurisdictionId ?? "No jurisdiction"}
+                          </p>
                           <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
                             {source.sourceId} · {source.sectionRef}
                           </p>

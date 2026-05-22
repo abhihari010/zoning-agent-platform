@@ -22,6 +22,7 @@ def _clear_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "WATSONX_PROJECT_ID",
         "WATSONX_MODEL_ID",
         "WATSONX_VECTOR_INDEX_ID",
+        "BETA_ACCESS_KEY",
     ]:
         monkeypatch.delenv(name, raising=False)
 
@@ -36,6 +37,7 @@ def test_settings_default_to_offline_providers(monkeypatch: pytest.MonkeyPatch) 
     assert settings.embedding_provider == "none"
     assert not settings.uses_watsonx
     assert not settings.uses_openai
+    assert settings.beta_access_key == ""
 
 
 def test_settings_prefers_new_database_path(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -51,6 +53,13 @@ def test_settings_keeps_legacy_database_path_fallback(monkeypatch: pytest.Monkey
     monkeypatch.setenv("IBM_ZONING_DB_PATH", "tmp/legacy.sqlite3")
 
     assert get_settings().database_path == Path("tmp/legacy.sqlite3")
+
+
+def test_settings_reads_beta_access_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("BETA_ACCESS_KEY", "secret-beta-key")
+
+    assert get_settings().beta_access_key == "secret-beta-key"
 
 
 def test_unknown_provider_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None:

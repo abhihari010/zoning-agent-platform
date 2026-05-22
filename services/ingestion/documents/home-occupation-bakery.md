@@ -1,5 +1,6 @@
 title: Home Occupation Bakery Guidance
 section_ref: Sec 12.4.2
+jurisdiction_id: blacksburg-va
 url: https://example.gov/zoning/12.4
 effective_date: 2024-01-01
 districts: residential-low-density, mixed-use-core
