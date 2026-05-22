@@ -32,6 +32,9 @@ class IntakeResponse(BaseModel):
     latitude: float | None = None
     longitude: float | None = None
     status: Literal["created", "invalid_address"]
+    support_status: Literal["supported", "unsupported", "invalid"] = "supported"
+    jurisdiction_id: str | None = None
+    jurisdiction_name: str | None = None
     follow_up_questions: list[str] = Field(default_factory=list)
 
 

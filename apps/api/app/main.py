@@ -1,4 +1,6 @@
+import hashlib
 import os
+import secrets
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -17,6 +19,7 @@ load_dotenv(API_DIR / ".env", override=True)
 load_dotenv(API_DIR / ".env.local", override=True)
 
 from app.routers.api import router as api_router
+from app.settings import get_settings
 
 app = FastAPI(title="Zoning Agent API", version="0.1.0")
 
@@ -42,9 +45,9 @@ app.add_middleware(
 
 @app.middleware("http")
 async def require_beta_access_key(request: Request, call_next):
-    beta_access_key = os.getenv("BETA_ACCESS_KEY", "").strip()
+    beta_access_keys = get_settings().beta_access_keys
     if (
-        beta_access_key
+        beta_access_keys
         and request.url.path.startswith("/api/v1/")
         and request.method != "OPTIONS"
     ):
@@ -54,7 +57,11 @@ async def require_beta_access_key(request: Request, call_next):
                 status_code=401,
                 content={"detail": "Beta access key required."},
             )
-        if provided_key != beta_access_key:
+        provided_key_hash = hashlib.sha256(provided_key.encode("utf-8")).hexdigest()
+        if not any(
+            secrets.compare_digest(provided_key_hash, access_key.key_hash)
+            for access_key in beta_access_keys
+        ):
             return JSONResponse(
                 status_code=403,
                 content={"detail": "Invalid beta access key."},

@@ -24,6 +24,8 @@ def _clear_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "WATSONX_MODEL_ID",
         "WATSONX_VECTOR_INDEX_ID",
         "BETA_ACCESS_KEY",
+        "BETA_ACCESS_KEYS",
+        "ADMIN_ACCESS_KEY",
     ]:
         monkeypatch.delenv(name, raising=False)
 
@@ -67,7 +69,32 @@ def test_settings_reads_beta_access_key(monkeypatch: pytest.MonkeyPatch) -> None
     _clear_provider_env(monkeypatch)
     monkeypatch.setenv("BETA_ACCESS_KEY", "secret-beta-key")
 
-    assert get_settings().beta_access_key == "secret-beta-key"
+    settings = get_settings()
+
+    assert settings.beta_access_key == "secret-beta-key"
+    assert settings.beta_access_keys[0].label == "legacy"
+    assert settings.beta_access_keys[0].key_hash != "secret-beta-key"
+
+
+def test_settings_reads_labeled_beta_access_keys(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("BETA_ACCESS_KEYS", "alice:alice-key,bob:bob-key")
+
+    settings = get_settings()
+
+    assert [key.label for key in settings.beta_access_keys] == ["alice", "bob"]
+    assert all(key.key_hash not in {"alice-key", "bob-key"} for key in settings.beta_access_keys)
+
+
+def test_settings_reads_admin_access_key_hash(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("ADMIN_ACCESS_KEY", "admin-key")
+
+    settings = get_settings()
+
+    assert settings.admin_access_key == "admin-key"
+    assert settings.admin_access_key_hash
+    assert settings.admin_access_key_hash != "admin-key"
 
 
 def test_unknown_provider_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None:

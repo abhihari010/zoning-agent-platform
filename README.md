@@ -276,6 +276,8 @@ Set environment variables before starting the API when needed:
 - `DATABASE_URL`: optional SQLAlchemy-compatible database URL. Render staging and production must set this to Postgres.
 - `ZONING_DB_PATH`: optional SQLite database path for local fallback only (default `apps/api/app/data/app.sqlite3`)
 - `BETA_ACCESS_KEY`: optional private beta key; when set, every `/api/v1/*` request must include `X-Beta-Access-Key`
+- `BETA_ACCESS_KEYS`: optional rotatable beta keys as comma-separated `label:key` pairs, for example `alice:invite-one,bob:invite-two`. These work alongside `BETA_ACCESS_KEY`.
+- `ADMIN_ACCESS_KEY`: optional source-admin key. When set, `POST /api/v1/ingestion/sources`, `POST /api/v1/ingestion/reindex`, and `POST /api/v1/ingestion/import-local-docs` require `X-Admin-Access-Key`.
 - `AI_PROVIDER`: optional analysis provider (`deterministic`, `openai`, or `watsonx`, default `deterministic`)
 - `RAG_PROVIDER`: optional retrieval provider (`source_registry`, `hybrid_local`, or `watsonx`, default `source_registry`)
 - `EMBEDDING_PROVIDER`: optional embedding provider (`none`, `local`, or `openai`, default `none`)
@@ -349,7 +351,8 @@ Target beta shape:
 - Render staging and production use Postgres through `DATABASE_URL`.
 - The current free staging database is Supabase project `tzstkgifmftqcdguhshn` in `us-east-2`.
 - `ZONING_DB_PATH` is local fallback only and should not be set on Render.
-- Private beta access is enforced by `BETA_ACCESS_KEY`.
+- Private beta access is enforced by `BETA_ACCESS_KEY` and/or labeled entries in `BETA_ACCESS_KEYS`.
+- Admin source writes can be separated from tester access with `ADMIN_ACCESS_KEY`; source status/list remain available to beta testers.
 
 Current deployed targets:
 
@@ -378,6 +381,8 @@ Free Supabase staging is for pre-user validation only. Before inviting real test
    - `DATABASE_URL=<Supabase session pooler URL with password from dashboard>`
    - `CORS_ALLOW_ORIGINS=https://zoning-agent-platform.vercel.app`
    - `BETA_ACCESS_KEY=<long random beta key>`
+   - `BETA_ACCESS_KEYS=<label:key,label2:key2>` for additional tester keys, if needed
+   - `ADMIN_ACCESS_KEY=<long random admin key>` before exposing Source Admin write actions
    - `GOOGLE_MAPS_API_KEY=<restricted server key>`
    - `AI_PROVIDER=deterministic`
    - `RAG_PROVIDER=hybrid_local`

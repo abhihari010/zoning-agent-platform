@@ -12,7 +12,9 @@ from app.storage import store
 
 
 @pytest.fixture(autouse=True)
-def clear_store() -> None:
+def clear_store(monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in ["BETA_ACCESS_KEY", "BETA_ACCESS_KEYS", "ADMIN_ACCESS_KEY"]:
+        monkeypatch.delenv(name, raising=False)
     store.reset()
 
 
@@ -61,6 +63,71 @@ def test_beta_access_key_protects_api_routes(monkeypatch):
     assert accepted_response.status_code == 200
 
 
+def test_beta_access_keys_accept_multiple_labeled_keys(monkeypatch):
+    monkeypatch.setenv("BETA_ACCESS_KEYS", "alice:alice-key,bob:bob-key")
+    client = TestClient(app)
+
+    alice_response = client.post(
+        "/api/v1/sessions",
+        headers={"X-Beta-Access-Key": "alice-key"},
+    )
+    bob_response = client.post(
+        "/api/v1/sessions",
+        headers={"X-Beta-Access-Key": "bob-key"},
+    )
+    wrong_response = client.post(
+        "/api/v1/sessions",
+        headers={"X-Beta-Access-Key": "alice"},
+    )
+
+    assert alice_response.status_code == 200
+    assert bob_response.status_code == 200
+    assert wrong_response.status_code == 403
+
+
+def test_beta_access_keys_preserve_single_key_compatibility(monkeypatch):
+    monkeypatch.setenv("BETA_ACCESS_KEY", "legacy-key")
+    monkeypatch.setenv("BETA_ACCESS_KEYS", "tester:new-key")
+    client = TestClient(app)
+
+    legacy_response = client.post(
+        "/api/v1/sessions",
+        headers={"X-Beta-Access-Key": "legacy-key"},
+    )
+    new_response = client.post(
+        "/api/v1/sessions",
+        headers={"X-Beta-Access-Key": "new-key"},
+    )
+
+    assert legacy_response.status_code == 200
+    assert new_response.status_code == 200
+
+
+def test_admin_access_key_protects_source_write_routes(monkeypatch):
+    monkeypatch.setenv("BETA_ACCESS_KEY", "beta-key")
+    monkeypatch.setenv("ADMIN_ACCESS_KEY", "admin-key")
+    client = TestClient(app)
+    beta_headers = {"X-Beta-Access-Key": "beta-key"}
+
+    status_response = client.get("/api/v1/ingestion/status", headers=beta_headers)
+    list_response = client.get("/api/v1/ingestion/sources", headers=beta_headers)
+    missing_admin_response = client.post("/api/v1/ingestion/reindex", headers=beta_headers)
+    wrong_admin_response = client.post(
+        "/api/v1/ingestion/reindex",
+        headers={**beta_headers, "X-Admin-Access-Key": "wrong-admin-key"},
+    )
+    accepted_response = client.post(
+        "/api/v1/ingestion/reindex",
+        headers={**beta_headers, "X-Admin-Access-Key": "admin-key"},
+    )
+
+    assert status_response.status_code == 200
+    assert list_response.status_code == 200
+    assert missing_admin_response.status_code == 401
+    assert wrong_admin_response.status_code == 403
+    assert accepted_response.status_code == 200
+
+
 def test_intake_invalid_address_returns_invalid_status(monkeypatch):
     client = TestClient(app)
 
@@ -77,6 +144,7 @@ def test_intake_invalid_address_returns_invalid_status(monkeypatch):
             longitude=None,
             is_valid=False,
             warnings=["Address could not be validated with Google Maps APIs."],
+            support_status="invalid",
         )
 
     monkeypatch.setattr("app.routers.api.normalize_address", fake_normalize)
@@ -91,6 +159,7 @@ def test_intake_invalid_address_returns_invalid_status(monkeypatch):
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "invalid_address"
+    assert body["support_status"] == "invalid"
     assert body["district"] == "unknown"
 
 
@@ -122,6 +191,7 @@ def test_intake_success_persists_geodata(monkeypatch):
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "created"
+    assert body["support_status"] == "supported"
     assert body["place_id"] == "place-123"
     assert body["latitude"] == 40.0
 
@@ -130,6 +200,46 @@ def test_intake_success_persists_geodata(monkeypatch):
     assert project is not None
     assert project.place_id == "place-123"
     assert project.jurisdiction_id is None
+
+
+def test_intake_recognized_unsupported_jurisdiction_returns_metadata(monkeypatch):
+    client = TestClient(app)
+
+    from app import services
+
+    def fake_normalize(_: str):
+        return services.AddressNormalizationResult(
+            normalized_address="100 Main St, Christiansburg, VA 24073, USA",
+            district="unknown",
+            place_id="place-unsupported",
+            latitude=37.1,
+            longitude=-80.4,
+            is_valid=False,
+            warnings=["This tool does not yet support zoning review for Christiansburg, VA."],
+            support_status="unsupported",
+            jurisdiction_id="christiansburg-va",
+            jurisdiction_name="Christiansburg, VA",
+        )
+
+    monkeypatch.setattr("app.routers.api.normalize_address", fake_normalize)
+
+    response = client.post(
+        "/api/v1/projects/intake",
+        json={
+            "session_id": str(uuid4()),
+            "project_description": "Convert garage to bakery with two employees and set operating hours.",
+            "address": "100 Main St Christiansburg VA",
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "invalid_address"
+    assert body["support_status"] == "unsupported"
+    assert body["jurisdiction_id"] == "christiansburg-va"
+    assert body["jurisdiction_name"] == "Christiansburg, VA"
+    assert "does not yet support zoning review" in body["follow_up_questions"][-1]
+    assert store.get_project(UUID(body["project_id"])) is None
 
 
 def test_address_suggest_returns_suggestions(monkeypatch):
