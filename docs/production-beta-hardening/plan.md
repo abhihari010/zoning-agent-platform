@@ -9,7 +9,7 @@ This plan breaks production readiness into parallelizable tickets. The ordering 
 - Production storage target is Postgres, selected by `DATABASE_URL`.
 - Local development and default tests must keep a SQLite fallback.
 - Use SQLAlchemy 2.x, Alembic, and `psycopg` unless implementation discovery finds a concrete blocker.
-- Render free web service plus free Render Postgres is staging only. Paid Postgres is required before storing real user beta data.
+- Render free web service plus the selected free Supabase Postgres project is staging only. A paid database plan is required before storing real user beta data.
 - Keep Vercel frontend and Render API as the deployment targets.
 - Preserve the existing frontend-facing API response shapes unless a ticket explicitly coordinates a contract change.
 - Expand regionally first: Montgomery County, Christiansburg, and Roanoke/Roanoke County.
@@ -128,7 +128,7 @@ Make Render deployment config and docs reflect a free staging path with Postgres
 
 ### Context
 
-The current `render.yaml` uses a free web service and `/tmp/app.sqlite3`. Free Render web files are ephemeral. Free Render Postgres can support staging but expires after 30 days and has no backups.
+The previous Render path used a free web service and `/tmp/app.sqlite3`. Free Render web files are ephemeral. The selected staging path is the free Supabase Postgres project, so staging is not tied to Render's 30-day free database expiration.
 
 ### Relevant Files or References
 
@@ -139,7 +139,7 @@ The current `render.yaml` uses a free web service and `/tmp/app.sqlite3`. Free R
 
 ### Proposed Approach
 
-Update Render Blueprint/docs to use `DATABASE_URL` for the API, document free staging limitations, and document the paid production switch. If Blueprint-managed free Postgres is practical, include it in `render.yaml`; otherwise document the dashboard setup and required env vars. Keep `ZONING_DB_PATH` as local fallback only.
+Update Render Blueprint/docs to use `DATABASE_URL` for the API, document Supabase free staging limitations, and document the paid production switch. Document the dashboard setup and required env vars because the Supabase database is managed outside the Render Blueprint. Keep `ZONING_DB_PATH` as local fallback only.
 
 ### Acceptance Criteria
 

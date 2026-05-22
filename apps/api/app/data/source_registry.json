@@ -1,23 +1,23 @@
 [
   {
-    "source_id": "muni-zoning-12.4",
-    "title": "Municipal Zoning Ordinance 12.4",
-    "excerpt": "Home occupation businesses may be conditionally permitted in low-density districts with parking and signage limits.",
-    "section_ref": "Sec 12.4.2",
+    "source_id": "blacksburg-home-occupation-standards",
+    "title": "Town of Blacksburg Home Occupation Use and Design Standards",
+    "excerpt": "Home occupation standards restrict outside storage and hazardous materials, limit home occupation floor area to 25% of the dwelling, allow one nonresident worker, prohibit on-site advertising signs, and require traffic volumes consistent with nearby dwellings without adding parking spaces during the home occupation.",
+    "section_ref": "Zoning Ordinance Sec. 4211(B)(3)-(8)",
     "jurisdiction_id": "blacksburg-va",
-    "url": "https://example.gov/zoning/12.4",
-    "effective_date": "2024-01-01",
+    "url": "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
+    "effective_date": "2026-03-19",
     "districts": ["residential-low-density", "mixed-use-core"],
     "uses": ["home-based-food-business", "general"]
   },
   {
-    "source_id": "fire-code-8.2",
-    "title": "Local Fire and Safety Code 8.2",
-    "excerpt": "Commercial food preparation requires ventilation review and fire suppression verification before permit issuance.",
-    "section_ref": "Sec 8.2.1",
+    "source_id": "blacksburg-business-zoning-home-occupation",
+    "title": "Town of Blacksburg Zoning Guidance for Business Licenses and Home Occupations",
+    "excerpt": "The Town instructs prospective businesses to confirm that zoning allows the proposed business use before applying for a business license. The Town's zoning page states that home occupations, meaning businesses run administratively out of the home, are allowed in every Blacksburg zoning district subject to the Home Occupation Application ordinance standards.",
+    "section_ref": "Business Licenses and Home Occupations",
     "jurisdiction_id": "blacksburg-va",
-    "url": "https://example.gov/fire/8.2",
-    "effective_date": "2023-09-15",
+    "url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
+    "effective_date": "2026-03-19",
     "districts": [
       "residential-low-density",
       "mixed-use-core",
@@ -27,14 +27,62 @@
     "uses": ["home-based-food-business", "general"]
   },
   {
-    "source_id": "industry-zoning-4.1",
-    "title": "Industrial and Employment Use Code 4.1",
-    "excerpt": "Light manufacturing and high-impact kitchen equipment require special review in industrial and employment districts.",
-    "section_ref": "Sec 4.1.7",
+    "source_id": "blacksburg-off-street-parking-home-occupation",
+    "title": "Blacksburg Zoning Ordinance Off-Street Parking Schedule for Home Occupations",
+    "excerpt": "The Blacksburg Zoning Ordinance off-street parking schedule lists Home occupation under residential use types and points minimum parking review to section 4211(B)(8), with no maximum parking standard stated in the schedule.",
+    "section_ref": "Zoning Ordinance Sec. 5210; Sec. 4211(B)(8)",
     "jurisdiction_id": "blacksburg-va",
-    "url": "https://example.gov/zoning/4.1",
-    "effective_date": "2022-06-10",
-    "districts": ["industrial-zone", "commercial-employment"],
-    "uses": ["general"]
+    "url": "https://library.municode.com/va/blacksburg/codes/code_of_ordinances?nodeId=CO_APXAORNO1137BLZOOR_ARTVDEST_DIV2OREPASTLO_S5200PU",
+    "effective_date": "2026-03-19",
+    "districts": ["residential-low-density", "mixed-use-core"],
+    "uses": ["home-based-food-business", "general"]
+  },
+  {
+    "source_id": "blacksburg-building-safety-review",
+    "title": "Town of Blacksburg Planning and Building Department Building Safety Review",
+    "excerpt": "The Building Safety Division reviews construction plans for conformance with the Virginia Uniform Statewide Building Code and town ordinances, issues construction permits, inspects projects for approved-plan compliance, and issues certificates of occupancy.",
+    "section_ref": "Building Safety",
+    "jurisdiction_id": "blacksburg-va",
+    "url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building",
+    "effective_date": "2026-03-19",
+    "districts": [
+      "residential-low-density",
+      "mixed-use-core",
+      "commercial-employment",
+      "industrial-zone"
+    ],
+    "uses": ["home-based-food-business", "general"]
+  },
+  {
+    "source_id": "virginia-food-establishment-permit",
+    "title": "Virginia Department of Health Food Establishment Permit Guidance",
+    "excerpt": "VDH states that foodservice operators opening a new or remodeled foodservice facility should submit plan review materials to the local health department, apply for a Food Establishment Permit before opening, and request a health department inspection before the permit is issued.",
+    "section_ref": "Applying for a Food Permit",
+    "jurisdiction_id": "blacksburg-va",
+    "url": "https://www.vdh.virginia.gov/environmental-health/food-safety-in-virginia/foodapplication/",
+    "effective_date": "2026-05-08",
+    "districts": [
+      "residential-low-density",
+      "mixed-use-core",
+      "commercial-employment",
+      "industrial-zone"
+    ],
+    "uses": ["home-based-food-business", "general"]
+  },
+  {
+    "source_id": "virginia-home-commercial-kitchen-food-businesses",
+    "title": "VDACS Home and Commercial Kitchen-Based Food Businesses",
+    "excerpt": "VDACS explains that food establishments, including private homes that manufacture, process, pack, or hold food for sale, are subject to Virginia food laws and related regulations unless an exception applies, and operating generally requires inspection and a permit.",
+    "section_ref": "Home & Commercial Kitchen-Based Businesses",
+    "jurisdiction_id": "blacksburg-va",
+    "url": "https://www.vdacs.virginia.gov/dairy-kitchen-food-services-businesses.shtml",
+    "effective_date": "2026-05-22",
+    "districts": [
+      "residential-low-density",
+      "mixed-use-core",
+      "commercial-employment",
+      "industrial-zone"
+    ],
+    "uses": ["home-based-food-business", "general"]
   }
 ]

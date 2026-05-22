@@ -285,6 +285,8 @@ def test_analyze_project_runs_with_offline_default_providers(monkeypatch: pytest
 
     assert result.feasibility.decision == "conditional"
     assert result.citations
+    placeholder_host = "example" + ".gov"
+    assert all(placeholder_host not in (citation.url or "") for citation in result.citations)
     assert not any("watsonx" in warning.lower() for warning in result.warnings)
 
 

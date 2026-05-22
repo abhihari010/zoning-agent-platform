@@ -246,7 +246,7 @@ def test_ingestion_sources_seed_and_upsert():
                 "excerpt": "Small commercial conversions must maintain two off-street spaces.",
                 "section_ref": "Sec 2.9",
                 "jurisdiction_id": "blacksburg-va",
-                "url": "https://example.gov/parking/2.9",
+                "url": "https://library.municode.com/va/blacksburg/codes/code_of_ordinances?nodeId=CO_APXAORNO1137BLZOOR_ARTVDEST_DIV2OREPASTLO_S5200PU",
                 "effective_date": "2025-02-01",
                 "districts": ["mixed-use-core"],
                 "uses": ["home-based-food-business"],
@@ -260,6 +260,8 @@ def test_ingestion_sources_seed_and_upsert():
         source["source_id"] == "parking-code-2.9" and source["jurisdiction_id"] == "blacksburg-va"
         for source in updated_sources
     )
+    placeholder_host = "example" + ".gov"
+    assert all(placeholder_host not in (source.get("url") or "") for source in updated_sources)
 
 
 def test_ingestion_reindex_reports_source_count():
@@ -366,7 +368,7 @@ def test_import_local_docs_reindex_creates_stable_chunks_with_metadata():
                     "title: Bakery Rule",
                     "section_ref: Sec 12.4.2",
                     "jurisdiction_id: blacksburg-va",
-                    "url: https://example.gov/zoning/12.4",
+                    "url: https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
                     "effective_date: 2026-01-15",
                     "districts: mixed-use-core, residential-low-density",
                     "uses: home-based-food-business",
@@ -398,7 +400,7 @@ def test_import_local_docs_reindex_creates_stable_chunks_with_metadata():
         assert chunk.source_id == "bakery-rule"
         assert chunk.section_ref == "Sec 12.4.2"
         assert chunk.jurisdiction_id == "blacksburg-va"
-        assert chunk.url == "https://example.gov/zoning/12.4"
+        assert chunk.url == "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000"
         assert chunk.effective_date == "2026-01-15"
         assert chunk.districts == ["mixed-use-core", "residential-low-density"]
         assert chunk.uses == ["home-based-food-business"]

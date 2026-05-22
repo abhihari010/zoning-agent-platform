@@ -13,6 +13,7 @@ def _clear_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "RAG_PROVIDER",
         "EMBEDDING_PROVIDER",
         "EMBEDDING_MODEL",
+        "DATABASE_URL",
         "ZONING_DB_PATH",
         "IBM_ZONING_DB_PATH",
         "OPENAI_API_KEY",
@@ -46,6 +47,13 @@ def test_settings_prefers_new_database_path(monkeypatch: pytest.MonkeyPatch) -> 
     monkeypatch.setenv("IBM_ZONING_DB_PATH", "tmp/legacy.sqlite3")
 
     assert get_settings().database_path == Path("tmp/new.sqlite3")
+
+
+def test_settings_reads_database_url(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("DATABASE_URL", "postgres://user:pass@example.test:5432/zoning")
+
+    assert get_settings().database_url == "postgres://user:pass@example.test:5432/zoning"
 
 
 def test_settings_keeps_legacy_database_path_fallback(monkeypatch: pytest.MonkeyPatch) -> None:

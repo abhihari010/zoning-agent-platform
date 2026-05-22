@@ -39,6 +39,7 @@ class Settings:
     rag_provider: RAGProviderName
     embedding_provider: EmbeddingProviderName
     embedding_model: str
+    database_url: str
     database_path: Path
     google_maps_api_key: str
     google_maps_timeout_seconds: float
@@ -72,6 +73,7 @@ def get_settings() -> Settings:
     }
     default_ai_provider = "watsonx" if legacy_watsonx_enabled else "deterministic"
     default_rag_provider = "watsonx" if legacy_watsonx_enabled else "source_registry"
+    database_url = _env("DATABASE_URL")
     database_path = _env("ZONING_DB_PATH") or _env("IBM_ZONING_DB_PATH")
 
     return Settings(
@@ -88,6 +90,7 @@ def get_settings() -> Settings:
             _provider_name("EMBEDDING_PROVIDER", "none", VALID_EMBEDDING_PROVIDERS),
         ),
         embedding_model=_env("EMBEDDING_MODEL", "text-embedding-3-small"),
+        database_url=database_url,
         database_path=Path(database_path) if database_path else DEFAULT_DB_PATH,
         google_maps_api_key=_env("GOOGLE_MAPS_API_KEY"),
         google_maps_timeout_seconds=float(_env("GOOGLE_MAPS_TIMEOUT_SECONDS", "8")),
