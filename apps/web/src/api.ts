@@ -11,6 +11,7 @@ const DEFAULT_API_URL = import.meta.env.PROD
 const API_ORIGIN = (import.meta.env.VITE_API_URL ?? DEFAULT_API_URL).replace(/\/$/, "");
 const API_BASE = `${API_ORIGIN}/api/v1`;
 const BETA_ACCESS_STORAGE_KEY = "zoning-agent.betaAccessKey";
+const ADMIN_ACCESS_STORAGE_KEY = "zoning-agent.adminAccessKey";
 
 function isLocalApiUrl(): boolean {
   try {
@@ -40,9 +41,34 @@ export function clearBetaAccessKey(): void {
   window.sessionStorage.removeItem(BETA_ACCESS_STORAGE_KEY);
 }
 
-function requestHeaders(headers: Record<string, string> = {}): HeadersInit {
+export function getAdminAccessKey(): string {
+  return window.sessionStorage.getItem(ADMIN_ACCESS_STORAGE_KEY) ?? "";
+}
+
+export function setAdminAccessKey(value: string): void {
+  const trimmed = value.trim();
+  if (trimmed) {
+    window.sessionStorage.setItem(ADMIN_ACCESS_STORAGE_KEY, trimmed);
+  } else {
+    window.sessionStorage.removeItem(ADMIN_ACCESS_STORAGE_KEY);
+  }
+}
+
+export function clearAdminAccessKey(): void {
+  window.sessionStorage.removeItem(ADMIN_ACCESS_STORAGE_KEY);
+}
+
+function requestHeaders(
+  headers: Record<string, string> = {},
+  options: { includeAdminAccess?: boolean } = {},
+): HeadersInit {
   const betaAccessKey = getBetaAccessKey();
-  return betaAccessKey ? { ...headers, "X-Beta-Access-Key": betaAccessKey } : headers;
+  const adminAccessKey = options.includeAdminAccess ? getAdminAccessKey() : "";
+  return {
+    ...headers,
+    ...(betaAccessKey ? { "X-Beta-Access-Key": betaAccessKey } : {}),
+    ...(adminAccessKey ? { "X-Admin-Access-Key": adminAccessKey } : {}),
+  };
 }
 
 export interface IntakeResponse {
@@ -53,6 +79,9 @@ export interface IntakeResponse {
   latitude?: number | null;
   longitude?: number | null;
   status: "created" | "invalid_address";
+  supportStatus: "supported" | "unsupported" | "invalid";
+  jurisdictionId?: string | null;
+  jurisdictionName?: string | null;
   followUpQuestions: FollowUpQuestion[];
 }
 
@@ -72,6 +101,13 @@ export interface SourceIndexStatus {
   sourceCount: number;
   chunkCount: number;
   hasIndex: boolean;
+  indexReady: boolean;
+  autoSeedSources: boolean;
+  autoReindexOnEmpty: boolean;
+  sourceRegistryVersion?: string | null;
+  staleSourceIds: string[];
+  missingChunkSourceIds: string[];
+  readinessWarnings: string[];
   lastImportAt?: string | null;
   lastReindexAt?: string | null;
   sourcesMissingMetadata: Array<{
@@ -109,6 +145,17 @@ async function parseError(response: Response, fallback: string): Promise<string>
   } catch {
     return fallback;
   }
+}
+
+async function parseAdminActionError(response: Response, action: string): Promise<string> {
+  const detail = await parseError(response, `${action} failed`);
+  if (response.status === 401) {
+    return `${detail} Enter the source admin key, then retry ${action.toLowerCase()}.`;
+  }
+  if (response.status === 403) {
+    return `${detail} Check the source admin key or ask an administrator to rotate it.`;
+  }
+  return detail;
 }
 
 export async function suggestAddresses(
@@ -166,6 +213,9 @@ export async function intakeProject(input: {
     latitude?: number | null;
     longitude?: number | null;
     status: "created" | "invalid_address";
+    support_status?: "supported" | "unsupported" | "invalid";
+    jurisdiction_id?: string | null;
+    jurisdiction_name?: string | null;
     follow_up_questions: string[];
   };
 
@@ -177,6 +227,9 @@ export async function intakeProject(input: {
     latitude: payload.latitude,
     longitude: payload.longitude,
     status: payload.status,
+    supportStatus: payload.support_status ?? "supported",
+    jurisdictionId: payload.jurisdiction_id,
+    jurisdictionName: payload.jurisdiction_name,
     followUpQuestions: toFollowUpQuestions(payload.follow_up_questions),
   };
 }
@@ -364,6 +417,13 @@ export async function fetchSourceIndexStatus(): Promise<SourceIndexStatus> {
     source_count: number;
     chunk_count: number;
     has_index: boolean;
+    index_ready?: boolean;
+    auto_seed_sources?: boolean;
+    auto_reindex_on_empty?: boolean;
+    source_registry_version?: string | null;
+    stale_source_ids?: string[];
+    missing_chunk_source_ids?: string[];
+    readiness_warnings?: string[];
     last_import_at?: string | null;
     last_reindex_at?: string | null;
     sources_missing_metadata: Array<{
@@ -376,6 +436,13 @@ export async function fetchSourceIndexStatus(): Promise<SourceIndexStatus> {
     sourceCount: payload.source_count,
     chunkCount: payload.chunk_count,
     hasIndex: payload.has_index,
+    indexReady: payload.index_ready ?? payload.has_index,
+    autoSeedSources: payload.auto_seed_sources ?? true,
+    autoReindexOnEmpty: payload.auto_reindex_on_empty ?? true,
+    sourceRegistryVersion: payload.source_registry_version,
+    staleSourceIds: payload.stale_source_ids ?? [],
+    missingChunkSourceIds: payload.missing_chunk_source_ids ?? [],
+    readinessWarnings: payload.readiness_warnings ?? [],
     lastImportAt: payload.last_import_at,
     lastReindexAt: payload.last_reindex_at,
     sourcesMissingMetadata: payload.sources_missing_metadata.map((source) => ({
@@ -390,7 +457,10 @@ export async function saveSource(
 ): Promise<SourceRegistryEntry[]> {
   const response = await fetch(`${API_BASE}/ingestion/sources`, {
     method: "POST",
-    headers: requestHeaders({ "Content-Type": "application/json" }),
+    headers: requestHeaders(
+      { "Content-Type": "application/json" },
+      { includeAdminAccess: true },
+    ),
     body: JSON.stringify({
       source: {
         source_id: source.sourceId,
@@ -406,7 +476,7 @@ export async function saveSource(
     }),
   });
   if (!response.ok) {
-    throw new Error(await parseError(response, "Failed to save source"));
+    throw new Error(await parseAdminActionError(response, "Save source"));
   }
 
   const payload = (await response.json()) as {
@@ -432,10 +502,10 @@ export async function reindexSources(): Promise<{
 }> {
   const response = await fetch(`${API_BASE}/ingestion/reindex`, {
     method: "POST",
-    headers: requestHeaders(),
+    headers: requestHeaders({}, { includeAdminAccess: true }),
   });
   if (!response.ok) {
-    throw new Error(await parseError(response, "Failed to reindex sources"));
+    throw new Error(await parseAdminActionError(response, "Reindex sources"));
   }
 
   const payload = (await response.json()) as {
@@ -455,11 +525,14 @@ export async function importLocalDocuments(
 ): Promise<LocalDocumentImportResult> {
   const response = await fetch(`${API_BASE}/ingestion/import-local-docs`, {
     method: "POST",
-    headers: requestHeaders({ "Content-Type": "application/json" }),
+    headers: requestHeaders(
+      { "Content-Type": "application/json" },
+      { includeAdminAccess: true },
+    ),
     body: JSON.stringify({ directory: directory?.trim() || null }),
   });
   if (!response.ok) {
-    throw new Error(await parseError(response, "Failed to import local documents"));
+    throw new Error(await parseAdminActionError(response, "Import local documents"));
   }
 
   const payload = (await response.json()) as {

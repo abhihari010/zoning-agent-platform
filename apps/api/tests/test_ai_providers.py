@@ -75,6 +75,52 @@ def test_source_registry_retriever_filters_by_district_and_use() -> None:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
 
+def test_source_registry_retriever_scopes_citations_by_jurisdiction() -> None:
+    temp_dir = Path(__file__).resolve().parent / "_tmp_provider_jurisdiction_sources"
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
+    temp_dir.mkdir(parents=True)
+
+    try:
+        source_store = SQLiteStore(temp_dir / "sources.sqlite3")
+        source_store.upsert_source(
+            SourceRegistryEntry(
+                source_id="blacksburg-home-business",
+                title="Blacksburg Home Business Rule",
+                excerpt="Blacksburg home occupation bakeries require review.",
+                section_ref="Sec 1",
+                jurisdiction_id="blacksburg-va",
+                districts=["unknown"],
+                uses=["home-based-food-business"],
+            )
+        )
+        source_store.upsert_source(
+            SourceRegistryEntry(
+                source_id="montgomery-home-occupation",
+                title="Montgomery County Home Occupation Rule",
+                excerpt="Montgomery County home occupations require zoning, health, and inspections review.",
+                section_ref="Home Occupations",
+                jurisdiction_id="montgomery-county-va",
+                districts=["unknown"],
+                uses=["home-based-food-business"],
+            )
+        )
+
+        result = SourceRegistryRetrievalProvider(source_store).retrieve(
+            RetrievalProviderRequest(
+                district="unknown",
+                inferred_use="home-based-food-business",
+                project_description="garage bakery",
+                jurisdiction_id="montgomery-county-va",
+            )
+        )
+
+        assert [citation.source_id for citation in result.citations] == ["montgomery-home-occupation"]
+        assert all("Blacksburg" not in citation.title for citation in result.citations)
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+
 def test_local_embedding_provider_is_deterministic() -> None:
     provider = LocalHashEmbeddingProvider(dimensions=8)
 
