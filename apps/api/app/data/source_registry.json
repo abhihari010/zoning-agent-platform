@@ -84,5 +84,71 @@
       "industrial-zone"
     ],
     "uses": ["home-based-food-business", "general"]
+  },
+  {
+    "source_id": "montgomery-county-home-occupation-zoning",
+    "title": "Montgomery County Home Occupation Zoning Guidance",
+    "excerpt": "Montgomery County states that home occupations in the unincorporated county are regulated by the zoning ordinance, are permitted in listed residential and agricultural districts, must be secondary to the residence, may not exceed 25% of dwelling floor area, may use an accessory building, and must avoid exterior impacts such as traffic, parking demand, noise, vibration, glare, odors, or electrical interference.",
+    "section_ref": "Home Occupations; revised October 2021",
+    "jurisdiction_id": "montgomery-county-va",
+    "url": "https://www.montgomerycountyva.gov/docs/default-source/planning-gis/applications-and-forms/zoning/home-occupation-form.pdf?sfvrsn=8068743c_4",
+    "effective_date": "2021-10",
+    "districts": ["unknown", "residential-low-density", "mixed-use-core", "commercial-employment"],
+    "uses": ["home-based-food-business", "general"]
+  },
+  {
+    "source_id": "montgomery-county-home-occupation-review-triggers",
+    "title": "Montgomery County Home Occupation Health, Inspections, and Sign Review Triggers",
+    "excerpt": "The Montgomery County home occupation form directs food-preparation businesses to contact the Health Department about a food service permit, directs projects with additions or structural alterations to contact Montgomery County Inspections, and notes that a home occupation sign requires sign-requirement verification with Planning and a separate permit.",
+    "section_ref": "Home Occupations; additional considerations",
+    "jurisdiction_id": "montgomery-county-va",
+    "url": "https://www.montgomerycountyva.gov/docs/default-source/planning-gis/applications-and-forms/zoning/home-occupation-form.pdf?sfvrsn=8068743c_4",
+    "effective_date": "2021-10",
+    "districts": ["unknown", "residential-low-density", "mixed-use-core", "commercial-employment"],
+    "uses": ["home-based-food-business", "food-business", "general"]
+  },
+  {
+    "source_id": "montgomery-county-planning-gis-zoning-permit-sequence",
+    "title": "Montgomery County Planning and GIS Zoning Permit Review Sequence",
+    "excerpt": "Montgomery County Planning and GIS Services administers zoning and subdivision ordinances in unincorporated areas. The county directs applicants to submit zoning permit materials to Planning and GIS Services before applying for a building permit at the Department of Inspections, with Planning and GIS listed for zoning questions and Building Inspections listed for building permit questions.",
+    "section_ref": "Planning and GIS Services; zoning permit approval steps",
+    "jurisdiction_id": "montgomery-county-va",
+    "url": "https://www.montgomerycountyva.gov/1/departments-services/planning",
+    "effective_date": "2026-05-22",
+    "districts": ["unknown", "residential-low-density", "mixed-use-core", "commercial-employment", "industrial-zone"],
+    "uses": ["home-based-food-business", "food-business", "general"]
+  },
+  {
+    "source_id": "montgomery-county-gis-zoning-map",
+    "title": "Montgomery County GIS Zoning Map and Parcel Lookup",
+    "excerpt": "Montgomery County GIS identifies MyGIS OneView as the county's interactive public map resource for parcel, land, and location information, lists a zoning map in the map gallery, and cautions that maps and GIS data are reference materials rather than legal determinations of official county records.",
+    "section_ref": "GIS and Mapping Services; Map Gallery and disclaimer",
+    "jurisdiction_id": "montgomery-county-va",
+    "url": "https://www.montgomerycountyva.gov/1/departments-services/GIS",
+    "effective_date": "2026-05-22",
+    "districts": ["unknown", "residential-low-density", "mixed-use-core", "commercial-employment", "industrial-zone"],
+    "uses": ["home-based-food-business", "food-business", "general"]
+  },
+  {
+    "source_id": "montgomery-county-building-permit-usbc",
+    "title": "Montgomery County Residential Building Permit and USBC Compliance",
+    "excerpt": "Montgomery County's residential building permit application says a permit must be issued before construction begins, applications must include construction plans, all building work must comply with the Virginia Uniform Statewide Building Code, and applicants must contact Planning and GIS Services to discuss zoning and development-code compliance.",
+    "section_ref": "Residential Building Permit Application; updated April 2025",
+    "jurisdiction_id": "montgomery-county-va",
+    "url": "https://www.montgomerycountyva.gov/docs/default-source/building-inspections/residential/residential-permit-application.pdf?sfvrsn=d0b3bbc8_4",
+    "effective_date": "2025-04",
+    "districts": ["unknown", "residential-low-density", "mixed-use-core", "commercial-employment"],
+    "uses": ["home-based-food-business", "general"]
+  },
+  {
+    "source_id": "new-river-health-district-food-establishment-review",
+    "title": "New River Health District Food Establishment Plan Review and Permits",
+    "excerpt": "The Virginia Department of Health New River Health District describes environmental health inspections for restaurants and other establishments, identifies establishment plan review and permit fees, and provides applications for new or remodeled food establishments, annual permit renewal, mobile food establishments, and temporary food events.",
+    "section_ref": "Environmental Health; food service establishment applications",
+    "jurisdiction_id": "montgomery-county-va",
+    "url": "https://www.vdh.virginia.gov/new-river/environmental-health/",
+    "effective_date": "2025-08-19",
+    "districts": ["unknown", "residential-low-density", "mixed-use-core", "commercial-employment"],
+    "uses": ["home-based-food-business", "food-business", "food-service", "general"]
   }
 ]

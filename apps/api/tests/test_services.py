@@ -157,16 +157,6 @@ def _mock_google_address(monkeypatch: pytest.MonkeyPatch, payload: dict) -> None
             "Christiansburg, VA",
         ),
         (
-            "755 Roanoke St, Christiansburg, VA 24073, USA",
-            [
-                {"long_name": "Merrimac", "types": ["locality"]},
-                {"long_name": "Montgomery County", "types": ["administrative_area_level_2"]},
-                {"long_name": "Virginia", "types": ["administrative_area_level_1"]},
-            ],
-            "montgomery-county-va",
-            "Montgomery County, VA",
-        ),
-        (
             "215 Church Ave SW, Roanoke, VA 24011, USA",
             [
                 {"long_name": "Roanoke", "types": ["locality"]},
@@ -213,6 +203,33 @@ def test_normalize_address_recognized_unsupported_jurisdictions(
     assert result.jurisdiction_id == expected_id
     assert result.jurisdiction_name == expected_name
     assert "does not yet support zoning review" in result.warnings[0]
+
+
+def test_normalize_address_supported_montgomery_county_jurisdiction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("GOOGLE_MAPS_API_KEY", "demo-key")
+    _mock_google_address(
+        monkeypatch,
+        {
+            "formatted_address": "755 Roanoke St, Christiansburg, VA 24073, USA",
+            "place_id": "place-montgomery",
+            "address_components": [
+                {"long_name": "Merrimac", "types": ["locality"]},
+                {"long_name": "Montgomery County", "types": ["administrative_area_level_2"]},
+                {"long_name": "Virginia", "types": ["administrative_area_level_1"]},
+            ],
+            "geometry": {"location": {"lat": 37.1, "lng": -80.4}},
+        },
+    )
+
+    result = services.normalize_address("755 Roanoke St Christiansburg VA")
+
+    assert result.is_valid is True
+    assert result.support_status == "supported"
+    assert result.jurisdiction_id == "montgomery-county-va"
+    assert result.jurisdiction_name == "Montgomery County, VA"
+    assert result.place_id == "place-montgomery"
 
 
 def test_normalize_address_valid_unrecognized_jurisdiction_is_not_invalid(

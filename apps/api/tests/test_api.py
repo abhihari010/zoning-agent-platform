@@ -345,7 +345,9 @@ def test_ingestion_sources_seed_and_upsert():
     assert list_response.status_code == 200
     sources = list_response.json()["sources"]
     assert len(sources) >= 3
-    assert all(source["jurisdiction_id"] == "blacksburg-va" for source in sources)
+    assert all(source["jurisdiction_id"] for source in sources)
+    assert any(source["jurisdiction_id"] == "blacksburg-va" for source in sources)
+    assert any(source["jurisdiction_id"] == "montgomery-county-va" for source in sources)
 
     upsert_response = client.post(
         "/api/v1/ingestion/sources",

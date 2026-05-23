@@ -6,11 +6,13 @@ import type {
   FollowUpQuestion,
 } from "@zoning-agent/shared-schema";
 import {
+  clearAdminAccessKey,
   analyzeProject,
   clearBetaAccessKey,
   createSession,
   fetchSourceIndexStatus,
   fetchTrace,
+  getAdminAccessKey,
   getBetaAccessKey,
   importLocalDocuments,
   intakeProject,
@@ -18,6 +20,7 @@ import {
   reindexSources,
   requiresBetaAccess,
   saveSource,
+  setAdminAccessKey,
   setBetaAccessKey,
   suggestAddresses,
   submitFeedback,
@@ -188,6 +191,60 @@ function evidenceLabel(citationCount: number): string {
   return `${citationCount} cited sources`;
 }
 
+function supportStatusLabel(status?: IntakeResponse["supportStatus"]): string {
+  if (status === "unsupported") {
+    return "Recognized, not covered";
+  }
+  if (status === "invalid") {
+    return "Invalid or unverified";
+  }
+  return "Supported";
+}
+
+function supportStatusTone(status?: IntakeResponse["supportStatus"]): string {
+  if (status === "unsupported") {
+    return "border-amber-200 bg-amber-50 text-amber-900";
+  }
+  if (status === "invalid") {
+    return "border-red-200 bg-red-50 text-red-900";
+  }
+  return "border-emerald-200 bg-emerald-50 text-emerald-900";
+}
+
+function intakeErrorMessage(intakeResult: IntakeResponse): string {
+  if (intakeResult.supportStatus === "unsupported") {
+    const jurisdiction = intakeResult.jurisdictionName ?? "this jurisdiction";
+    return `${jurisdiction} was recognized, but source coverage is not ready for zoning review yet. Try a supported jurisdiction or contact the planning office directly.`;
+  }
+  return "The address could not be validated. Enter a complete street address with city and state, then try again.";
+}
+
+function readinessTone(indexStatus: SourceIndexStatus | null): string {
+  if (!indexStatus) {
+    return "border-slate-200 bg-slate-50 text-slate-900";
+  }
+  if (indexStatus.indexReady) {
+    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+  }
+  if (indexStatus.hasIndex) {
+    return "border-amber-200 bg-amber-50 text-amber-900";
+  }
+  return "border-red-200 bg-red-50 text-red-900";
+}
+
+function readinessLabel(indexStatus: SourceIndexStatus | null): string {
+  if (!indexStatus) {
+    return "Unknown";
+  }
+  if (indexStatus.indexReady) {
+    return "Ready";
+  }
+  if (indexStatus.hasIndex) {
+    return "Needs refresh";
+  }
+  return "Not indexed";
+}
+
 function buildChecklistDownload(
   intake: IntakeResponse | null,
   result: AnalyzeResponse,
@@ -260,6 +317,9 @@ export function App() {
   const [importDirectory, setImportDirectory] = useState("");
   const [importing, setImporting] = useState(false);
   const [importMessage, setImportMessage] = useState("");
+  const [adminAccessKey, setStoredAdminAccessKey] = useState(() => getAdminAccessKey());
+  const [adminAccessInput, setAdminAccessInput] = useState("");
+  const [adminAccessMessage, setAdminAccessMessage] = useState("");
   const addressSectionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -432,6 +492,17 @@ export function App() {
     return new Map(entries.map((source) => [source.sourceId, source.missingFields]));
   }, [indexStatus]);
 
+  const sourceIndexIssuesById = useMemo(() => {
+    const issues = new Map<string, string[]>();
+    for (const sourceId of indexStatus?.staleSourceIds ?? []) {
+      issues.set(sourceId, [...(issues.get(sourceId) ?? []), "Stale index"]);
+    }
+    for (const sourceId of indexStatus?.missingChunkSourceIds ?? []) {
+      issues.set(sourceId, [...(issues.get(sourceId) ?? []), "Missing chunks"]);
+    }
+    return issues;
+  }, [indexStatus]);
+
   function selectSuggestion(option: string) {
     setAddress(option);
     setSuggestions([]);
@@ -503,6 +574,25 @@ export function App() {
     setIndexStatus(null);
   }
 
+  function saveAdminKey() {
+    if (!adminAccessInput.trim()) {
+      setAdminAccessMessage("Enter the source admin key to enable write actions.");
+      return;
+    }
+
+    setAdminAccessKey(adminAccessInput);
+    setStoredAdminAccessKey(adminAccessInput.trim());
+    setAdminAccessInput("");
+    setAdminAccessMessage("Source admin key saved for this browser session.");
+  }
+
+  function clearStoredAdminKey() {
+    clearAdminAccessKey();
+    setStoredAdminAccessKey("");
+    setAdminAccessInput("");
+    setAdminAccessMessage("Source admin key cleared. Source status and catalog remain visible.");
+  }
+
   async function runAnalysis(projectId: string, answers?: Record<string, string>) {
     setPhase("analyzing");
     setActiveAgentIndex(0);
@@ -554,9 +644,7 @@ export function App() {
 
       if (intakeResult.status !== "created") {
         setPhase("error");
-        setError(
-          "This tool only supports addresses in Blacksburg, VA. Please enter a valid Blacksburg street address.",
-        );
+        setError(intakeErrorMessage(intakeResult));
         return;
       }
 
@@ -1560,6 +1648,15 @@ export function App() {
                       </p>
                       <p className="mt-2 font-semibold text-slate-900">{intake.normalizedAddress}</p>
                     </div>
+                    <div className={`rounded-2xl border p-4 ${supportStatusTone(intake.supportStatus)}`}>
+                      <p className="text-xs uppercase tracking-[0.18em] opacity-75">Jurisdiction</p>
+                      <p className="mt-2 font-semibold">
+                        {intake.jurisdictionName ?? intake.jurisdictionId ?? "Unknown jurisdiction"}
+                      </p>
+                      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-80">
+                        {supportStatusLabel(intake.supportStatus)}
+                      </p>
+                    </div>
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                         <p className="text-xs uppercase tracking-[0.18em] text-slate-500">District</p>
@@ -1625,6 +1722,15 @@ export function App() {
                   Source Health
                 </p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className={`rounded-2xl border p-4 ${readinessTone(indexStatus)}`}>
+                    <p className="text-xs uppercase tracking-[0.18em] opacity-75">Readiness</p>
+                    <p className="mt-2 text-2xl font-semibold">{readinessLabel(indexStatus)}</p>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-80">
+                      {indexStatus?.sourceRegistryVersion
+                        ? `Registry ${indexStatus.sourceRegistryVersion}`
+                        : "Registry version unset"}
+                    </p>
+                  </div>
                   <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                     <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Sources</p>
                     <p className="mt-2 text-2xl font-semibold text-pine">
@@ -1632,14 +1738,10 @@ export function App() {
                     </p>
                   </div>
                   <div
-                    className={`rounded-2xl border p-4 ${
-                      indexStatus?.hasIndex
-                        ? "border-emerald-200 bg-emerald-50"
-                        : "border-amber-200 bg-amber-50"
-                    }`}
+                    className={`rounded-2xl border p-4 ${readinessTone(indexStatus)}`}
                   >
-                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Index</p>
-                    <p className="mt-2 text-2xl font-semibold text-slate-900">
+                    <p className="text-xs uppercase tracking-[0.18em] opacity-75">Index</p>
+                    <p className="mt-2 text-2xl font-semibold">
                       {indexStatus?.chunkCount ?? 0} chunks
                     </p>
                   </div>
@@ -1662,6 +1764,89 @@ export function App() {
                     {indexStatus.sourcesMissingMetadata.length === 1 ? "" : "s"} need metadata before the
                     index is fully auditable.
                   </p>
+                )}
+                {indexStatus && (
+                  <div className="mt-4 grid gap-3">
+                    {(indexStatus.staleSourceIds.length > 0 ||
+                      indexStatus.missingChunkSourceIds.length > 0) && (
+                      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+                        <p className="font-semibold">Index refresh needed</p>
+                        {indexStatus.staleSourceIds.length > 0 && (
+                          <p className="mt-2 leading-6">
+                            Stale sources: {indexStatus.staleSourceIds.join(", ")}
+                          </p>
+                        )}
+                        {indexStatus.missingChunkSourceIds.length > 0 && (
+                          <p className="mt-2 leading-6">
+                            Missing chunks: {indexStatus.missingChunkSourceIds.join(", ")}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {indexStatus.readinessWarnings.length > 0 && (
+                      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+                        <p className="font-semibold">Readiness warnings</p>
+                        <ul className="mt-2 space-y-1 leading-6">
+                          {indexStatus.readinessWarnings.map((warning) => (
+                            <li key={warning}>{warning}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs leading-5 text-slate-600">
+                      Auto seed: {indexStatus.autoSeedSources ? "on" : "off"} · Auto reindex empty:{" "}
+                      {indexStatus.autoReindexOnEmpty ? "on" : "off"}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                  Admin Access
+                </p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  Source status and catalog load with beta access. Save the separate admin key here
+                  before editing sources, importing documents, or reindexing.
+                </p>
+                <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Write access</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-900">
+                    {adminAccessKey ? "Admin key saved for this session" : "No admin key saved"}
+                  </p>
+                </div>
+                <label className="mt-4 block text-sm font-semibold text-slate-700">
+                  Source admin key
+                  <input
+                    className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+                    type="password"
+                    value={adminAccessInput}
+                    onChange={(event) => setAdminAccessInput(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        saveAdminKey();
+                      }
+                    }}
+                  />
+                </label>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={saveAdminKey}
+                    className="rounded-2xl bg-clay px-4 py-3 font-semibold text-white"
+                  >
+                    Save admin key
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearStoredAdminKey}
+                    className="rounded-2xl border border-slate-300 px-4 py-3 font-semibold text-slate-700"
+                  >
+                    Clear key
+                  </button>
+                </div>
+                {adminAccessMessage && (
+                  <p className="mt-4 text-sm text-slate-700">{adminAccessMessage}</p>
                 )}
               </div>
 
@@ -1851,8 +2036,18 @@ export function App() {
                     >
                       {(() => {
                         const missingFields = sourceHealthById.get(source.sourceId) ?? [];
-                        return missingFields.length > 0 ? (
+                        const indexIssues = sourceIndexIssuesById.get(source.sourceId) ?? [];
+                        const hasIssues = missingFields.length > 0 || indexIssues.length > 0;
+                        return hasIssues ? (
                           <div className="mb-3 flex flex-wrap gap-2">
+                            {indexIssues.map((issue) => (
+                              <span
+                                key={issue}
+                                className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900"
+                              >
+                                {issue}
+                              </span>
+                            ))}
                             {missingFields.map((field) => (
                               <span
                                 key={field}

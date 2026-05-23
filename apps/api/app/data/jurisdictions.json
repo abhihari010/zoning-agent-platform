@@ -21,14 +21,17 @@
   {
     "jurisdiction_id": "montgomery-county-va",
     "name": "Montgomery County, VA",
-    "supported": false,
+    "supported": true,
     "match_strategy": "county",
     "locality_names": ["Riner", "Shawsville", "Elliston", "Prices Fork", "Merrimac"],
     "county_names": ["Montgomery County"],
     "state_names": ["VA", "Virginia"],
     "official_source_urls": [
       "https://www.montgomerycountyva.gov/1/departments-services/planning",
-      "https://www.montgomerycountyva.gov/1/departments-services/planning/zoning-permits"
+      "https://www.montgomerycountyva.gov/1/departments-services/planning/zoning-permits",
+      "https://www.montgomerycountyva.gov/1/departments-services/GIS",
+      "https://library.municode.com/va/montgomery_county/codes/code_of_ordinances",
+      "https://www.vdh.virginia.gov/new-river/environmental-health/"
     ],
     "planning_contact": {
       "department": "Planning & GIS Services",
@@ -36,7 +39,7 @@
       "email": "mcplan@montgomerycountyva.gov",
       "phone": "540-394-2148"
     },
-    "district_mapping_strategy": "unsupported_until_official_sources_and_parcel_zoning_mapping_are_indexed"
+    "district_mapping_strategy": "supported_source_backed_county_lookup_with_official_gis_verification_required"
   },
   {
     "jurisdiction_id": "christiansburg-va",
