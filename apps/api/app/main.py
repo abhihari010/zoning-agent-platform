@@ -21,7 +21,7 @@ load_dotenv(API_DIR / ".env.local", override=True)
 from app.routers.api import router as api_router
 from app.settings import get_settings
 
-app = FastAPI(title="Zoning Agent API", version="0.1.0")
+app = FastAPI(title="Zoning Review API", version="0.1.0")
 
 _cors_origins_env = os.getenv("CORS_ALLOW_ORIGINS", "").strip()
 if _cors_origins_env == "*":

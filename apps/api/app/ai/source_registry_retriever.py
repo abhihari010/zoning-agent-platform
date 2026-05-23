@@ -182,8 +182,13 @@ class SourceRegistryRetrievalProvider:
                     title=source.title,
                     excerpt=source.excerpt,
                     section_ref=source.section_ref,
+                    jurisdiction_id=source.jurisdiction_id,
+                    source_type=source.source_type,
                     url=source.url,
                     effective_date=source.effective_date,
+                    retrieved_at=source.retrieved_at,
+                    score=1.0,
+                    metadata=source.metadata,
                 )
             )
 

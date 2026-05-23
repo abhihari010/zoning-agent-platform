@@ -9,6 +9,7 @@ from app.ai.deterministic_provider import DeterministicAnalysisProvider
 from app.ai.embedding_provider import LocalHashEmbeddingProvider
 from app.ai.hybrid_local_retriever import HybridLocalRetrievalProvider
 from app.ai.interfaces import AnalysisProviderRequest, EmbeddingProviderRequest, RetrievalProviderRequest
+from app.ai.local_model_provider import LocalModelAnalysisProvider
 from app.ingestion import build_source_chunks
 from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider
 from app.ai.watsonx_provider import WatsonXAnalysisProvider, WatsonXRetrievalProvider
@@ -167,6 +168,98 @@ def test_hybrid_local_retriever_uses_indexed_chunks() -> None:
         assert "parking" in result.citations[0].excerpt
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_hybrid_local_retriever_returns_empty_when_chroma_has_no_hits(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("VECTOR_PROVIDER", "chroma")
+    temp_dir = Path(__file__).resolve().parent / "_tmp_hybrid_empty_chroma"
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
+    temp_dir.mkdir(parents=True)
+
+    try:
+        source_store = SQLiteStore(temp_dir / "sources.sqlite3")
+        source_store.upsert_source(
+            SourceRegistryEntry(
+                source_id="coffee-rule",
+                title="Coffee Rule",
+                excerpt="Coffee shops require parking review.",
+                section_ref="Sec 10.2",
+                jurisdiction_id="blacksburg-va",
+                districts=["mixed-use-core"],
+                uses=["food_service"],
+            )
+        )
+        source_store.replace_source_chunks(build_source_chunks(source_store.list_sources()))
+        monkeypatch.setattr("app.ai.hybrid_local_retriever.ChromaVectorStore.query", lambda *args, **kwargs: [])
+
+        result = HybridLocalRetrievalProvider(
+            source_store,
+            embedding_provider=LocalHashEmbeddingProvider(),
+        ).retrieve(
+            RetrievalProviderRequest(
+                district="mixed-use-core",
+                inferred_use="food_service",
+                project_description="coffee shop",
+                jurisdiction_id="blacksburg-va",
+            )
+        )
+
+        assert result.citations == []
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_local_model_provider_uses_openai_compatible_chat_endpoint(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AI_PROVIDER", "local")
+    monkeypatch.setenv("LOCAL_MODEL_BASE_URL", "http://localhost:1234/v1")
+    monkeypatch.setenv("LOCAL_MODEL_NAME", "local-test-model")
+
+    class FakeResponse:
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict:
+            return {
+                "choices": [
+                    {
+                        "message": {
+                            "content": (
+                                '{"decision":"conditional","summary":"Evidence indicates review is needed.",'
+                                '"required_permits":["Zoning Permit"],"follow_up_questions":[],"warnings":[]}'
+                            )
+                        }
+                    }
+                ]
+            }
+
+    captured: dict = {}
+
+    def fake_post(url: str, headers: dict, json: dict, timeout: float):
+        captured["url"] = url
+        captured["json"] = json
+        captured["timeout"] = timeout
+        return FakeResponse()
+
+    monkeypatch.setattr("app.ai.local_model_provider.httpx.post", fake_post)
+
+    result = LocalModelAnalysisProvider().generate_analysis(
+        AnalysisProviderRequest(
+            project_description="Open a small coffee shop.",
+            district="mixed-use-core",
+            citation_excerpts=["Food service may require review."],
+            missing_fields=[],
+        )
+    )
+
+    assert captured["url"] == "http://localhost:1234/v1/chat/completions"
+    assert captured["json"]["model"] == "local-test-model"
+    assert result.decision == "conditional"
+    assert result.required_permits == ["Zoning Permit"]
 
 
 def test_watsonx_providers_require_credentials_by_selection(monkeypatch: pytest.MonkeyPatch) -> None:

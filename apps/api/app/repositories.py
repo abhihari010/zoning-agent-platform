@@ -49,7 +49,7 @@ class StoreRepository(Protocol):
 
     def get_audit_events(self, project_id: UUID) -> list[AuditEvent]: ...
 
-    def audit(self, stage: str, project_id: str) -> None: ...
+    def audit(self, stage: str, project_id: str, details: dict[str, Any] | None = None) -> None: ...
 
     def save_feedback(self, feedback_record: FeedbackRecord) -> FeedbackRecord: ...
 
@@ -62,6 +62,18 @@ class StoreRepository(Protocol):
     def replace_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]: ...
 
     def list_source_chunks(self) -> list[SourceChunk]: ...
+
+    def list_source_chunks_filtered(
+        self,
+        *,
+        jurisdiction_id: str | None = None,
+        source_id: str | None = None,
+        district: str | None = None,
+        use: str | None = None,
+        source_type: str | None = None,
+    ) -> list[SourceChunk]: ...
+
+    def get_source_chunks_by_ids(self, chunk_ids: list[str]) -> list[SourceChunk]: ...
 
     def get_source_chunk_count(self) -> int: ...
 
@@ -115,11 +127,17 @@ class SQLAlchemyStore:
                 "jurisdiction_id": "VARCHAR(200)",
                 "url": "VARCHAR(2000)",
                 "effective_date": "VARCHAR(50)",
+                "source_type": "VARCHAR(200)",
+                "retrieved_at": "VARCHAR(80)",
+                "source_version": "VARCHAR(120)",
+                "content_hash": "VARCHAR(64)",
             },
             "source_chunks": {
                 "chunk_index": "INTEGER DEFAULT 0",
                 "source_text_hash": "VARCHAR(64) DEFAULT ''",
                 "jurisdiction_id": "VARCHAR(200)",
+                "source_type": "VARCHAR(200)",
+                "source_version": "VARCHAR(120)",
             },
             "audit_events": {
                 "details_json": "JSON",
@@ -235,23 +253,37 @@ class SQLAlchemyStore:
         try:
             with self.engine.connect() as connection:
                 rows = connection.execute(
-                    select(audit_events.c.stage, audit_events.c.project_id, audit_events.c.created_at)
+                    select(
+                        audit_events.c.stage,
+                        audit_events.c.project_id,
+                        audit_events.c.details_json,
+                        audit_events.c.created_at,
+                    )
                     .where(audit_events.c.project_id == str(project_id))
                     .order_by(audit_events.c.id.asc())
                 ).all()
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not load audit events for {project_id}: {exc}") from exc
 
-        return [AuditEvent.model_validate(dict(row._mapping)) for row in rows]
+        return [
+            AuditEvent(
+                stage=row.stage,
+                project_id=row.project_id,
+                details=_coerce_payload(row.details_json) if row.details_json else {},
+                created_at=_coerce_datetime(row.created_at),
+            )
+            for row in rows
+        ]
 
-    def audit(self, stage: str, project_id: str) -> None:
-        event = AuditEvent(stage=stage, project_id=project_id)
+    def audit(self, stage: str, project_id: str, details: dict[str, Any] | None = None) -> None:
+        event = AuditEvent(stage=stage, project_id=project_id, details=details or {})
         try:
             with self.engine.begin() as connection:
                 connection.execute(
                     insert(audit_events).values(
                         project_id=event.project_id,
                         stage=event.stage,
+                        details_json=event.details,
                         created_at=event.created_at,
                     )
                 )
@@ -289,6 +321,10 @@ class SQLAlchemyStore:
                     "jurisdiction_id": source.jurisdiction_id,
                     "url": source.url,
                     "effective_date": source.effective_date,
+                    "source_type": source.source_type,
+                    "retrieved_at": source.retrieved_at,
+                    "source_version": source.source_version,
+                    "content_hash": source.content_hash,
                     "payload_json": payload,
                     "updated_at": now,
                 }
@@ -344,6 +380,8 @@ class SQLAlchemyStore:
                                 "chunk_index": chunk.chunk_index,
                                 "source_text_hash": chunk.source_text_hash,
                                 "jurisdiction_id": chunk.jurisdiction_id,
+                                "source_type": chunk.source_type,
+                                "source_version": chunk.source_version,
                                 "payload_json": chunk.model_dump(mode="json"),
                                 "created_at": now,
                                 "updated_at": now,
@@ -367,6 +405,38 @@ class SQLAlchemyStore:
             raise DatabaseStorageError(f"Could not list source chunks: {exc}") from exc
 
         return [SourceChunk.model_validate(_coerce_payload(row.payload_json)) for row in rows]
+
+    def list_source_chunks_filtered(
+        self,
+        *,
+        jurisdiction_id: str | None = None,
+        source_id: str | None = None,
+        district: str | None = None,
+        use: str | None = None,
+        source_type: str | None = None,
+    ) -> list[SourceChunk]:
+        filtered: list[SourceChunk] = []
+        for chunk in self.list_source_chunks():
+            if source_id and chunk.source_id != source_id:
+                continue
+            if source_type and chunk.source_type != source_type:
+                continue
+            if jurisdiction_id and chunk.jurisdiction_id and chunk.jurisdiction_id not in {jurisdiction_id, "*"}:
+                continue
+            if district and district != "unknown" and district not in chunk.districts and "*" not in chunk.districts:
+                continue
+            if use and use not in chunk.uses and "general" not in chunk.uses:
+                continue
+            filtered.append(chunk)
+        return filtered
+
+    def get_source_chunks_by_ids(self, chunk_ids: list[str]) -> list[SourceChunk]:
+        if not chunk_ids:
+            return []
+        wanted = set(chunk_ids)
+        ordered = {chunk_id: index for index, chunk_id in enumerate(chunk_ids)}
+        chunks = [chunk for chunk in self.list_source_chunks() if chunk.chunk_id in wanted]
+        return sorted(chunks, key=lambda chunk: ordered.get(chunk.chunk_id, len(ordered)))
 
     def get_source_chunk_count(self) -> int:
         try:

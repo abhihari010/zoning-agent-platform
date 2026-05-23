@@ -95,6 +95,12 @@ export interface SourceRegistryEntry {
   effectiveDate?: string | null;
   districts: string[];
   uses: string[];
+  sourceType?: string | null;
+  retrievedAt?: string | null;
+  sourceVersion?: string | null;
+  contentHash?: string | null;
+  fullText?: string | null;
+  metadata?: Record<string, unknown>;
 }
 
 export interface SourceIndexStatus {
@@ -108,6 +114,11 @@ export interface SourceIndexStatus {
   staleSourceIds: string[];
   missingChunkSourceIds: string[];
   readinessWarnings: string[];
+  vectorProvider: string;
+  vectorIndexReady: boolean;
+  vectorCount: number;
+  vectorCollection?: string | null;
+  vectorReadinessWarnings: string[];
   lastImportAt?: string | null;
   lastReindexAt?: string | null;
   sourcesMissingMetadata: Array<{
@@ -254,8 +265,32 @@ export async function analyzeProject(
   const payload = (await response.json()) as {
     status: AnalyzeResponse["status"];
     trace_id: string;
+    pipeline?: {
+      version: string;
+      prompt_version: string;
+      provider: string;
+      rag_provider: string;
+      embedding_provider: string;
+      trace_id: string;
+    } | null;
+    citation_validation?: {
+      valid: boolean;
+      citation_coverage: number;
+      unsupported_claims: string[];
+      invalid_citation_ids: string[];
+      confidence_adjustment: "none" | "downgrade_low_confidence";
+      warnings: string[];
+      jurisdiction_id?: string | null;
+    } | null;
     agents: Array<{
-      key: "intent" | "research" | "compliance";
+      key: "intake" | "location" | "retrieval" | "compliance" | "checklist";
+      label: string;
+      status: "completed" | "needs_clarification" | "warning" | "skipped";
+      headline: string;
+      details: string[];
+    }>;
+    pipeline_stages?: Array<{
+      key: "intake" | "location" | "retrieval" | "compliance" | "checklist";
       label: string;
       status: "completed" | "needs_clarification" | "warning" | "skipped";
       headline: string;
@@ -278,8 +313,14 @@ export async function analyzeProject(
       title: string;
       excerpt: string;
       section_ref: string;
+      chunk_id?: string | null;
+      jurisdiction_id?: string | null;
+      source_type?: string | null;
       url?: string;
       effective_date?: string;
+      retrieved_at?: string | null;
+      score?: number | null;
+      metadata?: Record<string, unknown>;
     }>;
     disclaimers: string[];
     follow_up_questions: string[];
@@ -289,6 +330,28 @@ export async function analyzeProject(
   return {
     status: payload.status,
     traceId: payload.trace_id,
+    pipeline: payload.pipeline
+      ? {
+          version: payload.pipeline.version,
+          promptVersion: payload.pipeline.prompt_version,
+          provider: payload.pipeline.provider,
+          ragProvider: payload.pipeline.rag_provider,
+          embeddingProvider: payload.pipeline.embedding_provider,
+          traceId: payload.pipeline.trace_id,
+        }
+      : null,
+    citationValidation: payload.citation_validation
+      ? {
+          valid: payload.citation_validation.valid,
+          citationCoverage: payload.citation_validation.citation_coverage,
+          unsupportedClaims: payload.citation_validation.unsupported_claims,
+          invalidCitationIds: payload.citation_validation.invalid_citation_ids,
+          confidenceAdjustment: payload.citation_validation.confidence_adjustment,
+          warnings: payload.citation_validation.warnings,
+          jurisdictionId: payload.citation_validation.jurisdiction_id,
+        }
+      : null,
+    pipelineStages: payload.pipeline_stages,
     agents: payload.agents,
     feasibility: payload.feasibility,
     checklist: {
@@ -305,8 +368,14 @@ export async function analyzeProject(
       title: citation.title,
       excerpt: citation.excerpt,
       sectionRef: citation.section_ref,
+      chunkId: citation.chunk_id,
+      jurisdictionId: citation.jurisdiction_id,
+      sourceType: citation.source_type,
       url: citation.url,
       effectiveDate: citation.effective_date,
+      retrievedAt: citation.retrieved_at,
+      score: citation.score,
+      metadata: citation.metadata ?? {},
     })),
     disclaimers: payload.disclaimers,
     followUpQuestions: toFollowUpQuestions(payload.follow_up_questions),
@@ -316,7 +385,7 @@ export async function analyzeProject(
 
 export async function fetchTrace(projectId: string): Promise<AuditEvent[]> {
   const response = await fetch(`${API_BASE}/projects/${projectId}/trace`, {
-    headers: requestHeaders(),
+    headers: requestHeaders({}, { includeAdminAccess: true }),
   });
   if (!response.ok) {
     throw new Error(await parseError(response, "Failed to load trace"));
@@ -326,6 +395,7 @@ export async function fetchTrace(projectId: string): Promise<AuditEvent[]> {
     events: Array<{
       stage: string;
       project_id: string;
+      details?: Record<string, unknown>;
       created_at: string;
     }>;
   };
@@ -333,6 +403,7 @@ export async function fetchTrace(projectId: string): Promise<AuditEvent[]> {
   return payload.events.map((event) => ({
     stage: event.stage,
     projectId: event.project_id,
+    details: event.details ?? {},
     createdAt: event.created_at,
   }));
 }
@@ -367,6 +438,12 @@ function mapSourceEntry(payload: {
   effective_date?: string | null;
   districts: string[];
   uses: string[];
+  source_type?: string | null;
+  retrieved_at?: string | null;
+  source_version?: string | null;
+  content_hash?: string | null;
+  full_text?: string | null;
+  metadata?: Record<string, unknown>;
 }): SourceRegistryEntry {
   return {
     sourceId: payload.source_id,
@@ -378,6 +455,12 @@ function mapSourceEntry(payload: {
     effectiveDate: payload.effective_date,
     districts: payload.districts,
     uses: payload.uses,
+    sourceType: payload.source_type,
+    retrievedAt: payload.retrieved_at,
+    sourceVersion: payload.source_version,
+    contentHash: payload.content_hash,
+    fullText: payload.full_text,
+    metadata: payload.metadata ?? {},
   };
 }
 
@@ -424,6 +507,11 @@ export async function fetchSourceIndexStatus(): Promise<SourceIndexStatus> {
     stale_source_ids?: string[];
     missing_chunk_source_ids?: string[];
     readiness_warnings?: string[];
+    vector_provider?: string;
+    vector_index_ready?: boolean;
+    vector_count?: number;
+    vector_collection?: string | null;
+    vector_readiness_warnings?: string[];
     last_import_at?: string | null;
     last_reindex_at?: string | null;
     sources_missing_metadata: Array<{
@@ -443,6 +531,11 @@ export async function fetchSourceIndexStatus(): Promise<SourceIndexStatus> {
     staleSourceIds: payload.stale_source_ids ?? [],
     missingChunkSourceIds: payload.missing_chunk_source_ids ?? [],
     readinessWarnings: payload.readiness_warnings ?? [],
+    vectorProvider: payload.vector_provider ?? "none",
+    vectorIndexReady: payload.vector_index_ready ?? false,
+    vectorCount: payload.vector_count ?? 0,
+    vectorCollection: payload.vector_collection,
+    vectorReadinessWarnings: payload.vector_readiness_warnings ?? [],
     lastImportAt: payload.last_import_at,
     lastReindexAt: payload.last_reindex_at,
     sourcesMissingMetadata: payload.sources_missing_metadata.map((source) => ({
@@ -499,6 +592,10 @@ export async function reindexSources(): Promise<{
   status: string;
   sourceCount: number;
   chunkCount: number;
+  vectorProvider: string;
+  vectorCount: number;
+  vectorIndexReady: boolean;
+  vectorWarnings: string[];
 }> {
   const response = await fetch(`${API_BASE}/ingestion/reindex`, {
     method: "POST",
@@ -512,11 +609,19 @@ export async function reindexSources(): Promise<{
     status: string;
     source_count: number;
     chunk_count: number;
+    vector_provider?: string;
+    vector_count?: number;
+    vector_index_ready?: boolean;
+    vector_warnings?: string[];
   };
   return {
     status: payload.status,
     sourceCount: payload.source_count,
     chunkCount: payload.chunk_count,
+    vectorProvider: payload.vector_provider ?? "none",
+    vectorCount: payload.vector_count ?? 0,
+    vectorIndexReady: payload.vector_index_ready ?? false,
+    vectorWarnings: payload.vector_warnings ?? [],
   };
 }
 

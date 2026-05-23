@@ -18,12 +18,17 @@ from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider
 from app.ingestion import import_source_documents, parse_source_file
 from app.models import SourceRegistryEntry
 from app.storage import SQLiteStore, store
+from app.tools import CitationTool, IntakeTool
+from app.orchestrator.pipeline_context import PipelineContext
 
 
 def _clear_external_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
     for name in [
         "AI_PROVIDER",
         "RAG_PROVIDER",
+        "LOCAL_MODEL_BASE_URL",
+        "LOCAL_MODEL_NAME",
+        "LOCAL_MODEL_TIMEOUT_SECONDS",
         "WATSONX_ENABLED",
         "WATSONX_API_KEY",
         "WATSONX_PROJECT_ID",
@@ -266,6 +271,64 @@ def test_keyword_district_rules_from_env(monkeypatch: pytest.MonkeyPatch) -> Non
     assert rules["warehouse"] == "industrial-zone"
 
 
+def test_intake_tool_returns_structured_deterministic_result() -> None:
+    context = PipelineContext(
+        project_description="I want to convert my garage into a small coffee shop.",
+        combined_description="I want to convert my garage into a small coffee shop.",
+        district="mixed-use-core",
+    )
+
+    result = IntakeTool().extract(context)
+
+    assert result.use_type == "food_service"
+    assert result.project_scope == "change_of_use"
+    assert result.business_activity == "coffee_shop"
+    assert result.clarification_required is True
+    assert "change_of_use" in result.possible_triggers
+    assert "parking" in result.possible_triggers
+    assert result.clarification_questions
+
+
+def test_citation_tool_rejects_wrong_jurisdiction() -> None:
+    temp_dir = Path(__file__).resolve().parent / "_tmp_citation_validation"
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
+    temp_dir.mkdir(parents=True)
+
+    try:
+        source_store = SQLiteStore(temp_dir / "sources.sqlite3")
+        source_store.upsert_source(
+            SourceRegistryEntry(
+                source_id="wrong-city-rule",
+                title="Wrong City Rule",
+                excerpt="This source belongs to another jurisdiction.",
+                section_ref="Sec 1",
+                jurisdiction_id="christiansburg-va",
+                districts=["mixed-use-core"],
+                uses=["general"],
+            )
+        )
+
+        validation = CitationTool(source_store).validate(
+            citations=[
+                services.SourceCitation(
+                    source_id="wrong-city-rule",
+                    title="Wrong City Rule",
+                    excerpt="This source belongs to another jurisdiction.",
+                    section_ref="Sec 1",
+                    jurisdiction_id="christiansburg-va",
+                )
+            ],
+            jurisdiction_id="blacksburg-va",
+        )
+
+        assert validation.valid is False
+        assert validation.confidence_adjustment == "downgrade_low_confidence"
+        assert "wrong-city-rule" in validation.invalid_citation_ids
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+
 def test_analyze_project_watsonx_success_override(monkeypatch: pytest.MonkeyPatch) -> None:
     class FakeWatsonXRetriever:
         name = "watsonx"
@@ -364,6 +427,17 @@ def test_analyze_project_runs_with_offline_default_providers(monkeypatch: pytest
     )
 
     assert result.feasibility.decision == "conditional"
+    assert result.pipeline is not None
+    assert result.pipeline.version == "single_orchestrator_v1"
+    assert result.pipeline_stages
+    assert result.pipeline_stages == result.agents
+    assert [stage.label for stage in result.agents] == [
+        "Understand Project",
+        "Resolve Property",
+        "Retrieve Sources",
+        "Analyze Compliance",
+        "Generate Checklist",
+    ]
     assert result.citations
     placeholder_host = "example" + ".gov"
     assert all(placeholder_host not in (citation.url or "") for citation in result.citations)
@@ -402,6 +476,8 @@ def test_analyze_project_without_matching_citations_is_unknown_low_confidence(
         assert result.feasibility.decision == "unknown"
         assert result.status == "low_confidence"
         assert result.citations == []
+        assert result.citation_validation is not None
+        assert result.citation_validation.valid is False
         assert result.feasibility.confidence < 0.6
         assert any("No relevant ordinances" in warning for warning in result.warnings)
     finally:

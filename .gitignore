@@ -20,5 +20,6 @@ __pycache__/
 *.pyc
 *.sqlite3
 *.tsbuildinfo
+apps/api/app/data/chroma/
 
 .vercel
