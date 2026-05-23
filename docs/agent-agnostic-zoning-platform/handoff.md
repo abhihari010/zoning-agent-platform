@@ -1,12 +1,16 @@
 # Agent-Agnostic Zoning Platform Handoff
 
-## Current Repo State
+This handoff is historical. The current production-readiness handoff is:
+
+- `docs/production-beta-hardening/handoff.md`
+
+## Historical Repo State
 
 - Local repo: `C:\Users\abhih\Zoning-Agent-App`
 - GitHub repo: `https://github.com/abhihari010/zoning-agent-platform`
-- Active branch: `codex/phase-1-foundation`
-- Draft PR: `https://github.com/abhihari010/zoning-agent-platform/pull/14`
-- Main planning docs:
+- Historical branch: `codex/phase-1-foundation`
+- Historical draft PR: `https://github.com/abhihari010/zoning-agent-platform/pull/14`
+- Historical planning docs:
   - `docs/agent-agnostic-zoning-platform/spec.md`
   - `docs/agent-agnostic-zoning-platform/plan.md`
 
@@ -54,24 +58,4 @@ Backend result:
 
 ## Recommended Next Step
 
-Review and merge PR #14 first.
-
-Then continue with:
-
-1. Issue #7: update/expand backend tests for offline provider behavior.
-2. Issue #8: update documentation for provider-agnostic operation.
-3. Issue #9: add local retrieval indexing foundation.
-
-If continuing immediately before merge, stay on:
-
-```powershell
-git switch codex/phase-1-foundation
-```
-
-If starting after PR #14 is merged, switch to `main`, pull, and create a new branch:
-
-```powershell
-git switch main
-git pull
-git switch -c codex/offline-provider-tests-docs
-```
+Use `docs/production-beta-hardening/handoff.md` for current deployment, storage, verification, and remaining production-readiness work.

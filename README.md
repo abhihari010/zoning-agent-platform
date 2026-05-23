@@ -206,7 +206,7 @@ Success criteria:
 
 ### Suggested Next Sprint
 
-The production beta foundation is in place. The next narrow sprint should validate deployed behavior with real configuration before adding accounts, billing, or broader jurisdiction coverage.
+The production beta foundation is in place. The next narrow sprint should validate deployed behavior with real configuration before adding accounts, billing, or broader jurisdiction coverage. Current handoff details live in `docs/production-beta-hardening/handoff.md`.
 
 1. Deploy the API to Render with `DATABASE_URL` pointed at staging Postgres and a private beta key.
 2. Deploy the web app to Vercel with `VITE_API_URL` pointed at Render.
@@ -237,6 +237,11 @@ The production beta foundation is in place. The next narrow sprint should valida
 - [x] Add optional external provider seams for OpenAI analysis and embeddings.
 - [x] Add jurisdiction metadata to source registry entries.
 - [x] Add private beta API access gate and deployment runbook.
+- [x] Add Postgres-backed storage with SQLite retained for local tests.
+- [x] Add official Blacksburg and Montgomery County source coverage.
+- [x] Add source readiness automation and deployed smoke-test coverage.
+- [x] Add separate source-admin access and frontend readiness indicators.
+- [x] Add production beta handoff documentation.
 
 ## Structure
 
@@ -343,6 +348,8 @@ Run backend tests:
 Frontend expects backend at `http://localhost:8000`.
 
 ## Production Beta Runbook
+
+Current detailed handoff: `docs/production-beta-hardening/handoff.md`
 
 Target beta shape:
 
