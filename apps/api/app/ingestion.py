@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 from app.models import SourceChunk, SourceRegistryEntry
@@ -59,15 +60,16 @@ def build_source_chunks(sources: list[SourceRegistryEntry]) -> list[SourceChunk]
     chunks: list[SourceChunk] = []
 
     for source in sorted(sources, key=lambda item: item.source_id):
-        source_text = " ".join(source.excerpt.split())
+        source_text = " ".join((source.full_text or source.excerpt).split())
         source_text_hash = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
+        source_version = source.source_version or source_text_hash[:16]
 
         for index, chunk_text in enumerate(_chunk_text(source_text)):
-            stable_key = f"{source.source_id}|{source.section_ref}|{index}"
+            stable_key = f"{source.source_id}|{source.section_ref}|{index}|{source_text_hash[:16]}"
             digest = hashlib.sha256(stable_key.encode("utf-8")).hexdigest()[:16]
             chunks.append(
                 SourceChunk(
-                    chunk_id=f"{source.source_id}:chunk:{digest}",
+                    chunk_id=f"{source.source_id}:chunk:{index}:{source_text_hash[:12]}:{digest[:8]}",
                     source_id=source.source_id,
                     title=source.title,
                     chunk_text=chunk_text,
@@ -79,6 +81,15 @@ def build_source_chunks(sources: list[SourceRegistryEntry]) -> list[SourceChunk]
                     effective_date=source.effective_date,
                     districts=source.districts,
                     uses=source.uses,
+                    source_type=source.source_type,
+                    retrieved_at=source.retrieved_at,
+                    source_version=source_version,
+                    token_count=len(chunk_text.split()),
+                    metadata={
+                        **source.metadata,
+                        "source_version": source_version,
+                        "content_hash": source_text_hash,
+                    },
                 )
             )
 
@@ -103,6 +114,9 @@ def _parse_text_document(path: Path) -> SourceRegistryEntry:
                 "jurisdiction_id",
                 "url",
                 "effective_date",
+                "source_type",
+                "retrieved_at",
+                "source_version",
                 "districts",
                 "uses",
             }:
@@ -116,7 +130,6 @@ def _parse_text_document(path: Path) -> SourceRegistryEntry:
         in_metadata = False
         body_lines.append(line)
 
-    body = "\n".join(body_lines).strip()
     title = metadata.get("title")
     if not title:
         for line in lines:
@@ -127,6 +140,10 @@ def _parse_text_document(path: Path) -> SourceRegistryEntry:
         if not title:
             title = path.stem.replace("-", " ").replace("_", " ").title()
 
+    body = "\n".join(body_lines).strip()
+    normalized_body = " ".join((body or title or path.stem).split())
+    content_hash = hashlib.sha256(normalized_body.encode("utf-8")).hexdigest()
+    retrieved_at = metadata.get("retrieved_at") or datetime.now(timezone.utc).isoformat()
     section_ref = metadata.get("section_ref") or "Document excerpt"
     excerpt = _extract_excerpt(body or title)
 
@@ -140,16 +157,29 @@ def _parse_text_document(path: Path) -> SourceRegistryEntry:
         effective_date=metadata.get("effective_date"),
         districts=_parse_csv_field(metadata.get("districts", "general")) or ["general"],
         uses=_parse_csv_field(metadata.get("uses", "general")) or ["general"],
+        source_type=metadata.get("source_type") or "zoning_ordinance",
+        retrieved_at=retrieved_at,
+        source_version=metadata.get("source_version") or content_hash[:16],
+        content_hash=content_hash,
+        full_text=body or title,
+        metadata={"imported_from": str(path.name)},
     )
 
 
 def _parse_json_document(path: Path) -> list[SourceRegistryEntry]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if isinstance(payload, list):
-        return [SourceRegistryEntry.model_validate(item) for item in payload]
+        return [SourceRegistryEntry.model_validate(_normalize_json_source_payload(item)) for item in payload]
     if isinstance(payload, dict):
-        return [SourceRegistryEntry.model_validate(payload)]
+        return [SourceRegistryEntry.model_validate(_normalize_json_source_payload(payload))]
     raise ValueError(f"Unsupported JSON structure in {path}")
+
+
+def _normalize_json_source_payload(payload: dict) -> dict:
+    normalized = dict(payload)
+    if not normalized.get("excerpt") and normalized.get("full_text"):
+        normalized["excerpt"] = _extract_excerpt(str(normalized["full_text"]))
+    return normalized
 
 
 def parse_source_file(path: Path) -> list[SourceRegistryEntry]:

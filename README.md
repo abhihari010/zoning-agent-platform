@@ -1,18 +1,20 @@
-# Zoning Agent Platform
+# Zoning Review Platform
 
 Monorepo for a zoning feasibility assistant that helps a resident or business owner ask, in plain English, whether a project is likely allowed at a property and what permits or reviews come next.
 
-The current build uses a React frontend and a FastAPI backend with a sequential three-agent orchestration flow:
+The current build uses a React frontend and a FastAPI backend with a single zoning orchestrator that runs a staged review pipeline:
 
-1. `User Intent Agent`: interprets the project description and flags missing details.
-2. `Zoning Research Agent`: retrieves district-relevant municipal source excerpts.
-3. `Compliance & Checklist Agent`: synthesizes the result into a feasibility summary, permit path, warnings, and citations.
+1. `Understand Project`: interprets the project description and flags missing details.
+2. `Resolve Property`: normalizes location context, jurisdiction, and district metadata.
+3. `Retrieve Sources`: retrieves district-relevant municipal source excerpts.
+4. `Analyze Compliance`: synthesizes feasibility from structured facts and retrieved evidence.
+5. `Generate Checklist`: formats permit steps, warnings, citations, and the user-facing checklist.
 
 The frontend is designed to connect those stages together visibly for the user, including:
 
 - intake form for project description and address
-- progress tracker for each agent stage
-- clarification modal when the intent stage needs more information
+- progress tracker for each pipeline stage
+- clarification modal when intake needs more information
 - feasibility dashboard with citations and warnings
 - downloadable permit checklist
 - prominent legal disclaimer
@@ -27,28 +29,28 @@ The roadmap keeps the useful shape of the original system while expanding beyond
 
 - Keep zoning answers citation-first. Every recommendation should link back to source text, effective dates, jurisdiction, and section references.
 - Treat AI output as assisted drafting, not legal authority. The app should always explain uncertainty and route low-confidence cases to human review.
-- Separate the agent workflow from the model provider. The same three-agent flow should work with future hosted providers, local models, or deterministic fallback logic.
+- Separate the orchestrated workflow from the model provider. The same staged pipeline should work with hosted providers, local models, or deterministic fallback logic.
 - Make geography configurable. Blacksburg should become the first supported jurisdiction, not a hard-coded boundary.
 - Design for expansion through source data, not one-off conditionals. Adding a city should mostly mean adding jurisdiction metadata, parcel/district mapping, and ordinance documents.
 
 ### Target Architecture
 
-1. `Intake Agent`
+1. `Intake Tool`
    - Understands the user's project description.
    - Extracts use type, construction scope, business operations, missing details, and risk factors.
    - Produces follow-up questions when the project is underspecified.
 
-2. `Jurisdiction & Parcel Agent`
+2. `Jurisdiction & Parcel Tool`
    - Normalizes the address.
    - Determines jurisdiction, parcel context, zoning district, overlays, and special areas when available.
    - Replaces the current Blacksburg-only address restriction with configurable jurisdiction support.
 
-3. `Retrieval Agent`
+3. `Retrieval Tool`
    - Searches the local zoning knowledge base.
    - Filters by jurisdiction, district, use, overlay, source type, and effective date.
    - Returns cited excerpts with enough metadata for auditability.
 
-4. `Compliance Agent`
+4. `Compliance Tool`
    - Synthesizes feasibility, likely permit path, review triggers, warnings, and next steps.
    - Must only make claims that can be traced to retrieved source excerpts or clearly marked assumptions.
 
@@ -58,11 +60,11 @@ The roadmap keeps the useful shape of the original system while expanding beyond
 
 ### Phase 1: Provider Boundary Foundation
 
-Phase 1 is implemented in the current codebase. The backend now routes analysis and retrieval through provider-neutral interfaces in `apps/api/app/ai/`, while `apps/api/app/services.py` preserves the existing `AnalyzeResult` response shape consumed by the frontend.
+Phase 1 is implemented in the current codebase. The backend now routes analysis and retrieval through provider-neutral interfaces in `apps/api/app/ai/`, and `apps/api/app/orchestrator/ZoningOrchestrator` coordinates the staged review through tool modules under `apps/api/app/tools/`. `apps/api/app/services.py` remains as a compatibility facade for the existing API route and tests.
 
 Implemented provider settings:
 
-- `AI_PROVIDER=deterministic|openai|watsonx`
+- `AI_PROVIDER=deterministic|openai|watsonx|local`
 - `RAG_PROVIDER=source_registry|hybrid_local|watsonx`
 - `EMBEDDING_PROVIDER=none|local|openai`
 
@@ -73,6 +75,7 @@ Default behavior:
 - no WatsonX credentials required
 - missing citations force an `unknown` or low-confidence result instead of a high-confidence zoning conclusion
 - `hybrid_local` can retrieve from indexed chunks with deterministic local embeddings when enabled
+- the free/local path uses SQLite or the configured Postgres store as the source of truth, with optional embedded ChromaDB vectors for Phase 2 retrieval
 
 WatsonX behavior:
 
@@ -86,35 +89,37 @@ OpenAI behavior:
 - OpenAI embeddings are optional and selected with `EMBEDDING_PROVIDER=openai`.
 - Tests and local defaults do not require OpenAI credentials.
 
+Local model behavior:
+
+- Local model analysis is optional and selected with `AI_PROVIDER=local`.
+- The local provider calls an OpenAI-compatible chat completions endpoint using `LOCAL_MODEL_BASE_URL`, `LOCAL_MODEL_NAME`, and `LOCAL_MODEL_TIMEOUT_SECONDS`.
+- Deterministic local mode remains the default; local model credentials or services are not required for tests.
+
 Phase 1 reference docs:
 
+- `docs/single-orchestrator-architecture.md`
 - `docs/agent-agnostic-zoning-platform/spec.md`
 - `docs/agent-agnostic-zoning-platform/plan.md`
 
 ### Phase 2: Build a Real Local RAG Pipeline
 
-The current source registry can store excerpts, and `services/ingestion/documents/` can import local `.md`, `.txt`, and `.json` documents. The next step is to turn that into a searchable knowledge base.
+Phase 2 is implemented around SQL-backed source/chunk records plus an optional embedded ChromaDB vector index. SQL remains the durable source of truth; Chroma is rebuildable index state selected with `VECTOR_PROVIDER=chroma`.
 
-Recommended steps:
+Implemented pieces:
 
-1. Add document records for jurisdiction, source URL, source type, effective date, and retrieval timestamp.
-2. Add chunking with stable chunk IDs.
-3. Add embeddings for each chunk.
-4. Store vectors in a local database first:
-   - ChromaDB for fast local prototyping, or
-   - SQLite plus vector extension if you want fewer moving parts, or
-   - Postgres/pgvector when preparing for production.
-5. Implement hybrid retrieval:
-   - keyword search for exact ordinance terms
-   - vector search for semantic matches
-   - metadata filters for jurisdiction, district, use, and document type
-6. Return citations from chunks, not hand-written excerpts.
+1. Source records include source type, retrieval timestamp, source version, content hash, and full document text.
+2. Local `.md`, `.txt`, and `.json` imports preserve full text while keeping `excerpt` as a preview field.
+3. Reindexing builds deterministic, hash-versioned SQL chunks with stable chunk IDs.
+4. `POST /api/v1/ingestion/reindex` computes embeddings and syncs Chroma vectors when `VECTOR_PROVIDER=chroma`.
+5. `hybrid_local` retrieves chunk citations through Chroma vector search plus keyword scoring and metadata filters, with a SQL-backed fallback if Chroma is unavailable.
+6. Ingestion status reports vector provider, collection, vector count, readiness, and warnings.
 
 Success criteria:
 
 - `POST /api/v1/ingestion/import-local-docs` can ingest real ordinance documents.
 - `POST /api/v1/ingestion/reindex` actually rebuilds the retrieval index.
 - Retrieval returns source-backed chunks with section references and URLs.
+- Chroma can be deleted and rebuilt from SQL source/chunk records.
 
 ### Phase 3: Expand Beyond Blacksburg
 
@@ -283,10 +288,14 @@ Set environment variables before starting the API when needed:
 - `BETA_ACCESS_KEY`: optional private beta key; when set, every `/api/v1/*` request must include `X-Beta-Access-Key`
 - `BETA_ACCESS_KEYS`: optional rotatable beta keys as comma-separated `label:key` pairs, for example `alice:invite-one,bob:invite-two`. These work alongside `BETA_ACCESS_KEY`.
 - `ADMIN_ACCESS_KEY`: optional source-admin key. When set, `POST /api/v1/ingestion/sources`, `POST /api/v1/ingestion/reindex`, and `POST /api/v1/ingestion/import-local-docs` require `X-Admin-Access-Key`.
-- `AI_PROVIDER`: optional analysis provider (`deterministic`, `openai`, or `watsonx`, default `deterministic`)
+- `AI_PROVIDER`: optional analysis provider (`deterministic`, `openai`, `local`, or `watsonx`, default `deterministic`)
 - `RAG_PROVIDER`: optional retrieval provider (`source_registry`, `hybrid_local`, or `watsonx`, default `source_registry`)
 - `EMBEDDING_PROVIDER`: optional embedding provider (`none`, `local`, or `openai`, default `none`)
 - `EMBEDDING_MODEL`: model name used when `EMBEDDING_PROVIDER=openai`
+- `VECTOR_PROVIDER`: optional vector index provider (`none` or `chroma`, default `none`; use `chroma` with `RAG_PROVIDER=hybrid_local`)
+- `CHROMA_PATH`: embedded ChromaDB persistence path (default `apps/api/app/data/chroma`)
+- `CHROMA_COLLECTION`: Chroma collection name (default `zoning_source_chunks`)
+- `CHROMA_RESET_ON_REINDEX`: whether `/ingestion/reindex` should reset the Chroma collection before upsert (default `false`)
 - `OPENAI_API_KEY`: required when `AI_PROVIDER=openai` or `EMBEDDING_PROVIDER=openai`
 - `OPENAI_MODEL`: model name used when `AI_PROVIDER=openai`
 - `OPENAI_BASE_URL`: optional OpenAI-compatible API base URL
@@ -325,7 +334,7 @@ Available API additions:
 - `GET /api/v1/ingestion/sources`: list persistent source registry entries
 - `POST /api/v1/ingestion/sources`: create or update a source registry entry
 - `POST /api/v1/ingestion/reindex`: request source reindex
-- `GET /api/v1/ingestion/status`: inspect source count, chunk count, index status, and source metadata health
+- `GET /api/v1/ingestion/status`: inspect source count, chunk count, SQL index status, vector index status, and source metadata health
 - `POST /api/v1/ingestion/import-local-docs`: parse local `.md`, `.txt`, or `.json` documents into source entries
 - `GET /health`: unauthenticated backend health check for deployment platforms
 
@@ -333,7 +342,7 @@ Analysis behavior:
 
 - If no provider variables are set, analysis uses deterministic local logic and retrieval uses the source registry.
 - If `AI_PROVIDER=openai`, analysis attempts an OpenAI Responses API structured-output call.
-- If `RAG_PROVIDER=hybrid_local`, retrieval ranks indexed chunks with metadata, keyword overlap, and optional embeddings.
+- If `RAG_PROVIDER=hybrid_local`, retrieval ranks indexed chunks with metadata filters, keyword overlap, and Chroma vectors when `VECTOR_PROVIDER=chroma`.
 - If `AI_PROVIDER=watsonx`, analysis attempts watsonx model inference.
 - If `RAG_PROVIDER=watsonx`, retrieval attempts the WatsonX vector index.
 - If watsonx call fails, backend falls back to deterministic analysis and records a warning.

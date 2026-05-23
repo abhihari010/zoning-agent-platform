@@ -13,11 +13,18 @@ def _clear_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "RAG_PROVIDER",
         "EMBEDDING_PROVIDER",
         "EMBEDDING_MODEL",
+        "VECTOR_PROVIDER",
+        "CHROMA_PATH",
+        "CHROMA_COLLECTION",
+        "CHROMA_RESET_ON_REINDEX",
         "DATABASE_URL",
         "ZONING_DB_PATH",
         "IBM_ZONING_DB_PATH",
         "OPENAI_API_KEY",
         "OPENAI_MODEL",
+        "LOCAL_MODEL_BASE_URL",
+        "LOCAL_MODEL_NAME",
+        "LOCAL_MODEL_TIMEOUT_SECONDS",
         "WATSONX_ENABLED",
         "WATSONX_API_KEY",
         "WATSONX_PROJECT_ID",
@@ -38,9 +45,26 @@ def test_settings_default_to_offline_providers(monkeypatch: pytest.MonkeyPatch) 
     assert settings.ai_provider == "deterministic"
     assert settings.rag_provider == "source_registry"
     assert settings.embedding_provider == "none"
+    assert settings.vector_provider == "none"
     assert not settings.uses_watsonx
     assert not settings.uses_openai
     assert settings.beta_access_key == ""
+    assert settings.local_model_base_url == "http://localhost:11434/v1"
+    assert settings.local_model_name == "llama3.1:8b"
+
+
+def test_settings_accepts_local_ai_provider(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("AI_PROVIDER", "local")
+    monkeypatch.setenv("LOCAL_MODEL_BASE_URL", "http://localhost:1234/v1")
+    monkeypatch.setenv("LOCAL_MODEL_NAME", "local-test-model")
+
+    settings = get_settings()
+
+    assert settings.ai_provider == "local"
+    assert settings.uses_local_model
+    assert settings.local_model_base_url == "http://localhost:1234/v1"
+    assert settings.local_model_name == "local-test-model"
 
 
 def test_settings_prefers_new_database_path(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -118,6 +142,14 @@ def test_unknown_embedding_provider_raises_clear_error(monkeypatch: pytest.Monke
     monkeypatch.setenv("EMBEDDING_PROVIDER", "mystery")
 
     with pytest.raises(ConfigurationError, match="EMBEDDING_PROVIDER must be one of"):
+        get_settings()
+
+
+def test_unknown_vector_provider_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("VECTOR_PROVIDER", "mystery")
+
+    with pytest.raises(ConfigurationError, match="VECTOR_PROVIDER must be one of"):
         get_settings()
 
 

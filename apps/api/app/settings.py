@@ -7,15 +7,18 @@ from pathlib import Path
 from typing import Literal, cast
 
 
-AIProviderName = Literal["deterministic", "openai", "watsonx"]
+AIProviderName = Literal["deterministic", "openai", "watsonx", "local"]
 RAGProviderName = Literal["source_registry", "hybrid_local", "watsonx"]
 EmbeddingProviderName = Literal["none", "local", "openai"]
+VectorProviderName = Literal["none", "chroma"]
 
-VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "watsonx"}
+VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "watsonx", "local"}
 VALID_RAG_PROVIDERS: set[str] = {"source_registry", "hybrid_local", "watsonx"}
 VALID_EMBEDDING_PROVIDERS: set[str] = {"none", "local", "openai"}
+VALID_VECTOR_PROVIDERS: set[str] = {"none", "chroma"}
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent / "data" / "app.sqlite3"
+DEFAULT_CHROMA_PATH = Path(__file__).resolve().parent / "data" / "chroma"
 
 
 class ConfigurationError(RuntimeError):
@@ -75,7 +78,11 @@ class Settings:
     ai_provider: AIProviderName
     rag_provider: RAGProviderName
     embedding_provider: EmbeddingProviderName
+    vector_provider: VectorProviderName
     embedding_model: str
+    chroma_path: Path
+    chroma_collection: str
+    chroma_reset_on_reindex: bool
     database_url: str
     database_path: Path
     google_maps_api_key: str
@@ -84,6 +91,10 @@ class Settings:
     openai_model: str
     openai_base_url: str
     openai_timeout_seconds: float
+    local_model_base_url: str
+    local_model_name: str
+    local_model_timeout_seconds: float
+    local_model_api_key: str
     watsonx_api_key: str
     watsonx_url: str
     watsonx_project_id: str
@@ -105,6 +116,10 @@ class Settings:
     @property
     def uses_openai(self) -> bool:
         return self.ai_provider == "openai" or self.embedding_provider == "openai"
+
+    @property
+    def uses_local_model(self) -> bool:
+        return self.ai_provider == "local"
 
 
 def get_settings() -> Settings:
@@ -139,7 +154,14 @@ def get_settings() -> Settings:
             EmbeddingProviderName,
             _provider_name("EMBEDDING_PROVIDER", "none", VALID_EMBEDDING_PROVIDERS),
         ),
+        vector_provider=cast(
+            VectorProviderName,
+            _provider_name("VECTOR_PROVIDER", "none", VALID_VECTOR_PROVIDERS),
+        ),
         embedding_model=_env("EMBEDDING_MODEL", "text-embedding-3-small"),
+        chroma_path=Path(_env("CHROMA_PATH")) if _env("CHROMA_PATH") else DEFAULT_CHROMA_PATH,
+        chroma_collection=_env("CHROMA_COLLECTION", "zoning_source_chunks"),
+        chroma_reset_on_reindex=_env_bool("CHROMA_RESET_ON_REINDEX", False),
         database_url=database_url,
         database_path=Path(database_path) if database_path else DEFAULT_DB_PATH,
         google_maps_api_key=_env("GOOGLE_MAPS_API_KEY"),
@@ -148,6 +170,10 @@ def get_settings() -> Settings:
         openai_model=_env("OPENAI_MODEL", "gpt-4o-mini"),
         openai_base_url=_env("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/"),
         openai_timeout_seconds=float(_env("OPENAI_TIMEOUT_SECONDS", "20")),
+        local_model_base_url=_env("LOCAL_MODEL_BASE_URL", "http://localhost:11434/v1").rstrip("/"),
+        local_model_name=_env("LOCAL_MODEL_NAME", "llama3.1:8b"),
+        local_model_timeout_seconds=float(_env("LOCAL_MODEL_TIMEOUT_SECONDS", "60")),
+        local_model_api_key=_env("LOCAL_MODEL_API_KEY"),
         watsonx_api_key=_env("WATSONX_API_KEY"),
         watsonx_url=_env("WATSONX_URL", "https://us-south.ml.cloud.ibm.com").rstrip("/"),
         watsonx_project_id=_env("WATSONX_PROJECT_ID"),

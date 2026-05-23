@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import type {
-  AgentReport,
   AnalyzeResponse,
   AuditEvent,
   FollowUpQuestion,
+  PipelineStageReport,
 } from "@zoning-agent/shared-schema";
 import {
   clearAdminAccessKey,
@@ -31,6 +31,7 @@ import {
 
 const DISCLAIMER =
   "Educational guidance only. Zoning rules, permit triggers, and code interpretations must be verified with the official planning department before you rely on this result.";
+const PIPELINE_STAGE_COUNT = 5;
 
 type Workspace = "assistant" | "admin";
 type Phase = "idle" | "intake" | "analyzing" | "done" | "error";
@@ -135,7 +136,7 @@ function decisionTone(decision: AnalyzeResponse["feasibility"]["decision"]): str
   }
 }
 
-function statusTone(status: AgentReport["status"], isActive: boolean): string {
+function statusTone(status: PipelineStageReport["status"], isActive: boolean): string {
   if (isActive) {
     return "border-clay bg-clay/10";
   }
@@ -293,7 +294,7 @@ export function App() {
   const [suggestionLoading, setSuggestionLoading] = useState(false);
   const [autocompleteSession] = useState(() => crypto.randomUUID());
   const [phase, setPhase] = useState<Phase>("idle");
-  const [activeAgentIndex, setActiveAgentIndex] = useState(0);
+  const [activeStageIndex, setActiveStageIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [intake, setIntake] = useState<IntakeResponse | null>(null);
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
@@ -363,7 +364,7 @@ export function App() {
     }
 
     const interval = window.setInterval(() => {
-      setActiveAgentIndex((current) => (current + 1) % 3);
+      setActiveStageIndex((current) => (current + 1) % PIPELINE_STAGE_COUNT);
     }, 1200);
 
     return () => window.clearInterval(interval);
@@ -447,32 +448,50 @@ export function App() {
     [acceptedDisclaimer, projectDescription, address],
   );
 
-  const displayedAgents = useMemo(() => {
-    const loadingAgents: AgentReport[] = [
+  const displayedStages = useMemo(() => {
+    const loadingStages: PipelineStageReport[] = [
       {
-        key: "intent",
-        label: "Understanding Request",
+        key: "intake",
+        label: "Understand Project",
         status: "completed",
         headline: "Interpreting the project, use type, and missing details.",
         details: ["Extracting the project goal from plain English."],
       },
       {
-        key: "research",
-        label: "Retrieving Zoning Codes",
+        key: "location",
+        label: "Resolve Property",
+        status: "completed",
+        headline: "Checking jurisdiction, address validity, and zoning district context.",
+        details: ["Preparing location metadata for source retrieval."],
+      },
+      {
+        key: "retrieval",
+        label: "Retrieve Sources",
         status: "completed",
         headline: "Looking up district rules, permit triggers, and ordinance excerpts.",
         details: ["Searching the municipal source registry."],
       },
       {
         key: "compliance",
-        label: "Drafting Checklist",
+        label: "Analyze Compliance",
+        status: "completed",
+        headline: "Evaluating the retrieved evidence against the project facts.",
+        details: ["Checking whether the evidence supports a zoning conclusion."],
+      },
+      {
+        key: "checklist",
+        label: "Generate Checklist",
         status: "completed",
         headline: "Turning the zoning evidence into a permit path and plain-language answer.",
         details: ["Producing the feasibility summary and next steps."],
       },
     ];
 
-    return result?.agents.length ? result.agents : loadingAgents;
+    return result?.pipelineStages?.length
+      ? result.pipelineStages
+      : result?.agents.length
+        ? result.agents
+        : loadingStages;
   }, [result]);
 
   const assistantPrompts = useMemo(() => {
@@ -595,7 +614,7 @@ export function App() {
 
   async function runAnalysis(projectId: string, answers?: Record<string, string>) {
     setPhase("analyzing");
-    setActiveAgentIndex(0);
+    setActiveStageIndex(0);
     const analysis = await analyzeProject(projectId, answers);
     setResult(analysis);
     setPhase("done");
@@ -771,7 +790,7 @@ export function App() {
       setReindexMessage("");
       const summary = await reindexSources();
       setReindexMessage(
-        `Reindex ${summary.status}. ${summary.sourceCount} sources produced ${summary.chunkCount} chunks.`,
+        `Reindex ${summary.status}. ${summary.sourceCount} sources produced ${summary.chunkCount} chunks and ${summary.vectorCount} vectors.`,
       );
       await refreshSources();
     } catch (reindexError) {
@@ -844,7 +863,7 @@ export function App() {
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
             Private Beta
           </p>
-          <h1 className="mt-3 font-heading text-3xl text-pine">Zoning Agent Platform</h1>
+          <h1 className="mt-3 font-heading text-3xl text-pine">Zoning Review Platform</h1>
           <p className="mt-3 text-sm leading-6 text-slate-700">
             Enter your beta access key to open the zoning review workspace.
           </p>
@@ -885,15 +904,15 @@ export function App() {
         <section className="mb-5 grid gap-5 rounded-[28px] border border-pine/10 bg-white/90 p-6 shadow-card backdrop-blur lg:grid-cols-[minmax(0,1.5fr)_320px]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
-              Zoning Agent Platform
+              Zoning Review Platform
             </p>
             <h1 className="mt-3 max-w-4xl font-heading text-3xl leading-tight text-pine md:text-[2.75rem]">
               Check whether a project is allowed on a property and get the next permit steps.
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700 md:text-base">
-              This workspace runs a three-agent zoning review: one agent interprets the request,
-              one retrieves municipal code evidence, and one turns that into a feasibility summary
-              plus a permit checklist.
+              This workspace runs one orchestrated zoning pipeline: it understands the request,
+              checks property context, retrieves municipal code evidence, and turns that into a
+              feasibility summary plus a permit checklist.
             </p>
           </div>
 
@@ -949,7 +968,7 @@ export function App() {
                     <h2 className="mt-2 font-heading text-2xl text-pine">Tell us what you want to build</h2>
                     <p className="mt-2 text-sm leading-6 text-slate-600">
                       Start with the project and the parcel address. The system will validate the
-                      property, infer the likely zoning context, and run the three-agent review.
+                      property, infer the likely zoning context, and run the staged review.
                     </p>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
@@ -973,7 +992,7 @@ export function App() {
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                         Workflow
                       </p>
-                      <p className="mt-2 text-sm font-semibold text-slate-900">3 agents</p>
+                      <p className="mt-2 text-sm font-semibold text-slate-900">5 stages</p>
                     </div>
                     <div className="rounded-2xl border border-slate-200 bg-white p-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -1170,9 +1189,9 @@ export function App() {
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-                      Agent Progress
+                      Pipeline Progress
                     </p>
-                    <h2 className="mt-2 font-heading text-2xl text-pine">Three-agent workflow</h2>
+                    <h2 className="mt-2 font-heading text-2xl text-pine">Orchestrated workflow</h2>
                   </div>
                   <p className="text-sm text-slate-600">
                     {phase === "analyzing"
@@ -1184,25 +1203,25 @@ export function App() {
                 </div>
 
                 <div className="mt-5 grid gap-3">
-                  {displayedAgents.map((agent, index) => {
-                    const isActive = phase === "analyzing" && index === activeAgentIndex;
+                  {displayedStages.map((stage, index) => {
+                    const isActive = phase === "analyzing" && index === activeStageIndex;
                     return (
                       <article
-                        key={agent.key}
-                        className={`rounded-2xl border p-4 ${statusTone(agent.status, isActive)}`}
+                        key={stage.key}
+                        className={`rounded-2xl border p-4 ${statusTone(stage.status, isActive)}`}
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div>
-                            <p className="font-semibold text-slate-900">{agent.label}</p>
-                            <p className="mt-1 text-sm text-slate-700">{agent.headline}</p>
+                            <p className="font-semibold text-slate-900">{stage.label}</p>
+                            <p className="mt-1 text-sm text-slate-700">{stage.headline}</p>
                           </div>
                           <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">
-                            {isActive ? "Working" : agent.status.replace("_", " ")}
+                            {isActive ? "Working" : stage.status.replace("_", " ")}
                           </span>
                         </div>
-                        {agent.details.length > 0 && (
+                        {stage.details.length > 0 && (
                           <ul className="mt-3 space-y-1 text-sm text-slate-600">
-                            {agent.details.map((detail) => (
+                            {stage.details.map((detail) => (
                               <li key={detail}>{detail}</li>
                             ))}
                           </ul>
@@ -1319,6 +1338,39 @@ export function App() {
                             : "Each cited source is available in the Evidence tab for review."}
                         </p>
                       </div>
+                      {result.citationValidation && (
+                        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+                          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
+                            Citation validation
+                          </p>
+                          <p className="mt-2 text-sm font-semibold text-slate-900">
+                            {(result.citationValidation.citationCoverage * 100).toFixed(0)}% coverage
+                          </p>
+                          <p className="mt-2 text-sm leading-6 text-slate-600">
+                            {result.citationValidation.valid
+                              ? "All returned citations passed the current validation checks."
+                              : "Unsupported or invalid citation references were found."}
+                          </p>
+                          {result.citationValidation.unsupportedClaims.length > 0 && (
+                            <ul className="mt-2 space-y-1 text-xs leading-5 text-amber-900">
+                              {result.citationValidation.unsupportedClaims.map((claim) => (
+                                <li key={claim}>{claim}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
+                      {result.pipeline && (
+                        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+                          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Pipeline</p>
+                          <p className="mt-2 text-sm font-semibold text-slate-900">
+                            {result.pipeline.provider} / {result.pipeline.ragProvider}
+                          </p>
+                          <p className="mt-1 text-xs leading-5 text-slate-500">
+                            {result.pipeline.version} | {result.pipeline.traceId}
+                          </p>
+                        </div>
+                      )}
                       {result.citations.length > 0 && (
                         <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
                           <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
@@ -1430,16 +1482,25 @@ export function App() {
                           {result.citations.length > 0 ? (
                             result.citations.map((citation) => (
                               <article
-                                key={citation.sourceId}
+                                key={`${citation.sourceId}-${citation.chunkId ?? citation.sectionRef}`}
                                 className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
                               >
                                 <p className="font-semibold text-slate-900">{citation.title}</p>
-                                <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
-                                  {citation.sectionRef}
-                                </p>
+                                <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                                  <span>{citation.sectionRef}</span>
+                                  {citation.chunkId && <span>Chunk {citation.chunkId}</span>}
+                                  {citation.jurisdictionId && <span>{citation.jurisdictionId}</span>}
+                                  {citation.score != null && <span>Score {citation.score.toFixed(2)}</span>}
+                                </div>
                                 <p className="mt-3 text-sm leading-7 text-slate-700">
                                   {citation.excerpt}
                                 </p>
+                                <div className="mt-3 grid gap-2 text-xs text-slate-500 sm:grid-cols-2">
+                                  <span>
+                                    Effective date: {citation.effectiveDate ?? "Not provided"}
+                                  </span>
+                                  <span>Source type: {citation.sourceType ?? "registry"}</span>
+                                </div>
                                 {citation.url && (
                                   <a
                                     className="mt-3 inline-flex text-sm font-semibold text-clay underline-offset-2 hover:underline"
@@ -1478,6 +1539,11 @@ export function App() {
                                 <p className="mt-1 text-xs text-slate-500">
                                   {new Date(event.createdAt).toLocaleString()}
                                 </p>
+                                {Object.keys(event.details).length > 0 && (
+                                  <pre className="mt-3 overflow-auto rounded-xl bg-white p-3 text-xs leading-5 text-slate-600">
+                                    {JSON.stringify(event.details, null, 2)}
+                                  </pre>
+                                )}
                               </div>
                             ))
                           ) : (
@@ -1488,48 +1554,6 @@ export function App() {
                     </section>
 
                     <div className="hidden">
-                      <section
-                        className={`rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8 ${
-                          resultView !== "evidence" ? "hidden" : ""
-                        }`}
-                      >
-                        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-                          Source References
-                        </p>
-                      <div className="mt-4 grid gap-3">
-                          {result.citations.length > 0 ? (
-                            result.citations.map((citation) => (
-                              <article
-                                key={citation.sourceId}
-                                className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
-                              >
-                                <p className="font-semibold text-slate-900">{citation.title}</p>
-                                <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
-                                  {citation.sectionRef}
-                                </p>
-                                <p className="mt-3 text-sm leading-6 text-slate-700">
-                                  {citation.excerpt}
-                                </p>
-                                {citation.url && (
-                                  <a
-                                    className="mt-3 inline-flex text-sm font-semibold text-clay underline-offset-2 hover:underline"
-                                    href={citation.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                  >
-                                    Open source reference
-                                  </a>
-                                )}
-                              </article>
-                            ))
-                          ) : (
-                            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-                              No source excerpts were retrieved for this request.
-                            </div>
-                          )}
-                        </div>
-                      </section>
-
                       <section
                         className={`rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8 ${
                           resultView !== "trace" ? "hidden" : ""
@@ -1707,7 +1731,7 @@ export function App() {
                     ))
                   ) : (
                     <p className="text-sm leading-6 text-slate-600">
-                      Follow-up questions and confidence warnings will appear here when the agents need more detail.
+                      Follow-up questions and confidence warnings will appear here when the review needs more detail.
                     </p>
                   )}
                 </div>
@@ -1743,6 +1767,21 @@ export function App() {
                     <p className="text-xs uppercase tracking-[0.18em] opacity-75">Index</p>
                     <p className="mt-2 text-2xl font-semibold">
                       {indexStatus?.chunkCount ?? 0} chunks
+                    </p>
+                  </div>
+                  <div
+                    className={`rounded-2xl border p-4 ${
+                      indexStatus?.vectorIndexReady
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-950"
+                        : "border-amber-200 bg-amber-50 text-amber-950"
+                    }`}
+                  >
+                    <p className="text-xs uppercase tracking-[0.18em] opacity-75">Vectors</p>
+                    <p className="mt-2 text-2xl font-semibold">
+                      {indexStatus?.vectorCount ?? 0} vectors
+                    </p>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-80">
+                      {indexStatus?.vectorProvider ?? "none"}
                     </p>
                   </div>
                   <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -1788,6 +1827,16 @@ export function App() {
                         <p className="font-semibold">Readiness warnings</p>
                         <ul className="mt-2 space-y-1 leading-6">
                           {indexStatus.readinessWarnings.map((warning) => (
+                            <li key={warning}>{warning}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {indexStatus.vectorReadinessWarnings.length > 0 && (
+                      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+                        <p className="font-semibold">Vector warnings</p>
+                        <ul className="mt-2 space-y-1 leading-6">
+                          {indexStatus.vectorReadinessWarnings.map((warning) => (
                             <li key={warning}>{warning}</li>
                           ))}
                         </ul>

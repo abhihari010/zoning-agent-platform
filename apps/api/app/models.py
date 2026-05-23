@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import hashlib
 from datetime import datetime, timezone
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 AnalyzeStatus = Literal["success", "needs_clarification", "low_confidence", "error"]
 DecisionType = Literal["likely_allowed", "conditional", "restricted", "unknown"]
-AgentKey = Literal["intent", "research", "compliance"]
+PipelineStageKey = Literal["intake", "location", "retrieval", "compliance", "checklist"]
+AgentKey = PipelineStageKey
 AgentStatus = Literal["completed", "needs_clarification", "warning", "skipped"]
 
 
@@ -43,8 +45,29 @@ class SourceCitation(BaseModel):
     title: str
     excerpt: str
     section_ref: str
+    chunk_id: str | None = None
+    jurisdiction_id: str | None = None
+    source_type: str | None = None
     url: str | None = None
     effective_date: str | None = None
+    retrieved_at: str | None = None
+    score: float | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class IntakeResult(BaseModel):
+    use_type: str | None = None
+    project_scope: str | None = None
+    construction_scope: str | None = None
+    business_activity: str | None = None
+    possible_triggers: list[str] = Field(default_factory=list)
+    missing_details: list[str] = Field(default_factory=list)
+    clarification_required: bool = False
+    clarification_questions: list[str] = Field(default_factory=list)
+    confidence: Literal["high", "medium", "low"] = "medium"
+    inferred_use: str = "general"
+    user_intent: str = "review whether the proposed project is allowed on the property"
+    project_category: str = "general-project"
 
 
 class SourceRegistryEntry(BaseModel):
@@ -57,6 +80,23 @@ class SourceRegistryEntry(BaseModel):
     effective_date: str | None = Field(default=None, max_length=50)
     districts: list[str] = Field(default_factory=list)
     uses: list[str] = Field(default_factory=list)
+    source_type: str = Field(default="zoning_ordinance", min_length=1, max_length=200)
+    retrieved_at: str | None = Field(default=None, max_length=80)
+    source_version: str | None = Field(default=None, max_length=120)
+    content_hash: str | None = Field(default=None, min_length=64, max_length=64)
+    full_text: str | None = Field(default=None, max_length=250_000)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def populate_content_fields(self) -> "SourceRegistryEntry":
+        body = " ".join((self.full_text or self.excerpt).split())
+        if not self.full_text:
+            self.full_text = self.excerpt
+        if body:
+            self.content_hash = hashlib.sha256(body.encode("utf-8")).hexdigest()
+        if self.content_hash and not self.source_version:
+            self.source_version = self.content_hash[:16]
+        return self
 
 
 class SourceChunk(BaseModel):
@@ -72,6 +112,11 @@ class SourceChunk(BaseModel):
     effective_date: str | None = Field(default=None, max_length=50)
     districts: list[str] = Field(default_factory=list)
     uses: list[str] = Field(default_factory=list)
+    source_type: str = Field(default="zoning_ordinance", min_length=1, max_length=200)
+    retrieved_at: str | None = Field(default=None, max_length=80)
+    source_version: str | None = Field(default=None, max_length=120)
+    token_count: int = Field(default=0, ge=0)
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class SourceRegistryUpsertRequest(BaseModel):
@@ -101,12 +146,21 @@ class SourceIndexStatusResponse(BaseModel):
     stale_source_ids: list[str] = Field(default_factory=list)
     missing_chunk_source_ids: list[str] = Field(default_factory=list)
     readiness_warnings: list[str] = Field(default_factory=list)
+    vector_provider: str = "none"
+    vector_index_ready: bool = False
+    vector_count: int = 0
+    vector_collection: str | None = None
+    vector_readiness_warnings: list[str] = Field(default_factory=list)
 
 
 class ReindexResponse(BaseModel):
     status: Literal["completed"]
     source_count: int
     chunk_count: int
+    vector_provider: str = "none"
+    vector_count: int = 0
+    vector_index_ready: bool = False
+    vector_warnings: list[str] = Field(default_factory=list)
 
 
 class LocalDocumentImportRequest(BaseModel):
@@ -140,18 +194,44 @@ class Checklist(BaseModel):
     departments: list[str]
 
 
-class AgentReport(BaseModel):
-    key: AgentKey
+class PipelineStageReport(BaseModel):
+    key: PipelineStageKey
     label: str
     status: AgentStatus
     headline: str
     details: list[str] = Field(default_factory=list)
 
 
+# Backward-compatible name for existing imports and response consumers.
+AgentReport = PipelineStageReport
+
+
+class PipelineMetadata(BaseModel):
+    version: str
+    prompt_version: str
+    provider: str
+    rag_provider: str
+    embedding_provider: str
+    trace_id: str
+
+
+class CitationValidationResult(BaseModel):
+    valid: bool
+    citation_coverage: float = Field(ge=0, le=1)
+    unsupported_claims: list[str] = Field(default_factory=list)
+    invalid_citation_ids: list[str] = Field(default_factory=list)
+    confidence_adjustment: Literal["none", "downgrade_low_confidence"] = "none"
+    warnings: list[str] = Field(default_factory=list)
+    jurisdiction_id: str | None = None
+
+
 class AnalyzeResult(BaseModel):
     status: AnalyzeStatus
     trace_id: str
-    agents: list[AgentReport] = Field(default_factory=list)
+    pipeline: PipelineMetadata | None = None
+    citation_validation: CitationValidationResult | None = None
+    pipeline_stages: list[PipelineStageReport] = Field(default_factory=list)
+    agents: list[PipelineStageReport] = Field(default_factory=list)
     feasibility: Feasibility
     checklist: Checklist
     citations: list[SourceCitation]
@@ -163,6 +243,7 @@ class AnalyzeResult(BaseModel):
 class AuditEvent(BaseModel):
     stage: str
     project_id: str
+    details: dict[str, Any] = Field(default_factory=dict)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

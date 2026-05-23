@@ -5,22 +5,16 @@ import os
 import re
 from dataclasses import dataclass
 from typing import Any, Literal
-from uuid import uuid4
 
 import httpx
 
 from app.ai import get_analysis_provider, get_retrieval_provider
-from app.ai.deterministic_provider import deterministic_feasibility
-from app.ai.interfaces import AnalysisProviderRequest, RetrievalProviderRequest
-from app.ai.source_registry_retriever import ensure_seed_sources, ensure_source_index_ready
+from app.ai.interfaces import RetrievalProviderRequest
+from app.ai.source_registry_retriever import ensure_seed_sources
 from app.district_mapping import map_district_from_components
 from app.jurisdictions import detect_jurisdiction
 from app.models import (
-    AgentReport,
     AnalyzeResult,
-    Checklist,
-    ChecklistStep,
-    Feasibility,
     SourceCitation,
 )
 
@@ -422,233 +416,21 @@ def analyze_project(
     project_description: str,
     district: str,
     jurisdiction_id: str | None = None,
+    jurisdiction_name: str | None = None,
+    normalized_address: str | None = None,
+    project_id: str | None = None,
     clarification_answers: dict[str, str] | None = None,
+    trace_recorder: Any | None = None,
 ) -> AnalyzeResult:
-    combined_description = _merge_project_context(project_description, clarification_answers)
-    intent = extract_intent(combined_description)
-    analysis_provider = get_analysis_provider()
-    retrieval_provider = get_retrieval_provider()
-    analysis_provider_name = analysis_provider.name
-    retrieval_provider_name = retrieval_provider.name
-    retrieval_error: str | None = None
-    retrieval_source_store = getattr(retrieval_provider, "source_store", None)
-    source_readiness = (
-        ensure_source_index_ready(retrieval_source_store)
-        if retrieval_source_store
-        else ensure_source_index_ready()
-    )
-    try:
-        citations = retrieval_provider.retrieve(
-            RetrievalProviderRequest(
-                district=district,
-                inferred_use=intent.inferred_use,
-                project_description=combined_description,
-                jurisdiction_id=jurisdiction_id,
-            )
-        ).citations
-    except Exception as exc:
-        citations = []
-        retrieval_error = str(exc)
+    from app.orchestrator import ZoningOrchestrator
 
-    confidence = _confidence_score(intent.missing_fields, citations)
-    if not source_readiness.index_ready:
-        confidence = max(0.1, min(confidence, 0.55))
-
-    try:
-        provider_output = analysis_provider.generate_analysis(
-            AnalysisProviderRequest(
-                project_description=combined_description,
-                district=district,
-                citation_excerpts=[citation.excerpt for citation in citations],
-                missing_fields=intent.missing_fields,
-            )
-        )
-    except Exception as exc:
-        warnings_from_provider = [f"{analysis_provider_name} analysis fallback engaged: {exc}"]
-        fallback_decision, fallback_summary = deterministic_feasibility(combined_description, district)
-        decision = fallback_decision
-        summary = fallback_summary
-        permits_override: list[str] = []
-        follow_up: list[str] = []
-        warnings: list[str] = warnings_from_provider
-    else:
-        decision = provider_output.decision
-        summary = provider_output.summary
-        permits_override = provider_output.required_permits
-        follow_up = list(provider_output.follow_up_questions)
-        warnings = list(provider_output.warnings)
-
-    status = "success"
-    agent_reports: list[AgentReport] = [
-        AgentReport(
-            key="intent",
-            label="User Intent Agent",
-            status="completed",
-            headline=f"Captured a {intent.project_category} request to {intent.user_intent}.",
-            details=[
-                f"Project category: {intent.project_category}",
-                f"Inferred use: {intent.inferred_use}",
-                f"District context: {district}",
-            ],
-        )
-    ]
-
-    if retrieval_error:
-        if retrieval_provider_name == "watsonx":
-            warnings.append(f"watsonx retrieval failed: {retrieval_error}")
-        else:
-            warnings.append(f"Local source retrieval failed: {retrieval_error}")
-
-    if not source_readiness.index_ready:
-        warnings.extend(source_readiness.warnings)
-        warnings.append("Source index readiness is incomplete; verify this result with the planning office.")
-
-    if citations:
-        agent_reports.append(
-            AgentReport(
-                key="research",
-                label="Zoning Research Agent",
-                status="completed",
-                headline=(
-                    f"Retrieved {len(citations)} ordinance passages from the watsonx knowledge index."
-                    if retrieval_provider_name == "watsonx"
-                    else f"Retrieved {len(citations)} relevant zoning source excerpts for review."
-                ),
-                details=[
-                    f"District searched: {district}",
-                    f"Use searched: {intent.inferred_use}",
-                    *[f"{citation.title} ({citation.section_ref})" for citation in citations[:3]],
-                ],
-            )
-        )
-    else:
-        agent_reports.append(
-            AgentReport(
-                key="research",
-                label="Zoning Research Agent",
-                status="warning",
-                headline=(
-                    "watsonx retrieval did not return matching Blacksburg ordinance passages for this request."
-                    if retrieval_provider_name == "watsonx"
-                    else "No relevant municipal ordinances were found in the current source registry."
-                ),
-                details=[
-                    (
-                        "The watsonx ordinance index did not return enough zoning text for this district and use."
-                        if retrieval_provider_name == "watsonx"
-                        else "The system could not retrieve matching zoning text for this district and use."
-                    ),
-                    "A human review with the planning department is recommended before acting.",
-                ],
-            )
-        )
-        decision = "unknown"
-        summary = (
-            "We could not find enough source material for this district and project type to make a reliable zoning call."
-        )
-        warnings.append(
-            (
-                "No relevant ordinances were returned by watsonx retrieval for this request. Please contact the planning office."
-                if retrieval_provider_name == "watsonx"
-                else "No relevant ordinances were found in the current zoning source registry. Please contact the planning office."
-            )
-        )
-
-    if intent.missing_fields:
-        status = "needs_clarification"
-        follow_up.extend([f"Please provide {field}." for field in intent.missing_fields])
-        agent_reports[0].status = "needs_clarification"
-        agent_reports[0].headline = "The project brief needs a few more details before the zoning call is reliable."
-        agent_reports[0].details.extend([f"Missing: {field}" for field in intent.missing_fields])
-
-    if confidence < 0.6 or not citations or district == "unknown":
-        if status != "needs_clarification":
-            status = "low_confidence"
-        warnings.append("Confidence is low due to incomplete evidence or conflicting context.")
-        warnings.append("Human-in-the-loop fallback: verify the parcel directly with the zoning or planning office.")
-
-    if not citations:
-        checklist_steps = [
-            ChecklistStep(
-                order=1,
-                action="Contact the planning department for parcel-level zoning verification",
-                required_docs=["property address", "parcel number if available", "project description"],
-                department="Planning Department",
-            ),
-            ChecklistStep(
-                order=2,
-                action="Request the current zoning district, permitted use table, and recent amendments",
-                required_docs=["written zoning inquiry", "site sketch if available"],
-                department="Planning Department",
-            ),
-            ChecklistStep(
-                order=3,
-                action="Confirm permit sequencing before spending on design or construction",
-                required_docs=["draft floor plan", "business operations summary"],
-                department="Permit Office",
-            ),
-        ]
-    else:
-        checklist_steps = [
-            ChecklistStep(
-                order=1,
-                action="Request zoning verification letter for the parcel",
-                required_docs=["site plan", "property ownership proof"],
-                department="Planning Department",
-            ),
-            ChecklistStep(
-                order=2,
-                action="Submit change-of-use permit application",
-                required_docs=["business description", "floor plan", "parking plan"],
-                department="Permit Office",
-            ),
-            ChecklistStep(
-                order=3,
-                action="Complete fire and health compliance inspections",
-                required_docs=["equipment specification", "ventilation design"],
-                department="Fire Marshal and Health Department",
-            ),
-        ]
-
-    checklist = Checklist(
-        steps=checklist_steps,
-        permits=permits_override
-        or (
-            ["Zoning Verification Request", "Planning Counter Review"]
-            if not citations
-            else ["Change-of-Use Permit", "Business License", "Health Permit"]
-        ),
-        documents=(
-            ["Property Address", "Project Narrative", "Parcel Number", "Site Sketch"]
-            if not citations
-            else ["Site Plan", "Floor Plan", "Parking Plan", "Fire Safety Plan"]
-        ),
-        departments=["Planning", "Permitting", "Fire", "Health"] if citations else ["Planning", "Permitting"],
-    )
-
-    deduped_follow_up = _dedupe_follow_up_questions(follow_up)
-    agent_reports.append(
-        AgentReport(
-            key="compliance",
-            label="Compliance & Checklist Agent",
-            status="warning" if status == "low_confidence" else ("needs_clarification" if status == "needs_clarification" else "completed"),
-            headline=summary,
-            details=[
-                f"Decision: {decision}",
-                f"Confidence: {confidence:.2f}",
-                f"Checklist steps: {len(checklist.steps)}",
-            ],
-        )
-    )
-
-    return AnalyzeResult(
-        status=status,
-        trace_id=f"trace-{uuid4()}",
-        agents=agent_reports,
-        feasibility=Feasibility(decision=decision, confidence=confidence, summary=summary),
-        checklist=checklist,
-        citations=citations,
-        disclaimers=DISCLAIMER_TEXT,
-        follow_up_questions=deduped_follow_up,
-        warnings=warnings,
+    return ZoningOrchestrator().analyze_project(
+        project_description=project_description,
+        district=district,
+        jurisdiction_id=jurisdiction_id,
+        jurisdiction_name=jurisdiction_name,
+        normalized_address=normalized_address,
+        project_id=project_id,
+        clarification_answers=clarification_answers,
+        trace_recorder=trace_recorder,
     )

@@ -9,6 +9,7 @@ import httpx
 from fastapi import APIRouter, Depends, Header, HTTPException
 
 from app.ai.source_registry_retriever import ensure_source_index_ready
+from app.ai.registry import get_embedding_provider
 from app.ingestion import build_source_chunks, import_source_documents
 from app.models import (
     AnalysisRecord,
@@ -27,6 +28,8 @@ from app.models import (
     SourceRegistryUpsertRequest,
     SessionCreateResponse,
 )
+from app.orchestrator import PipelineTraceRecorder
+from app.rag.vector_store import get_vector_index_status, sync_vector_index
 from app.settings import get_settings
 from app.services import analyze_project, ensure_seed_sources, normalize_address, suggest_addresses
 from app.storage import store
@@ -154,7 +157,11 @@ def analyze(project_id: UUID, payload: AnalyzeRequest):
         project_description=project.project_description,
         district=project.district,
         jurisdiction_id=project.jurisdiction_id,
+        jurisdiction_name=project.jurisdiction_name,
+        normalized_address=project.normalized_address,
+        project_id=str(project_id),
         clarification_answers=payload.clarification_answers,
+        trace_recorder=PipelineTraceRecorder(project_id=str(project_id), audit=store.audit),
     )
     store.save_analysis(AnalysisRecord(project_id=project_id, result=result))
     store.audit(f"analysis.completed.{result.status}", str(project_id))
@@ -169,7 +176,7 @@ def get_result(project_id: UUID):
     return analysis.result
 
 
-@router.get("/projects/{project_id}/trace")
+@router.get("/projects/{project_id}/trace", dependencies=[Depends(require_admin_access)])
 def get_trace(project_id: UUID):
     project = store.get_project(project_id)
     if not project and not store.get_analysis(project_id):
@@ -198,6 +205,7 @@ def ingestion_status() -> SourceIndexStatusResponse:
     readiness = ensure_source_index_ready()
     settings = get_settings()
     sources = store.list_sources()
+    vector_status = get_vector_index_status(settings)
     return SourceIndexStatusResponse(
         source_count=len(sources),
         chunk_count=readiness.chunk_count,
@@ -219,6 +227,11 @@ def ingestion_status() -> SourceIndexStatusResponse:
         stale_source_ids=readiness.stale_source_ids,
         missing_chunk_source_ids=readiness.missing_chunk_source_ids,
         readiness_warnings=readiness.warnings,
+        vector_provider=vector_status.provider,
+        vector_index_ready=vector_status.ready,
+        vector_count=vector_status.count,
+        vector_collection=vector_status.collection,
+        vector_readiness_warnings=vector_status.warnings,
     )
 
 
@@ -228,15 +241,32 @@ def ingestion_status() -> SourceIndexStatusResponse:
     dependencies=[Depends(require_admin_access)],
 )
 def reindex_sources() -> ReindexResponse:
+    settings = get_settings()
     ensure_seed_sources()
     sources = store.list_sources()
     chunks = build_source_chunks(sources)
     store.replace_source_chunks(chunks)
-    store.audit("source.reindex.completed", "source-registry")
+    vector_result = sync_vector_index(chunks, get_embedding_provider(settings), settings)
+    store.audit(
+        "source.reindex.completed",
+        "source-registry",
+        {
+            "source_count": len(sources),
+            "chunk_count": len(chunks),
+            "vector_provider": vector_result.provider,
+            "vector_count": vector_result.count,
+            "vector_index_ready": vector_result.ready,
+            "vector_warnings": vector_result.warnings,
+        },
+    )
     return ReindexResponse(
         status="completed",
         source_count=len(sources),
         chunk_count=len(chunks),
+        vector_provider=vector_result.provider,
+        vector_count=vector_result.count,
+        vector_index_ready=vector_result.ready,
+        vector_warnings=vector_result.warnings,
     )
 
 

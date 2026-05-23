@@ -292,6 +292,45 @@ def test_project_trace_returns_audit_events(monkeypatch):
     assert any(event["stage"] == "project.intake.validated" for event in events)
 
 
+def test_project_trace_requires_admin_key_when_configured(monkeypatch):
+    monkeypatch.setenv("ADMIN_ACCESS_KEY", "admin-key")
+    client = TestClient(app)
+
+    from app import services
+
+    def fake_normalize(_: str):
+        return services.AddressNormalizationResult(
+            normalized_address="123 Main St, Springfield",
+            district="mixed-use-core",
+            place_id="place-123",
+            latitude=40.0,
+            longitude=-74.0,
+            is_valid=True,
+            warnings=[],
+        )
+
+    monkeypatch.setattr("app.routers.api.normalize_address", fake_normalize)
+
+    intake_response = client.post(
+        "/api/v1/projects/intake",
+        json={
+            "session_id": str(uuid4()),
+            "project_description": "Convert garage to bakery with two employees and renovation plans.",
+            "address": "123 Main St",
+        },
+    )
+    project_id = intake_response.json()["project_id"]
+
+    missing_response = client.get(f"/api/v1/projects/{project_id}/trace")
+    accepted_response = client.get(
+        f"/api/v1/projects/{project_id}/trace",
+        headers={"X-Admin-Access-Key": "admin-key"},
+    )
+
+    assert missing_response.status_code == 401
+    assert accepted_response.status_code == 200
+
+
 def test_feedback_persists_and_returns_accepted(monkeypatch):
     client = TestClient(app)
 
@@ -520,6 +559,10 @@ def test_import_local_docs_endpoint():
         assert body["status"] == "completed"
         assert body["imported_count"] == 1
         assert "local-rule" in body["imported_source_ids"]
+        imported = next(source for source in store.list_sources() if source.source_id == "local-rule")
+        assert imported.full_text == "Neighborhood retail uses may require frontage review."
+        assert imported.excerpt == "Neighborhood retail uses may require frontage review."
+        assert imported.content_hash
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
 

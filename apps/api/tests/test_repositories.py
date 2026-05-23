@@ -119,12 +119,20 @@ def test_repository_round_trips_current_storage_operations(tmp_path, case_name: 
     )
     assert repository.save_feedback(feedback) == feedback
 
+    repository.audit(
+        "pipeline.intake.completed",
+        str(project.project_id),
+        {"inferred_use": "home-based-food-business"},
+    )
     repository.audit("source.reindex.completed", "source-registry")
     assert repository.get_latest_audit_timestamp("source.reindex.completed") is not None
 
-    stages = [event.stage for event in repository.get_audit_events(project.project_id)]
+    events = repository.get_audit_events(project.project_id)
+    stages = [event.stage for event in events]
     assert stages == [
         "project.created",
         "analysis.saved",
         "feedback.saved",
+        "pipeline.intake.completed",
     ]
+    assert events[-1].details == {"inferred_use": "home-based-food-business"}
