@@ -22,4 +22,8 @@ __pycache__/
 *.tsbuildinfo
 apps/api/app/data/chroma/
 
+# Pytest basetemp directories (created by --basetemp flag)
+.tmp/
+.tmp-*/
+
 .vercel

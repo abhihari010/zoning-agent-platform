@@ -11,7 +11,6 @@ from app.ai.interfaces import (
 )
 from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider, ensure_source_index_ready
 from app.models import SourceChunk, SourceCitation
-from app.rag.vector_store import ChromaVectorStore
 from app.settings import get_settings
 from app.storage import SQLiteStore, store
 
@@ -104,6 +103,8 @@ class HybridLocalRetrievalProvider:
         ).embeddings[0]
         if not query_embedding:
             return None
+
+        from app.rag.vector_store import ChromaVectorStore  # lazy import to avoid circular dependency
 
         vector_hits = ChromaVectorStore().query(
             query_embedding,

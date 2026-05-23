@@ -193,7 +193,7 @@ def test_hybrid_local_retriever_returns_empty_when_chroma_has_no_hits(
             )
         )
         source_store.replace_source_chunks(build_source_chunks(source_store.list_sources()))
-        monkeypatch.setattr("app.ai.hybrid_local_retriever.ChromaVectorStore.query", lambda *args, **kwargs: [])
+        monkeypatch.setattr("app.rag.vector_store.ChromaVectorStore.query", lambda *args, **kwargs: [])
 
         result = HybridLocalRetrievalProvider(
             source_store,
