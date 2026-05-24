@@ -1,0 +1,11 @@
+[
+  {
+    "address_pattern": "250 s main st",
+    "jurisdiction_id": "blacksburg-va",
+    "parcel_id": "PARCEL-001",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "fixture"
+  }
+]

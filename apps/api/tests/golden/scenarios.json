@@ -1,0 +1,76 @@
+[
+  {
+    "id": "blacksburg-home-bakery-conditional",
+    "project_description": "Convert an attached garage into a small home bakery with two employees, posted operating hours, and interior renovation plans.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "blacksburg-va",
+    "jurisdiction_name": "Blacksburg, VA",
+    "normalized_address": "250 S Main St, Blacksburg, VA 24060",
+    "sources": [
+      {
+        "source_id": "golden-bakery-use",
+        "title": "Blacksburg Home Occupation Standards",
+        "excerpt": "Home occupation bakeries may be conditionally permitted in mixed-use districts when parking, signage, food safety, and fire review conditions are satisfied.",
+        "section_ref": "Sec. 12.4.2",
+        "jurisdiction_id": "blacksburg-va",
+        "url": "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
+        "effective_date": "2026-01-15",
+        "districts": ["mixed-use-core"],
+        "uses": ["home-based-food-business", "food-business"]
+      }
+    ],
+    "expect": {
+      "decisions": ["conditional"],
+      "statuses": ["success"],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true
+    }
+  },
+  {
+    "id": "unsupported-jurisdiction-handoff",
+    "project_description": "Open a small bakery with two employees, regular operating hours, and renovation plans.",
+    "district": "unknown",
+    "jurisdiction_id": "christiansburg-va",
+    "jurisdiction_name": "Christiansburg, VA",
+    "normalized_address": "100 Main St, Christiansburg, VA 24073",
+    "sources": [],
+    "expect": {
+      "decisions": ["unknown"],
+      "statuses": ["low_confidence"],
+      "min_citations": 0,
+      "max_citations": 0,
+      "jurisdiction_supported": false,
+      "required_warning_substrings": ["not currently supported"]
+    }
+  },
+  {
+    "id": "supported-jurisdiction-no-matching-evidence",
+    "project_description": "Open a restaurant with six employees, posted operating hours, and tenant improvement construction.",
+    "district": "industrial-zone",
+    "jurisdiction_id": "blacksburg-va",
+    "jurisdiction_name": "Blacksburg, VA",
+    "normalized_address": "600 Industrial Park Dr, Blacksburg, VA 24060",
+    "sources": [
+      {
+        "source_id": "golden-residential-bakery",
+        "title": "Residential Bakery Conditions",
+        "excerpt": "Home bakeries in residential districts require planning review and neighborhood impact screening.",
+        "section_ref": "Sec. 8.1",
+        "jurisdiction_id": "blacksburg-va",
+        "url": "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
+        "effective_date": "2026-01-15",
+        "districts": ["residential-low-density"],
+        "uses": ["home-based-food-business"]
+      }
+    ],
+    "expect": {
+      "decisions": ["unknown"],
+      "statuses": ["low_confidence"],
+      "min_citations": 0,
+      "max_citations": 0,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": ["No relevant ordinances"]
+    }
+  }
+]

@@ -107,7 +107,16 @@ class Settings:
     admin_access_key_hash: str
     auto_seed_sources: bool
     auto_reindex_on_empty: bool
+    startup_reindex_enabled: bool
     source_registry_version: str
+    # ---------------------------------------------------------------------------
+    # Workstream A — Cache settings (appended; do not reorder above fields)
+    # ---------------------------------------------------------------------------
+    cache_enabled: bool = True
+    cache_db_path: Path = Path("app/data/cache.sqlite3")
+    cache_default_ttl: int = 3600  # seconds
+    source_index_version: str = ""
+    prompt_version: str = "1.0"
 
     @property
     def uses_watsonx(self) -> bool:
@@ -186,7 +195,14 @@ def get_settings() -> Settings:
         admin_access_key_hash=_hash_access_key(admin_access_key) if admin_access_key else "",
         auto_seed_sources=_env_bool("AUTO_SEED_SOURCES", True),
         auto_reindex_on_empty=_env_bool("AUTO_REINDEX_ON_EMPTY", True),
+        startup_reindex_enabled=_env_bool("STARTUP_REINDEX_ENABLED", True),
         source_registry_version=_env("SOURCE_REGISTRY_VERSION"),
+        # Workstream A — cache settings
+        cache_enabled=_env_bool("CACHE_ENABLED", True),
+        cache_db_path=Path(_env("CACHE_DB_PATH")) if _env("CACHE_DB_PATH") else Path("app/data/cache.sqlite3"),
+        cache_default_ttl=int(_env("CACHE_DEFAULT_TTL", "3600")),
+        source_index_version=_env("SOURCE_INDEX_VERSION"),
+        prompt_version=_env("PROMPT_VERSION", "1.0"),
     )
 
 

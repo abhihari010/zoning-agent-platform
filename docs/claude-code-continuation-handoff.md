@@ -2,6 +2,39 @@
 
 Last updated: May 23, 2026
 
+## Section 0 Completion (Antigravity – May 23 2026)
+
+**Branch**: `main`
+**Checkpoint commits**:
+- `341323f` – feat: add single orchestrator and chroma local rag _(Codex)_
+- `4dc6313` – fix: break circular import between app.rag and app.ai; protect tmp dirs in gitignore _(Antigravity stabilization)_
+
+**Verification results after stabilization**:
+
+```text
+pytest -q   →  70 passed, 1 skipped
+pytest -q tests/test_rag_phase2.py  →  3 passed
+npm run typecheck:web  →  clean
+npm run build:web      →  clean (203 kB bundle)
+secret scan  →  no secrets found
+```
+
+**Bugs fixed during stabilization**:
+
+1. **Circular import** (`app.rag ↔ app.ai`): `hybrid_local_retriever.py` imported
+   `ChromaVectorStore` at module level, which cycled through `app.ai.__init__` →
+   `app.ai.registry` → back into `app.rag.vector_store` before it finished loading.
+   Fixed by moving the import to a lazy `from app.rag.vector_store import ChromaVectorStore`
+   inside `_retrieve_with_chroma()`. This also required updating the monkeypatch target in
+   `test_ai_providers.py` from `app.ai.hybrid_local_retriever.ChromaVectorStore.query` to
+   `app.rag.vector_store.ChromaVectorStore.query`.
+
+2. **Missing gitignore entries**: `.tmp/` and `.tmp-*/` added to protect pytest basetemp
+   dirs (`.tmp-pytest-api-*`, etc.) from being committed. Chroma path and `*.sqlite3` were
+   already protected.
+
+**Status**: Section 0 complete. Ready to begin Section 1 (Phase 2 Hardening).
+
 ## Purpose
 
 Continue the zoning platform conversion from an IBM-oriented/multi-agent prototype into a provider-agnostic, locally runnable, single-orchestrator zoning assistant.

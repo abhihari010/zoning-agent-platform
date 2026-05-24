@@ -5,9 +5,11 @@ from app.ai.registry import get_embedding_provider
 from app.ai.source_registry_retriever import ensure_source_index_ready
 from app.models import (
     AnalyzeResult,
+    CitationValidationResult,
     Feasibility,
     PipelineMetadata,
     PipelineStageReport,
+    TrustIndicators,
 )
 from app.orchestrator.pipeline_context import PIPELINE_VERSION, PipelineContext
 from app.orchestrator.pipeline_events import PipelineTraceRecorder
@@ -62,6 +64,7 @@ class ZoningOrchestrator:
             project_description=project_description,
             combined_description=combined_description,
             district=district,
+            location_already_resolved=normalized_address is not None,
             jurisdiction_id=jurisdiction_id,
             jurisdiction_name=jurisdiction_name,
             clarification_answers=clarification_answers or {},
@@ -78,6 +81,9 @@ class ZoningOrchestrator:
         recorder.record("intake", "started")
         intake = self.intake_tool.extract(context)
         context.intake = intake
+        district = context.district
+        jurisdiction_id = context.jurisdiction_id
+        jurisdiction_name = context.jurisdiction_name
         recorder.record(
             "intake",
             "completed",
@@ -87,7 +93,34 @@ class ZoningOrchestrator:
                 "clarification_required": intake.clarification_required,
             },
         )
-
+        recorder.record(
+            "intake.address_normalization",
+            "completed" if intake.address_confidence >= 0.3 else "warning",
+            {
+                "normalized_address": context.normalized_address,
+                "confidence": intake.address_confidence,
+            },
+        )
+        recorder.record(
+            "intake.jurisdiction_resolution",
+            "completed" if intake.jurisdiction_confidence >= 0.7 else "warning",
+            {
+                "jurisdiction_id": jurisdiction_id,
+                "jurisdiction_name": jurisdiction_name,
+                "confidence": intake.jurisdiction_confidence,
+                "method": intake.jurisdiction_method,
+            },
+        )
+        recorder.record(
+            "intake.district_resolution",
+            "completed" if intake.district_confidence >= 0.7 else "warning",
+            {
+                "district": district,
+                "confidence": intake.district_confidence,
+                "method": intake.district_method,
+                "parcel_id": intake.parcel_id,
+            },
+        )
         recorder.record(
             "location",
             "completed" if district != "unknown" else "warning",
@@ -97,6 +130,21 @@ class ZoningOrchestrator:
                 "district": district,
             },
         )
+        if context.jurisdiction_id and context.jurisdiction_supported is False:
+            recorder.record(
+                "unsupported_jurisdiction_early_exit",
+                "warning",
+                {"jurisdiction_id": jurisdiction_id, "jurisdiction_name": jurisdiction_name},
+            )
+            return self._unsupported_jurisdiction_result(
+                context=context,
+                intake=intake,
+                jurisdiction_name=jurisdiction_name,
+                analysis_provider_name=analysis_provider.name,
+                retrieval_provider_name=retrieval_provider.name,
+                embedding_provider_name=embedding_provider.name,
+                recorder=recorder,
+            )
 
         retrieval_error: str | None = None
         retrieval_source_store = getattr(retrieval_provider, "source_store", None)
@@ -107,33 +155,61 @@ class ZoningOrchestrator:
         )
 
         recorder.record("retrieval", "started")
+        retrieval_result: "RetrievalProviderResult | None" = None
         try:
-            citations = retrieval_provider.retrieve(
+            retrieval_result = retrieval_provider.retrieve(
                 RetrievalProviderRequest(
                     district=district,
                     inferred_use=intake.inferred_use,
                     project_description=context.combined_description,
                     jurisdiction_id=jurisdiction_id,
                 )
-            ).citations
+            )
+            citations = retrieval_result.citations
         except Exception as exc:
             citations = []
             retrieval_error = str(exc)
             recorder.record("retrieval", "failed", {"error": retrieval_error})
         else:
+            # Build trace details, injecting diagnostics when available
+            retrieval_trace: dict = {
+                "citation_count": len(citations),
+                "provider": retrieval_provider.name,
+            }
+            if retrieval_result is not None and retrieval_result.diagnostics is not None:
+                diag = retrieval_result.diagnostics
+                is_cache_hit = diag.fallback_reason == "cache_hit"
+                retrieval_trace.update(
+                    {
+                        "query_text": diag.query_text,
+                        "sql_chunk_count": diag.sql_chunk_count,
+                        "vector_hit_count": diag.vector_hit_count,
+                        "vector_provider": diag.vector_provider,
+                        "fallback_used": diag.fallback_used,
+                        "fallback_reason": diag.fallback_reason,
+                        "cache_hit": is_cache_hit,
+                        "elapsed_ms": round(diag.elapsed_ms, 1),
+                    }
+                )
             recorder.record(
                 "retrieval",
                 "completed" if citations else "warning",
-                {"citation_count": len(citations), "provider": retrieval_provider.name},
+                retrieval_trace,
             )
         context.citations = citations
+        context.evidence_chunks = retrieval_result.chunks if retrieval_result is not None else []
 
         confidence = service_helpers._confidence_score(intake.missing_details, citations)
         if not source_readiness.index_ready:
             confidence = max(0.1, min(confidence, 0.55))
 
         recorder.record("compliance", "started")
-        compliance = self.compliance_tool.analyze(context, analysis_provider, citations)
+        compliance = self.compliance_tool.analyze(
+            context,
+            analysis_provider,
+            citations,
+            context.evidence_chunks,
+        )
         decision = compliance.decision
         summary = compliance.summary
         permits_override = compliance.permits_override
@@ -146,6 +222,8 @@ class ZoningOrchestrator:
                 "provider": analysis_provider.name,
                 "used_model": compliance.used_model,
                 "decision": decision,
+                "structured": compliance.compliance is not None,
+                "compliance_confidence": compliance.compliance.confidence if compliance.compliance else None,
             },
         )
 
@@ -272,13 +350,163 @@ class ZoningOrchestrator:
                 embedding_provider=embedding_provider.name,
                 trace_id=context.trace_id,
             ),
+            trust_indicators=self._build_trust_indicators(
+                context=context,
+                source_readiness=source_readiness,
+                source_store=retrieval_source_store,
+                citation_count=len(citations),
+            ),
             citation_validation=validation,
             pipeline_stages=stage_reports,
             agents=stage_reports,
             feasibility=Feasibility(decision=decision, confidence=confidence, summary=summary),
+            compliance=compliance.compliance,
             checklist=checklist,
             citations=citations,
             disclaimers=service_helpers.DISCLAIMER_TEXT,
             follow_up_questions=deduped_follow_up,
             warnings=warnings,
+        )
+
+    def _unsupported_jurisdiction_result(
+        self,
+        *,
+        context: PipelineContext,
+        intake,
+        jurisdiction_name: str | None,
+        analysis_provider_name: str,
+        retrieval_provider_name: str,
+        embedding_provider_name: str,
+        recorder: PipelineTraceRecorder,
+    ) -> AnalyzeResult:
+        from app import services as service_helpers
+
+        stage_reports = self.report_tool.build_initial_stage_reports(
+            intake=intake,
+            district=context.district,
+            jurisdiction_name=jurisdiction_name,
+        )
+        stage_reports.append(
+            PipelineStageReport(
+                key="retrieval",
+                label="Retrieve Sources",
+                status="skipped",
+                headline="Skipped source retrieval because this jurisdiction is not currently supported.",
+                details=["No source coverage is configured for this jurisdiction."],
+            )
+        )
+        compliance = self.compliance_tool.analyze(context, service_helpers.get_analysis_provider(), [])
+        stage_reports.append(
+            PipelineStageReport(
+                key="compliance",
+                label="Analyze Compliance",
+                status="skipped",
+                headline=compliance.summary,
+                details=["Decision: unknown", "Confidence: 0.30"],
+            )
+        )
+        checklist = self.report_tool.build_checklist(citations=[], permits_override=[])
+        stage_reports.append(
+            PipelineStageReport(
+                key="checklist",
+                label="Generate Checklist",
+                status="completed",
+                headline="Prepared fallback steps for checking this property with the planning office.",
+                details=[f"Checklist steps: {len(checklist.steps)}"],
+            )
+        )
+        validation = CitationValidationResult(
+            valid=False,
+            citation_coverage=0.0,
+            unsupported_claims=["The requested jurisdiction is not currently supported."],
+            invalid_citation_ids=[],
+            confidence_adjustment="downgrade_low_confidence",
+            warnings=[],
+            jurisdiction_id=context.jurisdiction_id,
+        )
+        warnings = [
+            f"{jurisdiction_name or 'This jurisdiction'} is not currently supported.",
+            "Human-in-the-loop fallback: contact the local planning office before acting.",
+            *compliance.warnings,
+        ]
+        recorder.record("retrieval", "skipped", {"reason": "unsupported_jurisdiction"})
+        recorder.record("compliance", "skipped", {"reason": "unsupported_jurisdiction"})
+        recorder.record("citation_validation", "warning", {"citation_coverage": 0.0})
+        recorder.record("report", "completed")
+
+        return AnalyzeResult(
+            status="low_confidence",
+            trace_id=context.trace_id,
+            pipeline=PipelineMetadata(
+                version=PIPELINE_VERSION,
+                prompt_version=PROMPT_VERSION,
+                provider=analysis_provider_name,
+                rag_provider=retrieval_provider_name,
+                embedding_provider=embedding_provider_name,
+                trace_id=context.trace_id,
+            ),
+            trust_indicators=self._build_trust_indicators(
+                context=context,
+                source_readiness=None,
+                source_store=None,
+                citation_count=0,
+            ),
+            citation_validation=validation,
+            pipeline_stages=stage_reports,
+            agents=stage_reports,
+            feasibility=Feasibility(
+                decision="unknown",
+                confidence=0.3,
+                summary=compliance.summary,
+            ),
+            compliance=compliance.compliance,
+            checklist=checklist,
+            citations=[],
+            disclaimers=service_helpers.DISCLAIMER_TEXT,
+            follow_up_questions=[
+                "Contact the local planning office for zoning district and permit path confirmation."
+            ],
+            warnings=warnings,
+        )
+
+    def _build_trust_indicators(
+        self,
+        *,
+        context: PipelineContext,
+        source_readiness,
+        source_store,
+        citation_count: int,
+    ) -> TrustIndicators:
+        from app.rag.vector_store import get_vector_index_status
+        from app.storage import store
+
+        settings = get_settings()
+        vector_status = get_vector_index_status(settings)
+        source_count = source_readiness.source_count if source_readiness is not None else 0
+        source_index_ready = source_readiness.index_ready if source_readiness is not None else False
+        vector_readiness = (
+            source_index_ready
+            if settings.vector_provider == "none"
+            else bool(source_index_ready and vector_status.ready)
+        )
+        timestamp_store = source_store or store
+        last_source_update = (
+            timestamp_store.get_latest_audit_timestamp("source.reindex.completed")
+            or timestamp_store.get_latest_audit_timestamp("source.index.auto_reindex.completed")
+            or timestamp_store.get_latest_audit_timestamp("source.import.completed")
+            or timestamp_store.get_latest_audit_timestamp("source.seed.completed")
+        )
+
+        return TrustIndicators(
+            jurisdiction_analyzed=bool(context.jurisdiction_id)
+            and context.jurisdiction_supported is not False,
+            jurisdiction_supported=context.jurisdiction_supported,
+            jurisdiction_name=context.jurisdiction_name,
+            zoning_district=context.district,
+            district_confidence=context.district_confidence,
+            district_source=context.district_method,
+            source_count=source_count,
+            citation_count=citation_count,
+            vector_readiness=vector_readiness,
+            last_source_update=last_source_update,
         )

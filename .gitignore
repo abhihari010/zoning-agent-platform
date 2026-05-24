@@ -19,7 +19,14 @@ __pycache__/
 !**/.env.example
 *.pyc
 *.sqlite3
+cache.sqlite3
+apps/api/app/data/cache.sqlite3
 *.tsbuildinfo
 apps/api/app/data/chroma/
+
+# Pytest basetemp directories (created by --basetemp flag)
+.tmp/
+.tmp-*/
+apps/api/tests/golden/traces/
 
 .vercel

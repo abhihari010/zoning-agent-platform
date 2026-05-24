@@ -41,7 +41,10 @@ def test_health_endpoint_does_not_require_beta_key(monkeypatch):
     response = client.get("/health")
 
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    body = response.json()
+    assert body["status"] in {"ok", "warning"}
+    assert "source_index_ready" in body
+    assert "warnings" in body
 
 
 def test_beta_access_key_protects_api_routes(monkeypatch):

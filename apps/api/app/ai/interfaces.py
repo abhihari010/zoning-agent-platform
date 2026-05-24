@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
-from app.models import DecisionType, SourceCitation
+from app.models import ComplianceResult, DecisionType, SourceCitation
+
+if TYPE_CHECKING:
+    from app.models import RetrievalDiagnostics, SourceChunk
 
 
 @dataclass(frozen=True)
@@ -12,6 +15,8 @@ class AnalysisProviderRequest:
     district: str
     citation_excerpts: list[str]
     missing_fields: list[str]
+    chunks: list["SourceChunk"] = field(default_factory=list)
+    inferred_use: str = "general"
 
 
 @dataclass(frozen=True)
@@ -21,6 +26,7 @@ class AnalysisProviderResult:
     required_permits: list[str] = field(default_factory=list)
     follow_up_questions: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    compliance: ComplianceResult | None = None
 
 
 @dataclass(frozen=True)
@@ -38,6 +44,9 @@ class RetrievalProviderRequest:
 @dataclass(frozen=True)
 class RetrievalProviderResult:
     citations: list[SourceCitation]
+    chunks: list["SourceChunk"] = field(default_factory=list)
+    # Optional diagnostics populated by hybrid_local provider.
+    diagnostics: "RetrievalDiagnostics | None" = None
 
 
 @dataclass(frozen=True)

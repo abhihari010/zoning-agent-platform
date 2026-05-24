@@ -28,6 +28,7 @@ import {
   type SourceIndexStatus,
   type SourceRegistryEntry,
 } from "./api";
+import { EvidencePanel, TrustIndicatorBar, UnsupportedJurisdiction } from "./components/ResultTrust";
 
 const DISCLAIMER =
   "Educational guidance only. Zoning rules, permit triggers, and code interpretations must be verified with the official planning department before you rely on this result.";
@@ -1405,6 +1406,9 @@ export function App() {
                     </section>
                   </div>
 
+                  <TrustIndicatorBar result={result} />
+                  <UnsupportedJurisdiction result={result} />
+
                   <div
                     className={`grid gap-5 ${
                       resultView === "checklist"
@@ -1478,50 +1482,8 @@ export function App() {
                           ))}
                         </ol>
                       ) : resultView === "evidence" ? (
-                        <div className="mt-6 grid gap-3">
-                          {result.citations.length > 0 ? (
-                            result.citations.map((citation) => (
-                              <article
-                                key={`${citation.sourceId}-${citation.chunkId ?? citation.sectionRef}`}
-                                className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
-                              >
-                                <p className="font-semibold text-slate-900">{citation.title}</p>
-                                <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                                  <span>{citation.sectionRef}</span>
-                                  {citation.chunkId && <span>Chunk {citation.chunkId}</span>}
-                                  {citation.jurisdictionId && <span>{citation.jurisdictionId}</span>}
-                                  {citation.score != null && <span>Score {citation.score.toFixed(2)}</span>}
-                                </div>
-                                <p className="mt-3 text-sm leading-7 text-slate-700">
-                                  {citation.excerpt}
-                                </p>
-                                <div className="mt-3 grid gap-2 text-xs text-slate-500 sm:grid-cols-2">
-                                  <span>
-                                    Effective date: {citation.effectiveDate ?? "Not provided"}
-                                  </span>
-                                  <span>Source type: {citation.sourceType ?? "registry"}</span>
-                                </div>
-                                {citation.url && (
-                                  <a
-                                    className="mt-3 inline-flex text-sm font-semibold text-clay underline-offset-2 hover:underline"
-                                    href={citation.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                  >
-                                    Open source reference
-                                  </a>
-                                )}
-                              </article>
-                            ))
-                          ) : (
-                            <div className="rounded-[24px] border border-red-200 bg-red-50 p-5 text-sm text-red-900">
-                              <p className="font-semibold">No source excerpts were retrieved.</p>
-                              <p className="mt-2 leading-6">
-                                The zoning answer should stay unknown or low confidence until a planner verifies the parcel,
-                                district, permitted use table, and recent amendments.
-                              </p>
-                            </div>
-                          )}
+                        <div className="mt-6">
+                          <EvidencePanel citations={result.citations} />
                         </div>
                       ) : (
                         <div className="mt-6 grid gap-3">

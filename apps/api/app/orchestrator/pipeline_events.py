@@ -7,6 +7,13 @@ from typing import Literal
 
 PipelineEventStatus = Literal["started", "completed", "warning", "failed", "skipped"]
 
+PIPELINE_EVENT_TYPES = (
+    "address_normalization",
+    "jurisdiction_resolution",
+    "district_resolution",
+    "unsupported_jurisdiction_early_exit",
+)
+
 
 @dataclass
 class PipelineTraceRecorder:

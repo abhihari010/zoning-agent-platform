@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 import httpx
 from fastapi import APIRouter, Depends, Header, HTTPException
 
+from app.cache import invalidate_all_caches, invalidate_source_dependent_caches
 from app.ai.source_registry_retriever import ensure_source_index_ready
 from app.ai.registry import get_embedding_provider
 from app.ingestion import build_source_chunks, import_source_documents
@@ -32,6 +33,7 @@ from app.orchestrator import PipelineTraceRecorder
 from app.rag.vector_store import get_vector_index_status, sync_vector_index
 from app.settings import get_settings
 from app.services import analyze_project, ensure_seed_sources, normalize_address, suggest_addresses
+from app.startup import readiness_health
 from app.storage import store
 
 router = APIRouter(prefix="/api/v1")
@@ -197,6 +199,7 @@ def list_sources() -> SourceRegistryListResponse:
 )
 def upsert_source(payload: SourceRegistryUpsertRequest) -> SourceRegistryListResponse:
     store.upsert_source(payload.source)
+    invalidate_all_caches()
     return SourceRegistryListResponse(sources=store.list_sources())
 
 
@@ -247,6 +250,7 @@ def reindex_sources() -> ReindexResponse:
     chunks = build_source_chunks(sources)
     store.replace_source_chunks(chunks)
     vector_result = sync_vector_index(chunks, get_embedding_provider(settings), settings)
+    invalidate_source_dependent_caches()
     store.audit(
         "source.reindex.completed",
         "source-registry",
@@ -286,6 +290,7 @@ def import_local_docs(payload: LocalDocumentImportRequest) -> LocalDocumentImpor
         store.upsert_source(entry)
         imported_ids.append(entry.source_id)
 
+    invalidate_all_caches()
     store.audit("source.import.completed", payload.directory or "default-documents")
     return LocalDocumentImportResponse(
         status="completed",
@@ -315,8 +320,8 @@ def feedback(project_id: UUID, payload: FeedbackRequest):
 
 
 @router.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+def health() -> dict[str, object]:
+    return readiness_health()
 
 
 def _missing_source_metadata(source) -> list[str]:
