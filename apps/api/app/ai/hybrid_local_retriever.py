@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import re
+import time
 
 from app.ai.embedding_provider import cosine_similarity
 from app.ai.interfaces import (
@@ -10,12 +13,14 @@ from app.ai.interfaces import (
     RetrievalProviderResult,
 )
 from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider, ensure_source_index_ready
-from app.models import SourceChunk, SourceCitation
+from app.models import RetrievalDiagnostics, SourceChunk, SourceCitation
 from app.settings import get_settings
 from app.storage import SQLiteStore, store
 
 
 TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
+
+_CACHE_NAMESPACE = "retrieval"
 
 
 class HybridLocalRetrievalProvider:
@@ -30,24 +35,162 @@ class HybridLocalRetrievalProvider:
         self.embedding_provider = embedding_provider
 
     def retrieve(self, request: RetrievalProviderRequest) -> RetrievalProviderResult:
+        start = time.monotonic()
         ensure_source_index_ready(self.source_store)
         settings = get_settings()
+        source_index_version = _source_index_version(self.source_store, settings.source_index_version)
+
+        # ------------------------------------------------------------------ #
+        # Cache check
+        # ------------------------------------------------------------------ #
+        cache_key: str | None = None
+        if settings.cache_enabled:
+            try:
+                from app.cache import get_cache
+
+                cache = get_cache()
+                cache_key = _build_retrieval_cache_key(request, source_index_version)
+                cached = cache.get(_CACHE_NAMESPACE, cache_key)
+                if cached is not None:
+                    # Deserialize citations from cached JSON
+                    from app.models import SourceChunk as _SCH
+                    from app.models import SourceCitation as _SC
+
+                    cached_citations = cached.get("citations", cached) if isinstance(cached, dict) else cached
+                    cached_chunks = cached.get("chunks", []) if isinstance(cached, dict) else []
+                    citations = [_SC.model_validate(c) for c in cached_citations]
+                    chunks = [_SCH.model_validate(c) for c in cached_chunks]
+                    return RetrievalProviderResult(
+                        citations=citations,
+                        chunks=chunks,
+                        diagnostics=RetrievalDiagnostics(
+                            query_text=request.query,
+                            filters={
+                                "jurisdiction_id": request.jurisdiction_id,
+                                "district": request.district,
+                                "use": request.inferred_use,
+                            },
+                            sql_chunk_count=0,
+                            vector_hit_count=None,
+                            vector_provider=settings.vector_provider,
+                            fallback_used=False,
+                            fallback_reason="cache_hit",
+                            elapsed_ms=(time.monotonic() - start) * 1000,
+                        ),
+                    )
+            except Exception:
+                cache_key = None  # Cache unavailable; continue without it.
+
+        # ------------------------------------------------------------------ #
+        # Live retrieval
+        # ------------------------------------------------------------------ #
+        result: RetrievalProviderResult | None = None
+
         if settings.vector_provider == "chroma" and self.embedding_provider:
             try:
-                vector_result = self._retrieve_with_chroma(request)
-                if vector_result is not None:
-                    return vector_result
+                result = self._retrieve_with_chroma(request, start)
+            except Exception as exc:
+                # Chroma failed; fall through to SQL-backed keyword retrieval.
+                fallback_reason = str(exc)
+                chunks = self.source_store.list_source_chunks_filtered(
+                    jurisdiction_id=request.jurisdiction_id,
+                    district=request.district,
+                    use=request.inferred_use,
+                )
+                sql_result = self._sql_keyword_retrieve(request, chunks, start)
+                result = RetrievalProviderResult(
+                    citations=sql_result.citations,
+                    diagnostics=RetrievalDiagnostics(
+                        query_text=request.query,
+                        filters={
+                            "jurisdiction_id": request.jurisdiction_id,
+                            "district": request.district,
+                            "use": request.inferred_use,
+                        },
+                        sql_chunk_count=len(chunks),
+                        vector_hit_count=None,
+                        vector_provider=settings.vector_provider,
+                        fallback_used=True,
+                        fallback_reason=f"Chroma error: {fallback_reason}",
+                        elapsed_ms=(time.monotonic() - start) * 1000,
+                    ),
+                )
+
+        if result is None:
+            # No Chroma or no embedding provider; use SQL-backed keyword retrieval.
+            chunks = self.source_store.list_source_chunks_filtered(
+                jurisdiction_id=request.jurisdiction_id,
+                district=request.district,
+                use=request.inferred_use,
+            )
+            if not chunks:
+                fallback = SourceRegistryRetrievalProvider(self.source_store).retrieve(request)
+                result = RetrievalProviderResult(
+                    citations=fallback.citations,
+                    diagnostics=RetrievalDiagnostics(
+                        query_text=request.query,
+                        filters={
+                            "jurisdiction_id": request.jurisdiction_id,
+                            "district": request.district,
+                            "use": request.inferred_use,
+                        },
+                        sql_chunk_count=0,
+                        vector_hit_count=None,
+                        vector_provider=settings.vector_provider,
+                        fallback_used=True,
+                        fallback_reason="no SQL chunks matched filters",
+                        elapsed_ms=(time.monotonic() - start) * 1000,
+                    ),
+                )
+            else:
+                sql_result = self._sql_keyword_retrieve(request, chunks, start)
+                result = RetrievalProviderResult(
+                    citations=sql_result.citations,
+                    diagnostics=RetrievalDiagnostics(
+                        query_text=request.query,
+                        filters={
+                            "jurisdiction_id": request.jurisdiction_id,
+                            "district": request.district,
+                            "use": request.inferred_use,
+                        },
+                        sql_chunk_count=len(chunks),
+                        vector_hit_count=None,
+                        vector_provider=settings.vector_provider,
+                        fallback_used=False,
+                        fallback_reason=None,
+                        elapsed_ms=(time.monotonic() - start) * 1000,
+                    ),
+                )
+
+        # ------------------------------------------------------------------ #
+        # Cache store
+        # ------------------------------------------------------------------ #
+        if cache_key and settings.cache_enabled and result.citations:
+            try:
+                from app.cache import get_cache
+
+                cache = get_cache()
+                cache.put(
+                    _CACHE_NAMESPACE,
+                    cache_key,
+                    {
+                        "citations": [c.model_dump() for c in result.citations],
+                        "chunks": [c.model_dump() for c in result.chunks],
+                    },
+                    version=source_index_version or None,
+                    ttl_seconds=settings.cache_default_ttl,
+                )
             except Exception:
-                pass
+                pass  # Cache write failure is non-fatal.
 
-        chunks = self.source_store.list_source_chunks_filtered(
-            jurisdiction_id=request.jurisdiction_id,
-            district=request.district,
-            use=request.inferred_use,
-        )
-        if not chunks:
-            return SourceRegistryRetrievalProvider(self.source_store).retrieve(request)
+        return result
 
+    def _sql_keyword_retrieve(
+        self,
+        request: RetrievalProviderRequest,
+        chunks: list[SourceChunk],
+        start: float,
+    ) -> RetrievalProviderResult:
         query = request.query
         query_tokens = _tokens(query)
         chunk_vectors = [[] for _ in chunks]
@@ -88,12 +231,14 @@ class HybridLocalRetrievalProvider:
                     metadata=chunk.metadata,
                 )
                 for score, chunk in ranked[:5]
-            ]
+            ],
+            chunks=[chunk for _, chunk in ranked[:5]],
         )
 
     def _retrieve_with_chroma(
         self,
         request: RetrievalProviderRequest,
+        start: float,
     ) -> RetrievalProviderResult | None:
         if not self.embedding_provider:
             return None
@@ -106,17 +251,30 @@ class HybridLocalRetrievalProvider:
 
         from app.rag.vector_store import ChromaVectorStore  # lazy import to avoid circular dependency
 
+        settings = get_settings()
+        chroma_filters = {
+            "jurisdiction_id": request.jurisdiction_id,
+            "district": request.district,
+            "use": request.inferred_use,
+        }
         vector_hits = ChromaVectorStore().query(
             query_embedding,
-            filters={
-                "jurisdiction_id": request.jurisdiction_id,
-                "district": request.district,
-                "use": request.inferred_use,
-            },
+            filters=chroma_filters,
             limit=20,
         )
+
         if not vector_hits:
-            return RetrievalProviderResult(citations=[])
+            diag = RetrievalDiagnostics(
+                query_text=request.query,
+                filters=chroma_filters,
+                sql_chunk_count=0,
+                vector_hit_count=0,
+                vector_provider=settings.vector_provider,
+                fallback_used=False,
+                fallback_reason=None,
+                elapsed_ms=(time.monotonic() - start) * 1000,
+            )
+            return RetrievalProviderResult(citations=[], chunks=[], diagnostics=diag)
 
         chunks = self.source_store.get_source_chunks_by_ids([hit.chunk_id for hit in vector_hits])
         chunk_by_id = {chunk.chunk_id: chunk for chunk in chunks}
@@ -134,6 +292,16 @@ class HybridLocalRetrievalProvider:
             scored.append((vector_score_by_id.get(chunk.chunk_id, 0.0) + keyword_score, chunk))
 
         ranked = sorted(scored, key=lambda item: item[0], reverse=True)
+        diag = RetrievalDiagnostics(
+            query_text=request.query,
+            filters=chroma_filters,
+            sql_chunk_count=len(chunks),
+            vector_hit_count=len(vector_hits),
+            vector_provider=settings.vector_provider,
+            fallback_used=False,
+            fallback_reason=None,
+            elapsed_ms=(time.monotonic() - start) * 1000,
+        )
         return RetrievalProviderResult(
             citations=[
                 SourceCitation(
@@ -151,7 +319,9 @@ class HybridLocalRetrievalProvider:
                     metadata=chunk.metadata,
                 )
                 for score, chunk in ranked[:5]
-            ]
+            ],
+            chunks=[chunk for _, chunk in ranked[:5]],
+            diagnostics=diag,
         )
 
 
@@ -182,3 +352,41 @@ def _score_chunk(
         score += len(query_tokens.intersection(chunk_tokens)) / max(1, len(query_tokens))
 
     return score
+
+
+def _build_retrieval_cache_key(request: RetrievalProviderRequest, source_index_version: str) -> str:
+    """Produce a stable cache key for a retrieval request.
+
+    The key incorporates all parameters that affect the result so that
+    changing any of them produces a different cache entry.
+    """
+    raw = json.dumps(
+        {
+            "jurisdiction_id": request.jurisdiction_id,
+            "district": request.district,
+            "inferred_use": request.inferred_use,
+            "query": request.query,
+            "source_index_version": source_index_version,
+        },
+        sort_keys=True,
+    )
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def _source_index_version(source_store: SQLiteStore, configured_version: str) -> str:
+    """Return a content-derived source index version for cache keys."""
+    chunks = source_store.list_source_chunks()
+    if not chunks:
+        return configured_version
+    raw = json.dumps(
+        [
+            {
+                "chunk_id": chunk.chunk_id,
+                "source_text_hash": chunk.source_text_hash,
+                "source_version": chunk.source_version,
+            }
+            for chunk in sorted(chunks, key=lambda item: item.chunk_id)
+        ],
+        sort_keys=True,
+    )
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()

@@ -260,10 +260,44 @@ def _chunk_metadata(chunk: SourceChunk) -> dict[str, Any]:
 
 def _build_chroma_where(filters: dict[str, Any]) -> dict[str, Any]:
     conditions: list[dict[str, Any]] = []
+
+    # Exact-match filters
     for key in ["jurisdiction_id", "source_id", "source_type", "source_version"]:
         value = filters.get(key)
         if value:
             conditions.append({key: {"$eq": value}})
+
+    # District filter — pipe-delimited field; skip wildcard/unknown values
+    district = filters.get("district")
+    if district and district not in {"unknown", "*", ""}:
+        conditions.append({"districts": {"$contains": f"|{district}|"}})
+
+    # Use filter — pipe-delimited field; skip wildcard "general"
+    use = filters.get("use")
+    if use and use not in {"general", "*", ""}:
+        # Accept chunks that match the use OR are tagged "general"
+        conditions.append(
+            {
+                "$or": [
+                    {"uses": {"$contains": f"|{use}|"}},
+                    {"uses": {"$contains": "|general|"}},
+                ]
+            }
+        )
+
+    # Effective-date filter — include only ordinances effective on or before the date
+    effective_on_or_before = filters.get("effective_on_or_before")
+    if effective_on_or_before:
+        # Only apply when the field is non-empty; Chroma $lte is string lexicographic here
+        conditions.append(
+            {
+                "$or": [
+                    {"effective_date": {"$eq": ""}},
+                    {"effective_date": {"$lte": str(effective_on_or_before)}},
+                ]
+            }
+        )
+
     if not conditions:
         return {}
     if len(conditions) == 1:

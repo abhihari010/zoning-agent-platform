@@ -1,6 +1,7 @@
 import hashlib
 import os
 import secrets
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -20,8 +21,16 @@ load_dotenv(API_DIR / ".env.local", override=True)
 
 from app.routers.api import router as api_router
 from app.settings import get_settings
+from app.startup import prepare_source_index_for_startup, readiness_health
 
-app = FastAPI(title="Zoning Review API", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    prepare_source_index_for_startup()
+    yield
+
+
+app = FastAPI(title="Zoning Review API", version="0.1.0", lifespan=lifespan)
 
 _cors_origins_env = os.getenv("CORS_ALLOW_ORIGINS", "").strip()
 if _cors_origins_env == "*":
@@ -71,8 +80,8 @@ async def require_beta_access_key(request: Request, call_next):
 
 
 @app.get("/health")
-def render_health() -> dict[str, str]:
-    return {"status": "ok"}
+def render_health() -> dict[str, object]:
+    return readiness_health()
 
 
 app.include_router(api_router)

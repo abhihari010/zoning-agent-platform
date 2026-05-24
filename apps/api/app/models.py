@@ -68,6 +68,40 @@ class IntakeResult(BaseModel):
     inferred_use: str = "general"
     user_intent: str = "review whether the proposed project is allowed on the property"
     project_category: str = "general-project"
+    address_confidence: float = Field(default=0.0, ge=0, le=1)
+    jurisdiction_confidence: float = Field(default=0.0, ge=0, le=1)
+    jurisdiction_method: str = "unknown"
+    district_confidence: float = Field(default=0.0, ge=0, le=1)
+    district_method: str = "unknown"
+    parcel_id: str | None = None
+
+
+class AddressResult(BaseModel):
+    normalized_address: str
+    lat: float | None = None
+    lng: float | None = None
+    confidence: float = Field(default=0.0, ge=0, le=1)
+    warnings: list[str] = Field(default_factory=list)
+    place_id: str | None = None
+    address_components: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class JurisdictionResult(BaseModel):
+    jurisdiction_id: str | None = None
+    jurisdiction_name: str | None = None
+    supported: bool = False
+    confidence: float = Field(default=0.0, ge=0, le=1)
+    method: str = "unknown"
+    warnings: list[str] = Field(default_factory=list)
+
+
+class ParcelResult(BaseModel):
+    parcel_id: str | None = None
+    zoning_district: str | None = None
+    overlays: list[str] = Field(default_factory=list)
+    confidence: float = Field(default=0.0, ge=0, le=1)
+    method: str = "unknown"
+    warnings: list[str] = Field(default_factory=list)
 
 
 class SourceRegistryEntry(BaseModel):
@@ -215,6 +249,19 @@ class PipelineMetadata(BaseModel):
     trace_id: str
 
 
+class TrustIndicators(BaseModel):
+    jurisdiction_analyzed: bool = False
+    jurisdiction_supported: bool | None = None
+    jurisdiction_name: str | None = None
+    zoning_district: str
+    district_confidence: float = Field(default=0.0, ge=0, le=1)
+    district_source: str = "unknown"
+    source_count: int = 0
+    citation_count: int = 0
+    vector_readiness: bool = False
+    last_source_update: datetime | None = None
+
+
 class CitationValidationResult(BaseModel):
     valid: bool
     citation_coverage: float = Field(ge=0, le=1)
@@ -225,14 +272,36 @@ class CitationValidationResult(BaseModel):
     jurisdiction_id: str | None = None
 
 
+class ComplianceFinding(BaseModel):
+    category: str
+    status: Literal["compliant", "conditional", "non_compliant", "unknown"]
+    summary: str
+    citation_ids: list[str] = Field(default_factory=list)
+    confidence: float = Field(default=0.0, ge=0, le=1)
+
+
+class ComplianceResult(BaseModel):
+    feasibility: Literal["feasible", "conditional", "infeasible", "unknown"]
+    confidence: float = Field(default=0.0, ge=0, le=1)
+    summary: str
+    findings: list[ComplianceFinding] = Field(default_factory=list)
+    required_permits: list[str] = Field(default_factory=list)
+    permit_path: str | None = None
+    warnings: list[str] = Field(default_factory=list)
+    unresolved_questions: list[str] = Field(default_factory=list)
+    citation_chunk_ids: list[str] = Field(default_factory=list)
+
+
 class AnalyzeResult(BaseModel):
     status: AnalyzeStatus
     trace_id: str
     pipeline: PipelineMetadata | None = None
+    trust_indicators: TrustIndicators | None = None
     citation_validation: CitationValidationResult | None = None
     pipeline_stages: list[PipelineStageReport] = Field(default_factory=list)
     agents: list[PipelineStageReport] = Field(default_factory=list)
     feasibility: Feasibility
+    compliance: ComplianceResult | None = None
     checklist: Checklist
     citations: list[SourceCitation]
     disclaimers: list[str]
@@ -286,3 +355,21 @@ class AnalysisRecord(BaseModel):
     project_id: UUID
     result: AnalyzeResult
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+# ---------------------------------------------------------------------------
+# Retrieval diagnostics.
+# ---------------------------------------------------------------------------
+
+
+class RetrievalDiagnostics(BaseModel):
+    """Observability data captured during a retrieval call."""
+
+    query_text: str
+    filters: dict[str, Any] = Field(default_factory=dict)
+    sql_chunk_count: int = 0
+    vector_hit_count: int | None = None  # None if Chroma was not used
+    vector_provider: str = "none"
+    fallback_used: bool = False
+    fallback_reason: str | None = None
+    elapsed_ms: float = 0.0

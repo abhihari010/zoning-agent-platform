@@ -52,6 +52,19 @@ export interface PipelineMetadata {
   traceId: string;
 }
 
+export interface TrustIndicators {
+  jurisdictionAnalyzed: boolean;
+  jurisdictionSupported?: boolean | null;
+  jurisdictionName?: string | null;
+  zoningDistrict: string;
+  districtConfidence: number;
+  districtSource: string;
+  sourceCount: number;
+  citationCount: number;
+  vectorReadiness: boolean;
+  lastSourceUpdate?: string | null;
+}
+
 export interface CitationValidation {
   valid: boolean;
   citationCoverage: number;
@@ -68,6 +81,26 @@ export interface FeasibilityOutput {
   summary: string;
 }
 
+export interface ComplianceFinding {
+  category: string;
+  status: "compliant" | "conditional" | "non_compliant" | "unknown";
+  summary: string;
+  citationIds: string[];
+  confidence: number;
+}
+
+export interface ComplianceResult {
+  feasibility: "feasible" | "conditional" | "infeasible" | "unknown";
+  confidence: number;
+  summary: string;
+  findings: ComplianceFinding[];
+  requiredPermits: string[];
+  permitPath?: string | null;
+  warnings: string[];
+  unresolvedQuestions: string[];
+  citationChunkIds: string[];
+}
+
 export interface ChecklistStep {
   order: number;
   action: string;
@@ -79,11 +112,13 @@ export interface AnalyzeResponse {
   status: AnalyzeStatus;
   traceId: string;
   pipeline?: PipelineMetadata | null;
+  trustIndicators?: TrustIndicators | null;
   citationValidation?: CitationValidation | null;
   pipelineStages?: PipelineStageReport[];
   /** @deprecated Use pipelineStages. Kept as a compatibility alias. */
   agents: PipelineStageReport[];
   feasibility: FeasibilityOutput;
+  compliance?: ComplianceResult | null;
   checklist: {
     steps: ChecklistStep[];
     permits: string[];

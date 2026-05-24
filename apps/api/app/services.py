@@ -186,94 +186,68 @@ def suggest_addresses(query: str, session_token: str | None = None) -> list[str]
 
 
 def normalize_address(address: str) -> AddressNormalizationResult:
-    cleaned_input = " ".join(address.split()).strip()
-    if len(cleaned_input) < 5:
+    from app.tools import AddressTool, JurisdictionTool, ParcelTool
+
+    address_result = AddressTool(require_google=True).normalize(address)
+    if address_result.confidence <= 0:
         return AddressNormalizationResult(
-            normalized_address=cleaned_input,
+            normalized_address=address_result.normalized_address,
             district="unknown",
-            place_id=None,
-            latitude=None,
-            longitude=None,
+            place_id=address_result.place_id,
+            latitude=address_result.lat,
+            longitude=address_result.lng,
             is_valid=False,
-            warnings=["Address appears incomplete."],
+            warnings=address_result.warnings,
             support_status="invalid",
         )
 
-    api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-    if not api_key:
-        raise RuntimeError("GOOGLE_MAPS_API_KEY is not configured.")
-
-    timeout_seconds = float(os.getenv("GOOGLE_MAPS_TIMEOUT_SECONDS", "8"))
-    keyword_rules = _load_keyword_district_rules()
-
-    place_candidate = _google_find_place(cleaned_input, api_key, timeout_seconds)
-    geocode_result = _google_geocode(cleaned_input, api_key, timeout_seconds)
-
-    if not place_candidate and not geocode_result:
-        return AddressNormalizationResult(
-            normalized_address=cleaned_input,
-            district="unknown",
-            place_id=None,
-            latitude=None,
-            longitude=None,
-            is_valid=False,
-            warnings=["Address could not be validated with Google Maps APIs."],
-            support_status="invalid",
-        )
-
-    formatted_address = (
-        (place_candidate or {}).get("formatted_address")
-        or (geocode_result or {}).get("formatted_address")
-        or cleaned_input
+    jurisdiction = JurisdictionTool().resolve(
+        address_result.normalized_address,
+        address_result.lat,
+        address_result.lng,
+        None,
+        address_result.address_components,
     )
-
-    address_components = (
-        (place_candidate or {}).get("address_components")
-        or (geocode_result or {}).get("address_components")
-        or []
-    )
-    jurisdiction = detect_jurisdiction(formatted_address, address_components)
     if not jurisdiction.supported:
-        jurisdiction_name = jurisdiction.name or "this jurisdiction"
+        jurisdiction_name = jurisdiction.jurisdiction_name or "this jurisdiction"
         return AddressNormalizationResult(
-            normalized_address=formatted_address,
+            normalized_address=address_result.normalized_address,
             district="unknown",
-            place_id=None,
-            latitude=None,
-            longitude=None,
+            place_id=address_result.place_id,
+            latitude=address_result.lat,
+            longitude=address_result.lng,
             is_valid=False,
             warnings=[f"This tool does not yet support zoning review for {jurisdiction_name}."],
             support_status="unsupported",
             jurisdiction_id=jurisdiction.jurisdiction_id,
-            jurisdiction_name=jurisdiction.name,
+            jurisdiction_name=jurisdiction.jurisdiction_name,
         )
 
-    place_id = (place_candidate or {}).get("place_id") or (geocode_result or {}).get("place_id")
-
-    geometry = (place_candidate or {}).get("geometry") or (geocode_result or {}).get("geometry") or {}
-    location = geometry.get("location", {})
-    lat = location.get("lat")
-    lng = location.get("lng")
-
-    district = _extract_district_from_components(address_components)
+    parcel = ParcelTool().lookup(
+        address_result.normalized_address,
+        address_result.lat,
+        address_result.lng,
+        jurisdiction.jurisdiction_id or "",
+    )
+    district = parcel.zoning_district or _extract_district_from_components(address_result.address_components)
     if district == "unknown":
-        district = _district_from_keywords(formatted_address, keyword_rules)
+        district = _district_from_keywords(address_result.normalized_address, _load_keyword_district_rules())
 
-    warnings: list[str] = []
+    warnings: list[str] = [*address_result.warnings, *parcel.warnings]
     if district == "unknown":
         warnings.append("District could not be inferred from returned location context.")
 
     return AddressNormalizationResult(
-        normalized_address=formatted_address,
+        normalized_address=address_result.normalized_address,
         district=district,
-        place_id=place_id,
-        latitude=float(lat) if isinstance(lat, (float, int)) else None,
-        longitude=float(lng) if isinstance(lng, (float, int)) else None,
+        place_id=address_result.place_id,
+        latitude=address_result.lat,
+        longitude=address_result.lng,
         is_valid=True,
         warnings=warnings,
         support_status="supported",
         jurisdiction_id=jurisdiction.jurisdiction_id,
-        jurisdiction_name=jurisdiction.name,
+        jurisdiction_name=jurisdiction.jurisdiction_name,
     )
 
 

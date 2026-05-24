@@ -19,6 +19,7 @@ def _resolve_default_docs_path() -> Path:
 DEFAULT_INGESTION_DOCS_PATH = _resolve_default_docs_path()
 SUPPORTED_FILE_SUFFIXES = {".md", ".txt", ".json"}
 DEFAULT_CHUNK_MAX_CHARS = 900
+MIN_CHUNK_CHARS = 50
 
 
 def _slugify(text: str) -> str:
@@ -56,26 +57,90 @@ def _chunk_text(text: str, max_chars: int = DEFAULT_CHUNK_MAX_CHARS) -> list[str
     return chunks
 
 
+def _split_markdown_by_sections(text: str) -> list[tuple[str, str]]:
+    """Split markdown text on ## and ### headings.
+
+    Returns a list of (section_heading, section_body) tuples.  The text
+    before the first heading is returned under the empty heading ``""``.
+    """
+    # Pattern: heading at start of a line (## or ###, not ####+)
+    heading_pattern = re.compile(r"^(#{2,3}\s+.+)$", re.MULTILINE)
+    matches = list(heading_pattern.finditer(text))
+    if not matches:
+        return [("", text)]
+
+    sections: list[tuple[str, str]] = []
+    # Text before the first heading
+    preamble = text[: matches[0].start()].strip()
+    if preamble:
+        sections.append(("", preamble))
+
+    for i, match in enumerate(matches):
+        heading = match.group(1).lstrip("#").strip()
+        body_start = match.end()
+        body_end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+        body = text[body_start:body_end].strip()
+        sections.append((heading, body))
+
+    return sections
+
+
 def build_source_chunks(sources: list[SourceRegistryEntry]) -> list[SourceChunk]:
     chunks: list[SourceChunk] = []
 
     for source in sorted(sources, key=lambda item: item.source_id):
-        source_text = " ".join((source.full_text or source.excerpt).split())
+        raw_text = source.full_text or source.excerpt
+        source_text = " ".join(raw_text.split())
         source_text_hash = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
         source_version = source.source_version or source_text_hash[:16]
 
-        for index, chunk_text in enumerate(_chunk_text(source_text)):
-            stable_key = f"{source.source_id}|{source.section_ref}|{index}|{source_text_hash[:16]}"
+        # Use section-aware splitting only when the source was imported from a .md file.
+        # This preserves heading structure without breaking sources created programmatically
+        # that happen to have a zoning_ordinance source_type.
+        imported_from: str = source.metadata.get("imported_from", "")
+        is_markdown = imported_from.lower().endswith(".md")
+
+        # Build (section_ref, chunk_text) pairs
+        section_chunks: list[tuple[str, str]] = []
+        if is_markdown and raw_text:
+            for heading, body in _split_markdown_by_sections(raw_text):
+                section_ref = heading or source.section_ref
+                for part in _chunk_text(body):
+                    section_chunks.append((section_ref, part))
+        else:
+            for part in _chunk_text(source_text):
+                section_chunks.append((source.section_ref, part))
+
+        non_empty_section_chunks = [
+            (section_ref, chunk_text)
+            for section_ref, chunk_text in section_chunks
+            if chunk_text.strip()
+        ]
+        useful_section_chunks = [
+            (section_ref, chunk_text)
+            for section_ref, chunk_text in non_empty_section_chunks
+            if len(chunk_text.strip()) >= MIN_CHUNK_CHARS
+        ]
+        selected_section_chunks = useful_section_chunks
+        if not selected_section_chunks and len(non_empty_section_chunks) == 1:
+            # Preserve a single short source so existing manually entered source
+            # records do not disappear from the index entirely.
+            selected_section_chunks = non_empty_section_chunks
+
+        chunk_index = 0
+        for section_ref, chunk_text in selected_section_chunks:
+
+            stable_key = f"{source.source_id}|{section_ref}|{chunk_index}|{source_text_hash[:16]}"
             digest = hashlib.sha256(stable_key.encode("utf-8")).hexdigest()[:16]
             chunks.append(
                 SourceChunk(
-                    chunk_id=f"{source.source_id}:chunk:{index}:{source_text_hash[:12]}:{digest[:8]}",
+                    chunk_id=f"{source.source_id}:chunk:{chunk_index}:{source_text_hash[:12]}:{digest[:8]}",
                     source_id=source.source_id,
                     title=source.title,
                     chunk_text=chunk_text,
-                    chunk_index=index,
+                    chunk_index=chunk_index,
                     source_text_hash=source_text_hash,
-                    section_ref=source.section_ref,
+                    section_ref=section_ref,
                     jurisdiction_id=source.jurisdiction_id,
                     url=source.url,
                     effective_date=source.effective_date,
@@ -92,8 +157,10 @@ def build_source_chunks(sources: list[SourceRegistryEntry]) -> list[SourceChunk]
                     },
                 )
             )
+            chunk_index += 1
 
     return chunks
+
 
 
 def _parse_text_document(path: Path) -> SourceRegistryEntry:

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from app.ai.interfaces import RetrievalProviderRequest, RetrievalProviderResult
+from app.cache import invalidate_all_caches, invalidate_source_dependent_caches
 from app.ingestion import build_source_chunks
 from app.models import SourceChunk, SourceCitation, SourceRegistryEntry
 from app.settings import get_settings
@@ -62,6 +63,7 @@ def ensure_seed_sources(source_store: SQLiteStore = store) -> None:
         seeded_count += 1
 
     if seeded_count:
+        invalidate_all_caches()
         source_store.audit("source.seed.completed", f"{seeded_count} sources")
         if version_stage:
             source_store.audit(version_stage, "source-registry")
@@ -83,6 +85,7 @@ def ensure_source_index_ready(source_store: SQLiteStore = store) -> SourceIndexR
 
     if should_reindex:
         chunks = source_store.replace_source_chunks(expected_chunks)
+        invalidate_source_dependent_caches()
         source_store.audit(
             "source.index.auto_reindex.completed",
             _auto_reindex_reason(stale_source_ids, missing_chunk_source_ids),
@@ -159,37 +162,28 @@ class SourceRegistryRetrievalProvider:
 
     def retrieve(self, request: RetrievalProviderRequest) -> RetrievalProviderResult:
         ensure_source_index_ready(self.source_store)
+        chunks = self.source_store.list_source_chunks_filtered(
+            jurisdiction_id=request.jurisdiction_id,
+            district=request.district,
+            use=request.inferred_use,
+        )
         hits: list[SourceCitation] = []
-
-        for source in self.source_store.list_sources():
-            jurisdiction_ok = (
-                not request.jurisdiction_id
-                or not source.jurisdiction_id
-                or source.jurisdiction_id == request.jurisdiction_id
-                or source.jurisdiction_id == "*"
-            )
-            district_ok = (
-                request.district in source.districts
-                or "*" in source.districts
-                or request.district == "unknown"
-            )
-            use_ok = request.inferred_use in source.uses or "general" in source.uses
-            if not jurisdiction_ok or not district_ok or not use_ok:
-                continue
+        for chunk in chunks[:5]:
             hits.append(
                 SourceCitation(
-                    source_id=source.source_id,
-                    title=source.title,
-                    excerpt=source.excerpt,
-                    section_ref=source.section_ref,
-                    jurisdiction_id=source.jurisdiction_id,
-                    source_type=source.source_type,
-                    url=source.url,
-                    effective_date=source.effective_date,
-                    retrieved_at=source.retrieved_at,
+                    source_id=chunk.source_id,
+                    title=chunk.title,
+                    excerpt=chunk.chunk_text,
+                    section_ref=chunk.section_ref,
+                    chunk_id=chunk.chunk_id,
+                    jurisdiction_id=chunk.jurisdiction_id,
+                    source_type=chunk.source_type,
+                    url=chunk.url,
+                    effective_date=chunk.effective_date,
+                    retrieved_at=chunk.retrieved_at,
                     score=1.0,
-                    metadata=source.metadata,
+                    metadata=chunk.metadata,
                 )
             )
 
-        return RetrievalProviderResult(citations=hits[:5])
+        return RetrievalProviderResult(citations=hits, chunks=chunks[:5])
