@@ -35,7 +35,8 @@ host '...@aws-...pooler.supabase.com'`.
 
 ## Startup Readiness
 
-On startup, the API calls `prepare_source_index_for_startup()`:
+The Docker image runs `alembic upgrade head` before starting Uvicorn. After migrations complete, the
+API calls `prepare_source_index_for_startup()`:
 
 1. Seed bundled source records when the source registry is empty or the configured registry version
    has not been applied.
