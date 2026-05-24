@@ -28,6 +28,11 @@ Optional provider keys:
 - `WATSONX_API_KEY`, `WATSONX_PROJECT_ID`, `WATSONX_MODEL_ID`, and
   `WATSONX_VECTOR_INDEX_ID` only when selecting watsonx providers.
 
+If the database password contains reserved URL characters such as `@`, `:`, `/`, `?`, or `#`,
+percent-encode them in `DATABASE_URL`. For example, `@` must become `%40`. Otherwise the database
+driver can parse part of the password as the host and fail with an error like `failed to resolve
+host '...@aws-...pooler.supabase.com'`.
+
 ## Startup Readiness
 
 On startup, the API calls `prepare_source_index_for_startup()`:
