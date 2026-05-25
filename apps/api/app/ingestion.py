@@ -5,6 +5,7 @@ import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 from app.models import SourceChunk, SourceRegistryEntry
 
@@ -17,9 +18,21 @@ def _resolve_default_docs_path() -> Path:
 
 
 DEFAULT_INGESTION_DOCS_PATH = _resolve_default_docs_path()
+DEFAULT_SOURCE_PACKS_PATH = DEFAULT_INGESTION_DOCS_PATH.parent / "source_packs"
 SUPPORTED_FILE_SUFFIXES = {".md", ".txt", ".json"}
 DEFAULT_CHUNK_MAX_CHARS = 900
 MIN_CHUNK_CHARS = 50
+
+
+class SourcePackManifest:
+    def __init__(self, path: Path, payload: dict) -> None:
+        self.path = path
+        self.payload = payload
+        jurisdiction = payload.get("jurisdiction") if isinstance(payload.get("jurisdiction"), dict) else {}
+        self.jurisdiction_id = str(
+            payload.get("jurisdiction_id") or jurisdiction.get("jurisdiction_id") or ""
+        ).strip()
+        self.name = str(jurisdiction.get("name") or self.jurisdiction_id).strip()
 
 
 def _slugify(text: str) -> str:
@@ -100,6 +113,8 @@ def build_source_chunks(sources: list[SourceRegistryEntry]) -> list[SourceChunk]
         imported_from: str = source.metadata.get("imported_from", "")
         is_markdown = imported_from.lower().endswith(".md")
 
+        enriched_metadata = _source_chunk_metadata(source)
+
         # Build (section_ref, chunk_text) pairs
         section_chunks: list[tuple[str, str]] = []
         if is_markdown and raw_text:
@@ -151,7 +166,7 @@ def build_source_chunks(sources: list[SourceRegistryEntry]) -> list[SourceChunk]
                     source_version=source_version,
                     token_count=len(chunk_text.split()),
                     metadata={
-                        **source.metadata,
+                        **enriched_metadata,
                         "source_version": source_version,
                         "content_hash": source_text_hash,
                     },
@@ -271,3 +286,116 @@ def import_source_documents(directory: str | Path | None = None) -> list[SourceR
         for entry in parse_source_file(path):
             entries[entry.source_id] = entry
     return list(entries.values())
+
+
+def list_source_packs(directory: str | Path | None = None) -> list[SourcePackManifest]:
+    base_path = Path(directory) if directory else DEFAULT_SOURCE_PACKS_PATH
+    if not base_path.exists():
+        return []
+    if not base_path.is_dir():
+        raise ValueError(f"Source pack path must be a directory: {base_path}")
+
+    packs: list[SourcePackManifest] = []
+    for manifest_path in sorted(base_path.rglob("manifest.json")):
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            raise ValueError(f"Source pack manifest must be an object: {manifest_path}")
+        packs.append(SourcePackManifest(manifest_path, payload))
+    return packs
+
+
+def import_source_packs(directory: str | Path | None = None) -> list[SourceRegistryEntry]:
+    entries: dict[str, SourceRegistryEntry] = {}
+    for pack in list_source_packs(directory):
+        for entry in _sources_from_pack(pack):
+            entries[entry.source_id] = entry
+    return list(entries.values())
+
+
+def _sources_from_pack(pack: SourcePackManifest) -> list[SourceRegistryEntry]:
+    sources_payload = pack.payload.get("sources")
+    if not isinstance(sources_payload, list):
+        raise ValueError(f"Source pack is missing a sources list: {pack.path}")
+    if not pack.jurisdiction_id:
+        raise ValueError(f"Source pack is missing jurisdiction_id: {pack.path}")
+
+    entries: list[SourceRegistryEntry] = []
+    for raw_source in sources_payload:
+        if not isinstance(raw_source, dict):
+            raise ValueError(f"Source pack source must be an object: {pack.path}")
+        source = dict(raw_source)
+        source.setdefault("jurisdiction_id", pack.jurisdiction_id)
+        metadata = source.get("metadata") if isinstance(source.get("metadata"), dict) else {}
+        curated_fallback = bool(metadata.get("curated_local_fallback"))
+        missing = [
+            key
+            for key in ["source_id", "title", "section_ref", "jurisdiction_id", "url", "effective_date"]
+            if not str(source.get(key) or "").strip()
+        ]
+        if missing and not curated_fallback:
+            raise ValueError(
+                f"Source pack {pack.path} source is missing required fields: {', '.join(missing)}"
+            )
+        source.setdefault("retrieved_at", datetime.now(timezone.utc).date().isoformat())
+        source["metadata"] = {
+            **_source_pack_jurisdiction_metadata(pack, source),
+            **metadata,
+            "source_pack": pack.jurisdiction_id,
+            "source_pack_manifest": str(pack.path),
+        }
+        entries.append(SourceRegistryEntry.model_validate(source))
+    return entries
+
+
+def _source_chunk_metadata(source: SourceRegistryEntry) -> dict[str, Any]:
+    metadata: dict[str, Any] = {}
+    metadata.update(_metadata_from_registered_jurisdiction(source.jurisdiction_id))
+    metadata.update(source.metadata)
+    if not metadata.get("state") and source.jurisdiction_id == "*":
+        applies_to_states = metadata.get("applies_to_states")
+        if isinstance(applies_to_states, list) and len(applies_to_states) == 1:
+            metadata["state"] = str(applies_to_states[0])
+    metadata.setdefault("jurisdiction_scope", "global" if source.jurisdiction_id == "*" else "local")
+    metadata.setdefault("coverage_status", "")
+    metadata.setdefault("state", "")
+    metadata.setdefault("county", "")
+    metadata.setdefault("municipality", "")
+    return metadata
+
+
+def _metadata_from_registered_jurisdiction(jurisdiction_id: str | None) -> dict[str, str]:
+    if not jurisdiction_id or jurisdiction_id == "*":
+        return {}
+    try:
+        from app.jurisdictions import load_jurisdictions
+    except Exception:
+        return {}
+
+    for jurisdiction in load_jurisdictions():
+        if jurisdiction.jurisdiction_id == jurisdiction_id:
+            return {
+                "jurisdiction_scope": "local",
+                "state": jurisdiction.state or "",
+                "county": next(iter(jurisdiction.county_names), ""),
+                "municipality": next(iter(jurisdiction.locality_names), ""),
+                "coverage_status": jurisdiction.coverage_status,
+            }
+    return {}
+
+
+def _source_pack_jurisdiction_metadata(pack: SourcePackManifest, source: dict) -> dict[str, Any]:
+    jurisdiction = pack.payload.get("jurisdiction") if isinstance(pack.payload.get("jurisdiction"), dict) else {}
+    metadata: dict[str, Any] = {
+        "coverage_status": str(jurisdiction.get("coverage_status") or ""),
+        "state": str(jurisdiction.get("state") or ""),
+        "county": str(jurisdiction.get("county") or jurisdiction.get("county_name") or ""),
+        "municipality": str(jurisdiction.get("locality") or jurisdiction.get("name") or ""),
+    }
+    jurisdiction_id = str(source.get("jurisdiction_id") or pack.jurisdiction_id)
+    if jurisdiction_id == "*":
+        metadata["jurisdiction_scope"] = "global"
+    elif jurisdiction_id != pack.jurisdiction_id:
+        metadata["jurisdiction_scope"] = "parent"
+    else:
+        metadata["jurisdiction_scope"] = "local"
+    return {key: value for key, value in metadata.items() if value != ""}

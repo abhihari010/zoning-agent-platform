@@ -6,6 +6,7 @@ from sqlalchemy import (
     JSON,
     Boolean,
     Column,
+    Date,
     DateTime,
     Float,
     ForeignKey,
@@ -14,6 +15,7 @@ from sqlalchemy import (
     String,
     Table,
     Text,
+    UniqueConstraint,
     create_engine,
 )
 from sqlalchemy.engine import Engine
@@ -28,7 +30,19 @@ sessions = Table(
     "sessions",
     metadata,
     Column("session_id", String(36), primary_key=True),
+    Column("user_id", String(200), nullable=True, index=True),
     Column("created_at", DateTime(timezone=True), nullable=False),
+)
+
+users = Table(
+    "users",
+    metadata,
+    Column("user_id", String(200), primary_key=True),
+    Column("email", String(500), nullable=True, index=True),
+    Column("role", String(50), nullable=False),
+    Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("last_seen_at", DateTime(timezone=True), nullable=False),
+    Column("disabled_at", DateTime(timezone=True), nullable=True),
 )
 
 projects = Table(
@@ -36,6 +50,7 @@ projects = Table(
     metadata,
     Column("project_id", String(36), primary_key=True),
     Column("session_id", String(36), nullable=False, index=True),
+    Column("user_id", String(200), nullable=True, index=True),
     Column("project_description", Text, nullable=True),
     Column("input_address", Text, nullable=True),
     Column("normalized_address", Text, nullable=True),
@@ -55,6 +70,7 @@ analyses = Table(
     "analyses",
     metadata,
     Column("project_id", String(36), ForeignKey("projects.project_id"), primary_key=True),
+    Column("user_id", String(200), nullable=True, index=True),
     Column("payload_json", JSON, nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
 )
@@ -64,6 +80,7 @@ audit_events = Table(
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("project_id", String(200), nullable=False, index=True),
+    Column("user_id", String(200), nullable=True, index=True),
     Column("stage", String(200), nullable=False, index=True),
     Column("details_json", JSON, nullable=True),
     Column("created_at", DateTime(timezone=True), nullable=False),
@@ -74,6 +91,7 @@ feedback = Table(
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("project_id", String(36), ForeignKey("projects.project_id"), nullable=False, index=True),
+    Column("user_id", String(200), nullable=True, index=True),
     Column("helpful", Boolean, nullable=False),
     Column("comment", Text, nullable=True),
     Column("created_at", DateTime(timezone=True), nullable=False),
@@ -121,16 +139,62 @@ beta_access_events = Table(
     Column("created_at", DateTime(timezone=True), nullable=False),
 )
 
+usage_events = Table(
+    "usage_events",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("user_id", String(200), nullable=True, index=True),
+    Column("event_type", String(100), nullable=False, index=True),
+    Column("created_at", DateTime(timezone=True), nullable=False, index=True),
+)
+
+usage_counters = Table(
+    "usage_counters",
+    metadata,
+    Column("user_id", String(200), nullable=False),
+    Column("event_type", String(100), nullable=False),
+    Column("usage_date", Date, nullable=False),
+    Column("usage_count", Integer, nullable=False),
+    Column("updated_at", DateTime(timezone=True), nullable=False),
+    UniqueConstraint("user_id", "event_type", "usage_date", name="uq_usage_counters_daily"),
+)
+
 jurisdictions = Table(
     "jurisdictions",
     metadata,
     Column("jurisdiction_id", String(200), primary_key=True),
     Column("name", String(500), nullable=False),
     Column("state", String(100), nullable=True),
+    Column("state_fips", String(10), nullable=True),
+    Column("county_fips", String(10), nullable=True),
+    Column("place_fips", String(10), nullable=True),
+    Column("jurisdiction_type", String(50), nullable=False, default="unknown"),
+    Column("parent_jurisdiction_id", String(200), nullable=True, index=True),
+    Column("coverage_status", String(50), nullable=False, default="unsupported", index=True),
     Column("supported", Boolean, nullable=False, default=False),
+    Column("official_source_urls_json", JSON, nullable=True),
+    Column("zoning_map_url", String(2000), nullable=True),
+    Column("planning_contact_json", JSON, nullable=True),
+    Column("last_verified_at", String(80), nullable=True),
     Column("payload_json", JSON, nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),
+)
+
+jurisdiction_requests = Table(
+    "jurisdiction_requests",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("user_id", String(200), nullable=True, index=True),
+    Column("jurisdiction_id", String(200), nullable=True, index=True),
+    Column("jurisdiction_name", String(500), nullable=True),
+    Column("state", String(100), nullable=True),
+    Column("county", String(200), nullable=True),
+    Column("locality", String(200), nullable=True),
+    Column("normalized_address", Text, nullable=False),
+    Column("requested_use_type", String(200), nullable=True),
+    Column("comment", Text, nullable=True),
+    Column("created_at", DateTime(timezone=True), nullable=False),
 )
 
 

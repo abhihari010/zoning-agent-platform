@@ -10,8 +10,11 @@ const DEFAULT_API_URL = import.meta.env.PROD
 
 const API_ORIGIN = (import.meta.env.VITE_API_URL ?? DEFAULT_API_URL).replace(/\/$/, "");
 const API_BASE = `${API_ORIGIN}/api/v1`;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? "";
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? "";
 const BETA_ACCESS_STORAGE_KEY = "zoning-agent.betaAccessKey";
 const ADMIN_ACCESS_STORAGE_KEY = "zoning-agent.adminAccessKey";
+let authToken = "";
 
 function isLocalApiUrl(): boolean {
   try {
@@ -23,6 +26,17 @@ function isLocalApiUrl(): boolean {
 }
 
 export const requiresBetaAccess = !isLocalApiUrl();
+export const authMode: "disabled" | "beta" | "supabase" =
+  (import.meta.env.VITE_AUTH_MODE as "disabled" | "beta" | "supabase" | undefined) ??
+  (SUPABASE_URL && SUPABASE_ANON_KEY ? "supabase" : requiresBetaAccess ? "beta" : "disabled");
+export const supabaseConfig = {
+  url: SUPABASE_URL,
+  anonKey: SUPABASE_ANON_KEY,
+};
+
+export function setAuthToken(value: string): void {
+  authToken = value;
+}
 
 export function getBetaAccessKey(): string {
   return window.sessionStorage.getItem(BETA_ACCESS_STORAGE_KEY) ?? "";
@@ -66,9 +80,31 @@ function requestHeaders(
   const adminAccessKey = options.includeAdminAccess ? getAdminAccessKey() : "";
   return {
     ...headers,
+    ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
     ...(betaAccessKey ? { "X-Beta-Access-Key": betaAccessKey } : {}),
     ...(adminAccessKey ? { "X-Admin-Access-Key": adminAccessKey } : {}),
   };
+}
+
+export interface CurrentUser {
+  userId?: string | null;
+  email?: string | null;
+  role: "anonymous" | "legacy_beta" | "user" | "admin";
+  authMode: "disabled" | "beta" | "supabase";
+  publicSignupsEnabled: boolean;
+}
+
+export interface ProjectSummary {
+  projectId: string;
+  normalizedAddress: string;
+  jurisdictionId?: string | null;
+  jurisdictionName?: string | null;
+  district: string;
+  status: "created" | "analyzed";
+  decision?: AnalyzeResponse["feasibility"]["decision"] | null;
+  confidence?: number | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IntakeResponse {
@@ -82,7 +118,30 @@ export interface IntakeResponse {
   supportStatus: "supported" | "unsupported" | "invalid";
   jurisdictionId?: string | null;
   jurisdictionName?: string | null;
+  coverageStatus?: CoverageStatus | null;
+  planningContact?: Record<string, string>;
+  officialSourceUrls?: string[];
   followUpQuestions: FollowUpQuestion[];
+}
+
+export type CoverageStatus =
+  | "unsupported"
+  | "source_discovery"
+  | "source_indexed"
+  | "qa_ready"
+  | "public_supported";
+
+export interface JurisdictionCoverage {
+  jurisdictionId: string;
+  name: string;
+  state?: string | null;
+  jurisdictionType: string;
+  coverageStatus: CoverageStatus;
+  supported: boolean;
+  officialSourceUrls: string[];
+  zoningMapUrl?: string | null;
+  planningContact: Record<string, string>;
+  lastVerifiedAt?: string | null;
 }
 
 export interface SourceRegistryEntry {
@@ -119,6 +178,8 @@ export interface SourceIndexStatus {
   vectorCount: number;
   vectorCollection?: string | null;
   vectorReadinessWarnings: string[];
+  sourcePackCount: number;
+  sourcePackJurisdictionIds: string[];
   lastImportAt?: string | null;
   lastReindexAt?: string | null;
   sourcesMissingMetadata: Array<{
@@ -202,6 +263,180 @@ export async function createSession(): Promise<string> {
   return payload.session_id;
 }
 
+export interface JurisdictionRequestResult {
+  status: "created" | "existing";
+  jurisdictionId?: string | null;
+  jurisdictionName?: string | null;
+  requestCount: number;
+}
+
+export interface JurisdictionRequestSummary {
+  jurisdictionId?: string | null;
+  jurisdictionName?: string | null;
+  state?: string | null;
+  county?: string | null;
+  locality?: string | null;
+  requestCount: number;
+  lastRequestedAt: string;
+}
+
+export async function fetchCurrentUser(): Promise<CurrentUser> {
+  const response = await fetch(`${API_BASE}/me`, {
+    headers: requestHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Failed to load user"));
+  }
+  const payload = (await response.json()) as {
+    user_id?: string | null;
+    email?: string | null;
+    role: CurrentUser["role"];
+    auth_mode: CurrentUser["authMode"];
+    public_signups_enabled: boolean;
+  };
+  return {
+    userId: payload.user_id,
+    email: payload.email,
+    role: payload.role,
+    authMode: payload.auth_mode,
+    publicSignupsEnabled: payload.public_signups_enabled,
+  };
+}
+
+export async function listProjects(): Promise<ProjectSummary[]> {
+  const response = await fetch(`${API_BASE}/projects`, {
+    headers: requestHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Failed to load projects"));
+  }
+  const payload = (await response.json()) as {
+    projects: Array<{
+      project_id: string;
+      normalized_address: string;
+      jurisdiction_id?: string | null;
+      jurisdiction_name?: string | null;
+      district: string;
+      status: "created" | "analyzed";
+      decision?: AnalyzeResponse["feasibility"]["decision"] | null;
+      confidence?: number | null;
+      created_at: string;
+      updated_at: string;
+    }>;
+  };
+  return payload.projects.map((project) => ({
+    projectId: project.project_id,
+    normalizedAddress: project.normalized_address,
+    jurisdictionId: project.jurisdiction_id,
+    jurisdictionName: project.jurisdiction_name,
+    district: project.district,
+    status: project.status,
+    decision: project.decision,
+    confidence: project.confidence,
+    createdAt: project.created_at,
+    updatedAt: project.updated_at,
+  }));
+}
+
+export async function fetchJurisdictionRequestSummaries(): Promise<JurisdictionRequestSummary[]> {
+  const response = await fetch(`${API_BASE}/admin/jurisdiction-requests`, {
+    headers: requestHeaders({}, { includeAdminAccess: true }),
+  });
+  if (!response.ok) {
+    throw new Error(await parseAdminActionError(response, "Load jurisdiction requests"));
+  }
+  const payload = (await response.json()) as {
+    requests: Array<{
+      jurisdiction_id?: string | null;
+      jurisdiction_name?: string | null;
+      state?: string | null;
+      county?: string | null;
+      locality?: string | null;
+      request_count: number;
+      last_requested_at: string;
+    }>;
+  };
+  return payload.requests.map((request) => ({
+    jurisdictionId: request.jurisdiction_id,
+    jurisdictionName: request.jurisdiction_name,
+    state: request.state,
+    county: request.county,
+    locality: request.locality,
+    requestCount: request.request_count,
+    lastRequestedAt: request.last_requested_at,
+  }));
+}
+
+export async function fetchJurisdictionCoverage(): Promise<JurisdictionCoverage[]> {
+  const response = await fetch(`${API_BASE}/jurisdictions/coverage`, {
+    headers: requestHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Failed to load coverage"));
+  }
+  const payload = (await response.json()) as {
+    jurisdictions: Array<{
+      jurisdiction_id: string;
+      name: string;
+      state?: string | null;
+      jurisdiction_type: string;
+      coverage_status: CoverageStatus;
+      supported: boolean;
+      official_source_urls: string[];
+      zoning_map_url?: string | null;
+      planning_contact: Record<string, string>;
+      last_verified_at?: string | null;
+    }>;
+  };
+  return payload.jurisdictions.map((jurisdiction) => ({
+    jurisdictionId: jurisdiction.jurisdiction_id,
+    name: jurisdiction.name,
+    state: jurisdiction.state,
+    jurisdictionType: jurisdiction.jurisdiction_type,
+    coverageStatus: jurisdiction.coverage_status,
+    supported: jurisdiction.supported,
+    officialSourceUrls: jurisdiction.official_source_urls,
+    zoningMapUrl: jurisdiction.zoning_map_url,
+    planningContact: jurisdiction.planning_contact ?? {},
+    lastVerifiedAt: jurisdiction.last_verified_at,
+  }));
+}
+
+export async function requestJurisdictionSupport(input: {
+  normalizedAddress: string;
+  jurisdictionId?: string | null;
+  jurisdictionName?: string | null;
+  requestedUseType?: string | null;
+  comment?: string | null;
+}): Promise<JurisdictionRequestResult> {
+  const response = await fetch(`${API_BASE}/jurisdiction-requests`, {
+    method: "POST",
+    headers: requestHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({
+      normalized_address: input.normalizedAddress,
+      jurisdiction_id: input.jurisdictionId,
+      jurisdiction_name: input.jurisdictionName,
+      requested_use_type: input.requestedUseType,
+      comment: input.comment,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Failed to request jurisdiction support"));
+  }
+  const payload = (await response.json()) as {
+    status: "created" | "existing";
+    jurisdiction_id?: string | null;
+    jurisdiction_name?: string | null;
+    request_count: number;
+  };
+  return {
+    status: payload.status,
+    jurisdictionId: payload.jurisdiction_id,
+    jurisdictionName: payload.jurisdiction_name,
+    requestCount: payload.request_count,
+  };
+}
+
 export async function intakeProject(input: {
   session_id: string;
   project_description: string;
@@ -227,6 +462,9 @@ export async function intakeProject(input: {
     support_status?: "supported" | "unsupported" | "invalid";
     jurisdiction_id?: string | null;
     jurisdiction_name?: string | null;
+    coverage_status?: CoverageStatus | null;
+    planning_contact?: Record<string, string>;
+    official_source_urls?: string[];
     follow_up_questions: string[];
   };
 
@@ -241,6 +479,9 @@ export async function intakeProject(input: {
     supportStatus: payload.support_status ?? "supported",
     jurisdictionId: payload.jurisdiction_id,
     jurisdictionName: payload.jurisdiction_name,
+    coverageStatus: payload.coverage_status,
+    planningContact: payload.planning_contact ?? {},
+    officialSourceUrls: payload.official_source_urls ?? [],
     followUpQuestions: toFollowUpQuestions(payload.follow_up_questions),
   };
 }
@@ -445,6 +686,109 @@ export async function analyzeProject(
   };
 }
 
+export async function fetchProjectResult(projectId: string): Promise<AnalyzeResponse> {
+  const response = await fetch(`${API_BASE}/projects/${projectId}/result`, {
+    headers: requestHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Failed to load project result"));
+  }
+  return mapAnalyzePayload(await response.json());
+}
+
+function mapAnalyzePayload(payload: any): AnalyzeResponse {
+  if (payload.traceId) {
+    return payload as AnalyzeResponse;
+  }
+  return {
+    status: payload.status,
+    traceId: payload.trace_id,
+    pipeline: payload.pipeline
+      ? {
+          version: payload.pipeline.version,
+          promptVersion: payload.pipeline.prompt_version,
+          provider: payload.pipeline.provider,
+          ragProvider: payload.pipeline.rag_provider,
+          embeddingProvider: payload.pipeline.embedding_provider,
+          traceId: payload.pipeline.trace_id,
+        }
+      : null,
+    trustIndicators: payload.trust_indicators
+      ? {
+          jurisdictionAnalyzed: payload.trust_indicators.jurisdiction_analyzed,
+          jurisdictionSupported: payload.trust_indicators.jurisdiction_supported,
+          jurisdictionName: payload.trust_indicators.jurisdiction_name,
+          zoningDistrict: payload.trust_indicators.zoning_district,
+          districtConfidence: payload.trust_indicators.district_confidence,
+          districtSource: payload.trust_indicators.district_source,
+          sourceCount: payload.trust_indicators.source_count,
+          citationCount: payload.trust_indicators.citation_count,
+          vectorReadiness: payload.trust_indicators.vector_readiness,
+          lastSourceUpdate: payload.trust_indicators.last_source_update,
+        }
+      : null,
+    citationValidation: payload.citation_validation
+      ? {
+          valid: payload.citation_validation.valid,
+          citationCoverage: payload.citation_validation.citation_coverage,
+          unsupportedClaims: payload.citation_validation.unsupported_claims,
+          invalidCitationIds: payload.citation_validation.invalid_citation_ids,
+          confidenceAdjustment: payload.citation_validation.confidence_adjustment,
+          warnings: payload.citation_validation.warnings,
+          jurisdictionId: payload.citation_validation.jurisdiction_id,
+        }
+      : null,
+    pipelineStages: payload.pipeline_stages,
+    agents: payload.agents ?? [],
+    feasibility: payload.feasibility,
+    compliance: payload.compliance
+      ? {
+          feasibility: payload.compliance.feasibility,
+          confidence: payload.compliance.confidence,
+          summary: payload.compliance.summary,
+          findings: payload.compliance.findings.map((finding: any) => ({
+            category: finding.category,
+            status: finding.status,
+            summary: finding.summary,
+            citationIds: finding.citation_ids,
+            confidence: finding.confidence,
+          })),
+          requiredPermits: payload.compliance.required_permits,
+          permitPath: payload.compliance.permit_path,
+          warnings: payload.compliance.warnings,
+          unresolvedQuestions: payload.compliance.unresolved_questions,
+          citationChunkIds: payload.compliance.citation_chunk_ids,
+        }
+      : null,
+    checklist: {
+      ...payload.checklist,
+      steps: payload.checklist.steps.map((step: any) => ({
+        order: step.order,
+        action: step.action,
+        requiredDocs: step.required_docs,
+        department: step.department,
+      })),
+    },
+    citations: payload.citations.map((citation: any) => ({
+      sourceId: citation.source_id,
+      title: citation.title,
+      excerpt: citation.excerpt,
+      sectionRef: citation.section_ref,
+      chunkId: citation.chunk_id,
+      jurisdictionId: citation.jurisdiction_id,
+      sourceType: citation.source_type,
+      url: citation.url,
+      effectiveDate: citation.effective_date,
+      retrievedAt: citation.retrieved_at,
+      score: citation.score,
+      metadata: citation.metadata ?? {},
+    })),
+    disclaimers: payload.disclaimers,
+    followUpQuestions: toFollowUpQuestions(payload.follow_up_questions),
+    warnings: payload.warnings,
+  };
+}
+
 export async function fetchTrace(projectId: string): Promise<AuditEvent[]> {
   const response = await fetch(`${API_BASE}/projects/${projectId}/trace`, {
     headers: requestHeaders({}, { includeAdminAccess: true }),
@@ -574,6 +918,8 @@ export async function fetchSourceIndexStatus(): Promise<SourceIndexStatus> {
     vector_count?: number;
     vector_collection?: string | null;
     vector_readiness_warnings?: string[];
+    source_pack_count?: number;
+    source_pack_jurisdiction_ids?: string[];
     last_import_at?: string | null;
     last_reindex_at?: string | null;
     sources_missing_metadata: Array<{
@@ -598,6 +944,8 @@ export async function fetchSourceIndexStatus(): Promise<SourceIndexStatus> {
     vectorCount: payload.vector_count ?? 0,
     vectorCollection: payload.vector_collection,
     vectorReadinessWarnings: payload.vector_readiness_warnings ?? [],
+    sourcePackCount: payload.source_pack_count ?? 0,
+    sourcePackJurisdictionIds: payload.source_pack_jurisdiction_ids ?? [],
     lastImportAt: payload.last_import_at,
     lastReindexAt: payload.last_reindex_at,
     sourcesMissingMetadata: payload.sources_missing_metadata.map((source) => ({
@@ -700,6 +1048,33 @@ export async function importLocalDocuments(
   });
   if (!response.ok) {
     throw new Error(await parseAdminActionError(response, "Import local documents"));
+  }
+
+  const payload = (await response.json()) as {
+    status: string;
+    imported_count: number;
+    source_count: number;
+    imported_source_ids: string[];
+  };
+  return {
+    status: payload.status,
+    importedCount: payload.imported_count,
+    sourceCount: payload.source_count,
+    importedSourceIds: payload.imported_source_ids,
+  };
+}
+
+export async function importSourcePacks(directory?: string): Promise<LocalDocumentImportResult> {
+  const response = await fetch(`${API_BASE}/ingestion/import-source-packs`, {
+    method: "POST",
+    headers: requestHeaders(
+      { "Content-Type": "application/json" },
+      { includeAdminAccess: true },
+    ),
+    body: JSON.stringify({ directory: directory?.trim() || null }),
+  });
+  if (!response.ok) {
+    throw new Error(await parseAdminActionError(response, "Import source packs"));
   }
 
   const payload = (await response.json()) as {

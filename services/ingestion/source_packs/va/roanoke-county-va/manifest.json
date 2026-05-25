@@ -1,0 +1,90 @@
+{
+  "schema_version": "source-pack/v1",
+  "jurisdiction": {
+    "jurisdiction_id": "roanoke-county-va",
+    "name": "Roanoke County, VA",
+    "coverage_status": "source_indexed",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "161",
+    "place_fips": null,
+    "jurisdiction_type": "county",
+    "parent_jurisdiction_id": null,
+    "official_source_urls": [
+      "https://www.roanokecountyva.gov/348/Zoning",
+      "https://www.roanokecountyva.gov/305/Planning",
+      "https://www.roanokecountyva.gov/gis",
+      "https://www.roanokecountyva.gov/301/Building-Safety",
+      "https://library.municode.com/va/roanoke_county/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "https://www.roanokecountyva.gov/gis",
+    "planning_contact": {
+      "department": "Planning and Zoning",
+      "url": "https://www.roanokecountyva.gov/348/Zoning",
+      "phone": "540-772-2068"
+    }
+  },
+  "verification_notes": "Official county zoning, planning, GIS, building safety, and Municode ordinance sources are identified. Keep non-public until district mapping and golden QA pass.",
+  "sources": [
+    {
+      "source_id": "roanoke-county-zoning-office",
+      "title": "Roanoke County Zoning Office",
+      "excerpt": "Roanoke County Planning and Zoning administers the zoning ordinance and land use codes, responds to land use concerns, and provides zoning-related public guidance for properties in the county.",
+      "section_ref": "Zoning; Planning and Zoning",
+      "jurisdiction_id": "roanoke-county-va",
+      "url": "https://www.roanokecountyva.gov/348/Zoning",
+      "effective_date": "2026-05-25",
+      "districts": ["unknown"],
+      "uses": ["general"],
+      "source_type": "planning_page"
+    },
+    {
+      "source_id": "roanoke-county-zoning-ordinance",
+      "title": "Roanoke County Zoning Ordinance",
+      "excerpt": "The Roanoke County Code identifies the county zoning ordinance and official zoning map as the framework for zoning districts, map amendments, special use permits, variances, and other zoning reviews.",
+      "section_ref": "Roanoke County Zoning Ordinance",
+      "jurisdiction_id": "roanoke-county-va",
+      "url": "https://library.municode.com/va/roanoke_county/codes/code_of_ordinances",
+      "effective_date": "2026-05-25",
+      "districts": ["unknown"],
+      "uses": ["general"],
+      "source_type": "zoning_ordinance"
+    },
+    {
+      "source_id": "roanoke-county-planning-office",
+      "title": "Roanoke County Planning Office",
+      "excerpt": "Roanoke County Planning provides land use and development guidance and works with zoning, development review, and county planning processes.",
+      "section_ref": "Planning",
+      "jurisdiction_id": "roanoke-county-va",
+      "url": "https://www.roanokecountyva.gov/305/Planning",
+      "effective_date": "2026-05-25",
+      "districts": ["unknown"],
+      "uses": ["general"],
+      "source_type": "planning_page"
+    },
+    {
+      "source_id": "roanoke-county-gis-zoning-map",
+      "title": "Roanoke County GIS Services and Zoning Details",
+      "excerpt": "Roanoke County GIS applications provide web-based map access for county and Town of Vinton users, including property information and zoning details through GIS applications.",
+      "section_ref": "GIS Services and Information",
+      "jurisdiction_id": "roanoke-county-va",
+      "url": "https://www.roanokecountyva.gov/gis",
+      "effective_date": "2026-05-25",
+      "districts": ["unknown"],
+      "uses": ["general"],
+      "source_type": "gis_layer"
+    },
+    {
+      "source_id": "roanoke-county-building-safety-usbc",
+      "title": "Roanoke County Building Safety and USBC Enforcement",
+      "excerpt": "Roanoke County Building Safety enforces the Virginia Uniform Statewide Building Code and requires permits before construction, reconstruction, alteration, repair, conversion, or demolition of regulated buildings or structures.",
+      "section_ref": "Building Safety",
+      "jurisdiction_id": "roanoke-county-va",
+      "url": "https://www.roanokecountyva.gov/301/Building-Safety",
+      "effective_date": "2026-05-25",
+      "districts": ["unknown"],
+      "uses": ["home-based-food-business", "food-business", "food-service", "general"],
+      "source_type": "building_code"
+    }
+  ]
+}

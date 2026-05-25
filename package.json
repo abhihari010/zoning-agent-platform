@@ -9,6 +9,10 @@
   "scripts": {
     "dev:web": "npm run dev -w @zoning-agent/web",
     "build:web": "npm run build -w @zoning-agent/web",
-    "typecheck:web": "npm run typecheck -w @zoning-agent/web"
+    "typecheck:web": "npm run typecheck -w @zoning-agent/web",
+    "test:e2e": "node tests/e2e/public-launch-smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
   }
 }

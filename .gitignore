@@ -30,3 +30,4 @@ apps/api/app/data/chroma/
 apps/api/tests/golden/traces/
 
 .vercel
+.env*

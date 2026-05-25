@@ -1,0 +1,55 @@
+{
+  "schema_version": "source-pack/v1",
+  "jurisdiction": {
+    "jurisdiction_id": "montgomery-county-va",
+    "name": "Montgomery County, VA",
+    "coverage_status": "public_supported",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "121",
+    "place_fips": null,
+    "jurisdiction_type": "county",
+    "parent_jurisdiction_id": null,
+    "official_source_urls": [
+      "https://www.montgomerycountyva.gov/1/departments-services/planning",
+      "https://www.montgomerycountyva.gov/1/departments-services/planning/zoning-permits",
+      "https://www.montgomerycountyva.gov/1/departments-services/GIS",
+      "https://library.municode.com/va/montgomery_county/codes/code_of_ordinances",
+      "https://www.vdh.virginia.gov/new-river/environmental-health/"
+    ],
+    "zoning_map_url": "https://www.montgomerycountyva.gov/1/departments-services/GIS",
+    "planning_contact": {
+      "department": "Planning & GIS Services",
+      "url": "https://www.montgomerycountyva.gov/1/departments-services/planning",
+      "email": "mcplan@montgomerycountyva.gov",
+      "phone": "540-394-2148"
+    }
+  },
+  "verification_notes": "Existing public-supported source pack for unincorporated Montgomery County home occupations, zoning sequence, GIS, building permit, and health review triggers.",
+  "sources": [
+    {
+      "source_id": "montgomery-county-home-occupation-zoning",
+      "title": "Montgomery County Home Occupation Zoning Guidance",
+      "excerpt": "Montgomery County states that home occupations in the unincorporated county are regulated by the zoning ordinance, are permitted in listed residential and agricultural districts, must be secondary to the residence, may not exceed 25% of dwelling floor area, may use an accessory building, and must avoid exterior impacts such as traffic, parking demand, noise, vibration, glare, odors, or electrical interference.",
+      "section_ref": "Home Occupations; revised October 2021",
+      "jurisdiction_id": "montgomery-county-va",
+      "url": "https://www.montgomerycountyva.gov/docs/default-source/planning-gis/applications-and-forms/zoning/home-occupation-form.pdf?sfvrsn=8068743c_4",
+      "effective_date": "2021-10",
+      "districts": ["unknown", "residential-low-density", "mixed-use-core", "commercial-employment"],
+      "uses": ["home-based-food-business", "general"],
+      "source_type": "zoning_ordinance"
+    },
+    {
+      "source_id": "montgomery-county-planning-gis-zoning-permit-sequence",
+      "title": "Montgomery County Planning and GIS Zoning Permit Review Sequence",
+      "excerpt": "Montgomery County Planning and GIS Services administers zoning and subdivision ordinances in unincorporated areas. The county directs applicants to submit zoning permit materials to Planning and GIS Services before applying for a building permit at the Department of Inspections, with Planning and GIS listed for zoning questions and Building Inspections listed for building permit questions.",
+      "section_ref": "Planning and GIS Services; zoning permit approval steps",
+      "jurisdiction_id": "montgomery-county-va",
+      "url": "https://www.montgomerycountyva.gov/1/departments-services/planning",
+      "effective_date": "2026-05-22",
+      "districts": ["unknown", "residential-low-density", "mixed-use-core", "commercial-employment", "industrial-zone"],
+      "uses": ["home-based-food-business", "food-business", "general"],
+      "source_type": "planning_page"
+    }
+  ]
+}

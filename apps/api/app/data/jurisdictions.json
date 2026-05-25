@@ -2,6 +2,12 @@
   {
     "jurisdiction_id": "blacksburg-va",
     "name": "Blacksburg, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "121",
+    "place_fips": "07784",
+    "jurisdiction_type": "municipality",
+    "coverage_status": "public_supported",
     "supported": true,
     "match_strategy": "locality",
     "locality_names": ["Blacksburg"],
@@ -11,16 +17,23 @@
       "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
       "https://library.municode.com/va/blacksburg"
     ],
+    "zoning_map_url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
     "planning_contact": {
       "department": "Planning and Building Department",
       "url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building",
       "phone": "540-443-1300"
     },
+    "last_verified_at": "2026-05-24",
     "district_mapping_strategy": "supported_source_backed_lookup_with_google_component_keyword_fallback"
   },
   {
     "jurisdiction_id": "montgomery-county-va",
     "name": "Montgomery County, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "121",
+    "jurisdiction_type": "county",
+    "coverage_status": "public_supported",
     "supported": true,
     "match_strategy": "county",
     "locality_names": ["Riner", "Shawsville", "Elliston", "Prices Fork", "Merrimac"],
@@ -33,54 +46,82 @@
       "https://library.municode.com/va/montgomery_county/codes/code_of_ordinances",
       "https://www.vdh.virginia.gov/new-river/environmental-health/"
     ],
+    "zoning_map_url": "https://www.montgomerycountyva.gov/1/departments-services/GIS",
     "planning_contact": {
       "department": "Planning & GIS Services",
       "url": "https://www.montgomerycountyva.gov/1/departments-services/planning",
       "email": "mcplan@montgomerycountyva.gov",
       "phone": "540-394-2148"
     },
+    "last_verified_at": "2026-05-24",
     "district_mapping_strategy": "supported_source_backed_county_lookup_with_official_gis_verification_required"
   },
   {
     "jurisdiction_id": "christiansburg-va",
     "name": "Christiansburg, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "121",
+    "place_fips": "16608",
+    "jurisdiction_type": "municipality",
+    "coverage_status": "source_indexed",
     "supported": false,
     "match_strategy": "locality",
     "locality_names": ["Christiansburg"],
     "county_names": ["Montgomery County"],
     "state_names": ["VA", "Virginia"],
     "official_source_urls": [
-      "https://www.christiansburg.org/150/Planning"
+      "https://www.christiansburg.org/150/Planning",
+      "https://www.christiansburg.org/161/Town-Code",
+      "https://www.christiansburg.org/146/GIS-and-Maps",
+      "https://www.christiansburg.org/1686/Permit-Plans-Applications"
     ],
+    "zoning_map_url": "https://www.christiansburg.org/DocumentCenter/View/7461/Zoning-Map?bidId=",
     "planning_contact": {
       "department": "Planning",
       "url": "https://www.christiansburg.org/150/Planning",
       "phone": "540-382-6120"
     },
-    "district_mapping_strategy": "unsupported_until_town_code_and_zoning_map_sources_are_indexed"
+    "last_verified_at": "2026-05-25",
+    "district_mapping_strategy": "source_indexed_until_town_code_and_zoning_map_qa_pass"
   },
   {
     "jurisdiction_id": "roanoke-va",
     "name": "Roanoke, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "770",
+    "place_fips": "68000",
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
     "supported": false,
     "match_strategy": "locality_and_county",
     "locality_names": ["Roanoke"],
     "county_names": ["Roanoke City", "City of Roanoke"],
     "state_names": ["VA", "Virginia"],
     "official_source_urls": [
+      "https://www.roanokeva.gov/2964/Planning-Zoning-Permitting",
       "https://www.roanokeva.gov/1251/Zoning",
-      "https://www.roanokeva.gov/2964/Planning-Zoning-Permitting"
+      "https://gis03.roanokeva.gov/arcgis/rest/services/Public/Zoning/MapServer",
+      "https://www.roanokeva.gov/1145/Inspections"
     ],
+    "zoning_map_url": "https://gis03.roanokeva.gov/arcgis/rest/services/Public/Zoning/MapServer",
     "planning_contact": {
       "department": "Planning, Building, & Development",
       "url": "https://www.roanokeva.gov/2964/Planning-Zoning-Permitting",
       "phone": "540-853-1730"
     },
-    "district_mapping_strategy": "unsupported_until_city_zoning_code_and_gis_layers_are_indexed"
+    "last_verified_at": "2026-05-25",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
   },
   {
     "jurisdiction_id": "roanoke-county-va",
     "name": "Roanoke County, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "161",
+    "jurisdiction_type": "county",
+    "coverage_status": "source_indexed",
     "supported": false,
     "match_strategy": "county",
     "locality_names": ["Cave Spring", "Hollins", "Vinton", "Salem", "Bent Mountain", "Bonsack"],
@@ -89,13 +130,17 @@
     "official_source_urls": [
       "https://www.roanokecountyva.gov/348/Zoning",
       "https://www.roanokecountyva.gov/305/Planning",
-      "https://www.roanokecountyva.gov/460/Zoning-Requirements"
+      "https://www.roanokecountyva.gov/gis",
+      "https://www.roanokecountyva.gov/301/Building-Safety",
+      "https://library.municode.com/va/roanoke_county/codes/code_of_ordinances"
     ],
+    "zoning_map_url": "https://www.roanokecountyva.gov/gis",
     "planning_contact": {
       "department": "Planning and Zoning",
       "url": "https://www.roanokecountyva.gov/348/Zoning",
       "phone": "540-772-2068"
     },
-    "district_mapping_strategy": "unsupported_until_county_zoning_ordinance_and_map_sources_are_indexed"
+    "last_verified_at": "2026-05-25",
+    "district_mapping_strategy": "source_indexed_until_county_zoning_ordinance_and_map_sources_qa_pass"
   }
 ]
