@@ -45,6 +45,9 @@ class AddressNormalizationResult:
     support_status: Literal["supported", "unsupported", "invalid"] = "supported"
     jurisdiction_id: str | None = None
     jurisdiction_name: str | None = None
+    coverage_status: str | None = None
+    planning_contact: dict[str, str] | None = None
+    official_source_urls: list[str] | None = None
 
 
 def _slugify(text: str) -> str:
@@ -150,13 +153,9 @@ def suggest_addresses(query: str, session_token: str | None = None) -> list[str]
         raise RuntimeError("GOOGLE_MAPS_API_KEY is not configured.")
 
     timeout_seconds = float(os.getenv("GOOGLE_MAPS_TIMEOUT_SECONDS", "8"))
-    # Bias toward Blacksburg, VA (37.2296, -80.4139) within a 6 km radius
     params = {
         "input": trimmed,
         "types": "address",
-        "location": "37.2296,-80.4139",
-        "radius": "6000",
-        "strictbounds": "true",
         "components": "country:US",
         "key": api_key,
     }
@@ -221,6 +220,9 @@ def normalize_address(address: str) -> AddressNormalizationResult:
             support_status="unsupported",
             jurisdiction_id=jurisdiction.jurisdiction_id,
             jurisdiction_name=jurisdiction.jurisdiction_name,
+            coverage_status=jurisdiction.coverage_status,
+            planning_contact=jurisdiction.planning_contact,
+            official_source_urls=jurisdiction.official_source_urls,
         )
 
     parcel = ParcelTool().lookup(
@@ -248,6 +250,9 @@ def normalize_address(address: str) -> AddressNormalizationResult:
         support_status="supported",
         jurisdiction_id=jurisdiction.jurisdiction_id,
         jurisdiction_name=jurisdiction.jurisdiction_name,
+        coverage_status=jurisdiction.coverage_status,
+        planning_contact=jurisdiction.planning_contact,
+        official_source_urls=jurisdiction.official_source_urls,
     )
 
 

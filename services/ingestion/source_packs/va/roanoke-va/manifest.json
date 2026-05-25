@@ -1,0 +1,89 @@
+{
+  "schema_version": "source-pack/v1",
+  "jurisdiction": {
+    "jurisdiction_id": "roanoke-va",
+    "name": "Roanoke, VA",
+    "coverage_status": "source_indexed",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "770",
+    "place_fips": "68000",
+    "jurisdiction_type": "independent_city",
+    "parent_jurisdiction_id": null,
+    "official_source_urls": [
+      "https://www.roanokeva.gov/2964/Planning-Zoning-Permitting",
+      "https://www.roanokeva.gov/1251/Zoning",
+      "https://gis03.roanokeva.gov/arcgis/rest/services/Public/Zoning/MapServer",
+      "https://www.roanokeva.gov/1145/Inspections"
+    ],
+    "zoning_map_url": "https://gis03.roanokeva.gov/arcgis/rest/services/Public/Zoning/MapServer",
+    "planning_contact": {
+      "department": "Planning, Building, & Development",
+      "url": "https://www.roanokeva.gov/2964/Planning-Zoning-Permitting",
+      "phone": "540-853-1730"
+    }
+  },
+  "verification_notes": "Official city planning, zoning code, business-license zoning verification, GIS, and inspections sources are identified. Keep non-public until district mapping and golden QA pass.",
+  "sources": [
+    {
+      "source_id": "roanoke-planning-zoning-permitting",
+      "title": "City of Roanoke Planning, Zoning, and Permitting",
+      "excerpt": "Roanoke states that zoning laws determine permissible business types in certain areas, that construction projects require permits, and that applicants should contact Planning, Building, and Development before purchasing property or starting substantial upgrades.",
+      "section_ref": "Planning, Zoning, & Permitting",
+      "jurisdiction_id": "roanoke-va",
+      "url": "https://www.roanokeva.gov/2964/Planning-Zoning-Permitting",
+      "effective_date": "2026-05-25",
+      "districts": ["unknown"],
+      "uses": ["food-business", "food-service", "general"],
+      "source_type": "planning_page"
+    },
+    {
+      "source_id": "roanoke-zoning-code-map",
+      "title": "City of Roanoke Zoning Code and Official Zoning Map",
+      "excerpt": "Roanoke identifies Chapter 36.2 of the City Code as the zoning code and explains that the Official Zoning Map is available through the City's Real Estate GIS with Planning and Zoning layers for base and overlay zones.",
+      "section_ref": "Zoning Code; Official Zoning Map",
+      "jurisdiction_id": "roanoke-va",
+      "url": "https://www.roanokeva.gov/1251/Zoning",
+      "effective_date": "2026-05-25",
+      "districts": ["unknown"],
+      "uses": ["general"],
+      "source_type": "zoning_ordinance"
+    },
+    {
+      "source_id": "roanoke-business-license-zoning-verification",
+      "title": "City of Roanoke Business License Zoning Verification",
+      "excerpt": "Roanoke requires zoning verification as part of the Commissioner of the Revenue business license process and recommends business owners check property zoning before signing a lease or purchasing property.",
+      "section_ref": "Zoning Verification for a Business License",
+      "jurisdiction_id": "roanoke-va",
+      "url": "https://www.roanokeva.gov/1251/Zoning",
+      "effective_date": "2026-05-25",
+      "districts": ["unknown"],
+      "uses": ["food-business", "food-service", "general"],
+      "source_type": "permit_page"
+    },
+    {
+      "source_id": "roanoke-gis-zoning-mapserver",
+      "title": "City of Roanoke ArcGIS Zoning Map Service",
+      "excerpt": "The City of Roanoke ArcGIS REST zoning service identifies the public zoning map layer, service description, query support, and City of Roanoke copyright metadata for zoning map retrieval.",
+      "section_ref": "Public/Zoning MapServer",
+      "jurisdiction_id": "roanoke-va",
+      "url": "https://gis03.roanokeva.gov/arcgis/rest/services/Public/Zoning/MapServer",
+      "effective_date": "2026-05-25",
+      "districts": ["unknown"],
+      "uses": ["general"],
+      "source_type": "gis_layer"
+    },
+    {
+      "source_id": "roanoke-inspections-permit-management",
+      "title": "City of Roanoke Inspections and Permit Management",
+      "excerpt": "Roanoke states most permits require at least one inspection and directs permit holders to manage inspections through eTRAKiT, with inspection requests scheduled by the next business day when submitted before the daily cutoff.",
+      "section_ref": "Inspections; Scheduling Inspections",
+      "jurisdiction_id": "roanoke-va",
+      "url": "https://www.roanokeva.gov/1145/Inspections",
+      "effective_date": "2026-05-25",
+      "districts": ["unknown"],
+      "uses": ["food-business", "food-service", "general"],
+      "source_type": "building_code"
+    }
+  ]
+}

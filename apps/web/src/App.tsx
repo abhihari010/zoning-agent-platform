@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { createClient, type Session } from "@supabase/supabase-js";
 import type {
   AnalyzeResponse,
   AuditEvent,
@@ -8,23 +9,38 @@ import type {
 import {
   clearAdminAccessKey,
   analyzeProject,
+  authMode,
   clearBetaAccessKey,
   createSession,
+  fetchCurrentUser,
+  fetchJurisdictionCoverage,
+  fetchJurisdictionRequestSummaries,
+  fetchProjectResult,
   fetchSourceIndexStatus,
   fetchTrace,
   getAdminAccessKey,
   getBetaAccessKey,
   importLocalDocuments,
+  importSourcePacks,
   intakeProject,
+  listProjects,
   listSources,
   reindexSources,
   requiresBetaAccess,
+  requestJurisdictionSupport,
   saveSource,
   setAdminAccessKey,
+  setAuthToken,
   setBetaAccessKey,
+  supabaseConfig,
   suggestAddresses,
   submitFeedback,
   type IntakeResponse,
+  type CurrentUser,
+  type CoverageStatus,
+  type JurisdictionCoverage,
+  type JurisdictionRequestSummary,
+  type ProjectSummary,
   type SourceIndexStatus,
   type SourceRegistryEntry,
 } from "./api";
@@ -33,11 +49,16 @@ import { EvidencePanel, TrustIndicatorBar, UnsupportedJurisdiction } from "./com
 const DISCLAIMER =
   "Educational guidance only. Zoning rules, permit triggers, and code interpretations must be verified with the official planning department before you rely on this result.";
 const PIPELINE_STAGE_COUNT = 5;
+const supabase =
+  authMode === "supabase" && supabaseConfig.url && supabaseConfig.anonKey
+    ? createClient(supabaseConfig.url, supabaseConfig.anonKey)
+    : null;
 
 type Workspace = "assistant" | "admin";
 type Phase = "idle" | "intake" | "analyzing" | "done" | "error";
 type FeedbackState = "idle" | "submitting" | "submitted";
 type ResultView = "checklist" | "evidence" | "trace";
+type LegalPage = "terms" | "privacy" | "disclaimer" | null;
 
 interface IntakeFacts {
   useType: string;
@@ -109,6 +130,11 @@ function formatDateTime(value?: string | null): string {
     return "Not recorded";
   }
   return new Date(value).toLocaleString();
+}
+
+function formatLocationParts(...parts: Array<string | null | undefined>): string {
+  const values = parts.map((part) => part?.trim()).filter(Boolean);
+  return values.length > 0 ? values.join(" / ") : "Location not recorded";
 }
 
 function decisionLabel(decision: AnalyzeResponse["feasibility"]["decision"]): string {
@@ -213,6 +239,62 @@ function supportStatusTone(status?: IntakeResponse["supportStatus"]): string {
   return "border-emerald-200 bg-emerald-50 text-emerald-900";
 }
 
+function coverageLabel(status?: CoverageStatus | null): string {
+  switch (status) {
+    case "public_supported":
+      return "Public supported";
+    case "qa_ready":
+      return "QA ready";
+    case "source_indexed":
+      return "Sources indexed";
+    case "source_discovery":
+      return "Source discovery";
+    default:
+      return "Not covered";
+  }
+}
+
+function coverageTone(status?: CoverageStatus | null): string {
+  if (status === "public_supported") {
+    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+  }
+  if (status === "qa_ready" || status === "source_indexed") {
+    return "border-amber-200 bg-amber-50 text-amber-900";
+  }
+  return "border-slate-200 bg-slate-50 text-slate-700";
+}
+
+function legalCopy(page: Exclude<LegalPage, null>): { title: string; paragraphs: string[] } {
+  if (page === "privacy") {
+    return {
+      title: "Privacy Policy",
+      paragraphs: [
+        "We store account identity, project addresses, project descriptions, generated analyses, feedback, and jurisdiction support requests so users can return to their work and so we can improve coverage.",
+        "Do not submit confidential legal, financial, medical, or highly sensitive personal information. You can request deletion of stored project data by contacting the app operator.",
+        "Operational logs may include timestamps, route names, and non-secret status information. Access tokens, passwords, and beta keys should never be logged or printed.",
+      ],
+    };
+  }
+  if (page === "terms") {
+    return {
+      title: "Terms of Use",
+      paragraphs: [
+        "This application provides educational zoning guidance and workflow support. It is not a law firm, government office, permit issuer, or substitute for professional advice.",
+        "Users are responsible for verifying every zoning conclusion, permit requirement, and citation with the official planning, building, health, or fire authority before taking action.",
+        "Coverage can change as local codes, maps, source availability, and QA status change. The product may decline to answer when source coverage is incomplete.",
+      ],
+    };
+  }
+  return {
+    title: "Disclaimer",
+    paragraphs: [
+      "Zoning Review Platform is not legal advice and is not official municipal approval.",
+      "A result means the app found a source-backed educational interpretation. It does not grant permits, approvals, variances, inspections, licenses, or occupancy rights.",
+      "Always verify parcel zoning, overlays, permitted-use tables, recent amendments, and procedural requirements with the official planning office.",
+    ],
+  };
+}
+
 function intakeErrorMessage(intakeResult: IntakeResponse): string {
   if (intakeResult.supportStatus === "unsupported") {
     const jurisdiction = intakeResult.jurisdictionName ?? "this jurisdiction";
@@ -282,6 +364,20 @@ function buildChecklistDownload(
 }
 
 export function App() {
+  const [authSession, setAuthSession] = useState<Session | null>(null);
+  const [authLoading, setAuthLoading] = useState(authMode === "supabase");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const [projects, setProjects] = useState<ProjectSummary[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+  const [projectsMessage, setProjectsMessage] = useState("");
+  const [coverage, setCoverage] = useState<JurisdictionCoverage[]>([]);
+  const [coverageMessage, setCoverageMessage] = useState("");
+  const [legalPage, setLegalPage] = useState<LegalPage>(null);
+  const [jurisdictionRequestMessage, setJurisdictionRequestMessage] = useState("");
+  const [jurisdictionRequestSubmitting, setJurisdictionRequestSubmitting] = useState(false);
   const [betaAccessKey, setStoredBetaAccessKey] = useState(() => getBetaAccessKey());
   const [betaAccessInput, setBetaAccessInput] = useState("");
   const [betaAccessError, setBetaAccessError] = useState("");
@@ -315,6 +411,9 @@ export function App() {
   const [sourceForm, setSourceForm] = useState<SourceRegistryEntry>(emptySourceForm);
   const [sourceMessage, setSourceMessage] = useState("");
   const [sourceSaving, setSourceSaving] = useState(false);
+  const [jurisdictionRequests, setJurisdictionRequests] = useState<JurisdictionRequestSummary[]>([]);
+  const [jurisdictionRequestsLoading, setJurisdictionRequestsLoading] = useState(false);
+  const [jurisdictionRequestsMessage, setJurisdictionRequestsMessage] = useState("");
   const [reindexMessage, setReindexMessage] = useState("");
   const [importDirectory, setImportDirectory] = useState("");
   const [importing, setImporting] = useState(false);
@@ -323,6 +422,151 @@ export function App() {
   const [adminAccessInput, setAdminAccessInput] = useState("");
   const [adminAccessMessage, setAdminAccessMessage] = useState("");
   const addressSectionRef = useRef<HTMLDivElement | null>(null);
+  const isSupabaseAuthenticated = authMode !== "supabase" || Boolean(authSession);
+  const canUseBetaAccess = authMode === "beta" && (!requiresBetaAccess || Boolean(betaAccessKey));
+  const canLoadPrivateData =
+    authMode === "supabase" ? Boolean(authSession) : authMode === "beta" ? canUseBetaAccess : true;
+  const canUseAdminTools =
+    authMode === "supabase" ? currentUser?.role === "admin" : true;
+  const publicSupportedCoverage = useMemo(
+    () => coverage.filter((item) => item.coverageStatus === "public_supported"),
+    [coverage],
+  );
+  const indexedCoverage = useMemo(
+    () => coverage.filter((item) => item.coverageStatus === "source_indexed"),
+    [coverage],
+  );
+  const currentCoverage = useMemo(
+    () => coverage.find((item) => item.jurisdictionId === intake?.jurisdictionId),
+    [coverage, intake?.jurisdictionId],
+  );
+  const coverageByJurisdictionId = useMemo(
+    () => new Map(coverage.map((item) => [item.jurisdictionId, item])),
+    [coverage],
+  );
+  const coverageByJurisdictionName = useMemo(
+    () => new Map(coverage.map((item) => [item.name.toLowerCase(), item])),
+    [coverage],
+  );
+
+  useEffect(() => {
+    if (!supabase) {
+      setAuthLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) {
+        return;
+      }
+      const session = data.session;
+      setAuthSession(session);
+      setAuthToken(session?.access_token ?? "");
+      setAuthLoading(false);
+    });
+
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthSession(session);
+      setAuthToken(session?.access_token ?? "");
+      setCurrentUser(null);
+      setProjects([]);
+    });
+
+    return () => {
+      cancelled = true;
+      subscription.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadCoverage() {
+      try {
+        const items = await fetchJurisdictionCoverage();
+        if (!cancelled) {
+          setCoverage(items);
+          setCoverageMessage("");
+        }
+      } catch (coverageError) {
+        if (!cancelled) {
+          setCoverageMessage(
+            coverageError instanceof Error ? coverageError.message : "Coverage could not be loaded.",
+          );
+        }
+      }
+    }
+    loadCoverage();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!canLoadPrivateData) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadCurrentUser() {
+      try {
+        const user = await fetchCurrentUser();
+        if (!cancelled) {
+          setCurrentUser(user);
+        }
+      } catch {
+        if (!cancelled) {
+          setCurrentUser(null);
+        }
+      }
+    }
+
+    void loadCurrentUser();
+    return () => {
+      cancelled = true;
+    };
+  }, [canLoadPrivateData, authSession, betaAccessKey]);
+
+  useEffect(() => {
+    if (!canLoadPrivateData || !canUseAdminTools) {
+      setJurisdictionRequests([]);
+      setJurisdictionRequestsMessage("");
+      setJurisdictionRequestsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadJurisdictionRequests() {
+      try {
+        setJurisdictionRequestsLoading(true);
+        const summaries = await fetchJurisdictionRequestSummaries();
+        if (!cancelled) {
+          setJurisdictionRequests(summaries);
+          setJurisdictionRequestsMessage("");
+        }
+      } catch (requestError) {
+        if (!cancelled) {
+          setJurisdictionRequests([]);
+          setJurisdictionRequestsMessage(
+            requestError instanceof Error
+              ? requestError.message
+              : "Failed to load jurisdiction requests.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setJurisdictionRequestsLoading(false);
+        }
+      }
+    }
+
+    void loadJurisdictionRequests();
+    return () => {
+      cancelled = true;
+    };
+  }, [canLoadPrivateData, canUseAdminTools, authSession, betaAccessKey, adminAccessKey]);
 
   useEffect(() => {
     const trimmed = address.trim();
@@ -405,7 +649,7 @@ export function App() {
   }, [intake, result, phase]);
 
   useEffect(() => {
-    if (requiresBetaAccess && !betaAccessKey) {
+    if (!canLoadPrivateData) {
       return;
     }
 
@@ -439,7 +683,22 @@ export function App() {
     return () => {
       cancelled = true;
     };
-  }, [betaAccessKey]);
+  }, [canLoadPrivateData, authSession, betaAccessKey]);
+
+  useEffect(() => {
+    if (authMode !== "supabase" || !authSession) {
+      setProjects([]);
+      return;
+    }
+
+    void refreshProjects();
+  }, [authSession]);
+
+  useEffect(() => {
+    if (workspace === "admin" && !canUseAdminTools) {
+      setWorkspace("assistant");
+    }
+  }, [workspace, canUseAdminTools]);
 
   const canSubmit = useMemo(
     () =>
@@ -523,6 +782,21 @@ export function App() {
     return issues;
   }, [indexStatus]);
 
+  function coverageForRequest(
+    request: JurisdictionRequestSummary,
+  ): JurisdictionCoverage | undefined {
+    if (request.jurisdictionId) {
+      const byId = coverageByJurisdictionId.get(request.jurisdictionId);
+      if (byId) {
+        return byId;
+      }
+    }
+    if (request.jurisdictionName) {
+      return coverageByJurisdictionName.get(request.jurisdictionName.toLowerCase());
+    }
+    return undefined;
+  }
+
   function selectSuggestion(option: string) {
     setAddress(option);
     setSuggestions([]);
@@ -570,6 +844,82 @@ export function App() {
     if (message) {
       setSourceMessage(message);
     }
+  }
+
+  async function refreshProjects(message?: string) {
+    if (authMode !== "supabase") {
+      return;
+    }
+    try {
+      setProjectsLoading(true);
+      const nextProjects = await listProjects();
+      setProjects(nextProjects);
+      if (message) {
+        setProjectsMessage(message);
+      }
+    } catch (projectError) {
+      setProjectsMessage(
+        projectError instanceof Error ? projectError.message : "Failed to load projects.",
+      );
+    } finally {
+      setProjectsLoading(false);
+    }
+  }
+
+  async function signIn() {
+    if (!supabase) {
+      setAuthMessage("Supabase is not configured for this deployment.");
+      return;
+    }
+    if (!authEmail.trim() || !authPassword) {
+      setAuthMessage("Enter your email and password.");
+      return;
+    }
+
+    setAuthLoading(true);
+    setAuthMessage("");
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: authEmail.trim(),
+      password: authPassword,
+    });
+    if (signInError) {
+      setAuthMessage(signInError.message);
+    }
+    setAuthLoading(false);
+  }
+
+  async function signUp() {
+    if (!supabase) {
+      setAuthMessage("Supabase is not configured for this deployment.");
+      return;
+    }
+    if (!authEmail.trim() || authPassword.length < 8) {
+      setAuthMessage("Enter an email and a password with at least 8 characters.");
+      return;
+    }
+
+    setAuthLoading(true);
+    setAuthMessage("");
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: authEmail.trim(),
+      password: authPassword,
+    });
+    setAuthMessage(
+      signUpError
+        ? signUpError.message
+        : "Account created. Check your email if confirmation is required, then sign in.",
+    );
+    setAuthLoading(false);
+  }
+
+  async function signOut() {
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
+    setAuthToken("");
+    setCurrentUser(null);
+    setProjects([]);
+    resetWorkspace();
   }
 
   function unlockPrivateBeta() {
@@ -646,6 +996,7 @@ export function App() {
     setFeedbackNote("");
     setFeedbackState("idle");
     setFeedbackMessage("");
+    setJurisdictionRequestMessage("");
     setResultView("checklist");
     setClarificationOpen(false);
     setClarificationQuestions([]);
@@ -668,7 +1019,14 @@ export function App() {
         return;
       }
 
+      if (intakeResult.supportStatus === "unsupported") {
+        setPhase("error");
+        setError(intakeErrorMessage(intakeResult));
+        return;
+      }
+
       await runAnalysis(intakeResult.projectId);
+      await refreshProjects();
     } catch (submitError) {
       setPhase("error");
       setError(
@@ -731,6 +1089,34 @@ export function App() {
         feedbackError instanceof Error
           ? feedbackError.message
           : "Feedback submission failed.",
+      );
+    }
+  }
+
+  async function openSavedProject(project: ProjectSummary) {
+    try {
+      setProjectsMessage("");
+      setWorkspace("assistant");
+      setPhase("done");
+      setError(null);
+      setProjectDescription("");
+      setAddress(project.normalizedAddress);
+      setIntake({
+        projectId: project.projectId,
+        normalizedAddress: project.normalizedAddress,
+        district: project.district,
+        status: "created",
+        supportStatus: "supported",
+        jurisdictionId: project.jurisdictionId,
+        jurisdictionName: project.jurisdictionName,
+        followUpQuestions: [],
+      });
+      const savedResult = await fetchProjectResult(project.projectId);
+      setResult(savedResult);
+      setResultView("checklist");
+    } catch (projectError) {
+      setProjectsMessage(
+        projectError instanceof Error ? projectError.message : "Failed to open saved project.",
       );
     }
   }
@@ -827,6 +1213,59 @@ export function App() {
     }
   }
 
+  async function onImportSourcePacks() {
+    try {
+      setImporting(true);
+      setImportMessage("");
+      const importResult = await importSourcePacks(importDirectory);
+      await refreshSources(
+        `Imported ${importResult.importedCount} source-pack record(s). ${importResult.sourceCount} sources now available.`,
+      );
+      setImportMessage(
+        importResult.importedSourceIds.length > 0
+          ? `Imported source packs: ${importResult.importedSourceIds.join(", ")}`
+          : "No source-pack records were imported.",
+      );
+    } catch (importError) {
+      setImportMessage(
+        importError instanceof Error
+          ? importError.message
+          : "Failed to import source packs.",
+      );
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  async function onRequestJurisdictionSupport() {
+    if (!intake || intake.supportStatus !== "unsupported") {
+      return;
+    }
+    try {
+      setJurisdictionRequestSubmitting(true);
+      setJurisdictionRequestMessage("");
+      const requestResult = await requestJurisdictionSupport({
+        normalizedAddress: intake.normalizedAddress,
+        jurisdictionId: intake.jurisdictionId,
+        jurisdictionName: intake.jurisdictionName,
+        requestedUseType: intakeFacts.useType || null,
+      });
+      setJurisdictionRequestMessage(
+        requestResult.status === "existing"
+          ? `You're already on the request list for ${requestResult.jurisdictionName ?? "this jurisdiction"}.`
+          : `Request noted. ${requestResult.requestCount} request${requestResult.requestCount === 1 ? "" : "s"} logged for ${requestResult.jurisdictionName ?? "this jurisdiction"}.`,
+      );
+    } catch (requestError) {
+      setJurisdictionRequestMessage(
+        requestError instanceof Error
+          ? requestError.message
+          : "Failed to request jurisdiction support.",
+      );
+    } finally {
+      setJurisdictionRequestSubmitting(false);
+    }
+  }
+
   function loadSourceIntoForm(source: SourceRegistryEntry) {
     setWorkspace("admin");
     setSourceForm(source);
@@ -848,6 +1287,7 @@ export function App() {
     setFeedbackNote("");
     setFeedbackState("idle");
     setFeedbackMessage("");
+    setJurisdictionRequestMessage("");
     setResultView("checklist");
     setClarificationOpen(false);
     setClarificationQuestions([]);
@@ -857,7 +1297,154 @@ export function App() {
   const showHumanFallback =
     result?.status === "low_confidence" || result?.feasibility.decision === "unknown";
 
-  if (requiresBetaAccess && !betaAccessKey) {
+  if (authMode === "supabase" && (authLoading || !isSupabaseAuthenticated)) {
+    const legal = legalPage ? legalCopy(legalPage) : null;
+    return (
+      <main className="min-h-screen bg-[linear-gradient(180deg,#f8f3ea_0%,#efe5d5_100%)] px-4 py-6 text-slate-900 md:px-8">
+        <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[minmax(0,1.2fr)_420px]">
+          <section className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+              Public Zoning Guidance
+            </p>
+            <h1 className="mt-3 font-heading text-4xl leading-tight text-pine md:text-5xl">
+              Zoning Review Platform
+            </h1>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700">
+              Check whether a proposed project has source-backed zoning guidance, get a permit
+              checklist, and request coverage when your jurisdiction is not ready yet.
+            </p>
+            <div className="mt-6 grid gap-3 md:grid-cols-3">
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-950">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em]">Supported</p>
+                <p className="mt-2 text-2xl font-semibold">{publicSupportedCoverage.length}</p>
+                <p className="mt-1 text-xs leading-5">Public jurisdictions with QA-backed answers.</p>
+              </div>
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em]">Indexed</p>
+                <p className="mt-2 text-2xl font-semibold">{indexedCoverage.length}</p>
+                <p className="mt-1 text-xs leading-5">Source packs being prepared for QA.</p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-slate-700">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em]">US Coverage</p>
+                <p className="mt-2 text-2xl font-semibold">Request-led</p>
+                <p className="mt-1 text-xs leading-5">Unsupported places become backlog signals.</p>
+              </div>
+            </div>
+            <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Current Coverage
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {coverage.slice(0, 8).map((item) => (
+                  <span
+                    key={item.jurisdictionId}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold ${coverageTone(item.coverageStatus)}`}
+                  >
+                    {item.name}: {coverageLabel(item.coverageStatus)}
+                  </span>
+                ))}
+                {coverageMessage && (
+                  <span className="text-sm text-slate-600">{coverageMessage}</span>
+                )}
+              </div>
+            </div>
+            <p className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+              {DISCLAIMER}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3 text-sm font-semibold text-slate-600">
+              <button type="button" onClick={() => setLegalPage("terms")}>Terms</button>
+              <button type="button" onClick={() => setLegalPage("privacy")}>Privacy</button>
+              <button type="button" onClick={() => setLegalPage("disclaimer")}>Disclaimer</button>
+            </div>
+          </section>
+
+          <section className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+              Account Access
+            </p>
+            <h2 className="mt-3 font-heading text-3xl text-pine">Sign in to start</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Save reviews, reopen prior projects, and request support for uncovered jurisdictions.
+            </p>
+            <label className="mt-6 block text-sm font-semibold text-slate-700">
+              Email
+              <input
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-clay focus:ring-2 focus:ring-clay"
+                type="email"
+                value={authEmail}
+                onChange={(event) => setAuthEmail(event.target.value)}
+              />
+            </label>
+            <label className="mt-4 block text-sm font-semibold text-slate-700">
+              Password
+              <input
+                className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-clay focus:ring-2 focus:ring-clay"
+                type="password"
+                value={authPassword}
+                onChange={(event) => setAuthPassword(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    void signIn();
+                  }
+                }}
+              />
+            </label>
+            {authMessage && (
+              <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                {authMessage}
+              </p>
+            )}
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => {
+                  void signIn();
+                }}
+                disabled={authLoading}
+                className="rounded-2xl bg-pine px-4 py-3 font-semibold text-white disabled:opacity-60"
+              >
+                {authLoading ? "Signing in..." : "Sign in"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  void signUp();
+                }}
+                disabled={authLoading}
+                className="rounded-2xl border border-slate-300 px-4 py-3 font-semibold text-slate-700 disabled:opacity-60"
+              >
+                Create account
+              </button>
+            </div>
+          </section>
+        </div>
+        {legal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+            <section className="w-full max-w-2xl rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                Public Disclosure
+              </p>
+              <h2 className="mt-2 font-heading text-3xl text-pine">{legal.title}</h2>
+              <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
+                {legal.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setLegalPage(null)}
+                className="mt-6 rounded-2xl bg-pine px-4 py-3 font-semibold text-white"
+              >
+                Close
+              </button>
+            </section>
+          </div>
+        )}
+      </main>
+    );
+  }
+
+  if (authMode === "beta" && requiresBetaAccess && !betaAccessKey) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,#f8f3ea_0%,#efe5d5_100%)] px-4 text-slate-900">
         <section className="w-full max-w-md rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
@@ -933,19 +1520,42 @@ export function App() {
               >
                 Assistant
               </button>
-              <button
-                type="button"
-                onClick={() => setWorkspace("admin")}
-                className={`flex-1 rounded-2xl px-4 py-3 text-sm font-semibold ${
-                  workspace === "admin"
-                    ? "bg-clay text-white"
-                    : "border border-slate-300 bg-white text-slate-700"
-                }`}
-              >
-                Source Admin
-              </button>
+              {canUseAdminTools && (
+                <button
+                  type="button"
+                  onClick={() => setWorkspace("admin")}
+                  className={`flex-1 rounded-2xl px-4 py-3 text-sm font-semibold ${
+                    workspace === "admin"
+                      ? "bg-clay text-white"
+                      : "border border-slate-300 bg-white text-slate-700"
+                  }`}
+                >
+                  Source Admin
+                </button>
+              )}
             </div>
-            {requiresBetaAccess && (
+            {authMode === "supabase" && (
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+                <p className="font-semibold text-slate-900">
+                  {currentUser?.email ?? authSession?.user.email ?? "Signed in"}
+                </p>
+                <div className="mt-2 flex items-center justify-between gap-3">
+                  <span className="text-xs uppercase tracking-[0.16em] text-slate-500">
+                    {currentUser?.role ?? "user"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void signOut();
+                    }}
+                    className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              </div>
+            )}
+            {authMode === "beta" && requiresBetaAccess && (
               <button
                 type="button"
                 onClick={changePrivateBetaKey}
@@ -1115,9 +1725,14 @@ export function App() {
                 </div>
 
                 <div ref={addressSectionRef}>
-                  <label className="block text-sm font-semibold text-slate-700" htmlFor="address">
-                    Property address
-                  </label>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-slate-700" htmlFor="address">
+                      Property address
+                    </label>
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
+                      US addresses accepted; answers only where coverage is public-supported
+                    </span>
+                  </div>
                   <input
                     id="address"
                     className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50/50 px-4 py-3 text-sm outline-none transition focus:border-clay focus:ring-2 focus:ring-clay"
@@ -1127,6 +1742,24 @@ export function App() {
                     placeholder="123 Main St, Blacksburg, VA"
                     autoComplete="off"
                   />
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {publicSupportedCoverage.slice(0, 4).map((item) => (
+                      <span
+                        key={item.jurisdictionId}
+                        className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900"
+                      >
+                        {item.name}
+                      </span>
+                    ))}
+                    {indexedCoverage.slice(0, 3).map((item) => (
+                      <span
+                        key={item.jurisdictionId}
+                        className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900"
+                      >
+                        {item.name} source-indexed
+                      </span>
+                    ))}
+                  </div>
 
                   {suggestionLoading && (
                     <p className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -1181,7 +1814,37 @@ export function App() {
 
                 {error && (
                   <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-                    {error}
+                    <p>{error}</p>
+                    {intake?.supportStatus === "unsupported" && (
+                      <div className="mt-4 rounded-2xl border border-amber-200 bg-white/80 p-4 text-amber-950">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em]">
+                          Request Coverage
+                        </p>
+                        <p className="mt-2 leading-6">
+                          We recognize {intake.jurisdictionName ?? "this jurisdiction"}, but it
+                          is {coverageLabel(intake.coverageStatus)} rather than public-supported.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            void onRequestJurisdictionSupport();
+                          }}
+                          disabled={jurisdictionRequestSubmitting || authMode !== "supabase"}
+                          className="mt-3 rounded-2xl bg-pine px-4 py-3 font-semibold text-white disabled:opacity-60"
+                        >
+                          {jurisdictionRequestSubmitting ? "Requesting..." : "Request support"}
+                        </button>
+                        {authMode !== "supabase" && (
+                          <p className="mt-2 text-xs leading-5">
+                            Sign-in mode records demand by user; beta/local mode does not submit
+                            coverage requests.
+                          </p>
+                        )}
+                        {jurisdictionRequestMessage && (
+                          <p className="mt-2 text-sm leading-6">{jurisdictionRequestMessage}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1613,6 +2276,56 @@ export function App() {
             </section>
 
             <aside className="space-y-5 xl:sticky xl:top-5 xl:self-start">
+              {authMode === "supabase" && (
+                <section className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                      Saved Projects
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void refreshProjects();
+                      }}
+                      className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500"
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    {projectsLoading ? (
+                      <p className="text-sm text-slate-600">Loading projects...</p>
+                    ) : projects.length > 0 ? (
+                      projects.slice(0, 6).map((project) => (
+                        <button
+                          key={project.projectId}
+                          type="button"
+                          onClick={() => {
+                            void openSavedProject(project);
+                          }}
+                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-clay"
+                        >
+                          <p className="text-sm font-semibold text-slate-900">
+                            {project.normalizedAddress}
+                          </p>
+                          <p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-500">
+                            {project.jurisdictionName ?? project.jurisdictionId ?? "Unknown"} ·{" "}
+                            {project.decision ? decisionLabel(project.decision) : project.status}
+                          </p>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-sm leading-6 text-slate-600">
+                        Saved zoning reviews will appear here after your first run.
+                      </p>
+                    )}
+                    {projectsMessage && (
+                      <p className="text-sm leading-6 text-slate-600">{projectsMessage}</p>
+                    )}
+                  </div>
+                </section>
+              )}
+
               <section className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
                   Case Snapshot
@@ -1640,8 +2353,29 @@ export function App() {
                         {intake.jurisdictionName ?? intake.jurisdictionId ?? "Unknown jurisdiction"}
                       </p>
                       <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-80">
+                        {coverageLabel(intake.coverageStatus ?? currentCoverage?.coverageStatus)}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
+                        Coverage Trust
+                      </p>
+                      <p className="mt-2 text-sm font-semibold text-slate-900">
                         {supportStatusLabel(intake.supportStatus)}
                       </p>
+                      <p className="mt-2 text-xs leading-5 text-slate-600">
+                        Last verified: {currentCoverage?.lastVerifiedAt ?? "Not recorded"}
+                      </p>
+                      {(intake.planningContact?.url || currentCoverage?.planningContact.url) && (
+                        <a
+                          className="mt-3 inline-flex text-sm font-semibold text-clay underline-offset-2 hover:underline"
+                          href={intake.planningContact?.url ?? currentCoverage?.planningContact.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Planning office
+                        </a>
+                      )}
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -1721,6 +2455,15 @@ export function App() {
                     <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Sources</p>
                     <p className="mt-2 text-2xl font-semibold text-pine">
                       {indexStatus?.sourceCount ?? sources.length}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Source Packs</p>
+                    <p className="mt-2 text-2xl font-semibold text-pine">
+                      {indexStatus?.sourcePackCount ?? 0}
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-slate-600">
+                      {(indexStatus?.sourcePackJurisdictionIds ?? []).join(", ") || "No packs found"}
                     </p>
                   </div>
                   <div
@@ -1810,6 +2553,81 @@ export function App() {
                     </div>
                   </div>
                 )}
+              </div>
+
+              <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                      Demand Backlog
+                    </p>
+                    <h2 className="mt-2 font-heading text-2xl text-pine">
+                      Jurisdiction Requests
+                    </h2>
+                  </div>
+                  <span className="rounded-full bg-mist px-3 py-1 text-xs font-semibold text-pine">
+                    {jurisdictionRequests.length} queued
+                  </span>
+                </div>
+                <div className="mt-5 space-y-3">
+                  {jurisdictionRequestsLoading ? (
+                    <p className="text-sm text-slate-600">Loading request backlog...</p>
+                  ) : jurisdictionRequestsMessage ? (
+                    <p className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+                      {jurisdictionRequestsMessage}
+                    </p>
+                  ) : jurisdictionRequests.length === 0 ? (
+                    <p className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+                      No jurisdiction requests have been logged yet.
+                    </p>
+                  ) : (
+                    jurisdictionRequests.map((request) => {
+                      const matchedCoverage = coverageForRequest(request);
+                      const coverageStatus = matchedCoverage?.coverageStatus;
+                      const title =
+                        request.jurisdictionName ??
+                        request.jurisdictionId ??
+                        "Unknown jurisdiction";
+                      return (
+                        <article
+                          key={`${request.jurisdictionId ?? "unknown"}-${request.jurisdictionName ?? "unnamed"}-${request.state ?? "na"}`}
+                          className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="font-semibold text-slate-900">{title}</p>
+                              <p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-500">
+                                {formatLocationParts(
+                                  request.state,
+                                  request.county,
+                                  request.locality,
+                                )}
+                              </p>
+                            </div>
+                            <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700">
+                              {request.requestCount} request
+                              {request.requestCount === 1 ? "" : "s"}
+                            </span>
+                          </div>
+                          <div className="mt-4 flex flex-wrap items-center gap-2">
+                            <span
+                              className={`rounded-full border px-3 py-1 text-xs font-semibold ${
+                                matchedCoverage
+                                  ? coverageTone(coverageStatus)
+                                  : "border-slate-200 bg-white text-slate-600"
+                              }`}
+                            >
+                              {matchedCoverage ? coverageLabel(coverageStatus) : "Coverage unknown"}
+                            </span>
+                            <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
+                              Last requested {formatDateTime(request.lastRequestedAt)}
+                            </span>
+                          </div>
+                        </article>
+                      );
+                    })
+                  )}
+                </div>
               </div>
 
               <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
@@ -2011,6 +2829,16 @@ export function App() {
                   <button
                     type="button"
                     onClick={() => {
+                      void onImportSourcePacks();
+                    }}
+                    disabled={importing}
+                    className="rounded-2xl bg-clay px-4 py-3 font-semibold text-white disabled:opacity-60"
+                  >
+                    Import source packs
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
                       void onReindexSources();
                     }}
                     className="rounded-2xl border border-slate-300 px-4 py-3 font-semibold text-slate-700"
@@ -2100,7 +2928,42 @@ export function App() {
             </div>
           </section>
         )}
+        <footer className="mt-8 flex flex-wrap gap-4 border-t border-pine/10 pt-5 text-sm font-semibold text-slate-500">
+          <button type="button" onClick={() => setLegalPage("terms")}>Terms</button>
+          <button type="button" onClick={() => setLegalPage("privacy")}>Privacy</button>
+          <button type="button" onClick={() => setLegalPage("disclaimer")}>Disclaimer</button>
+        </footer>
       </div>
+
+      {legalPage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
+          <section className="w-full max-w-2xl rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
+            {(() => {
+              const legal = legalCopy(legalPage);
+              return (
+                <>
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                    Public Disclosure
+                  </p>
+                  <h2 className="mt-2 font-heading text-3xl text-pine">{legal.title}</h2>
+                  <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
+                    {legal.paragraphs.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
+            <button
+              type="button"
+              onClick={() => setLegalPage(null)}
+              className="mt-6 rounded-2xl bg-pine px-4 py-3 font-semibold text-white"
+            >
+              Close
+            </button>
+          </section>
+        </div>
+      )}
 
       {clarificationOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">

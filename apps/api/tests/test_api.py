@@ -1,21 +1,82 @@
 from __future__ import annotations
 
 import shutil
+import base64
+import hashlib
+import hmac
+import json
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
 
+from app.models import AnalyzeResult, Checklist, Feasibility, ProjectRecord, UserRecord
 from app.main import app
 from app.storage import store
 
 
 @pytest.fixture(autouse=True)
 def clear_store(monkeypatch: pytest.MonkeyPatch) -> None:
-    for name in ["BETA_ACCESS_KEY", "BETA_ACCESS_KEYS", "ADMIN_ACCESS_KEY"]:
+    for name in [
+        "BETA_ACCESS_KEY",
+        "BETA_ACCESS_KEYS",
+        "ADMIN_ACCESS_KEY",
+        "AUTH_PROVIDER",
+        "AUTH_REQUIRED",
+        "SUPABASE_JWT_SECRET",
+        "ADMIN_USER_EMAILS",
+        "DAILY_ANALYSIS_LIMIT_FREE",
+        "DAILY_PROJECT_LIMIT_FREE",
+    ]:
         monkeypatch.delenv(name, raising=False)
     store.reset()
+
+
+def _jwt(
+    subject: str,
+    *,
+    email: str = "user@example.com",
+    secret: str = "test-secret",
+    role: str | None = "authenticated",
+    app_metadata: dict | None = None,
+    user_metadata: dict | None = None,
+) -> str:
+    header = {"alg": "HS256", "typ": "JWT"}
+    payload = {
+        "sub": subject,
+        "email": email,
+        "exp": int(time.time()) + 3600,
+    }
+    if role is not None:
+        payload["role"] = role
+    if app_metadata is not None:
+        payload["app_metadata"] = app_metadata
+    if user_metadata is not None:
+        payload["user_metadata"] = user_metadata
+
+    def encode(value: dict) -> str:
+        raw = json.dumps(value, separators=(",", ":")).encode("utf-8")
+        return base64.urlsafe_b64encode(raw).decode("utf-8").rstrip("=")
+
+    signing_input = f"{encode(header)}.{encode(payload)}"
+    signature = hmac.new(secret.encode("utf-8"), signing_input.encode("utf-8"), hashlib.sha256).digest()
+    encoded_signature = base64.urlsafe_b64encode(signature).decode("utf-8").rstrip("=")
+    return f"{signing_input}.{encoded_signature}"
+
+
+def _auth_headers(user_id: str, *, email: str = "user@example.com", **jwt_kwargs) -> dict[str, str]:
+    return {"Authorization": f"Bearer {_jwt(user_id, email=email, **jwt_kwargs)}"}
+
+
+def _enable_auth(monkeypatch: pytest.MonkeyPatch, *, admin_emails: str = "") -> None:
+    monkeypatch.setenv("AUTH_PROVIDER", "supabase")
+    monkeypatch.setenv("AUTH_REQUIRED", "true")
+    monkeypatch.setenv("SUPABASE_JWT_SECRET", "test-secret")
+    if admin_emails:
+        monkeypatch.setenv("ADMIN_USER_EMAILS", admin_emails)
 
 
 def test_intake_missing_google_key_returns_503(monkeypatch):
@@ -106,6 +167,70 @@ def test_beta_access_keys_preserve_single_key_compatibility(monkeypatch):
     assert new_response.status_code == 200
 
 
+def test_auth_required_accepts_supabase_jwt(monkeypatch):
+    _enable_auth(monkeypatch)
+    client = TestClient(app)
+
+    missing_response = client.post("/api/v1/sessions")
+    invalid_response = client.post(
+        "/api/v1/sessions",
+        headers={"Authorization": f"Bearer {_jwt('user-1', secret='wrong-secret')}"},
+    )
+    accepted_response = client.post("/api/v1/sessions", headers=_auth_headers("user-1"))
+    me_response = client.get("/api/v1/me", headers=_auth_headers("user-1"))
+
+    assert missing_response.status_code == 401
+    assert invalid_response.status_code == 403
+    assert accepted_response.status_code == 200
+    assert me_response.status_code == 200
+    assert me_response.json()["user_id"] == "user-1"
+    assert me_response.json()["role"] == "user"
+    assert store.get_user("user-1") is not None
+
+
+def test_user_metadata_admin_role_is_not_trusted(monkeypatch):
+    _enable_auth(monkeypatch)
+    client = TestClient(app)
+
+    response = client.post(
+        "/api/v1/ingestion/reindex",
+        headers=_auth_headers("user-1", user_metadata={"role": "admin"}),
+    )
+
+    assert response.status_code == 403
+    assert store.get_user("user-1").role == "user"
+
+
+def test_disabled_user_cannot_authenticate(monkeypatch):
+    _enable_auth(monkeypatch)
+    disabled_at = datetime.now(timezone.utc)
+    store.upsert_user(
+        UserRecord(
+            user_id="user-1",
+            email="user@example.com",
+            role="user",
+            disabled_at=disabled_at,
+        )
+    )
+    client = TestClient(app)
+
+    response = client.get("/api/v1/me", headers=_auth_headers("user-1"))
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "User account is disabled."
+    assert store.get_user("user-1").disabled_at is not None
+
+
+def test_auth_required_allows_legacy_beta_key_when_configured(monkeypatch):
+    _enable_auth(monkeypatch)
+    monkeypatch.setenv("BETA_ACCESS_KEY", "legacy-key")
+    client = TestClient(app)
+
+    response = client.post("/api/v1/sessions", headers={"X-Beta-Access-Key": "legacy-key"})
+
+    assert response.status_code == 200
+
+
 def test_admin_access_key_protects_source_write_routes(monkeypatch):
     monkeypatch.setenv("BETA_ACCESS_KEY", "beta-key")
     monkeypatch.setenv("ADMIN_ACCESS_KEY", "admin-key")
@@ -129,6 +254,50 @@ def test_admin_access_key_protects_source_write_routes(monkeypatch):
     assert missing_admin_response.status_code == 401
     assert wrong_admin_response.status_code == 403
     assert accepted_response.status_code == 200
+
+
+def test_auth_admin_role_can_reindex_without_admin_key(monkeypatch):
+    _enable_auth(monkeypatch, admin_emails="admin@example.com")
+    client = TestClient(app)
+
+    response = client.post(
+        "/api/v1/ingestion/reindex",
+        headers=_auth_headers("admin-1", email="admin@example.com"),
+    )
+
+    assert response.status_code == 200
+
+
+def test_normal_auth_user_cannot_reindex(monkeypatch):
+    _enable_auth(monkeypatch)
+    client = TestClient(app)
+
+    response = client.post("/api/v1/ingestion/reindex", headers=_auth_headers("user-1"))
+
+    assert response.status_code == 403
+
+
+def test_project_list_requires_authenticated_user(monkeypatch):
+    store.create_project(
+        ProjectRecord(
+            session_id=uuid4(),
+            user_id="user-1",
+            project_description="Convert garage to bakery.",
+            input_address="123 Main St",
+            normalized_address="123 Main St, Blacksburg, VA",
+            district="mixed-use-core",
+        )
+    )
+    client = TestClient(app)
+
+    anonymous_response = client.get("/api/v1/projects")
+
+    _enable_auth(monkeypatch)
+    monkeypatch.setenv("BETA_ACCESS_KEY", "legacy-key")
+    beta_response = client.get("/api/v1/projects", headers={"X-Beta-Access-Key": "legacy-key"})
+
+    assert anonymous_response.status_code == 401
+    assert beta_response.status_code == 401
 
 
 def test_intake_invalid_address_returns_invalid_status(monkeypatch):
@@ -203,6 +372,163 @@ def test_intake_success_persists_geodata(monkeypatch):
     assert project is not None
     assert project.place_id == "place-123"
     assert project.jurisdiction_id is None
+
+
+def test_authenticated_projects_are_owned_and_listed(monkeypatch):
+    _enable_auth(monkeypatch)
+    client = TestClient(app)
+
+    from app import services
+
+    def fake_normalize(_: str):
+        return services.AddressNormalizationResult(
+            normalized_address="123 Main St, Springfield",
+            district="mixed-use-core",
+            place_id="place-123",
+            latitude=40.0,
+            longitude=-74.0,
+            is_valid=True,
+            warnings=[],
+        )
+
+    monkeypatch.setattr("app.routers.api.normalize_address", fake_normalize)
+
+    headers = _auth_headers("user-1")
+    intake_response = client.post(
+        "/api/v1/projects/intake",
+        headers=headers,
+        json={
+            "session_id": str(uuid4()),
+            "project_description": "Convert garage to bakery with two employees and set operating hours.",
+            "address": "123 Main St",
+        },
+    )
+    assert intake_response.status_code == 200
+    project_id = intake_response.json()["project_id"]
+
+    project = store.get_project(UUID(project_id))
+    assert project is not None
+    assert project.user_id == "user-1"
+
+    owner_list_response = client.get("/api/v1/projects", headers=headers)
+    other_list_response = client.get("/api/v1/projects", headers=_auth_headers("user-2"))
+    other_result_response = client.get(
+        f"/api/v1/projects/{project_id}/result",
+        headers=_auth_headers("user-2"),
+    )
+
+    assert owner_list_response.status_code == 200
+    assert len(owner_list_response.json()["projects"]) == 1
+    assert other_list_response.status_code == 200
+    assert other_list_response.json()["projects"] == []
+    assert other_result_response.status_code == 404
+
+
+def test_admin_analysis_preserves_project_owner(monkeypatch):
+    _enable_auth(monkeypatch, admin_emails="admin@example.com")
+    client = TestClient(app)
+    project = ProjectRecord(
+        session_id=uuid4(),
+        user_id="user-1",
+        project_description="Convert garage to bakery.",
+        input_address="123 Main St",
+        normalized_address="123 Main St, Blacksburg, VA",
+        district="mixed-use-core",
+        jurisdiction_id="blacksburg-va",
+        jurisdiction_name="Blacksburg, VA",
+    )
+    store.create_project(project)
+
+    def fake_analyze_project(**_):
+        return AnalyzeResult(
+            status="success",
+            trace_id="trace-123",
+            feasibility=Feasibility(
+                decision="conditional",
+                confidence=0.9,
+                summary="Planning review is likely required.",
+            ),
+            checklist=Checklist(steps=[], permits=[], documents=[], departments=[]),
+            citations=[],
+            disclaimers=[],
+            follow_up_questions=[],
+            warnings=[],
+        )
+
+    monkeypatch.setattr("app.routers.api.analyze_project", fake_analyze_project)
+
+    response = client.post(
+        f"/api/v1/projects/{project.project_id}/analyze",
+        headers=_auth_headers("admin-1", email="admin@example.com"),
+        json={"project_id": str(project.project_id), "clarification_answers": {}},
+    )
+
+    assert response.status_code == 200
+    analysis = store.get_analysis(project.project_id)
+    assert analysis is not None
+    assert analysis.user_id == "user-1"
+
+
+def test_daily_project_limit_returns_429(monkeypatch):
+    _enable_auth(monkeypatch)
+    monkeypatch.setenv("DAILY_PROJECT_LIMIT_FREE", "0")
+    client = TestClient(app)
+
+    response = client.post(
+        "/api/v1/projects/intake",
+        headers=_auth_headers("user-1"),
+        json={
+            "session_id": str(uuid4()),
+            "project_description": "Convert garage to bakery with two employees and set operating hours.",
+            "address": "123 Main St",
+        },
+    )
+
+    assert response.status_code == 429
+
+
+def test_jurisdiction_coverage_and_request_flow(monkeypatch):
+    _enable_auth(monkeypatch, admin_emails="admin@example.com")
+    client = TestClient(app)
+
+    coverage_response = client.get("/api/v1/jurisdictions/coverage")
+    request_response = client.post(
+        "/api/v1/jurisdiction-requests",
+        headers=_auth_headers("user-1"),
+        json={
+            "normalized_address": "1 Main St, Richmond, VA 23219",
+            "jurisdiction_id": "us-va-richmond-city-richmond",
+            "jurisdiction_name": "Richmond, VA",
+            "state": "VA",
+            "county": "Richmond City",
+            "locality": "Richmond",
+            "requested_use_type": "food-service",
+        },
+    )
+    duplicate_response = client.post(
+        "/api/v1/jurisdiction-requests",
+        headers=_auth_headers("user-1"),
+        json={
+            "normalized_address": "1 Main St, Richmond, VA 23219",
+            "jurisdiction_id": "us-va-richmond-city-richmond",
+            "jurisdiction_name": "Richmond, VA",
+        },
+    )
+    admin_response = client.get(
+        "/api/v1/admin/jurisdiction-requests",
+        headers=_auth_headers("admin-1", email="admin@example.com"),
+    )
+
+    assert coverage_response.status_code == 200
+    coverage = coverage_response.json()["jurisdictions"]
+    assert any(item["jurisdiction_id"] == "blacksburg-va" and item["coverage_status"] == "public_supported" for item in coverage)
+    assert any(item["jurisdiction_id"] == "christiansburg-va" and item["coverage_status"] == "source_indexed" for item in coverage)
+    assert request_response.status_code == 200
+    assert request_response.json()["status"] == "created"
+    assert duplicate_response.status_code == 200
+    assert duplicate_response.json()["status"] == "existing"
+    assert admin_response.status_code == 200
+    assert admin_response.json()["requests"][0]["request_count"] == 1
 
 
 def test_intake_recognized_unsupported_jurisdiction_returns_metadata(monkeypatch):

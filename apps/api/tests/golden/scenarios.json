@@ -28,6 +28,35 @@
     }
   },
   {
+    "id": "montgomery-county-home-bakery-conditional",
+    "project_description": "Convert part of a rural home into a small home bakery with two employees, posted operating hours, and interior renovation plans.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "montgomery-county-va",
+    "jurisdiction_name": "Montgomery County, VA",
+    "normalized_address": "755 Roanoke St, Christiansburg, VA 24073",
+    "sources": [
+      {
+        "source_id": "golden-montgomery-home-occupation",
+        "title": "Montgomery County Home Occupation Zoning Guidance",
+        "excerpt": "Home occupations in unincorporated Montgomery County must remain secondary to the residence, avoid exterior impacts, and food-preparation businesses should contact the Health Department about food service permit requirements.",
+        "section_ref": "Home Occupations; additional considerations",
+        "jurisdiction_id": "montgomery-county-va",
+        "url": "https://www.montgomerycountyva.gov/docs/default-source/planning-gis/applications-and-forms/zoning/home-occupation-form.pdf?sfvrsn=8068743c_4",
+        "effective_date": "2021-10",
+        "districts": ["residential-low-density"],
+        "uses": ["home-based-food-business", "general"]
+      }
+    ],
+    "expect": {
+      "decisions": ["likely_allowed", "conditional"],
+      "statuses": ["success"],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "christiansburg-va"]
+    }
+  },
+  {
     "id": "unsupported-jurisdiction-handoff",
     "project_description": "Open a small bakery with two employees, regular operating hours, and renovation plans.",
     "district": "unknown",
@@ -42,6 +71,42 @@
       "max_citations": 0,
       "jurisdiction_supported": false,
       "required_warning_substrings": ["not currently supported"]
+    }
+  },
+  {
+    "id": "roanoke-source-indexed-handoff",
+    "project_description": "Open a small cafe with two employees, posted operating hours, and interior renovation plans.",
+    "district": "unknown",
+    "jurisdiction_id": "roanoke-va",
+    "jurisdiction_name": "Roanoke, VA",
+    "normalized_address": "215 Church Ave SW, Roanoke, VA 24011",
+    "sources": [],
+    "expect": {
+      "decisions": ["unknown"],
+      "statuses": ["low_confidence"],
+      "min_citations": 0,
+      "max_citations": 0,
+      "jurisdiction_supported": false,
+      "required_warning_substrings": ["not currently supported"],
+      "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "montgomery-county-va"]
+    }
+  },
+  {
+    "id": "roanoke-county-source-indexed-handoff",
+    "project_description": "Open a small home bakery with two employees, posted operating hours, and interior renovation plans.",
+    "district": "unknown",
+    "jurisdiction_id": "roanoke-county-va",
+    "jurisdiction_name": "Roanoke County, VA",
+    "normalized_address": "5204 Bernard Dr, Roanoke, VA 24018",
+    "sources": [],
+    "expect": {
+      "decisions": ["unknown"],
+      "statuses": ["low_confidence"],
+      "min_citations": 0,
+      "max_citations": 0,
+      "jurisdiction_supported": false,
+      "required_warning_substrings": ["not currently supported"],
+      "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "montgomery-county-va"]
     }
   },
   {

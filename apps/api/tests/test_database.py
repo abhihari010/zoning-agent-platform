@@ -41,6 +41,10 @@ def test_sqlite_store_creates_foundation_tables_for_local_fallback(tmp_path) -> 
         "source_chunks",
         "beta_access_events",
         "jurisdictions",
+        "users",
+        "usage_events",
+        "usage_counters",
+        "jurisdiction_requests",
     }.issubset(table_names)
 
 

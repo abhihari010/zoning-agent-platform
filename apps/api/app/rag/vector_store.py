@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from app.ai.interfaces import EmbeddingProvider, EmbeddingProviderRequest
+from app.jurisdictions import get_jurisdiction_scope, source_applies_to_jurisdiction
 from app.models import SourceChunk
 from app.settings import Settings, get_settings
 
@@ -243,13 +244,23 @@ def _chunk_metadata(chunk: SourceChunk) -> dict[str, Any]:
         "chunk_id": chunk.chunk_id,
         "source_id": chunk.source_id,
         "jurisdiction_id": chunk.jurisdiction_id or "",
+        "jurisdiction_scope": chunk.metadata.get(
+            "jurisdiction_scope",
+            "global" if chunk.jurisdiction_id == "*" else "local",
+        ),
+        "state": chunk.metadata.get("state", ""),
+        "county": chunk.metadata.get("county", ""),
+        "municipality": chunk.metadata.get("municipality", ""),
         "source_type": chunk.source_type,
         "section_ref": chunk.section_ref,
+        "url": chunk.url or "",
         "effective_date": chunk.effective_date or "",
         "retrieved_at": chunk.retrieved_at or "",
         "districts": _list_filter_value(chunk.districts),
         "uses": _list_filter_value(chunk.uses),
         "source_version": chunk.source_version or "",
+        "content_hash": chunk.metadata.get("content_hash", chunk.source_text_hash),
+        "coverage_status": chunk.metadata.get("coverage_status", ""),
         "token_count": chunk.token_count,
     }
     for key, value in chunk.metadata.items():
@@ -261,8 +272,29 @@ def _chunk_metadata(chunk: SourceChunk) -> dict[str, Any]:
 def _build_chroma_where(filters: dict[str, Any]) -> dict[str, Any]:
     conditions: list[dict[str, Any]] = []
 
+    jurisdiction_id = filters.get("jurisdiction_id")
+    if jurisdiction_id:
+        jurisdiction_scope = get_jurisdiction_scope(str(jurisdiction_id))
+        jurisdiction_conditions: list[dict[str, Any]] = [
+            {"jurisdiction_id": {"$eq": jurisdiction_id}},
+        ]
+        if jurisdiction_scope and jurisdiction_scope.parent_jurisdiction_id:
+            jurisdiction_conditions.append(
+                {"jurisdiction_id": {"$eq": jurisdiction_scope.parent_jurisdiction_id}}
+            )
+        if jurisdiction_scope and jurisdiction_scope.state:
+            jurisdiction_conditions.append(
+                {
+                    "$and": [
+                        {"jurisdiction_id": {"$eq": "*"}},
+                        {"state": {"$eq": jurisdiction_scope.state}},
+                    ]
+                }
+            )
+        conditions.append({"$or": jurisdiction_conditions})
+
     # Exact-match filters
-    for key in ["jurisdiction_id", "source_id", "source_type", "source_version"]:
+    for key in ["source_id", "source_type", "source_version"]:
         value = filters.get(key)
         if value:
             conditions.append({key: {"$eq": value}})
@@ -306,6 +338,13 @@ def _build_chroma_where(filters: dict[str, Any]) -> dict[str, Any]:
 
 
 def _metadata_matches(metadata: dict[str, Any], filters: dict[str, Any]) -> bool:
+    jurisdiction_id = filters.get("jurisdiction_id")
+    if jurisdiction_id and not source_applies_to_jurisdiction(
+        source_jurisdiction_id=str(metadata.get("jurisdiction_id") or "") or None,
+        source_metadata=metadata,
+        target_jurisdiction_id=str(jurisdiction_id),
+    ):
+        return False
     district = filters.get("district")
     if district and district != "unknown" and not _list_value_contains(metadata.get("districts"), district, wildcard="*"):
         return False

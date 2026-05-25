@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.models import CitationValidationResult, SourceCitation
+from app.jurisdictions import source_applies_to_jurisdiction
 from app.repositories import StoreRepository
 
 
@@ -21,7 +22,7 @@ class CitationTool:
         if not citations:
             unsupported_claims.append("No retrieved source chunks are available for this analysis.")
 
-        known_sources = self._known_source_jurisdictions()
+        known_sources = self._known_sources()
         for citation in citations:
             if not citation.source_id:
                 invalid_ids.append("<missing>")
@@ -29,15 +30,20 @@ class CitationTool:
             if known_sources and citation.source_id not in known_sources:
                 invalid_ids.append(citation.source_id)
                 unsupported_claims.append(f"{citation.source_id} was not found in the local source registry.")
-            source_jurisdiction = known_sources.get(citation.source_id)
+            source = known_sources.get(citation.source_id)
+            source_jurisdiction = source.jurisdiction_id if source else citation.jurisdiction_id
+            source_metadata = source.metadata if source else citation.metadata
             if (
                 jurisdiction_id
-                and source_jurisdiction
-                and source_jurisdiction not in {jurisdiction_id, "*"}
+                and not source_applies_to_jurisdiction(
+                    source_jurisdiction_id=source_jurisdiction,
+                    source_metadata=source_metadata,
+                    target_jurisdiction_id=jurisdiction_id,
+                )
             ):
                 invalid_ids.append(citation.source_id)
                 unsupported_claims.append(
-                    f"{citation.source_id} belongs to {source_jurisdiction}, not {jurisdiction_id}."
+                    f"{citation.source_id} belongs to {source_jurisdiction or 'an unknown jurisdiction'}, not {jurisdiction_id}."
                 )
             if not citation.effective_date:
                 warnings.append(f"{citation.source_id} is missing an effective date.")
@@ -56,10 +62,10 @@ class CitationTool:
             jurisdiction_id=jurisdiction_id,
         )
 
-    def _known_source_jurisdictions(self) -> dict[str, str | None]:
+    def _known_sources(self):
         if not self.source_store:
             return {}
         return {
-            source.source_id: source.jurisdiction_id
+            source.source_id: source
             for source in self.source_store.list_sources()
         }

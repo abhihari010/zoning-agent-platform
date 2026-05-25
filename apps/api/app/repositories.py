@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Protocol
 from uuid import UUID
 
-from sqlalchemy import delete, desc, insert, select, text, update
+from sqlalchemy import delete, desc, func, insert, select, text, update
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import (
@@ -16,20 +16,33 @@ from app.database import (
     database_url_from_settings,
     feedback,
     is_sqlite_url,
+    jurisdiction_requests,
+    jurisdictions,
     metadata,
     projects,
+    sessions,
     source_chunks,
     sources,
+    usage_counters,
     sqlite_url_from_path,
+    usage_events,
+    users,
 )
 from app.models import (
     AnalysisRecord,
     AuditEvent,
     FeedbackRecord,
+    JurisdictionRecord,
+    JurisdictionRequestCreate,
+    JurisdictionRequestResponse,
+    JurisdictionRequestSummary,
+    ProjectSummary,
     ProjectRecord,
     SourceChunk,
     SourceRegistryEntry,
+    UserRecord,
 )
+from app.jurisdictions import source_applies_to_jurisdiction
 
 
 class DatabaseStorageError(RuntimeError):
@@ -43,15 +56,47 @@ class StoreRepository(Protocol):
 
     def get_project(self, project_id: UUID) -> ProjectRecord | None: ...
 
+    def list_projects(self, user_id: str | None = None) -> list[ProjectSummary]: ...
+
     def save_analysis(self, analysis: AnalysisRecord) -> AnalysisRecord: ...
 
     def get_analysis(self, project_id: UUID) -> AnalysisRecord | None: ...
 
     def get_audit_events(self, project_id: UUID) -> list[AuditEvent]: ...
 
-    def audit(self, stage: str, project_id: str, details: dict[str, Any] | None = None) -> None: ...
+    def audit(
+        self,
+        stage: str,
+        project_id: str,
+        details: dict[str, Any] | None = None,
+        user_id: str | None = None,
+    ) -> None: ...
 
     def save_feedback(self, feedback_record: FeedbackRecord) -> FeedbackRecord: ...
+
+    def upsert_user(self, user: UserRecord) -> UserRecord: ...
+
+    def get_user(self, user_id: str) -> UserRecord | None: ...
+
+    def record_usage(self, event_type: str, user_id: str | None = None) -> None: ...
+
+    def reserve_usage(self, event_type: str, user_id: str, usage_date: date, limit: int) -> bool: ...
+
+    def count_usage_since(self, event_type: str, since: datetime, user_id: str | None = None) -> int: ...
+
+    def upsert_jurisdiction(self, jurisdiction: JurisdictionRecord) -> JurisdictionRecord: ...
+
+    def list_jurisdictions(self) -> list[JurisdictionRecord]: ...
+
+    def get_jurisdiction(self, jurisdiction_id: str) -> JurisdictionRecord | None: ...
+
+    def save_jurisdiction_request(
+        self,
+        request: JurisdictionRequestCreate,
+        user_id: str | None = None,
+    ) -> JurisdictionRequestResponse: ...
+
+    def list_jurisdiction_request_summaries(self) -> list[JurisdictionRequestSummary]: ...
 
     def upsert_source(self, source: SourceRegistryEntry) -> SourceRegistryEntry: ...
 
@@ -108,6 +153,7 @@ class SQLAlchemyStore:
     def _ensure_sqlite_compatibility_columns(self) -> None:
         compatibility_columns = {
             "projects": {
+                "user_id": "VARCHAR(200)",
                 "project_description": "TEXT",
                 "input_address": "TEXT",
                 "normalized_address": "TEXT",
@@ -140,7 +186,30 @@ class SQLAlchemyStore:
                 "source_version": "VARCHAR(120)",
             },
             "audit_events": {
+                "user_id": "VARCHAR(200)",
                 "details_json": "JSON",
+            },
+            "sessions": {
+                "user_id": "VARCHAR(200)",
+            },
+            "analyses": {
+                "user_id": "VARCHAR(200)",
+                "created_at": "DATETIME",
+            },
+            "feedback": {
+                "user_id": "VARCHAR(200)",
+            },
+            "jurisdictions": {
+                "state_fips": "VARCHAR(10)",
+                "county_fips": "VARCHAR(10)",
+                "place_fips": "VARCHAR(10)",
+                "jurisdiction_type": "VARCHAR(50) DEFAULT 'unknown'",
+                "parent_jurisdiction_id": "VARCHAR(200)",
+                "coverage_status": "VARCHAR(50) DEFAULT 'unsupported'",
+                "official_source_urls_json": "JSON",
+                "zoning_map_url": "VARCHAR(2000)",
+                "planning_contact_json": "JSON",
+                "last_verified_at": "VARCHAR(80)",
             },
         }
         with self.engine.begin() as connection:
@@ -158,14 +227,27 @@ class SQLAlchemyStore:
     def reset(self) -> None:
         try:
             with self.engine.begin() as connection:
-                for table in [feedback, audit_events, analyses, projects, source_chunks, sources]:
+                for table in [
+                    usage_counters,
+                    usage_events,
+                    jurisdiction_requests,
+                    feedback,
+                    audit_events,
+                    analyses,
+                    projects,
+                    sessions,
+                    source_chunks,
+                    sources,
+                    jurisdictions,
+                    users,
+                ]:
                     connection.execute(delete(table))
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not reset database: {exc}") from exc
 
     def create_project(self, project: ProjectRecord) -> ProjectRecord:
         self._upsert_project(project)
-        self.audit("project.created", str(project.project_id))
+        self.audit("project.created", str(project.project_id), user_id=project.user_id)
         return project
 
     def _upsert_project(self, project: ProjectRecord) -> None:
@@ -174,6 +256,7 @@ class SQLAlchemyStore:
             with self.engine.begin() as connection:
                 values = {
                     "session_id": str(project.session_id),
+                    "user_id": project.user_id,
                     "project_description": project.project_description,
                     "input_address": project.input_address,
                     "normalized_address": project.normalized_address,
@@ -213,6 +296,45 @@ class SQLAlchemyStore:
             return None
         return ProjectRecord.model_validate(_coerce_payload(row.payload_json))
 
+    def list_projects(self, user_id: str | None = None) -> list[ProjectSummary]:
+        if user_id is None:
+            return []
+
+        try:
+            with self.engine.connect() as connection:
+                statement = (
+                    select(projects.c.payload_json, analyses.c.payload_json.label("analysis_json"))
+                    .select_from(
+                        projects.outerjoin(analyses, projects.c.project_id == analyses.c.project_id)
+                    )
+                    .order_by(projects.c.updated_at.desc())
+                )
+                statement = statement.where(projects.c.user_id == user_id)
+                rows = connection.execute(statement).all()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError("Could not list projects") from exc
+
+        summaries: list[ProjectSummary] = []
+        for row in rows:
+            project = ProjectRecord.model_validate(_coerce_payload(row.payload_json))
+            analysis_payload = _coerce_payload(row.analysis_json) if row.analysis_json else None
+            analysis = AnalysisRecord.model_validate(analysis_payload) if analysis_payload else None
+            summaries.append(
+                ProjectSummary(
+                    project_id=project.project_id,
+                    normalized_address=project.normalized_address,
+                    jurisdiction_id=project.jurisdiction_id,
+                    jurisdiction_name=project.jurisdiction_name,
+                    district=project.district,
+                    status=project.status,
+                    decision=analysis.result.feasibility.decision if analysis else None,
+                    confidence=analysis.result.feasibility.confidence if analysis else None,
+                    created_at=project.created_at,
+                    updated_at=project.updated_at,
+                )
+            )
+        return summaries
+
     def save_analysis(self, analysis: AnalysisRecord) -> AnalysisRecord:
         project = self.get_project(analysis.project_id)
         if project:
@@ -226,6 +348,7 @@ class SQLAlchemyStore:
                 connection.execute(
                     insert(analyses).values(
                         project_id=str(analysis.project_id),
+                        user_id=analysis.user_id,
                         payload_json=analysis.model_dump(mode="json"),
                         created_at=analysis.created_at,
                     )
@@ -233,7 +356,7 @@ class SQLAlchemyStore:
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not save analysis {analysis.project_id}: {exc}") from exc
 
-        self.audit("analysis.saved", str(analysis.project_id))
+        self.audit("analysis.saved", str(analysis.project_id), user_id=analysis.user_id)
         return analysis
 
     def get_analysis(self, project_id: UUID) -> AnalysisRecord | None:
@@ -256,6 +379,7 @@ class SQLAlchemyStore:
                     select(
                         audit_events.c.stage,
                         audit_events.c.project_id,
+                        audit_events.c.user_id,
                         audit_events.c.details_json,
                         audit_events.c.created_at,
                     )
@@ -269,19 +393,27 @@ class SQLAlchemyStore:
             AuditEvent(
                 stage=row.stage,
                 project_id=row.project_id,
+                user_id=row.user_id,
                 details=_coerce_payload(row.details_json) if row.details_json else {},
                 created_at=_coerce_datetime(row.created_at),
             )
             for row in rows
         ]
 
-    def audit(self, stage: str, project_id: str, details: dict[str, Any] | None = None) -> None:
-        event = AuditEvent(stage=stage, project_id=project_id, details=details or {})
+    def audit(
+        self,
+        stage: str,
+        project_id: str,
+        details: dict[str, Any] | None = None,
+        user_id: str | None = None,
+    ) -> None:
+        event = AuditEvent(stage=stage, project_id=project_id, details=details or {}, user_id=user_id)
         try:
             with self.engine.begin() as connection:
                 connection.execute(
                     insert(audit_events).values(
                         project_id=event.project_id,
+                        user_id=event.user_id,
                         stage=event.stage,
                         details_json=event.details,
                         created_at=event.created_at,
@@ -296,6 +428,7 @@ class SQLAlchemyStore:
                 connection.execute(
                     insert(feedback).values(
                         project_id=str(feedback_record.project_id),
+                        user_id=feedback_record.user_id,
                         helpful=feedback_record.helpful,
                         comment=feedback_record.comment,
                         created_at=feedback_record.created_at,
@@ -304,8 +437,295 @@ class SQLAlchemyStore:
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not save feedback {feedback_record.project_id}: {exc}") from exc
 
-        self.audit("feedback.saved", str(feedback_record.project_id))
+        self.audit("feedback.saved", str(feedback_record.project_id), user_id=feedback_record.user_id)
         return feedback_record
+
+    def upsert_user(self, user: UserRecord) -> UserRecord:
+        existing = self.get_user(user.user_id)
+        created_at = existing.created_at if existing else user.created_at
+        disabled_at = existing.disabled_at if existing and existing.disabled_at is not None else user.disabled_at
+        try:
+            with self.engine.begin() as connection:
+                values = {
+                    "email": user.email,
+                    "role": user.role,
+                    "created_at": created_at,
+                    "last_seen_at": user.last_seen_at,
+                    "disabled_at": disabled_at,
+                }
+                result = connection.execute(
+                    update(users).where(users.c.user_id == user.user_id).values(**values)
+                )
+                if result.rowcount == 0:
+                    connection.execute(insert(users).values(user_id=user.user_id, **values))
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not save user {user.user_id}: {exc}") from exc
+        return user.model_copy(update={"created_at": created_at, "disabled_at": disabled_at})
+
+    def get_user(self, user_id: str) -> UserRecord | None:
+        try:
+            with self.engine.connect() as connection:
+                row = connection.execute(select(users).where(users.c.user_id == user_id)).first()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not load user {user_id}: {exc}") from exc
+
+        if not row:
+            return None
+        data = row._mapping
+        return UserRecord(
+            user_id=data["user_id"],
+            email=data["email"],
+            role=data["role"],
+            created_at=_coerce_datetime(data["created_at"]),
+            last_seen_at=_coerce_datetime(data["last_seen_at"]),
+            disabled_at=_coerce_datetime(data["disabled_at"]) if data["disabled_at"] else None,
+        )
+
+    def record_usage(self, event_type: str, user_id: str | None = None) -> None:
+        try:
+            with self.engine.begin() as connection:
+                connection.execute(
+                    insert(usage_events).values(
+                        user_id=user_id,
+                        event_type=event_type,
+                        created_at=datetime.now(timezone.utc),
+                    )
+                )
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not record usage event {event_type}: {exc}") from exc
+
+    def reserve_usage(self, event_type: str, user_id: str, usage_date: date, limit: int) -> bool:
+        if limit == 0:
+            return False
+        if limit < 0:
+            self.record_usage(event_type, user_id=user_id)
+            return True
+
+        now = datetime.now(timezone.utc)
+        try:
+            with self.engine.begin() as connection:
+                result = connection.execute(
+                    text(
+                        """
+                        INSERT INTO usage_counters (
+                            user_id,
+                            event_type,
+                            usage_date,
+                            usage_count,
+                            updated_at
+                        )
+                        VALUES (
+                            :user_id,
+                            :event_type,
+                            :usage_date,
+                            1,
+                            :updated_at
+                        )
+                        ON CONFLICT (user_id, event_type, usage_date)
+                        DO UPDATE SET
+                            usage_count = usage_counters.usage_count + 1,
+                            updated_at = excluded.updated_at
+                        WHERE usage_counters.usage_count < :limit
+                        """
+                    ),
+                    {
+                        "user_id": user_id,
+                        "event_type": event_type,
+                        "usage_date": usage_date,
+                        "updated_at": now,
+                        "limit": limit,
+                    },
+                )
+                if result.rowcount == 0:
+                    return False
+
+                connection.execute(
+                    insert(usage_events).values(
+                        user_id=user_id,
+                        event_type=event_type,
+                        created_at=now,
+                    )
+                )
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not reserve usage event {event_type}: {exc}") from exc
+        return True
+
+    def count_usage_since(self, event_type: str, since: datetime, user_id: str | None = None) -> int:
+        try:
+            with self.engine.connect() as connection:
+                statement = select(func.count()).select_from(usage_events).where(
+                    usage_events.c.event_type == event_type,
+                    usage_events.c.created_at >= since,
+                )
+                if user_id is not None:
+                    statement = statement.where(usage_events.c.user_id == user_id)
+                count = connection.execute(statement).scalar_one()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not count usage event {event_type}: {exc}") from exc
+        return int(count)
+
+    def upsert_jurisdiction(self, jurisdiction: JurisdictionRecord) -> JurisdictionRecord:
+        now = datetime.now(timezone.utc)
+        payload = jurisdiction.model_dump(mode="json")
+        try:
+            with self.engine.begin() as connection:
+                existing = connection.execute(
+                    select(jurisdictions.c.created_at).where(
+                        jurisdictions.c.jurisdiction_id == jurisdiction.jurisdiction_id
+                    )
+                ).first()
+                values = {
+                    "name": jurisdiction.name,
+                    "state": jurisdiction.state,
+                    "state_fips": jurisdiction.state_fips,
+                    "county_fips": jurisdiction.county_fips,
+                    "place_fips": jurisdiction.place_fips,
+                    "jurisdiction_type": jurisdiction.jurisdiction_type,
+                    "parent_jurisdiction_id": jurisdiction.parent_jurisdiction_id,
+                    "coverage_status": jurisdiction.coverage_status,
+                    "supported": jurisdiction.supported,
+                    "official_source_urls_json": jurisdiction.official_source_urls,
+                    "zoning_map_url": jurisdiction.zoning_map_url,
+                    "planning_contact_json": jurisdiction.planning_contact,
+                    "last_verified_at": jurisdiction.last_verified_at,
+                    "payload_json": payload,
+                    "updated_at": now,
+                }
+                if existing:
+                    connection.execute(
+                        update(jurisdictions)
+                        .where(jurisdictions.c.jurisdiction_id == jurisdiction.jurisdiction_id)
+                        .values(**values)
+                    )
+                else:
+                    connection.execute(
+                        insert(jurisdictions).values(
+                            jurisdiction_id=jurisdiction.jurisdiction_id,
+                            created_at=now,
+                            **values,
+                        )
+                    )
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(
+                f"Could not save jurisdiction {jurisdiction.jurisdiction_id}: {exc}"
+            ) from exc
+        return jurisdiction
+
+    def list_jurisdictions(self) -> list[JurisdictionRecord]:
+        try:
+            with self.engine.connect() as connection:
+                rows = connection.execute(
+                    select(jurisdictions.c.payload_json).order_by(jurisdictions.c.name.asc())
+                ).all()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError("Could not list jurisdictions") from exc
+        return [JurisdictionRecord.model_validate(_coerce_payload(row.payload_json)) for row in rows]
+
+    def get_jurisdiction(self, jurisdiction_id: str) -> JurisdictionRecord | None:
+        try:
+            with self.engine.connect() as connection:
+                row = connection.execute(
+                    select(jurisdictions.c.payload_json).where(
+                        jurisdictions.c.jurisdiction_id == jurisdiction_id
+                    )
+                ).first()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not load jurisdiction {jurisdiction_id}") from exc
+        return JurisdictionRecord.model_validate(_coerce_payload(row.payload_json)) if row else None
+
+    def save_jurisdiction_request(
+        self,
+        request: JurisdictionRequestCreate,
+        user_id: str | None = None,
+    ) -> JurisdictionRequestResponse:
+        now = datetime.now(timezone.utc)
+        jurisdiction_key = request.jurisdiction_id or request.jurisdiction_name
+        try:
+            with self.engine.begin() as connection:
+                existing_statement = select(jurisdiction_requests.c.id).where(
+                    jurisdiction_requests.c.user_id == user_id,
+                    jurisdiction_requests.c.jurisdiction_id == request.jurisdiction_id,
+                )
+                if request.jurisdiction_id is None:
+                    existing_statement = select(jurisdiction_requests.c.id).where(
+                        jurisdiction_requests.c.user_id == user_id,
+                        jurisdiction_requests.c.jurisdiction_name == request.jurisdiction_name,
+                    )
+                existing = connection.execute(existing_statement).first()
+                status = "existing" if existing else "created"
+                if not existing:
+                    connection.execute(
+                        insert(jurisdiction_requests).values(
+                            user_id=user_id,
+                            jurisdiction_id=request.jurisdiction_id,
+                            jurisdiction_name=request.jurisdiction_name,
+                            state=request.state,
+                            county=request.county,
+                            locality=request.locality,
+                            normalized_address=request.normalized_address,
+                            requested_use_type=request.requested_use_type,
+                            comment=request.comment,
+                            created_at=now,
+                        )
+                    )
+
+                count_statement = select(func.count()).select_from(jurisdiction_requests)
+                if request.jurisdiction_id:
+                    count_statement = count_statement.where(
+                        jurisdiction_requests.c.jurisdiction_id == request.jurisdiction_id
+                    )
+                elif jurisdiction_key:
+                    count_statement = count_statement.where(
+                        jurisdiction_requests.c.jurisdiction_name == request.jurisdiction_name
+                    )
+                request_count = connection.execute(count_statement).scalar_one()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError("Could not save jurisdiction request") from exc
+
+        return JurisdictionRequestResponse(
+            status=status,
+            jurisdiction_id=request.jurisdiction_id,
+            jurisdiction_name=request.jurisdiction_name,
+            request_count=int(request_count),
+        )
+
+    def list_jurisdiction_request_summaries(self) -> list[JurisdictionRequestSummary]:
+        try:
+            with self.engine.connect() as connection:
+                rows = connection.execute(
+                    select(
+                        jurisdiction_requests.c.jurisdiction_id,
+                        jurisdiction_requests.c.jurisdiction_name,
+                        jurisdiction_requests.c.state,
+                        jurisdiction_requests.c.county,
+                        jurisdiction_requests.c.locality,
+                        func.count().label("request_count"),
+                        func.max(jurisdiction_requests.c.created_at).label("last_requested_at"),
+                    )
+                    .group_by(
+                        jurisdiction_requests.c.jurisdiction_id,
+                        jurisdiction_requests.c.jurisdiction_name,
+                        jurisdiction_requests.c.state,
+                        jurisdiction_requests.c.county,
+                        jurisdiction_requests.c.locality,
+                    )
+                    .order_by(text("request_count DESC"))
+                ).all()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError("Could not list jurisdiction request summaries") from exc
+
+        return [
+            JurisdictionRequestSummary(
+                jurisdiction_id=row.jurisdiction_id,
+                jurisdiction_name=row.jurisdiction_name,
+                state=row.state,
+                county=row.county,
+                locality=row.locality,
+                request_count=int(row.request_count),
+                last_requested_at=_coerce_datetime(row.last_requested_at),
+            )
+            for row in rows
+        ]
 
     def upsert_source(self, source: SourceRegistryEntry) -> SourceRegistryEntry:
         now = datetime.now(timezone.utc)
@@ -421,7 +841,11 @@ class SQLAlchemyStore:
                 continue
             if source_type and chunk.source_type != source_type:
                 continue
-            if jurisdiction_id and chunk.jurisdiction_id and chunk.jurisdiction_id not in {jurisdiction_id, "*"}:
+            if jurisdiction_id and not source_applies_to_jurisdiction(
+                source_jurisdiction_id=chunk.jurisdiction_id,
+                source_metadata=chunk.metadata,
+                target_jurisdiction_id=jurisdiction_id,
+            ):
                 continue
             if district and district != "unknown" and district not in chunk.districts and "*" not in chunk.districts:
                 continue

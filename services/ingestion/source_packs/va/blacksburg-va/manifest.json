@@ -1,0 +1,52 @@
+{
+  "schema_version": "source-pack/v1",
+  "jurisdiction": {
+    "jurisdiction_id": "blacksburg-va",
+    "name": "Blacksburg, VA",
+    "coverage_status": "public_supported",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "121",
+    "place_fips": "07784",
+    "jurisdiction_type": "municipality",
+    "parent_jurisdiction_id": "montgomery-county-va",
+    "official_source_urls": [
+      "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
+      "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building",
+      "https://library.municode.com/va/blacksburg"
+    ],
+    "zoning_map_url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
+    "planning_contact": {
+      "department": "Planning and Building Department",
+      "url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building",
+      "phone": "540-443-1300"
+    }
+  },
+  "verification_notes": "Existing public-supported source pack covering home occupations, business zoning, parking, building review, and Virginia food review triggers.",
+  "sources": [
+    {
+      "source_id": "blacksburg-home-occupation-standards",
+      "title": "Town of Blacksburg Home Occupation Use and Design Standards",
+      "excerpt": "Home occupation standards restrict outside storage and hazardous materials, limit home occupation floor area to 25% of the dwelling, allow one nonresident worker, prohibit on-site advertising signs, and require traffic volumes consistent with nearby dwellings without adding parking spaces during the home occupation.",
+      "section_ref": "Zoning Ordinance Sec. 4211(B)(3)-(8)",
+      "jurisdiction_id": "blacksburg-va",
+      "url": "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
+      "effective_date": "2026-03-19",
+      "districts": ["residential-low-density", "mixed-use-core"],
+      "uses": ["home-based-food-business", "general"],
+      "source_type": "zoning_ordinance"
+    },
+    {
+      "source_id": "blacksburg-business-zoning-home-occupation",
+      "title": "Town of Blacksburg Zoning Guidance for Business Licenses and Home Occupations",
+      "excerpt": "The Town instructs prospective businesses to confirm that zoning allows the proposed business use before applying for a business license. The Town's zoning page states that home occupations, meaning businesses run administratively out of the home, are allowed in every Blacksburg zoning district subject to the Home Occupation Application ordinance standards.",
+      "section_ref": "Business Licenses and Home Occupations",
+      "jurisdiction_id": "blacksburg-va",
+      "url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
+      "effective_date": "2026-03-19",
+      "districts": ["residential-low-density", "mixed-use-core", "commercial-employment", "industrial-zone"],
+      "uses": ["home-based-food-business", "general"],
+      "source_type": "planning_page"
+    }
+  ]
+}

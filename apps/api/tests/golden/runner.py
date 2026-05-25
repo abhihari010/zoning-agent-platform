@@ -72,6 +72,10 @@ def assert_expectations(run: GoldenRun, scenario: dict[str, Any]) -> None:
     if "jurisdiction_supported" in expect:
         assert result.trust_indicators is not None
         assert result.trust_indicators.jurisdiction_supported is expect["jurisdiction_supported"]
+    forbidden_jurisdictions = set(expect.get("forbidden_citation_jurisdiction_ids", []))
+    if forbidden_jurisdictions:
+        citation_jurisdictions = {citation.jurisdiction_id for citation in result.citations}
+        assert citation_jurisdictions.isdisjoint(forbidden_jurisdictions)
 
     for warning in expect.get("required_warning_substrings", []):
         assert any(warning in candidate for candidate in result.warnings)

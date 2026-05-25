@@ -33,6 +33,14 @@ def _clear_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "BETA_ACCESS_KEY",
         "BETA_ACCESS_KEYS",
         "ADMIN_ACCESS_KEY",
+        "AUTH_PROVIDER",
+        "AUTH_REQUIRED",
+        "SUPABASE_PROJECT_URL",
+        "SUPABASE_JWT_SECRET",
+        "ADMIN_USER_EMAILS",
+        "PUBLIC_SIGNUPS_ENABLED",
+        "DAILY_ANALYSIS_LIMIT_FREE",
+        "DAILY_PROJECT_LIMIT_FREE",
     ]:
         monkeypatch.delenv(name, raising=False)
 
@@ -49,6 +57,10 @@ def test_settings_default_to_offline_providers(monkeypatch: pytest.MonkeyPatch) 
     assert not settings.uses_watsonx
     assert not settings.uses_openai
     assert settings.beta_access_key == ""
+    assert settings.auth_provider == "disabled"
+    assert settings.auth_required is False
+    assert settings.daily_analysis_limit_free == 10
+    assert settings.daily_project_limit_free == 25
     assert settings.local_model_base_url == "http://localhost:11434/v1"
     assert settings.local_model_name == "llama3.1:8b"
 
@@ -119,6 +131,29 @@ def test_settings_reads_admin_access_key_hash(monkeypatch: pytest.MonkeyPatch) -
     assert settings.admin_access_key == "admin-key"
     assert settings.admin_access_key_hash
     assert settings.admin_access_key_hash != "admin-key"
+
+
+def test_settings_reads_public_auth_configuration(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("AUTH_PROVIDER", "supabase")
+    monkeypatch.setenv("AUTH_REQUIRED", "true")
+    monkeypatch.setenv("SUPABASE_PROJECT_URL", "https://example.supabase.co/")
+    monkeypatch.setenv("SUPABASE_JWT_SECRET", "jwt-secret")
+    monkeypatch.setenv("ADMIN_USER_EMAILS", "Admin@Example.com, ops@example.com")
+    monkeypatch.setenv("PUBLIC_SIGNUPS_ENABLED", "false")
+    monkeypatch.setenv("DAILY_ANALYSIS_LIMIT_FREE", "3")
+    monkeypatch.setenv("DAILY_PROJECT_LIMIT_FREE", "4")
+
+    settings = get_settings()
+
+    assert settings.auth_provider == "supabase"
+    assert settings.auth_required is True
+    assert settings.supabase_project_url == "https://example.supabase.co"
+    assert settings.supabase_jwt_secret == "jwt-secret"
+    assert settings.admin_user_emails == ("admin@example.com", "ops@example.com")
+    assert settings.public_signups_enabled is False
+    assert settings.daily_analysis_limit_free == 3
+    assert settings.daily_project_limit_free == 4
 
 
 def test_unknown_provider_raises_clear_error(monkeypatch: pytest.MonkeyPatch) -> None:

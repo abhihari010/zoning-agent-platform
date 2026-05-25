@@ -259,6 +259,92 @@ def test_build_chroma_where_combined_filters() -> None:
     assert not _where_matches(missing_district, where)
 
 
+def test_chroma_jurisdiction_filter_prevents_cross_jurisdiction_hits() -> None:
+    client = FakeClient()
+    vector_store = ChromaVectorStore(client=client, collection_name="test")
+    sources = [
+        SourceRegistryEntry(
+            source_id="blacksburg-cafe-rule",
+            title="Blacksburg Cafe Rule",
+            excerpt="Cafe uses require zoning review in the mixed-use core district.",
+            section_ref="Sec 1",
+            jurisdiction_id="blacksburg-va",
+            districts=["mixed-use-core"],
+            uses=["food-service"],
+        ),
+        SourceRegistryEntry(
+            source_id="roanoke-cafe-rule",
+            title="Roanoke Cafe Rule",
+            excerpt="Cafe uses require zoning review in the mixed-use core district.",
+            section_ref="Sec 1",
+            jurisdiction_id="roanoke-va",
+            districts=["mixed-use-core"],
+            uses=["food-service"],
+        ),
+    ]
+    chunks = build_source_chunks(sources)
+
+    vector_store.upsert_chunks(chunks, [[0.1, 0.2, 0.3] for _ in chunks])
+    hits = vector_store.query(
+        [0.1, 0.2, 0.3],
+        filters={
+            "jurisdiction_id": "roanoke-va",
+            "district": "mixed-use-core",
+            "use": "food-service",
+        },
+        limit=10,
+    )
+
+    assert {hit.metadata["source_id"] for hit in hits} == {"roanoke-cafe-rule"}
+
+
+def test_chroma_jurisdiction_filter_allows_declared_statewide_sources() -> None:
+    client = FakeClient()
+    vector_store = ChromaVectorStore(client=client, collection_name="test")
+    sources = [
+        SourceRegistryEntry(
+            source_id="va-food-permit-rule",
+            title="Virginia Food Permit Rule",
+            excerpt="Food service establishments in Virginia require health department permit review.",
+            section_ref="Food permit",
+            jurisdiction_id="*",
+            districts=["unknown", "*"],
+            uses=["food-service", "general"],
+            source_type="health_code",
+            metadata={
+                "jurisdiction_scope": "global",
+                "state": "VA",
+                "applies_to_states": ["VA"],
+            },
+        ),
+        SourceRegistryEntry(
+            source_id="md-food-permit-rule",
+            title="Maryland Food Permit Rule",
+            excerpt="Food service establishments in Maryland require health department permit review.",
+            section_ref="Food permit",
+            jurisdiction_id="*",
+            districts=["unknown", "*"],
+            uses=["food-service", "general"],
+            source_type="health_code",
+            metadata={
+                "jurisdiction_scope": "global",
+                "state": "MD",
+                "applies_to_states": ["MD"],
+            },
+        ),
+    ]
+    chunks = build_source_chunks(sources)
+
+    vector_store.upsert_chunks(chunks, [[0.1, 0.2, 0.3] for _ in chunks])
+    hits = vector_store.query(
+        [0.1, 0.2, 0.3],
+        filters={"jurisdiction_id": "roanoke-va", "use": "food-service"},
+        limit=10,
+    )
+
+    assert {hit.metadata["source_id"] for hit in hits} == {"va-food-permit-rule"}
+
+
 # ---------------------------------------------------------------------------
 # A.4 — Real integration tests (require chromadb; skipped when not installed)
 # ---------------------------------------------------------------------------

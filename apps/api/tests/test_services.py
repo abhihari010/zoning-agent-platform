@@ -15,7 +15,7 @@ from app.ai.interfaces import (
     RetrievalProviderResult,
 )
 from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider
-from app.ingestion import import_source_documents, parse_source_file
+from app.ingestion import import_source_documents, import_source_packs, list_source_packs, parse_source_file
 from app.models import SourceRegistryEntry
 from app.storage import SQLiteStore, store
 from app.tools import CitationTool, IntakeTool
@@ -259,8 +259,10 @@ def test_normalize_address_valid_unrecognized_jurisdiction_is_not_invalid(
 
     assert result.is_valid is False
     assert result.support_status == "unsupported"
-    assert result.jurisdiction_id is None
-    assert "this jurisdiction" in result.warnings[0]
+    assert result.jurisdiction_id == "us-va-richmond-city-richmond"
+    assert result.jurisdiction_name == "Richmond, VA"
+    assert result.coverage_status == "unsupported"
+    assert "Richmond, VA" in result.warnings[0]
 
 
 def test_keyword_district_rules_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -575,3 +577,21 @@ def test_import_source_documents_reads_multiple_formats() -> None:
         assert {entry.source_id for entry in entries} == {"guidance", "parking-rule"}
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_source_pack_manifests_validate_and_import() -> None:
+    packs = list_source_packs()
+
+    assert {pack.jurisdiction_id for pack in packs} >= {
+        "blacksburg-va",
+        "montgomery-county-va",
+        "christiansburg-va",
+        "roanoke-va",
+        "roanoke-county-va",
+    }
+
+    entries = import_source_packs()
+
+    assert any(entry.jurisdiction_id == "christiansburg-va" for entry in entries)
+    assert all(entry.url for entry in entries)
+    assert all(entry.effective_date for entry in entries)

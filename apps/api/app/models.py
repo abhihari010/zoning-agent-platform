@@ -13,6 +13,20 @@ DecisionType = Literal["likely_allowed", "conditional", "restricted", "unknown"]
 PipelineStageKey = Literal["intake", "location", "retrieval", "compliance", "checklist"]
 AgentKey = PipelineStageKey
 AgentStatus = Literal["completed", "needs_clarification", "warning", "skipped"]
+CoverageStatus = Literal[
+    "unsupported",
+    "source_discovery",
+    "source_indexed",
+    "qa_ready",
+    "public_supported",
+]
+JurisdictionType = Literal[
+    "municipality",
+    "county",
+    "independent_city",
+    "unincorporated",
+    "unknown",
+]
 
 
 class SessionCreateResponse(BaseModel):
@@ -37,6 +51,9 @@ class IntakeResponse(BaseModel):
     support_status: Literal["supported", "unsupported", "invalid"] = "supported"
     jurisdiction_id: str | None = None
     jurisdiction_name: str | None = None
+    coverage_status: CoverageStatus | None = None
+    planning_contact: dict[str, str] = Field(default_factory=dict)
+    official_source_urls: list[str] = Field(default_factory=list)
     follow_up_questions: list[str] = Field(default_factory=list)
 
 
@@ -90,8 +107,16 @@ class JurisdictionResult(BaseModel):
     jurisdiction_id: str | None = None
     jurisdiction_name: str | None = None
     supported: bool = False
+    coverage_status: CoverageStatus = "unsupported"
     confidence: float = Field(default=0.0, ge=0, le=1)
     method: str = "unknown"
+    jurisdiction_type: JurisdictionType = "unknown"
+    state: str | None = None
+    county: str | None = None
+    locality: str | None = None
+    planning_contact: dict[str, str] = Field(default_factory=dict)
+    official_source_urls: list[str] = Field(default_factory=list)
+    zoning_map_url: str | None = None
     warnings: list[str] = Field(default_factory=list)
 
 
@@ -185,6 +210,8 @@ class SourceIndexStatusResponse(BaseModel):
     vector_count: int = 0
     vector_collection: str | None = None
     vector_readiness_warnings: list[str] = Field(default_factory=list)
+    source_pack_count: int = 0
+    source_pack_jurisdiction_ids: list[str] = Field(default_factory=list)
 
 
 class ReindexResponse(BaseModel):
@@ -206,6 +233,70 @@ class LocalDocumentImportResponse(BaseModel):
     imported_count: int
     source_count: int
     imported_source_ids: list[str]
+
+
+class JurisdictionRecord(BaseModel):
+    jurisdiction_id: str = Field(min_length=2, max_length=200)
+    name: str = Field(min_length=2, max_length=500)
+    state: str | None = Field(default=None, max_length=100)
+    state_fips: str | None = Field(default=None, max_length=10)
+    county_fips: str | None = Field(default=None, max_length=10)
+    place_fips: str | None = Field(default=None, max_length=10)
+    jurisdiction_type: JurisdictionType = "unknown"
+    parent_jurisdiction_id: str | None = Field(default=None, max_length=200)
+    coverage_status: CoverageStatus = "unsupported"
+    supported: bool = False
+    match_strategy: str = "locality"
+    locality_names: list[str] = Field(default_factory=list)
+    county_names: list[str] = Field(default_factory=list)
+    state_names: list[str] = Field(default_factory=list)
+    official_source_urls: list[str] = Field(default_factory=list)
+    zoning_map_url: str | None = Field(default=None, max_length=2000)
+    planning_contact: dict[str, str] = Field(default_factory=dict)
+    district_mapping_strategy: str | None = Field(default=None, max_length=500)
+    last_verified_at: str | None = Field(default=None, max_length=80)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def sync_supported_flag(self) -> "JurisdictionRecord":
+        self.supported = self.coverage_status == "public_supported"
+        return self
+
+
+class JurisdictionCoverageResponse(BaseModel):
+    jurisdictions: list[JurisdictionRecord]
+
+
+class JurisdictionRequestCreate(BaseModel):
+    normalized_address: str = Field(min_length=5, max_length=500)
+    jurisdiction_id: str | None = Field(default=None, max_length=200)
+    jurisdiction_name: str | None = Field(default=None, max_length=500)
+    state: str | None = Field(default=None, max_length=100)
+    county: str | None = Field(default=None, max_length=200)
+    locality: str | None = Field(default=None, max_length=200)
+    requested_use_type: str | None = Field(default=None, max_length=200)
+    comment: str | None = Field(default=None, max_length=2000)
+
+
+class JurisdictionRequestResponse(BaseModel):
+    status: Literal["created", "existing"]
+    jurisdiction_id: str | None = None
+    jurisdiction_name: str | None = None
+    request_count: int = 1
+
+
+class JurisdictionRequestSummary(BaseModel):
+    jurisdiction_id: str | None = None
+    jurisdiction_name: str | None = None
+    state: str | None = None
+    county: str | None = None
+    locality: str | None = None
+    request_count: int
+    last_requested_at: datetime
+
+
+class JurisdictionRequestSummaryResponse(BaseModel):
+    requests: list[JurisdictionRequestSummary]
 
 
 class Feasibility(BaseModel):
@@ -313,6 +404,7 @@ class AuditEvent(BaseModel):
     stage: str
     project_id: str
     details: dict[str, Any] = Field(default_factory=dict)
+    user_id: str | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -331,12 +423,14 @@ class FeedbackRecord(BaseModel):
     project_id: UUID
     helpful: bool
     comment: str | None = None
+    user_id: str | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class ProjectRecord(BaseModel):
     project_id: UUID = Field(default_factory=uuid4)
     session_id: UUID
+    user_id: str | None = None
     project_description: str
     input_address: str
     normalized_address: str
@@ -354,7 +448,50 @@ class ProjectRecord(BaseModel):
 class AnalysisRecord(BaseModel):
     project_id: UUID
     result: AnalyzeResult
+    user_id: str | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class UserRecord(BaseModel):
+    user_id: str
+    email: str | None = None
+    role: Literal["user", "admin"] = "user"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_seen_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    disabled_at: datetime | None = None
+
+
+class CurrentUserResponse(BaseModel):
+    user_id: str | None = None
+    email: str | None = None
+    role: Literal["anonymous", "legacy_beta", "user", "admin"] = "anonymous"
+    auth_mode: Literal["disabled", "beta", "supabase"] = "disabled"
+    public_signups_enabled: bool = True
+
+
+class ProjectSummary(BaseModel):
+    project_id: UUID
+    normalized_address: str
+    jurisdiction_id: str | None = None
+    jurisdiction_name: str | None = None
+    district: str
+    status: Literal["created", "analyzed"]
+    decision: DecisionType | None = None
+    confidence: float | None = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class ProjectListResponse(BaseModel):
+    projects: list[ProjectSummary]
+
+
+class UsageSummaryResponse(BaseModel):
+    date: str
+    intake_count: int
+    analysis_count: int
+    project_limit: int
+    analysis_limit: int
 
 
 # ---------------------------------------------------------------------------

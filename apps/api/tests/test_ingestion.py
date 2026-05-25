@@ -129,6 +129,30 @@ def test_non_markdown_source_still_works() -> None:
     assert all(len(chunk.chunk_text.strip()) >= MIN_CHUNK_CHARS for chunk in chunks)
 
 
+def test_source_chunks_include_jurisdiction_metadata_contract() -> None:
+    source = SourceRegistryEntry(
+        source_id="metadata-contract-rule",
+        title="Metadata Contract Rule",
+        excerpt="Food service uses require zoning review with sufficient text for chunking.",
+        section_ref="Sec 1",
+        jurisdiction_id="blacksburg-va",
+        url="https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
+        effective_date="2026-05-25",
+        districts=["mixed-use-core"],
+        uses=["food-service"],
+        source_type="zoning_ordinance",
+    )
+
+    chunk = build_source_chunks([source])[0]
+
+    assert chunk.metadata["jurisdiction_scope"] == "local"
+    assert chunk.metadata["state"] == "VA"
+    assert chunk.metadata["municipality"] == "Blacksburg"
+    assert chunk.metadata["coverage_status"] == "public_supported"
+    assert chunk.metadata["content_hash"] == chunk.source_text_hash
+    assert chunk.metadata["source_version"] == chunk.source_version
+
+
 def test_chunk_ids_are_deterministic() -> None:
     md = "## Section\nContent that is long enough to be a useful chunk."
     source = _make_md_source(md)

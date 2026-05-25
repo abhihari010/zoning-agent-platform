@@ -105,6 +105,14 @@ class Settings:
     beta_access_keys: tuple[AccessKey, ...]
     admin_access_key: str
     admin_access_key_hash: str
+    auth_provider: Literal["disabled", "supabase"]
+    auth_required: bool
+    supabase_project_url: str
+    supabase_jwt_secret: str
+    admin_user_emails: tuple[str, ...]
+    public_signups_enabled: bool
+    daily_analysis_limit_free: int
+    daily_project_limit_free: int
     auto_seed_sources: bool
     auto_reindex_on_empty: bool
     startup_reindex_enabled: bool
@@ -149,6 +157,11 @@ def get_settings() -> Settings:
         else ()
     ) + _parse_labeled_access_keys(_env("BETA_ACCESS_KEYS"))
     admin_access_key = _env("ADMIN_ACCESS_KEY")
+    admin_user_emails = tuple(
+        email.strip().lower()
+        for email in _env("ADMIN_USER_EMAILS").split(",")
+        if email.strip()
+    )
 
     return Settings(
         ai_provider=cast(
@@ -193,6 +206,17 @@ def get_settings() -> Settings:
         beta_access_keys=beta_access_keys,
         admin_access_key=admin_access_key,
         admin_access_key_hash=_hash_access_key(admin_access_key) if admin_access_key else "",
+        auth_provider=cast(
+            Literal["disabled", "supabase"],
+            _provider_name("AUTH_PROVIDER", "disabled", {"disabled", "supabase"}),
+        ),
+        auth_required=_env_bool("AUTH_REQUIRED", False),
+        supabase_project_url=_env("SUPABASE_PROJECT_URL").rstrip("/"),
+        supabase_jwt_secret=_env("SUPABASE_JWT_SECRET"),
+        admin_user_emails=admin_user_emails,
+        public_signups_enabled=_env_bool("PUBLIC_SIGNUPS_ENABLED", True),
+        daily_analysis_limit_free=int(_env("DAILY_ANALYSIS_LIMIT_FREE", "10")),
+        daily_project_limit_free=int(_env("DAILY_PROJECT_LIMIT_FREE", "25")),
         auto_seed_sources=_env_bool("AUTO_SEED_SOURCES", True),
         auto_reindex_on_empty=_env_bool("AUTO_REINDEX_ON_EMPTY", True),
         startup_reindex_enabled=_env_bool("STARTUP_REINDEX_ENABLED", True),
