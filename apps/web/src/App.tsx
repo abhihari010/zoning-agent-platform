@@ -12,6 +12,7 @@ import {
   authMode,
   clearBetaAccessKey,
   createSession,
+  deleteProject,
   fetchCurrentUser,
   fetchJurisdictionCoverage,
   fetchJurisdictionRequestSummaries,
@@ -270,7 +271,7 @@ function legalCopy(page: Exclude<LegalPage, null>): { title: string; paragraphs:
       title: "Privacy Policy",
       paragraphs: [
         "We store account identity, project addresses, project descriptions, generated analyses, feedback, and jurisdiction support requests so users can return to their work and so we can improve coverage.",
-        "Do not submit confidential legal, financial, medical, or highly sensitive personal information. You can request deletion of stored project data by contacting the app operator.",
+        "Do not submit confidential legal, financial, medical, or highly sensitive personal information. Signed-in users can delete saved projects in the app and can request full account deletion from the app operator.",
         "Operational logs may include timestamps, route names, and non-secret status information. Access tokens, passwords, and beta keys should never be logged or printed.",
       ],
     };
@@ -373,6 +374,7 @@ export function App() {
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
   const [projectsMessage, setProjectsMessage] = useState("");
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
   const [coverage, setCoverage] = useState<JurisdictionCoverage[]>([]);
   const [coverageMessage, setCoverageMessage] = useState("");
   const [legalPage, setLegalPage] = useState<LegalPage>(null);
@@ -1118,6 +1120,30 @@ export function App() {
       setProjectsMessage(
         projectError instanceof Error ? projectError.message : "Failed to open saved project.",
       );
+    }
+  }
+
+  async function onDeleteCurrentProject() {
+    if (!intake?.projectId) {
+      return;
+    }
+    const confirmed = window.confirm("Delete this saved zoning review? This cannot be undone.");
+    if (!confirmed) {
+      return;
+    }
+    try {
+      setDeletingProjectId(intake.projectId);
+      setProjectsMessage("");
+      await deleteProject(intake.projectId);
+      setProjects((current) => current.filter((item) => item.projectId !== intake.projectId));
+      resetWorkspace();
+      setProjectsMessage("Project deleted.");
+    } catch (projectError) {
+      setProjectsMessage(
+        projectError instanceof Error ? projectError.message : "Failed to delete project.",
+      );
+    } finally {
+      setDeletingProjectId(null);
     }
   }
 
@@ -2333,13 +2359,27 @@ export function App() {
                 {intake ? (
                   <div className="mt-4 space-y-3 text-sm text-slate-700">
                     {result && (
-                      <button
-                        type="button"
-                        onClick={downloadChecklist}
-                        className="w-full rounded-2xl bg-pine px-4 py-3 text-sm font-semibold text-white"
-                      >
-                        Download checklist
-                      </button>
+                      <div className="grid gap-2">
+                        <button
+                          type="button"
+                          onClick={downloadChecklist}
+                          className="w-full rounded-2xl bg-pine px-4 py-3 text-sm font-semibold text-white"
+                        >
+                          Download checklist
+                        </button>
+                        {authMode === "supabase" && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              void onDeleteCurrentProject();
+                            }}
+                            disabled={deletingProjectId === intake.projectId}
+                            className="w-full rounded-2xl border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:opacity-60"
+                          >
+                            {deletingProjectId === intake.projectId ? "Deleting project" : "Delete saved project"}
+                          </button>
+                        )}
+                      </div>
                     )}
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                       <p className="text-xs uppercase tracking-[0.18em] text-slate-500">

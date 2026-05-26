@@ -1,0 +1,18 @@
+name: Source Freshness
+
+on:
+  schedule:
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+
+jobs:
+  source-freshness:
+    name: Weekly source freshness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check source freshness
+        run: python scripts/check_source_freshness.py --max-age-days 90 --check-urls

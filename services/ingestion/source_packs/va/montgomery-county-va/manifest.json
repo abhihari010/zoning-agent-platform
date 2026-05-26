@@ -35,6 +35,7 @@
       "jurisdiction_id": "montgomery-county-va",
       "url": "https://www.montgomerycountyva.gov/docs/default-source/planning-gis/applications-and-forms/zoning/home-occupation-form.pdf?sfvrsn=8068743c_4",
       "effective_date": "2021-10",
+      "retrieved_at": "2026-05-25",
       "districts": ["unknown", "residential-low-density", "mixed-use-core", "commercial-employment"],
       "uses": ["home-based-food-business", "general"],
       "source_type": "zoning_ordinance"
@@ -47,6 +48,7 @@
       "jurisdiction_id": "montgomery-county-va",
       "url": "https://www.montgomerycountyva.gov/1/departments-services/planning",
       "effective_date": "2026-05-22",
+      "retrieved_at": "2026-05-25",
       "districts": ["unknown", "residential-low-density", "mixed-use-core", "commercial-employment", "industrial-zone"],
       "uses": ["home-based-food-business", "food-business", "general"],
       "source_type": "planning_page"

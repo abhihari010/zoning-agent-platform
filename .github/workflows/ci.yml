@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  backend:
+    name: Backend pytest
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install API
+        run: python -m pip install --upgrade pip && python -m pip install ".[dev]"
+      - name: Run pytest
+        run: pytest -q --basetemp ../../.tmp/pytest-ci
+
+  source-quality:
+    name: Source quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate source packs
+        run: python scripts/validate_source_packs.py
+      - name: Check public support candidates
+        run: python scripts/check_public_support_candidates.py blacksburg-va montgomery-county-va
+      - name: Check source freshness
+        run: python scripts/check_source_freshness.py --max-age-days 90
+
+  web:
+    name: Web build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck:web
+      - name: Build
+        run: npm run build:web
+
+  browser-smoke:
+    name: Browser fixture smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start Vite
+        run: |
+          npm run dev -w @zoning-agent/web -- --host 127.0.0.1 > /tmp/zoning-web.log 2>&1 &
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:5173 >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/zoning-web.log
+          exit 1
+      - name: Run fixture smoke
+        env:
+          WEB_BASE_URL: http://127.0.0.1:5173
+          E2E_MODE: fixture
+        run: npm run test:e2e
+
+  hygiene:
+    name: Hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Whitespace check
+        run: git diff --check

@@ -24,10 +24,12 @@ def clear_store(monkeypatch: pytest.MonkeyPatch) -> None:
         "BETA_ACCESS_KEY",
         "BETA_ACCESS_KEYS",
         "ADMIN_ACCESS_KEY",
+        "APP_ENV",
         "AUTH_PROVIDER",
         "AUTH_REQUIRED",
         "SUPABASE_JWT_SECRET",
         "ADMIN_USER_EMAILS",
+        "CORS_ALLOW_ORIGINS",
         "DAILY_ANALYSIS_LIMIT_FREE",
         "DAILY_PROJECT_LIMIT_FREE",
     ]:
@@ -40,16 +42,24 @@ def _jwt(
     *,
     email: str = "user@example.com",
     secret: str = "test-secret",
+    alg: str = "HS256",
+    aud: str | list[str] | None = "authenticated",
+    iss: str | None = None,
+    exp: int | None = None,
     role: str | None = "authenticated",
     app_metadata: dict | None = None,
     user_metadata: dict | None = None,
 ) -> str:
-    header = {"alg": "HS256", "typ": "JWT"}
+    header = {"alg": alg, "typ": "JWT"}
     payload = {
         "sub": subject,
         "email": email,
-        "exp": int(time.time()) + 3600,
+        "exp": exp if exp is not None else int(time.time()) + 3600,
     }
+    if aud is not None:
+        payload["aud"] = aud
+    if iss is not None:
+        payload["iss"] = iss
     if role is not None:
         payload["role"] = role
     if app_metadata is not None:
@@ -186,6 +196,47 @@ def test_auth_required_accepts_supabase_jwt(monkeypatch):
     assert me_response.json()["user_id"] == "user-1"
     assert me_response.json()["role"] == "user"
     assert store.get_user("user-1") is not None
+
+
+def test_auth_required_rejects_invalid_supabase_claims(monkeypatch):
+    _enable_auth(monkeypatch)
+    monkeypatch.setenv("SUPABASE_PROJECT_URL", "https://example.supabase.co")
+    client = TestClient(app)
+
+    invalid_audience = client.get(
+        "/api/v1/me",
+        headers=_auth_headers("user-1", aud="service_role", iss="https://example.supabase.co/auth/v1"),
+    )
+    invalid_issuer = client.get(
+        "/api/v1/me",
+        headers=_auth_headers("user-1", iss="https://wrong.supabase.co/auth/v1"),
+    )
+    expired = client.get(
+        "/api/v1/me",
+        headers=_auth_headers(
+            "user-1",
+            iss="https://example.supabase.co/auth/v1",
+            exp=int(time.time()) - 10,
+        ),
+    )
+    wrong_algorithm = client.get(
+        "/api/v1/me",
+        headers=_auth_headers("user-1", alg="none", iss="https://example.supabase.co/auth/v1"),
+    )
+    accepted = client.get(
+        "/api/v1/me",
+        headers=_auth_headers(
+            "user-1",
+            aud=["authenticated"],
+            iss="https://example.supabase.co/auth/v1",
+        ),
+    )
+
+    assert invalid_audience.status_code == 403
+    assert invalid_issuer.status_code == 403
+    assert expired.status_code == 401
+    assert wrong_algorithm.status_code == 403
+    assert accepted.status_code == 200
 
 
 def test_user_metadata_admin_role_is_not_trusted(monkeypatch):
@@ -422,6 +473,70 @@ def test_authenticated_projects_are_owned_and_listed(monkeypatch):
     assert other_list_response.status_code == 200
     assert other_list_response.json()["projects"] == []
     assert other_result_response.status_code == 404
+
+
+def test_authenticated_user_can_delete_own_project(monkeypatch):
+    _enable_auth(monkeypatch)
+    client = TestClient(app)
+    project = ProjectRecord(
+        session_id=uuid4(),
+        user_id="user-1",
+        project_description="Convert garage to bakery.",
+        input_address="123 Main St",
+        normalized_address="123 Main St, Blacksburg, VA",
+        district="mixed-use-core",
+    )
+    store.create_project(project)
+
+    other_delete = client.delete(
+        f"/api/v1/projects/{project.project_id}",
+        headers=_auth_headers("user-2"),
+    )
+    owner_delete = client.delete(
+        f"/api/v1/projects/{project.project_id}",
+        headers=_auth_headers("user-1"),
+    )
+    result_response = client.get(
+        f"/api/v1/projects/{project.project_id}/result",
+        headers=_auth_headers("user-1"),
+    )
+
+    assert other_delete.status_code == 404
+    assert owner_delete.status_code == 200
+    assert owner_delete.json()["status"] == "deleted"
+    assert store.get_project(project.project_id) is None
+    assert result_response.status_code == 404
+
+
+def test_authenticated_user_can_delete_account_data(monkeypatch):
+    _enable_auth(monkeypatch)
+    client = TestClient(app)
+    project = ProjectRecord(
+        session_id=uuid4(),
+        user_id="user-1",
+        project_description="Convert garage to bakery.",
+        input_address="123 Main St",
+        normalized_address="123 Main St, Blacksburg, VA",
+        district="mixed-use-core",
+    )
+    store.create_project(project)
+
+    response = client.delete("/api/v1/me/data", headers=_auth_headers("user-1"))
+
+    assert response.status_code == 200
+    assert response.json()["deleted_projects"] == 1
+    assert store.get_project(project.project_id) is None
+    assert store.get_user("user-1").disabled_at is not None
+
+
+def test_every_response_includes_request_id(monkeypatch):
+    _enable_auth(monkeypatch)
+    client = TestClient(app)
+
+    response = client.get("/api/v1/me", headers={**_auth_headers("user-1"), "X-Request-ID": "req-test"})
+
+    assert response.status_code == 200
+    assert response.headers["X-Request-ID"] == "req-test"
 
 
 def test_admin_analysis_preserves_project_owner(monkeypatch):

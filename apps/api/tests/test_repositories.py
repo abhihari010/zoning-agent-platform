@@ -186,3 +186,24 @@ def test_repository_round_trips_current_storage_operations(tmp_path, case_name: 
         "pipeline.intake.completed",
     ]
     assert events[-1].details == {"inferred_use": "home-based-food-business"}
+
+    assert repository.delete_project(project.project_id) is True
+    assert repository.get_project(project.project_id) is None
+    assert repository.get_analysis(project.project_id) is None
+    assert repository.get_audit_events(project.project_id) == []
+    assert repository.delete_project(project.project_id) is False
+
+    second_project = ProjectRecord(
+        session_id=uuid4(),
+        user_id="user-1",
+        project_description="Convert garage to bakery with two employees and set operating hours.",
+        input_address="300 Turner St NW",
+        normalized_address="300 Turner St NW, Blacksburg, VA 24060, USA",
+        district="mixed-use-core",
+    )
+    repository.create_project(second_project)
+    deleted_count = repository.delete_user_data("user-1")
+    assert deleted_count == 1
+    assert repository.get_project(second_project.project_id) is None
+    assert repository.list_projects("user-1") == []
+    assert repository.get_user("user-1").disabled_at is not None

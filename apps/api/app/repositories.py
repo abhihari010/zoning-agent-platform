@@ -58,6 +58,8 @@ class StoreRepository(Protocol):
 
     def list_projects(self, user_id: str | None = None) -> list[ProjectSummary]: ...
 
+    def delete_project(self, project_id: UUID) -> bool: ...
+
     def save_analysis(self, analysis: AnalysisRecord) -> AnalysisRecord: ...
 
     def get_analysis(self, project_id: UUID) -> AnalysisRecord | None: ...
@@ -77,6 +79,8 @@ class StoreRepository(Protocol):
     def upsert_user(self, user: UserRecord) -> UserRecord: ...
 
     def get_user(self, user_id: str) -> UserRecord | None: ...
+
+    def delete_user_data(self, user_id: str) -> int: ...
 
     def record_usage(self, event_type: str, user_id: str | None = None) -> None: ...
 
@@ -335,6 +339,23 @@ class SQLAlchemyStore:
             )
         return summaries
 
+    def delete_project(self, project_id: UUID) -> bool:
+        project_key = str(project_id)
+        try:
+            with self.engine.begin() as connection:
+                existing = connection.execute(
+                    select(projects.c.project_id).where(projects.c.project_id == project_key)
+                ).first()
+                if not existing:
+                    return False
+                connection.execute(delete(feedback).where(feedback.c.project_id == project_key))
+                connection.execute(delete(audit_events).where(audit_events.c.project_id == project_key))
+                connection.execute(delete(analyses).where(analyses.c.project_id == project_key))
+                connection.execute(delete(projects).where(projects.c.project_id == project_key))
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not delete project {project_id}: {exc}") from exc
+        return True
+
     def save_analysis(self, analysis: AnalysisRecord) -> AnalysisRecord:
         project = self.get_project(analysis.project_id)
         if project:
@@ -480,6 +501,39 @@ class SQLAlchemyStore:
             last_seen_at=_coerce_datetime(data["last_seen_at"]),
             disabled_at=_coerce_datetime(data["disabled_at"]) if data["disabled_at"] else None,
         )
+
+    def delete_user_data(self, user_id: str) -> int:
+        now = datetime.now(timezone.utc)
+        try:
+            with self.engine.begin() as connection:
+                project_rows = connection.execute(
+                    select(projects.c.project_id).where(projects.c.user_id == user_id)
+                ).all()
+                project_ids = [row.project_id for row in project_rows]
+                deleted_projects = len(project_ids)
+                for project_id in project_ids:
+                    connection.execute(delete(feedback).where(feedback.c.project_id == project_id))
+                    connection.execute(delete(audit_events).where(audit_events.c.project_id == project_id))
+                    connection.execute(delete(analyses).where(analyses.c.project_id == project_id))
+                    connection.execute(delete(projects).where(projects.c.project_id == project_id))
+                connection.execute(delete(feedback).where(feedback.c.user_id == user_id))
+                connection.execute(delete(audit_events).where(audit_events.c.user_id == user_id))
+                connection.execute(delete(usage_events).where(usage_events.c.user_id == user_id))
+                connection.execute(delete(usage_counters).where(usage_counters.c.user_id == user_id))
+                connection.execute(delete(jurisdiction_requests).where(jurisdiction_requests.c.user_id == user_id))
+                connection.execute(
+                    update(users)
+                    .where(users.c.user_id == user_id)
+                    .values(
+                        email=None,
+                        role="user",
+                        last_seen_at=now,
+                        disabled_at=now,
+                    )
+                )
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not delete user data for {user_id}: {exc}") from exc
+        return deleted_projects
 
     def record_usage(self, event_type: str, user_id: str | None = None) -> None:
         try:

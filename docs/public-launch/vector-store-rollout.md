@@ -2,12 +2,12 @@
 
 ## Current Choice
 
-The short-term production vector provider is Chroma, using jurisdiction-scoped metadata. The free/low-cost operating model is preserved by keeping Postgres as the source of truth and treating vectors as rebuildable retrieval infrastructure.
+The public-beta production vector provider is `none`. SQL source chunks are the retrieval baseline while the app runs on free/low-cost infrastructure. Chroma remains available for local and staging experiments, using jurisdiction-scoped metadata, but should not be required for production readiness until persistence and rebuild operations are explicit.
 
 ## Persistence
 
-- `VECTOR_PROVIDER=none` disables Chroma and uses SQL-backed retrieval.
-- `VECTOR_PROVIDER=chroma` enables Chroma.
+- `VECTOR_PROVIDER=none` disables Chroma and uses SQL-backed retrieval. This is the public-beta default.
+- `VECTOR_PROVIDER=chroma` enables Chroma for local or staging use.
 - `CHROMA_PATH` controls local persistence.
 - `CHROMA_COLLECTION` should use an environment-specific name, for example `zoning_sources_prod_v1`.
 - If the host filesystem is ephemeral, vectors must be rebuilt after deploy or restart from source registry rows.

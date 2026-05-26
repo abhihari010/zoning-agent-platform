@@ -436,7 +436,11 @@ Production builds should set the deployed API URL explicitly:
 
 - `VITE_API_URL=https://your-render-api.onrender.com`
 
-When `VITE_API_URL` points at a non-localhost API, the frontend shows the private beta access screen and stores the entered key in `sessionStorage`.
+Public beta builds should use Supabase Auth instead of the legacy beta gate:
+
+- `VITE_AUTH_MODE=supabase`
+- `VITE_SUPABASE_URL=<Supabase project URL>`
+- `VITE_SUPABASE_ANON_KEY=<Supabase anon key>`
 
 To avoid browser CORS failures, set this variable in the API host after Vercel gives you a deployment URL:
 
@@ -444,37 +448,39 @@ To avoid browser CORS failures, set this variable in the API host after Vercel g
 
 ### Deployed API Smoke Test
 
-Run the production beta smoke script after Render deploys, database migrations, or source registry changes. It uses only Python's standard library and never prints the beta key.
+Run the public-beta smoke scripts after Render deploys, database migrations, or source registry changes. They use only redacted tokens and should never print secrets.
 
 ```powershell
-$env:BETA_BASE_API_URL="https://zoning-agent-api.onrender.com"
-$env:BETA_ACCESS_KEY="<private beta key>"
-$env:BETA_TEST_SUPPORTED_ADDRESS="<supported Blacksburg, VA test address>"
-$env:BETA_TEST_UNSUPPORTED_ADDRESS="<valid address in a recognized but unsupported jurisdiction>"
-python scripts/smoke_beta_api.py
+$env:PUBLIC_BASE_API_URL="https://zoning-agent-api.onrender.com"
+$env:PUBLIC_AUTH_TOKEN="<Supabase smoke user access token>"
+$env:PUBLIC_TEST_SUPPORTED_ADDRESS="<supported test address>"
+$env:PUBLIC_TEST_UNSUPPORTED_ADDRESS="<valid unsupported-jurisdiction test address>"
+python scripts/smoke_public_api.py
+
+python scripts/check_production_config.py --api-url https://zoning-agent-api.onrender.com --web-origin https://zoning-agent-platform.vercel.app
 ```
 
 The script verifies:
 
-- unauthenticated `GET /health`
-- missing beta key returns `401`
-- invalid beta key returns `403`
-- valid beta key can call `/api/v1/ingestion/status`
-- source count is nonzero
-- chunk count is nonzero, or `/api/v1/ingestion/reindex` succeeds and creates chunks
+- unauthenticated `GET /health` and `GET /ready`
+- missing auth returns `401`
+- valid Supabase auth can call `/api/v1/me` and `/api/v1/projects`
+- source and chunk counts are nonzero
 - supported intake and analysis complete
-- stored result, citations/evidence, and trace events are available after analysis
-- unsupported-jurisdiction intake is distinguishable from a clearly invalid address probe
+- citations/evidence are returned after analysis
+- feedback can be submitted
+- unsupported-jurisdiction intake is distinguishable from supported intake
 
-`BETA_BASE_API_URL` defaults to `https://zoning-agent-api.onrender.com` if omitted. The supported and unsupported address values should be harmless non-user test addresses; do not use real customer data.
+The supported and unsupported address values should be harmless non-user test addresses; do not use real customer data. Keep `scripts/smoke_beta_api.py` only for temporary legacy QA while beta keys still exist.
 
 ### Launch Checklist
 
-1. Deploy the API and confirm `GET /health` returns `{"status":"ok"}`.
-2. Deploy the web app with `VITE_API_URL` set to the Render API URL.
+1. Confirm GitHub Actions CI is green.
+2. Deploy the API and confirm `GET /health` and `GET /ready` return healthy JSON.
 3. Run `alembic upgrade head` against the staging or production `DATABASE_URL`.
-4. Open the Vercel app, enter the private beta key, and confirm the source admin loads.
-5. In Source Admin, import local documents if needed, then run `Reindex sources`.
-6. Confirm `/api/v1/ingestion/status` reports nonzero sources and chunks.
-7. Run `python scripts/smoke_beta_api.py` with the smoke-test environment variables above.
-8. Roll back by redeploying the previous Render/Vercel deployment and restoring from the database provider's backup when production is on a paid plan.
+4. Deploy the web app with Supabase auth env vars and `VITE_API_URL` set to the Render API URL.
+5. Confirm `/api/v1/ingestion/status` reports nonzero sources and chunks.
+6. Run `python scripts/check_production_config.py`.
+7. Run `python scripts/smoke_public_api.py` with the smoke-test environment variables above.
+8. Run browser smoke with `E2E_MODE=live`.
+9. Roll back by redeploying the previous Render/Vercel deployment and restoring from the database provider's backup/export if needed.

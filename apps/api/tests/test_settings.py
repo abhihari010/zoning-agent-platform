@@ -10,6 +10,7 @@ from app.settings import ConfigurationError, get_settings, require_openai_settin
 def _clear_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
     for name in [
         "AI_PROVIDER",
+        "APP_ENV",
         "RAG_PROVIDER",
         "EMBEDDING_PROVIDER",
         "EMBEDDING_MODEL",
@@ -37,6 +38,7 @@ def _clear_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "AUTH_REQUIRED",
         "SUPABASE_PROJECT_URL",
         "SUPABASE_JWT_SECRET",
+        "CORS_ALLOW_ORIGINS",
         "ADMIN_USER_EMAILS",
         "PUBLIC_SIGNUPS_ENABLED",
         "DAILY_ANALYSIS_LIMIT_FREE",
@@ -51,6 +53,7 @@ def test_settings_default_to_offline_providers(monkeypatch: pytest.MonkeyPatch) 
     settings = get_settings()
 
     assert settings.ai_provider == "deterministic"
+    assert settings.app_env == "local"
     assert settings.rag_provider == "source_registry"
     assert settings.embedding_provider == "none"
     assert settings.vector_provider == "none"
@@ -63,6 +66,33 @@ def test_settings_default_to_offline_providers(monkeypatch: pytest.MonkeyPatch) 
     assert settings.daily_project_limit_free == 25
     assert settings.local_model_base_url == "http://localhost:11434/v1"
     assert settings.local_model_name == "llama3.1:8b"
+
+
+def test_production_settings_require_public_beta_configuration(monkeypatch: pytest.MonkeyPatch) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("APP_ENV", "production")
+
+    with pytest.raises(ConfigurationError, match="Production configuration is incomplete"):
+        get_settings()
+
+
+def test_production_settings_accept_required_public_beta_configuration(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _clear_provider_env(monkeypatch)
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("DATABASE_URL", "postgres://user:pass@example.test:5432/zoning")
+    monkeypatch.setenv("AUTH_PROVIDER", "supabase")
+    monkeypatch.setenv("AUTH_REQUIRED", "true")
+    monkeypatch.setenv("SUPABASE_PROJECT_URL", "https://example.supabase.co")
+    monkeypatch.setenv("SUPABASE_JWT_SECRET", "jwt-secret")
+    monkeypatch.setenv("GOOGLE_MAPS_API_KEY", "maps-key")
+    monkeypatch.setenv("CORS_ALLOW_ORIGINS", "https://zoning-agent-platform.vercel.app")
+
+    settings = get_settings()
+
+    assert settings.app_env == "production"
+    assert settings.cors_allow_origins == ("https://zoning-agent-platform.vercel.app",)
 
 
 def test_settings_accepts_local_ai_provider(monkeypatch: pytest.MonkeyPatch) -> None:
