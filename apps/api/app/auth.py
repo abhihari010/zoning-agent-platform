@@ -93,6 +93,7 @@ def authenticate_bearer_token(token: str, settings: Settings | None = None) -> A
         raise HTTPException(status_code=503, detail="SUPABASE_JWT_SECRET is not configured.")
 
     payload = _decode_hs256_jwt(token, resolved.supabase_jwt_secret)
+    _validate_supabase_claims(payload, resolved)
     subject = str(payload.get("sub") or "").strip()
     if not subject:
         raise HTTPException(status_code=403, detail="JWT subject is missing.")
@@ -156,6 +157,14 @@ def _decode_hs256_jwt(token: str, secret: str) -> dict[str, Any]:
     if len(parts) != 3:
         raise HTTPException(status_code=403, detail="Invalid JWT format.")
 
+    try:
+        header = json.loads(_base64url_decode(parts[0]))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=403, detail="Invalid JWT payload.") from exc
+
+    if header.get("alg") != "HS256":
+        raise HTTPException(status_code=403, detail="Unsupported JWT algorithm.")
+
     signing_input = f"{parts[0]}.{parts[1]}".encode("utf-8")
     expected_signature = hmac.new(secret.encode("utf-8"), signing_input, hashlib.sha256).digest()
     actual_signature = _base64url_decode(parts[2])
@@ -163,13 +172,9 @@ def _decode_hs256_jwt(token: str, secret: str) -> dict[str, Any]:
         raise HTTPException(status_code=403, detail="Invalid JWT signature.")
 
     try:
-        header = json.loads(_base64url_decode(parts[0]))
         payload = json.loads(_base64url_decode(parts[1]))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise HTTPException(status_code=403, detail="Invalid JWT payload.") from exc
-
-    if header.get("alg") != "HS256":
-        raise HTTPException(status_code=403, detail="Unsupported JWT algorithm.")
 
     exp = payload.get("exp")
     try:
@@ -179,6 +184,20 @@ def _decode_hs256_jwt(token: str, secret: str) -> dict[str, Any]:
         raise HTTPException(status_code=403, detail="Invalid JWT expiration.") from exc
 
     return payload
+
+
+def _validate_supabase_claims(payload: dict[str, Any], settings: Settings) -> None:
+    audience = payload.get("aud")
+    valid_audience = audience == "authenticated" or (
+        isinstance(audience, list) and "authenticated" in audience
+    )
+    if not valid_audience:
+        raise HTTPException(status_code=403, detail="JWT audience is invalid.")
+
+    if settings.supabase_project_url:
+        expected_issuer = f"{settings.supabase_project_url.rstrip('/')}/auth/v1"
+        if payload.get("iss") != expected_issuer:
+            raise HTTPException(status_code=403, detail="JWT issuer is invalid.")
 
 
 def _base64url_decode(value: str) -> bytes:

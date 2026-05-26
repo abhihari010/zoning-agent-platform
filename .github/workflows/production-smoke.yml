@@ -1,0 +1,49 @@
+name: Production Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: "API origin"
+        required: true
+        default: "https://zoning-agent-api.onrender.com"
+      web_url:
+        description: "Frontend origin"
+        required: true
+        default: "https://zoning-agent-platform.vercel.app"
+
+jobs:
+  production-smoke:
+    name: Production smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install web dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Check production config
+        run: >
+          python scripts/check_production_config.py
+          --api-url "${{ inputs.api_url }}"
+          --web-origin "${{ inputs.web_url }}"
+      - name: API smoke
+        env:
+          PUBLIC_BASE_API_URL: ${{ inputs.api_url }}
+          PUBLIC_AUTH_TOKEN: ${{ secrets.PUBLIC_AUTH_TOKEN }}
+          PUBLIC_ADMIN_TOKEN: ${{ secrets.PUBLIC_ADMIN_TOKEN }}
+          PUBLIC_TEST_SUPPORTED_ADDRESS: ${{ secrets.PUBLIC_TEST_SUPPORTED_ADDRESS }}
+          PUBLIC_TEST_UNSUPPORTED_ADDRESS: ${{ secrets.PUBLIC_TEST_UNSUPPORTED_ADDRESS }}
+        run: python scripts/smoke_public_api.py
+      - name: Browser smoke
+        env:
+          WEB_BASE_URL: ${{ inputs.web_url }}
+          E2E_MODE: live
+        run: npm run test:e2e

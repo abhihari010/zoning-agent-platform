@@ -32,6 +32,7 @@
       "jurisdiction_id": "blacksburg-va",
       "url": "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
       "effective_date": "2026-03-19",
+      "retrieved_at": "2026-05-25",
       "districts": ["residential-low-density", "mixed-use-core"],
       "uses": ["home-based-food-business", "general"],
       "source_type": "zoning_ordinance"
@@ -44,6 +45,7 @@
       "jurisdiction_id": "blacksburg-va",
       "url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
       "effective_date": "2026-03-19",
+      "retrieved_at": "2026-05-25",
       "districts": ["residential-low-density", "mixed-use-core", "commercial-employment", "industrial-zone"],
       "uses": ["home-based-food-business", "general"],
       "source_type": "planning_page"

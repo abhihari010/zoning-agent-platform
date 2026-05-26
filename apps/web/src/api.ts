@@ -338,6 +338,28 @@ export async function listProjects(): Promise<ProjectSummary[]> {
   }));
 }
 
+export async function deleteProject(projectId: string): Promise<void> {
+  const response = await fetch(`${API_BASE}/projects/${projectId}`, {
+    method: "DELETE",
+    headers: requestHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Failed to delete project"));
+  }
+}
+
+export async function deleteMyData(): Promise<{ deletedProjects: number }> {
+  const response = await fetch(`${API_BASE}/me/data`, {
+    method: "DELETE",
+    headers: requestHeaders(),
+  });
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Failed to delete account data"));
+  }
+  const payload = (await response.json()) as { deleted_projects: number };
+  return { deletedProjects: payload.deleted_projects };
+}
+
 export async function fetchJurisdictionRequestSummaries(): Promise<JurisdictionRequestSummary[]> {
   const response = await fetch(`${API_BASE}/admin/jurisdiction-requests`, {
     headers: requestHeaders({}, { includeAdminAccess: true }),

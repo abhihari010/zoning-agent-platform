@@ -9,16 +9,19 @@ The production path is a single FastAPI zoning pipeline behind the React client:
 - `EMBEDDING_PROVIDER=none`, `local`, or `openai`
 - `VECTOR_PROVIDER=none` or `chroma`
 
-For the private beta, prefer `RAG_PROVIDER=hybrid_local`, `EMBEDDING_PROVIDER=local`, and
-`VECTOR_PROVIDER=chroma` so retrieval has SQL source filtering plus vector fallback without IBM
-watsonx dependency.
+For the public beta, prefer `RAG_PROVIDER=hybrid_local`, `EMBEDDING_PROVIDER=local`, and
+`VECTOR_PROVIDER=none`. SQL source chunks are the production retrieval baseline until vector
+persistence is deliberately added. Chroma remains a rebuildable local/staging option.
 
 ## Required Environment
 
 - `DATABASE_URL`: production database connection string. Use `ZONING_DB_PATH` only for local SQLite.
+- `APP_ENV=production`: enables strict production configuration validation.
 - `GOOGLE_MAPS_API_KEY`: required for live address validation and autocomplete.
 - `CORS_ALLOW_ORIGINS`: set to the deployed frontend origin.
-- `BETA_ACCESS_KEYS`: comma-separated `label:key` entries for beta access.
+- `AUTH_PROVIDER=supabase`, `AUTH_REQUIRED=true`, `SUPABASE_PROJECT_URL`, and
+  `SUPABASE_JWT_SECRET`: required for public-beta user auth.
+- `BETA_ACCESS_KEYS`: temporary comma-separated `label:key` entries for QA/migration access only.
 - `ADMIN_ACCESS_KEY`: enables source write, import, and reindex routes.
 - `STARTUP_REINDEX_ENABLED=true`: warms and repairs the source index on API startup.
 
@@ -41,7 +44,7 @@ API calls `prepare_source_index_for_startup()`:
 1. Seed bundled source records when the source registry is empty or the configured registry version
    has not been applied.
 2. Rebuild stale or missing source chunks.
-3. Sync the vector index when `VECTOR_PROVIDER` is enabled.
+3. Sync the vector index when `VECTOR_PROVIDER` is enabled. Public beta should leave it disabled.
 4. Audit `source.startup_reindex.completed` with source, chunk, vector, and warning counts.
 
 Startup readiness is fail-soft. If the warmup cannot complete, the API still starts and reports the
@@ -49,7 +52,9 @@ issue in `/health` so the deployment platform can surface it.
 
 ## Health Checks
 
-Use `GET /health` for public platform health checks. It does not require beta access and returns:
+Use `GET /health` for public platform liveness checks. It does not require auth and returns the last
+known startup/source summary without forcing a deep reindex. Use `GET /ready` for deeper smoke checks.
+Readiness returns:
 
 - `status`: `ok` when source chunks are ready, otherwise `warning`
 - `source_index_ready`, `source_count`, `chunk_count`

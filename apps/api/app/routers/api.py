@@ -6,7 +6,7 @@ from datetime import datetime, time, timezone
 from uuid import UUID, uuid4
 
 import httpx
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 
 from app.cache import invalidate_all_caches, invalidate_source_dependent_caches
 from app.ai.source_registry_retriever import ensure_source_index_ready
@@ -210,7 +210,10 @@ def intake_project(payload: IntakeRequest, request: Request) -> IntakeResponse:
 
 
 @router.get("/address/suggest")
-def address_suggest(query: str, session_token: str | None = None):
+def address_suggest(
+    query: str = Query(min_length=3, max_length=200),
+    session_token: str | None = Query(default=None, max_length=200),
+):
     try:
         suggestions = suggest_addresses(query=query, session_token=session_token)
     except RuntimeError as exc:
@@ -308,6 +311,22 @@ def get_result(project_id: UUID, request: Request):
     if not analysis:
         raise HTTPException(status_code=404, detail="Analysis not found")
     return analysis.result
+
+
+@router.delete("/projects/{project_id}")
+def delete_project(project_id: UUID, request: Request):
+    auth = require_user(request)
+    require_project_access(project_id, auth)
+    if not store.delete_project(project_id):
+        raise HTTPException(status_code=404, detail="Project not found")
+    return {"status": "deleted", "project_id": str(project_id)}
+
+
+@router.delete("/me/data")
+def delete_my_data(request: Request):
+    auth = require_user(request)
+    deleted_projects = store.delete_user_data(auth.user_id)
+    return {"status": "deleted", "deleted_projects": deleted_projects}
 
 
 @router.get("/projects/{project_id}/trace", dependencies=[Depends(require_admin_access)])

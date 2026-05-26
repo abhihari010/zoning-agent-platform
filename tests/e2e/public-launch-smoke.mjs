@@ -1,6 +1,7 @@
 import { chromium } from "playwright";
 
 const baseUrl = process.env.WEB_BASE_URL || "http://localhost:5173";
+const mode = process.env.E2E_MODE || "fixture";
 const expectWorkspace = process.env.E2E_EXPECT_WORKSPACE === "true";
 const supabaseUserEmail = process.env.E2E_SUPABASE_USER_EMAIL;
 const supabaseUserPassword = process.env.E2E_SUPABASE_USER_PASSWORD;
@@ -374,6 +375,16 @@ async function installApiMocks(targetPage) {
       return;
     }
 
+    if (path.includes("/projects/") && request.method() === "DELETE") {
+      await route.fulfill(jsonResponse({ status: "deleted", project_id: path.split("/").pop() }));
+      return;
+    }
+
+    if (path.endsWith("/me/data") && request.method() === "DELETE") {
+      await route.fulfill(jsonResponse({ status: "deleted", deleted_projects: 1 }));
+      return;
+    }
+
     if (path.endsWith("/jurisdiction-requests")) {
       await route.fulfill(
         jsonResponse({
@@ -463,7 +474,9 @@ async function runOptionalSupabaseUserCheck() {
 }
 
 try {
-  await installApiMocks(page);
+  if (mode === "fixture") {
+    await installApiMocks(page);
+  }
   await page.goto(baseUrl, { waitUntil: "networkidle", timeout: 30_000 });
   const bodyText = await page.locator("body").innerText({ timeout: 10_000 });
 
@@ -478,11 +491,19 @@ try {
     /Privacy/i.test(bodyText) &&
     /Disclaimer/i.test(bodyText);
 
-  if (expectWorkspace && !isWorkspace) {
+  if (mode === "live") {
+    if (!isWorkspace && !isLaunchPage) {
+      throw new Error("Live production page is neither the public launch surface nor the workspace.");
+    }
+    if (/Source Admin|Demand Backlog|Jurisdiction Requests/i.test(bodyText) && !isWorkspace) {
+      throw new Error("Signed-out live public surface exposes admin request summary UI.");
+    }
+    await expectBodyIncludes("Zoning Review Platform");
+    assertNoBrowserErrors();
+    console.log(`Public launch live browser smoke passed for ${baseUrl}`);
+  } else if (expectWorkspace && !isWorkspace) {
     throw new Error("Expected the local workspace, but the public landing/sign-in page rendered.");
-  }
-
-  if (isLaunchPage && !isWorkspace) {
+  } else if (isLaunchPage && !isWorkspace) {
     await expectBodyIncludes("Public Zoning Guidance", "Current Coverage", "Account Access");
     if (/Source Admin|Demand Backlog|Jurisdiction Requests/i.test(bodyText)) {
       throw new Error("Signed-out public surface exposes admin request summary UI.");
@@ -494,8 +515,10 @@ try {
     throw new Error("Rendered page is neither the public launch surface nor the workspace.");
   }
 
-  assertNoBrowserErrors();
-  console.log(`Public launch browser smoke passed for ${baseUrl}`);
+  if (mode !== "live") {
+    assertNoBrowserErrors();
+    console.log(`Public launch browser smoke passed for ${baseUrl}`);
+  }
 } finally {
   await browser.close();
 }

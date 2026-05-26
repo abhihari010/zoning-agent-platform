@@ -10,6 +10,7 @@ API_ROOT = ROOT / "apps" / "api"
 sys.path.insert(0, str(API_ROOT))
 
 from app.ai.source_registry_retriever import ensure_seed_sources, ensure_source_index_ready  # noqa: E402
+from app.ingestion import import_source_packs  # noqa: E402
 from app.jurisdictions import validate_public_support_candidate  # noqa: E402
 from app.storage import store  # noqa: E402
 
@@ -22,6 +23,8 @@ def main() -> int:
     args = parser.parse_args()
 
     ensure_seed_sources()
+    for source in import_source_packs():
+        store.upsert_source(source)
     ensure_source_index_ready()
     exit_code = 0
     for jurisdiction_id in args.jurisdiction_ids:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 
 from app.ai.registry import get_embedding_provider
 from app.ai.source_registry_retriever import ensure_source_index_ready
@@ -21,12 +22,16 @@ class StartupReadiness:
     warnings: list[str] = field(default_factory=list)
 
 
+_LAST_STARTUP_READINESS: StartupReadiness | None = None
+
+
 def prepare_source_index_for_startup() -> StartupReadiness:
+    global _LAST_STARTUP_READINESS
     settings = get_settings()
     if not settings.startup_reindex_enabled:
         vector_status = get_vector_index_status(settings)
         source_count, chunk_count = _safe_source_counts()
-        return StartupReadiness(
+        _LAST_STARTUP_READINESS = StartupReadiness(
             status="skipped",
             source_count=source_count,
             chunk_count=chunk_count,
@@ -36,6 +41,7 @@ def prepare_source_index_for_startup() -> StartupReadiness:
             vector_count=vector_status.count,
             warnings=["Startup reindex is disabled with STARTUP_REINDEX_ENABLED=false."],
         )
+        return _LAST_STARTUP_READINESS
 
     try:
         readiness = ensure_source_index_ready()
@@ -56,7 +62,7 @@ def prepare_source_index_for_startup() -> StartupReadiness:
                 "warnings": warnings,
             },
         )
-        return StartupReadiness(
+        _LAST_STARTUP_READINESS = StartupReadiness(
             status=status,
             source_count=readiness.source_count,
             chunk_count=readiness.chunk_count,
@@ -66,11 +72,12 @@ def prepare_source_index_for_startup() -> StartupReadiness:
             vector_count=vector_result.count,
             warnings=warnings,
         )
+        return _LAST_STARTUP_READINESS
     except Exception as exc:
         _safe_audit("source.startup_reindex.failed", "source-registry", {"error": str(exc)})
         vector_status = get_vector_index_status(settings)
         source_count, chunk_count = _safe_source_counts()
-        return StartupReadiness(
+        _LAST_STARTUP_READINESS = StartupReadiness(
             status="warning",
             source_count=source_count,
             chunk_count=chunk_count,
@@ -80,6 +87,36 @@ def prepare_source_index_for_startup() -> StartupReadiness:
             vector_count=vector_status.count,
             warnings=[f"Startup source readiness failed: {exc}"],
         )
+        return _LAST_STARTUP_READINESS
+
+
+def liveness_health() -> dict[str, object]:
+    readiness = _LAST_STARTUP_READINESS
+    source_count, chunk_count = _safe_source_counts()
+    if readiness:
+        return {
+            "status": "ok" if readiness.source_index_ready else readiness.status,
+            "checked_at": datetime.now(timezone.utc).isoformat(),
+            "source_index_ready": readiness.source_index_ready,
+            "source_count": source_count or readiness.source_count,
+            "chunk_count": chunk_count or readiness.chunk_count,
+            "vector_provider": readiness.vector_provider,
+            "vector_index_ready": readiness.vector_index_ready,
+            "vector_count": readiness.vector_count,
+            "warnings": readiness.warnings,
+        }
+    vector_status = get_vector_index_status()
+    return {
+        "status": "ok" if chunk_count > 0 else "warning",
+        "checked_at": datetime.now(timezone.utc).isoformat(),
+        "source_index_ready": chunk_count > 0,
+        "source_count": source_count,
+        "chunk_count": chunk_count,
+        "vector_provider": vector_status.provider,
+        "vector_index_ready": vector_status.ready,
+        "vector_count": vector_status.count,
+        "warnings": vector_status.warnings,
+    }
 
 
 def readiness_health() -> dict[str, object]:

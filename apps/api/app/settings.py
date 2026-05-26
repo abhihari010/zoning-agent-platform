@@ -7,11 +7,13 @@ from pathlib import Path
 from typing import Literal, cast
 
 
+AppEnvName = Literal["local", "staging", "production"]
 AIProviderName = Literal["deterministic", "openai", "watsonx", "local"]
 RAGProviderName = Literal["source_registry", "hybrid_local", "watsonx"]
 EmbeddingProviderName = Literal["none", "local", "openai"]
 VectorProviderName = Literal["none", "chroma"]
 
+VALID_APP_ENVS: set[str] = {"local", "staging", "production"}
 VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "watsonx", "local"}
 VALID_RAG_PROVIDERS: set[str] = {"source_registry", "hybrid_local", "watsonx"}
 VALID_EMBEDDING_PROVIDERS: set[str] = {"none", "local", "openai"}
@@ -19,6 +21,7 @@ VALID_VECTOR_PROVIDERS: set[str] = {"none", "chroma"}
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent / "data" / "app.sqlite3"
 DEFAULT_CHROMA_PATH = Path(__file__).resolve().parent / "data" / "chroma"
+PRODUCTION_FRONTEND_ORIGIN = "https://zoning-agent-platform.vercel.app"
 
 
 class ConfigurationError(RuntimeError):
@@ -73,8 +76,13 @@ def _parse_labeled_access_keys(raw_value: str) -> tuple[AccessKey, ...]:
     return tuple(keys)
 
 
+def _parse_csv(raw_value: str) -> tuple[str, ...]:
+    return tuple(item.strip() for item in raw_value.split(",") if item.strip())
+
+
 @dataclass(frozen=True)
 class Settings:
+    app_env: AppEnvName
     ai_provider: AIProviderName
     rag_provider: RAGProviderName
     embedding_provider: EmbeddingProviderName
@@ -117,6 +125,7 @@ class Settings:
     auto_reindex_on_empty: bool
     startup_reindex_enabled: bool
     source_registry_version: str
+    cors_allow_origins: tuple[str, ...]
     # ---------------------------------------------------------------------------
     # Workstream A — Cache settings (appended; do not reorder above fields)
     # ---------------------------------------------------------------------------
@@ -163,7 +172,11 @@ def get_settings() -> Settings:
         if email.strip()
     )
 
-    return Settings(
+    settings = Settings(
+        app_env=cast(
+            AppEnvName,
+            _provider_name("APP_ENV", "local", VALID_APP_ENVS),
+        ),
         ai_provider=cast(
             AIProviderName,
             _provider_name("AI_PROVIDER", default_ai_provider, VALID_AI_PROVIDERS),
@@ -221,6 +234,7 @@ def get_settings() -> Settings:
         auto_reindex_on_empty=_env_bool("AUTO_REINDEX_ON_EMPTY", True),
         startup_reindex_enabled=_env_bool("STARTUP_REINDEX_ENABLED", True),
         source_registry_version=_env("SOURCE_REGISTRY_VERSION"),
+        cors_allow_origins=_parse_csv(_env("CORS_ALLOW_ORIGINS")),
         # Workstream A — cache settings
         cache_enabled=_env_bool("CACHE_ENABLED", True),
         cache_db_path=Path(_env("CACHE_DB_PATH")) if _env("CACHE_DB_PATH") else Path("app/data/cache.sqlite3"),
@@ -228,6 +242,36 @@ def get_settings() -> Settings:
         source_index_version=_env("SOURCE_INDEX_VERSION"),
         prompt_version=_env("PROMPT_VERSION", "1.0"),
     )
+    validate_production_settings(settings)
+    return settings
+
+
+def validate_production_settings(settings: Settings) -> None:
+    if settings.app_env != "production":
+        return
+
+    missing: list[str] = []
+    if not settings.database_url:
+        missing.append("DATABASE_URL")
+    if settings.auth_provider != "supabase":
+        missing.append("AUTH_PROVIDER=supabase")
+    if not settings.auth_required:
+        missing.append("AUTH_REQUIRED=true")
+    if not settings.supabase_project_url:
+        missing.append("SUPABASE_PROJECT_URL")
+    if not settings.supabase_jwt_secret:
+        missing.append("SUPABASE_JWT_SECRET")
+    if not settings.google_maps_api_key:
+        missing.append("GOOGLE_MAPS_API_KEY")
+    if "*" in settings.cors_allow_origins:
+        missing.append("CORS_ALLOW_ORIGINS must not be *")
+    if PRODUCTION_FRONTEND_ORIGIN not in settings.cors_allow_origins:
+        missing.append(f"CORS_ALLOW_ORIGINS must include {PRODUCTION_FRONTEND_ORIGIN}")
+
+    if missing:
+        raise ConfigurationError(
+            "Production configuration is incomplete: " + ", ".join(missing)
+        )
 
 
 def require_watsonx_settings(settings: Settings | None = None) -> Settings:

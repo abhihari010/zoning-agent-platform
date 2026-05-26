@@ -72,3 +72,28 @@ def test_health_readiness_fails_soft_when_database_is_unavailable(monkeypatch) -
     assert health["source_count"] == 0
     assert health["chunk_count"] == 0
     assert "Source readiness check failed" in health["warnings"][0]
+
+
+def test_liveness_health_uses_last_startup_snapshot(monkeypatch) -> None:
+    startup._LAST_STARTUP_READINESS = startup.StartupReadiness(
+        status="ready",
+        source_count=3,
+        chunk_count=3,
+        source_index_ready=True,
+        vector_provider="none",
+        vector_index_ready=False,
+        vector_count=0,
+        warnings=[],
+    )
+    monkeypatch.setattr(
+        startup,
+        "ensure_source_index_ready",
+        lambda: (_ for _ in ()).throw(RuntimeError("should not run deep readiness")),
+    )
+    monkeypatch.setattr(startup, "store", FailingStore())
+
+    health = startup.liveness_health()
+
+    assert health["status"] == "ok"
+    assert health["source_index_ready"] is True
+    assert health["source_count"] == 3
