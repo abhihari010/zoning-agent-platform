@@ -21,7 +21,7 @@ jobs:
       - name: Install API
         run: python -m pip install --upgrade pip && python -m pip install ".[dev]"
       - name: Run pytest
-        run: pytest -q --basetemp ../../.tmp/pytest-ci
+        run: mkdir -p ../../.tmp && pytest -q --basetemp ../../.tmp/pytest-ci
 
   source-quality:
     name: Source quality
@@ -31,6 +31,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install API dependencies
+        run: python -m pip install --upgrade pip && python -m pip install "apps/api[dev]"
       - name: Validate source packs
         run: python scripts/validate_source_packs.py
       - name: Check public support candidates
