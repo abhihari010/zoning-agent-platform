@@ -235,10 +235,7 @@ class ZoningOrchestrator:
         )
 
         if retrieval_error:
-            if retrieval_provider.name == "watsonx":
-                warnings.append(f"watsonx retrieval failed: {retrieval_error}")
-            else:
-                warnings.append(f"Local source retrieval failed: {retrieval_error}")
+            warnings.append(f"Source retrieval failed: {retrieval_error}")
 
         if not source_readiness.index_ready:
             warnings.extend(source_readiness.warnings)
@@ -254,11 +251,7 @@ class ZoningOrchestrator:
 
         if not citations:
             warnings.append(
-                (
-                    "No relevant ordinances were returned by watsonx retrieval for this request. Please contact the planning office."
-                    if retrieval_provider.name == "watsonx"
-                    else "No relevant ordinances were found in the current zoning source registry. Please contact the planning office."
-                )
+                "No relevant ordinances were found in the current zoning source registry. Please contact the planning office."
             )
 
         if intake.missing_details:

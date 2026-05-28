@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import uuid
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any
 
 from app.ai.interfaces import EmbeddingProvider, EmbeddingProviderRequest
 from app.jurisdictions import get_jurisdiction_scope, source_applies_to_jurisdiction
 from app.models import SourceChunk
 from app.settings import Settings, get_settings
+
+_CHUNK_ID_NAMESPACE = uuid.NAMESPACE_URL
 
 
 @dataclass(frozen=True)
@@ -36,27 +38,52 @@ class VectorIndexSyncResult:
     warnings: list[str] = field(default_factory=list)
 
 
-class ChromaVectorStore:
+class QdrantVectorStore:
     def __init__(
         self,
         *,
-        path: str | Path | None = None,
+        url: str | None = None,
+        api_key: str | None = None,
         collection_name: str | None = None,
         client: Any | None = None,
         settings: Settings | None = None,
     ) -> None:
         resolved = settings or get_settings()
-        self.path = Path(path) if path else resolved.chroma_path
-        self.collection_name = collection_name or resolved.chroma_collection
+        self._url = url or resolved.qdrant_url
+        self._api_key = api_key if api_key is not None else (resolved.qdrant_api_key or None)
+        self.collection_name = collection_name or resolved.qdrant_collection
         self._client = client
-        self._collection: Any | None = None
+
+    def _get_client(self) -> Any:
+        if self._client is not None:
+            return self._client
+        try:
+            from qdrant_client import QdrantClient
+        except ImportError as exc:
+            raise RuntimeError(
+                "qdrant-client is not installed. Install qdrant-client to use VECTOR_PROVIDER=qdrant."
+            ) from exc
+        self._client = QdrantClient(url=self._url, api_key=self._api_key, timeout=30)
+        return self._client
+
+    def _ensure_collection(self, vector_size: int) -> None:
+        from qdrant_client.models import Distance, VectorParams
+
+        client = self._get_client()
+        try:
+            client.get_collection(self.collection_name)
+        except Exception:
+            client.create_collection(
+                collection_name=self.collection_name,
+                vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
+            )
 
     def is_available(self) -> bool:
         try:
-            self._get_collection()
+            self._get_client().get_collections()
+            return True
         except Exception:
             return False
-        return True
 
     def upsert_chunks(self, chunks: list[SourceChunk], embeddings: list[list[float]]) -> None:
         if len(chunks) != len(embeddings):
@@ -64,22 +91,54 @@ class ChromaVectorStore:
         if not chunks:
             return
 
-        collection = self._get_collection()
-        collection.upsert(
-            ids=[chunk.chunk_id for chunk in chunks],
-            documents=[chunk.chunk_text for chunk in chunks],
-            embeddings=embeddings,
-            metadatas=[_chunk_metadata(chunk) for chunk in chunks],
-        )
+        from qdrant_client.models import PointStruct
+
+        vector_size = len(embeddings[0])
+        self._ensure_collection(vector_size)
+        client = self._get_client()
+        points = [
+            PointStruct(
+                id=_chunk_id_to_point_id(chunk.chunk_id),
+                vector=embedding,
+                payload=_chunk_metadata(chunk),
+            )
+            for chunk, embedding in zip(chunks, embeddings)
+        ]
+        client.upsert(collection_name=self.collection_name, points=points, wait=True)
 
     def delete_missing_chunk_ids(self, valid_chunk_ids: set[str]) -> int:
-        collection = self._get_collection()
-        existing = collection.get(include=[])
-        existing_ids = existing.get("ids", []) if isinstance(existing, dict) else []
-        stale_ids = [chunk_id for chunk_id in existing_ids if chunk_id not in valid_chunk_ids]
-        if stale_ids:
-            collection.delete(ids=stale_ids)
-        return len(stale_ids)
+        from qdrant_client.models import PointIdsList
+
+        existing_chunk_ids = self._scroll_all_chunk_ids()
+        stale_chunk_ids = [cid for cid in existing_chunk_ids if cid not in valid_chunk_ids]
+        if stale_chunk_ids:
+            stale_point_ids = [_chunk_id_to_point_id(cid) for cid in stale_chunk_ids]
+            self._get_client().delete(
+                collection_name=self.collection_name,
+                points_selector=PointIdsList(points=stale_point_ids),
+                wait=True,
+            )
+        return len(stale_chunk_ids)
+
+    def _scroll_all_chunk_ids(self) -> list[str]:
+        client = self._get_client()
+        chunk_ids: list[str] = []
+        offset = None
+        while True:
+            records, next_offset = client.scroll(
+                collection_name=self.collection_name,
+                with_payload=["chunk_id"],
+                with_vectors=False,
+                limit=1000,
+                offset=offset,
+            )
+            for record in records:
+                if record.payload and "chunk_id" in record.payload:
+                    chunk_ids.append(record.payload["chunk_id"])
+            if next_offset is None:
+                break
+            offset = next_offset
+        return chunk_ids
 
     def query(
         self,
@@ -91,68 +150,51 @@ class ChromaVectorStore:
             return []
 
         filters = filters or {}
-        where = _build_chroma_where(filters)
-        collection = self._get_collection()
-        response = collection.query(
-            query_embeddings=[query_embedding],
-            n_results=limit,
-            where=where or None,
-            include=["metadatas", "distances"],
-        )
+        qdrant_filter = _build_qdrant_filter(filters)
+        client = self._get_client()
 
-        ids = _first_result_list(response.get("ids", []))
-        distances = _first_result_list(response.get("distances", []))
-        metadatas = _first_result_list(response.get("metadatas", []))
+        try:
+            hits = client.search(
+                collection_name=self.collection_name,
+                query_vector=query_embedding,
+                query_filter=qdrant_filter,
+                limit=limit * 2,
+                with_payload=True,
+                with_vectors=False,
+            )
+        except Exception:
+            return []
 
         results: list[VectorQueryResult] = []
-        for index, chunk_id in enumerate(ids):
-            metadata = metadatas[index] if index < len(metadatas) and isinstance(metadatas[index], dict) else {}
+        for hit in hits:
+            metadata = hit.payload or {}
             if not _metadata_matches(metadata, filters):
                 continue
-            distance = distances[index] if index < len(distances) else None
-            score = 1.0 / (1.0 + float(distance)) if distance is not None else 0.0
+            score = float(hit.score)
             results.append(
                 VectorQueryResult(
-                    chunk_id=str(chunk_id),
-                    distance=float(distance) if distance is not None else None,
+                    chunk_id=str(metadata.get("chunk_id", str(hit.id))),
+                    distance=1.0 - score,
                     score=score,
                     metadata=metadata,
                 )
             )
+            if len(results) >= limit:
+                break
         return results
 
     def reset_collection(self) -> None:
-        client = self._get_client()
         try:
-            client.delete_collection(self.collection_name)
+            self._get_client().delete_collection(self.collection_name)
         except Exception:
             pass
-        self._collection = None
-        self._get_collection()
 
     def count(self) -> int:
-        return int(self._get_collection().count())
-
-    def _get_client(self) -> Any:
-        if self._client is not None:
-            return self._client
-
         try:
-            import chromadb
-        except ImportError as exc:
-            raise RuntimeError("ChromaDB is not installed. Install chromadb to use VECTOR_PROVIDER=chroma.") from exc
-
-        self.path.mkdir(parents=True, exist_ok=True)
-        self._client = chromadb.PersistentClient(path=str(self.path))
-        return self._client
-
-    def _get_collection(self) -> Any:
-        if self._collection is None:
-            self._collection = self._get_client().get_or_create_collection(
-                name=self.collection_name,
-                embedding_function=None,
-            )
-        return self._collection
+            result = self._get_client().count(collection_name=self.collection_name, exact=True)
+            return int(result.count)
+        except Exception:
+            return 0
 
 
 def get_vector_index_status(settings: Settings | None = None) -> VectorIndexStatus:
@@ -166,22 +208,22 @@ def get_vector_index_status(settings: Settings | None = None) -> VectorIndexStat
             warnings=["Vector index is disabled with VECTOR_PROVIDER=none."],
         )
 
-    store = ChromaVectorStore(settings=resolved)
+    store = QdrantVectorStore(settings=resolved)
     try:
         count = store.count()
     except Exception as exc:
         return VectorIndexStatus(
             provider=resolved.vector_provider,
-            collection=resolved.chroma_collection,
+            collection=resolved.qdrant_collection,
             ready=False,
             count=0,
             warnings=[str(exc)],
         )
 
-    warnings = [] if count > 0 else ["Chroma vector collection is empty."]
+    warnings = [] if count > 0 else ["Qdrant vector collection is empty."]
     return VectorIndexStatus(
         provider=resolved.vector_provider,
-        collection=resolved.chroma_collection,
+        collection=resolved.qdrant_collection,
         ready=count > 0,
         count=count,
         warnings=warnings,
@@ -203,9 +245,9 @@ def sync_vector_index(
             warnings=["Vector index skipped because VECTOR_PROVIDER=none."],
         )
 
-    store = ChromaVectorStore(settings=resolved)
+    store = QdrantVectorStore(settings=resolved)
     try:
-        if resolved.chroma_reset_on_reindex:
+        if resolved.vector_provider == "qdrant":
             store.reset_collection()
         embeddings = embedding_provider.embed(
             EmbeddingProviderRequest(texts=[chunk.chunk_text for chunk in chunks])
@@ -213,10 +255,10 @@ def sync_vector_index(
         if chunks and (not embeddings or any(not embedding for embedding in embeddings)):
             return VectorIndexSyncResult(
                 provider=resolved.vector_provider,
-                collection=resolved.chroma_collection,
+                collection=resolved.qdrant_collection,
                 ready=False,
                 count=0,
-                warnings=["Embedding provider returned empty vectors; Chroma index was not updated."],
+                warnings=["Embedding provider returned empty vectors; Qdrant index was not updated."],
             )
         store.upsert_chunks(chunks, embeddings)
         store.delete_missing_chunk_ids({chunk.chunk_id for chunk in chunks})
@@ -224,7 +266,7 @@ def sync_vector_index(
     except Exception as exc:
         return VectorIndexSyncResult(
             provider=resolved.vector_provider,
-            collection=resolved.chroma_collection,
+            collection=resolved.qdrant_collection,
             ready=False,
             count=0,
             warnings=[str(exc)],
@@ -232,15 +274,19 @@ def sync_vector_index(
 
     return VectorIndexSyncResult(
         provider=resolved.vector_provider,
-        collection=resolved.chroma_collection,
+        collection=resolved.qdrant_collection,
         ready=count > 0 and count >= len(chunks),
         count=count,
-        warnings=[] if count else ["Chroma vector collection is empty."],
+        warnings=[] if count else ["Qdrant vector collection is empty."],
     )
 
 
+def _chunk_id_to_point_id(chunk_id: str) -> str:
+    return str(uuid.uuid5(_CHUNK_ID_NAMESPACE, chunk_id))
+
+
 def _chunk_metadata(chunk: SourceChunk) -> dict[str, Any]:
-    metadata = {
+    metadata: dict[str, Any] = {
         "chunk_id": chunk.chunk_id,
         "source_id": chunk.source_id,
         "jurisdiction_id": chunk.jurisdiction_id or "",
@@ -256,8 +302,8 @@ def _chunk_metadata(chunk: SourceChunk) -> dict[str, Any]:
         "url": chunk.url or "",
         "effective_date": chunk.effective_date or "",
         "retrieved_at": chunk.retrieved_at or "",
-        "districts": _list_filter_value(chunk.districts),
-        "uses": _list_filter_value(chunk.uses),
+        "districts": [d for d in chunk.districts if d],
+        "uses": [u for u in chunk.uses if u],
         "source_version": chunk.source_version or "",
         "content_hash": chunk.metadata.get("content_hash", chunk.source_text_hash),
         "coverage_status": chunk.metadata.get("coverage_status", ""),
@@ -269,72 +315,59 @@ def _chunk_metadata(chunk: SourceChunk) -> dict[str, Any]:
     return metadata
 
 
-def _build_chroma_where(filters: dict[str, Any]) -> dict[str, Any]:
-    conditions: list[dict[str, Any]] = []
+def _build_qdrant_filter(filters: dict[str, Any]) -> Any | None:
+    from qdrant_client.models import FieldCondition, Filter, MatchValue
+
+    must: list[Any] = []
 
     jurisdiction_id = filters.get("jurisdiction_id")
     if jurisdiction_id:
         jurisdiction_scope = get_jurisdiction_scope(str(jurisdiction_id))
-        jurisdiction_conditions: list[dict[str, Any]] = [
-            {"jurisdiction_id": {"$eq": jurisdiction_id}},
+        should: list[Any] = [
+            FieldCondition(key="jurisdiction_id", match=MatchValue(value=jurisdiction_id))
         ]
         if jurisdiction_scope and jurisdiction_scope.parent_jurisdiction_id:
-            jurisdiction_conditions.append(
-                {"jurisdiction_id": {"$eq": jurisdiction_scope.parent_jurisdiction_id}}
+            should.append(
+                FieldCondition(
+                    key="jurisdiction_id",
+                    match=MatchValue(value=jurisdiction_scope.parent_jurisdiction_id),
+                )
             )
         if jurisdiction_scope and jurisdiction_scope.state:
-            jurisdiction_conditions.append(
-                {
-                    "$and": [
-                        {"jurisdiction_id": {"$eq": "*"}},
-                        {"state": {"$eq": jurisdiction_scope.state}},
+            should.append(
+                Filter(
+                    must=[
+                        FieldCondition(key="jurisdiction_id", match=MatchValue(value="*")),
+                        FieldCondition(key="state", match=MatchValue(value=jurisdiction_scope.state)),
                     ]
-                }
+                )
             )
-        conditions.append({"$or": jurisdiction_conditions})
+        must.append(Filter(should=should))
 
-    # Exact-match filters
     for key in ["source_id", "source_type", "source_version"]:
         value = filters.get(key)
         if value:
-            conditions.append({key: {"$eq": value}})
+            must.append(FieldCondition(key=key, match=MatchValue(value=value)))
 
-    # District filter — pipe-delimited field; skip wildcard/unknown values
     district = filters.get("district")
     if district and district not in {"unknown", "*", ""}:
-        conditions.append({"districts": {"$contains": f"|{district}|"}})
+        must.append(FieldCondition(key="districts", match=MatchValue(value=district)))
 
-    # Use filter — pipe-delimited field; skip wildcard "general"
     use = filters.get("use")
     if use and use not in {"general", "*", ""}:
-        # Accept chunks that match the use OR are tagged "general"
-        conditions.append(
-            {
-                "$or": [
-                    {"uses": {"$contains": f"|{use}|"}},
-                    {"uses": {"$contains": "|general|"}},
+        must.append(
+            Filter(
+                should=[
+                    FieldCondition(key="uses", match=MatchValue(value=use)),
+                    FieldCondition(key="uses", match=MatchValue(value="general")),
                 ]
-            }
+            )
         )
 
-    # Effective-date filter — include only ordinances effective on or before the date
-    effective_on_or_before = filters.get("effective_on_or_before")
-    if effective_on_or_before:
-        # Only apply when the field is non-empty; Chroma $lte is string lexicographic here
-        conditions.append(
-            {
-                "$or": [
-                    {"effective_date": {"$eq": ""}},
-                    {"effective_date": {"$lte": str(effective_on_or_before)}},
-                ]
-            }
-        )
-
-    if not conditions:
-        return {}
-    if len(conditions) == 1:
-        return conditions[0]
-    return {"$and": conditions}
+    # effective_date range filtering is handled in post-filter _metadata_matches
+    if not must:
+        return None
+    return Filter(must=must)
 
 
 def _metadata_matches(metadata: dict[str, Any], filters: dict[str, Any]) -> bool:
@@ -346,7 +379,9 @@ def _metadata_matches(metadata: dict[str, Any], filters: dict[str, Any]) -> bool
     ):
         return False
     district = filters.get("district")
-    if district and district != "unknown" and not _list_value_contains(metadata.get("districts"), district, wildcard="*"):
+    if district and district != "unknown" and not _list_value_contains(
+        metadata.get("districts"), district, wildcard="*"
+    ):
         return False
     use = filters.get("use")
     if use and not (
@@ -361,20 +396,8 @@ def _metadata_matches(metadata: dict[str, Any], filters: dict[str, Any]) -> bool
     return True
 
 
-def _list_filter_value(values: list[str]) -> str:
-    return "|" + "|".join(sorted({value for value in values if value})) + "|"
-
-
 def _list_value_contains(value: Any, needle: str, wildcard: str | None = None) -> bool:
     if isinstance(value, list):
         return needle in value or (wildcard is not None and wildcard in value)
     haystack = str(value or "")
     return f"|{needle}|" in haystack or (wildcard is not None and f"|{wildcard}|" in haystack)
-
-
-def _first_result_list(value: Any) -> list[Any]:
-    if isinstance(value, list) and value and isinstance(value[0], list):
-        return value[0]
-    if isinstance(value, list):
-        return value
-    return []

@@ -40,9 +40,6 @@ export interface PipelineStageReport {
   details: string[];
 }
 
-/** @deprecated Use PipelineStageReport. Kept for older API consumers. */
-export type AgentReport = PipelineStageReport;
-
 export interface PipelineMetadata {
   version: string;
   promptVersion: string;
@@ -115,8 +112,6 @@ export interface AnalyzeResponse {
   trustIndicators?: TrustIndicators | null;
   citationValidation?: CitationValidation | null;
   pipelineStages?: PipelineStageReport[];
-  /** @deprecated Use pipelineStages. Kept as a compatibility alias. */
-  agents: PipelineStageReport[];
   feasibility: FeasibilityOutput;
   compliance?: ComplianceResult | null;
   checklist: {

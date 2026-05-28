@@ -61,6 +61,7 @@ projects = Table(
     Column("latitude", Float, nullable=True),
     Column("longitude", Float, nullable=True),
     Column("status", String(50), nullable=False),
+    Column("legal_ack_at", DateTime(timezone=True), nullable=True),
     Column("payload_json", JSON, nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),

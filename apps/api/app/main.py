@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import time
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
@@ -20,6 +21,22 @@ load_dotenv(REPO_ROOT / ".env")
 load_dotenv(REPO_ROOT / ".env.local", override=True)
 load_dotenv(API_DIR / ".env", override=True)
 load_dotenv(API_DIR / ".env.local", override=True)
+
+_sentry_dsn = os.getenv("SENTRY_DSN", "").strip()
+if _sentry_dsn:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.fastapi import FastApiIntegration
+        from sentry_sdk.integrations.starlette import StarletteIntegration
+
+        sentry_sdk.init(
+            dsn=_sentry_dsn,
+            integrations=[StarletteIntegration(), FastApiIntegration()],
+            traces_sample_rate=0.1,
+            send_default_pii=False,
+        )
+    except ImportError:
+        pass  # sentry-sdk not installed; skip silently
 
 from app.routers.api import router as api_router
 from app.auth import authenticate_request, set_request_auth
@@ -67,7 +84,7 @@ app.add_middleware(
 
 
 @app.middleware("http")
-async def require_beta_access_key(request: Request, call_next):
+async def enforce_api_auth(request: Request, call_next):
     try:
         settings = get_settings()
     except ConfigurationError as exc:
@@ -76,7 +93,6 @@ async def require_beta_access_key(request: Request, call_next):
             status_code=503,
             content={"detail": "Server configuration is invalid."},
         )
-    beta_access_keys = settings.beta_access_keys
 
     if request.url.path in THROTTLED_PUBLIC_PATHS and request.method != "OPTIONS":
         throttle_response = _throttle_response(request, scope=request.url.path, limit=120)
@@ -84,7 +100,7 @@ async def require_beta_access_key(request: Request, call_next):
             return throttle_response
 
     if (
-        (settings.auth_required or beta_access_keys)
+        settings.auth_required
         and request.url.path.startswith("/api/v1/")
         and request.url.path not in PUBLIC_API_PATHS
         and request.method != "OPTIONS"
@@ -103,7 +119,7 @@ async def require_beta_access_key(request: Request, call_next):
         if auth:
             _log_event("auth.accepted", request, status_code=200, role=auth.role)
             set_request_auth(request, auth)
-        elif settings.auth_required:
+        else:
             _log_event("auth.missing", request, status_code=401)
             throttle_response = _throttle_response(request, scope="auth-failure", limit=60)
             if throttle_response:
@@ -111,18 +127,6 @@ async def require_beta_access_key(request: Request, call_next):
             return JSONResponse(
                 status_code=401,
                 content={"detail": "Authentication required."},
-            )
-        elif beta_access_keys:
-            if request.headers.get("X-Beta-Access-Key", "").strip():
-                _log_event("auth.beta.invalid", request, status_code=403)
-                return JSONResponse(
-                    status_code=403,
-                    content={"detail": "Invalid beta access key."},
-                )
-            _log_event("auth.beta.missing", request, status_code=401)
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Beta access key required."},
             )
 
     return await call_next(request)

@@ -4,7 +4,6 @@ import base64
 import hashlib
 import hmac
 import json
-import secrets
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Literal
@@ -16,8 +15,8 @@ from app.settings import Settings, get_settings
 from app.storage import store
 
 
-AuthMode = Literal["disabled", "beta", "supabase"]
-Role = Literal["anonymous", "legacy_beta", "user", "admin"]
+AuthMode = Literal["disabled", "supabase"]
+Role = Literal["anonymous", "user", "admin"]
 
 
 @dataclass(frozen=True)
@@ -29,7 +28,7 @@ class AuthContext:
 
     @property
     def is_authenticated(self) -> bool:
-        return self.user_id is not None or self.role in {"legacy_beta", "admin"}
+        return self.user_id is not None or self.role == "admin"
 
     @property
     def is_admin(self) -> bool:
@@ -57,31 +56,6 @@ def authenticate_request(request: Request, settings: Settings | None = None) -> 
         _persist_user(auth)
         return auth
 
-    if resolved.beta_access_keys:
-        beta_auth = authenticate_beta_key(request, resolved)
-        if beta_auth:
-            return beta_auth
-
-    return None
-
-
-def authenticate_beta_key(request: Request, settings: Settings | None = None) -> AuthContext | None:
-    resolved = settings or get_settings()
-    provided_key = request.headers.get("X-Beta-Access-Key", "").strip()
-    if not provided_key:
-        return None
-
-    provided_key_hash = hashlib.sha256(provided_key.encode("utf-8")).hexdigest()
-    for access_key in resolved.beta_access_keys:
-        if secrets.compare_digest(provided_key_hash, access_key.key_hash):
-            store.audit(
-                "auth.beta.accepted",
-                "auth",
-                {"key_label": access_key.label},
-            )
-            return AuthContext(role="legacy_beta", auth_mode="beta")
-
-    store.audit("auth.beta.rejected", "auth")
     return None
 
 
@@ -160,7 +134,7 @@ def _decode_hs256_jwt(token: str, secret: str) -> dict[str, Any]:
     try:
         header = json.loads(_base64url_decode(parts[0]))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise HTTPException(status_code=403, detail="Invalid JWT payload.") from exc
+        raise HTTPException(status_code=403, detail="Invalid JWT header.") from exc
 
     if header.get("alg") != "HS256":
         raise HTTPException(status_code=403, detail="Unsupported JWT algorithm.")

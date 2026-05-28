@@ -82,8 +82,6 @@ def require_project_access(project_id: UUID, auth: AuthContext) -> ProjectRecord
     if settings.auth_required:
         if auth.is_admin:
             return project
-        if auth.role == "legacy_beta" and project.user_id is None:
-            return project
         if not auth.user_id:
             raise HTTPException(status_code=401, detail="Authentication required.")
         if project.user_id != auth.user_id:
@@ -170,6 +168,15 @@ def intake_project(payload: IntakeRequest, request: Request) -> IntakeResponse:
             ],
         )
 
+    from datetime import datetime, timezone as _tz
+
+    _legal_ack_at = None
+    if payload.legal_ack_at:
+        try:
+            _legal_ack_at = datetime.fromisoformat(payload.legal_ack_at).replace(tzinfo=_tz.utc)
+        except ValueError:
+            pass
+
     project = ProjectRecord(
         session_id=payload.session_id,
         user_id=auth.user_id,
@@ -182,6 +189,7 @@ def intake_project(payload: IntakeRequest, request: Request) -> IntakeResponse:
         place_id=address_result.place_id,
         latitude=address_result.latitude,
         longitude=address_result.longitude,
+        legal_ack_at=_legal_ack_at,
     )
     store.create_project(project)
     store.audit("project.intake.validated", str(project.project_id), user_id=auth.user_id)

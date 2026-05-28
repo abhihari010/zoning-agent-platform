@@ -3,7 +3,6 @@ import { createClient, type Session } from "@supabase/supabase-js";
 import {
   authMode,
   fetchCurrentUser,
-  requiresBetaAccess,
   setAuthToken,
   supabaseConfig,
   type CurrentUser,
@@ -15,10 +14,8 @@ const supabase =
     : null;
 
 export function useSupabaseAuth({
-  betaAccessKey,
   onAuthStateReset,
 }: {
-  betaAccessKey: string;
   onAuthStateReset: () => void;
 }) {
   const [authSession, setAuthSession] = useState<Session | null>(null);
@@ -27,9 +24,7 @@ export function useSupabaseAuth({
   const [authPassword, setAuthPassword] = useState("");
   const [authMessage, setAuthMessage] = useState("");
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const canUseBetaAccess = authMode === "beta" && (!requiresBetaAccess || Boolean(betaAccessKey));
-  const canLoadPrivateData =
-    authMode === "supabase" ? Boolean(authSession) : authMode === "beta" ? canUseBetaAccess : true;
+  const canLoadPrivateData = authMode === "supabase" ? Boolean(authSession) : true;
 
   useEffect(() => {
     if (!supabase) {
@@ -85,7 +80,7 @@ export function useSupabaseAuth({
     return () => {
       cancelled = true;
     };
-  }, [canLoadPrivateData, authSession, betaAccessKey]);
+  }, [canLoadPrivateData, authSession]);
 
   async function signIn() {
     if (!supabase) {

@@ -1,5 +1,5 @@
 from app.rag.vector_store import (
-    ChromaVectorStore,
+    QdrantVectorStore,
     VectorIndexStatus,
     VectorQueryResult,
     get_vector_index_status,
@@ -7,7 +7,7 @@ from app.rag.vector_store import (
 )
 
 __all__ = [
-    "ChromaVectorStore",
+    "QdrantVectorStore",
     "VectorIndexStatus",
     "VectorQueryResult",
     "get_vector_index_status",
