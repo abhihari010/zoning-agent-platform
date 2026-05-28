@@ -74,14 +74,6 @@ else:
     ]
     _allow_credentials = True
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=_allow_origins,
-    allow_credentials=_allow_credentials,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 
 @app.middleware("http")
 async def enforce_api_auth(request: Request, call_next):
@@ -153,6 +145,19 @@ async def add_request_id_and_log(request: Request, call_next):
         )
         if response is not None:
             response.headers["X-Request-ID"] = request_id
+
+
+# CORSMiddleware is added last so it becomes the outermost middleware in the
+# Starlette stack (last add_middleware call = outermost wrapper). This ensures
+# CORS headers are present on ALL responses, including early-exit 401/503
+# responses from enforce_api_auth that bypass inner middleware layers.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_allow_origins,
+    allow_credentials=_allow_credentials,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")
