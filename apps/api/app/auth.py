@@ -10,6 +10,7 @@ from typing import Any, Literal
 
 import jwt as pyjwt
 from jwt import PyJWKClient
+from jwt.exceptions import PyJWKClientConnectionError
 from fastapi import HTTPException, Request
 
 from app.models import UserRecord
@@ -147,7 +148,7 @@ def _decode_supabase_jwt(token: str, settings: Settings) -> dict[str, Any]:
     elif alg == "ES256":
         if not settings.supabase_project_url:
             raise HTTPException(status_code=503, detail="SUPABASE_PROJECT_URL required for ES256 JWT validation.")
-        return _decode_es256_jwt(token, settings.supabase_project_url)
+        return _decode_es256_jwt(token, settings.supabase_project_url, settings.supabase_anon_key)
     else:
         raise HTTPException(status_code=403, detail="Unsupported JWT algorithm.")
 
@@ -177,10 +178,11 @@ def _decode_hs256_jwt(token: str, secret: str, parts: list[str] | None = None) -
     return payload
 
 
-def _decode_es256_jwt(token: str, project_url: str) -> dict[str, Any]:
+def _decode_es256_jwt(token: str, project_url: str, anon_key: str = "") -> dict[str, Any]:
     if project_url not in _jwks_clients:
         jwks_url = f"{project_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
-        _jwks_clients[project_url] = PyJWKClient(jwks_url, cache_keys=True)
+        headers = {"apikey": anon_key} if anon_key else {}
+        _jwks_clients[project_url] = PyJWKClient(jwks_url, cache_keys=True, headers=headers)
     try:
         signing_key = _jwks_clients[project_url].get_signing_key_from_jwt(token)
         return pyjwt.decode(
@@ -189,6 +191,8 @@ def _decode_es256_jwt(token: str, project_url: str) -> dict[str, Any]:
             algorithms=["ES256"],
             audience="authenticated",
         )
+    except PyJWKClientConnectionError as exc:
+        raise HTTPException(status_code=503, detail=f"JWKS endpoint unreachable: {exc}")
     except pyjwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="JWT is expired.")
     except pyjwt.InvalidTokenError as exc:
