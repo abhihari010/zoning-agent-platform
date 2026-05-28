@@ -83,6 +83,7 @@ class Settings:
     auth_required: bool
     supabase_project_url: str
     supabase_jwt_secret: str
+    supabase_anon_key: str
     admin_user_emails: tuple[str, ...]
     public_signups_enabled: bool
     daily_analysis_limit_free: int
@@ -167,6 +168,7 @@ def get_settings() -> Settings:
         auth_required=_env_bool("AUTH_REQUIRED", False),
         supabase_project_url=_env("SUPABASE_PROJECT_URL").rstrip("/"),
         supabase_jwt_secret=_env("SUPABASE_JWT_SECRET"),
+        supabase_anon_key=_env("SUPABASE_ANON_KEY"),
         admin_user_emails=admin_user_emails,
         public_signups_enabled=_env_bool("PUBLIC_SIGNUPS_ENABLED", True),
         daily_analysis_limit_free=int(_env("DAILY_ANALYSIS_LIMIT_FREE", "10")),
