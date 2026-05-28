@@ -86,11 +86,11 @@ class HybridLocalRetrievalProvider:
         # ------------------------------------------------------------------ #
         result: RetrievalProviderResult | None = None
 
-        if settings.vector_provider == "chroma" and self.embedding_provider:
+        if settings.vector_provider == "qdrant" and self.embedding_provider:
             try:
-                result = self._retrieve_with_chroma(request, start)
+                result = self._retrieve_with_qdrant(request, start)
             except Exception as exc:
-                # Chroma failed; fall through to SQL-backed keyword retrieval.
+                # Qdrant failed; fall through to SQL-backed keyword retrieval.
                 fallback_reason = str(exc)
                 chunks = self.source_store.list_source_chunks_filtered(
                     jurisdiction_id=request.jurisdiction_id,
@@ -111,13 +111,13 @@ class HybridLocalRetrievalProvider:
                         vector_hit_count=None,
                         vector_provider=settings.vector_provider,
                         fallback_used=True,
-                        fallback_reason=f"Chroma error: {fallback_reason}",
+                        fallback_reason=f"Qdrant error: {fallback_reason}",
                         elapsed_ms=(time.monotonic() - start) * 1000,
                     ),
                 )
 
         if result is None:
-            # No Chroma or no embedding provider; use SQL-backed keyword retrieval.
+            # No Qdrant or no embedding provider; use SQL-backed keyword retrieval.
             chunks = self.source_store.list_source_chunks_filtered(
                 jurisdiction_id=request.jurisdiction_id,
                 district=request.district,
@@ -235,7 +235,7 @@ class HybridLocalRetrievalProvider:
             chunks=[chunk for _, chunk in ranked[:5]],
         )
 
-    def _retrieve_with_chroma(
+    def _retrieve_with_qdrant(
         self,
         request: RetrievalProviderRequest,
         start: float,
@@ -249,24 +249,24 @@ class HybridLocalRetrievalProvider:
         if not query_embedding:
             return None
 
-        from app.rag.vector_store import ChromaVectorStore  # lazy import to avoid circular dependency
+        from app.rag.vector_store import QdrantVectorStore  # lazy import to avoid circular dependency
 
         settings = get_settings()
-        chroma_filters = {
+        vector_filters = {
             "jurisdiction_id": request.jurisdiction_id,
             "district": request.district,
             "use": request.inferred_use,
         }
-        vector_hits = ChromaVectorStore().query(
+        vector_hits = QdrantVectorStore().query(
             query_embedding,
-            filters=chroma_filters,
+            filters=vector_filters,
             limit=20,
         )
 
         if not vector_hits:
             diag = RetrievalDiagnostics(
                 query_text=request.query,
-                filters=chroma_filters,
+                filters=vector_filters,
                 sql_chunk_count=0,
                 vector_hit_count=0,
                 vector_provider=settings.vector_provider,
@@ -294,7 +294,7 @@ class HybridLocalRetrievalProvider:
         ranked = sorted(scored, key=lambda item: item[0], reverse=True)
         diag = RetrievalDiagnostics(
             query_text=request.query,
-            filters=chroma_filters,
+            filters=vector_filters,
             sql_chunk_count=len(chunks),
             vector_hit_count=len(vector_hits),
             vector_provider=settings.vector_provider,

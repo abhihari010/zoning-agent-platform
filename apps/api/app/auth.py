@@ -4,20 +4,24 @@ import base64
 import hashlib
 import hmac
 import json
-import secrets
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Literal
 
+import jwt as pyjwt
+from jwt import PyJWKClient
 from fastapi import HTTPException, Request
 
 from app.models import UserRecord
 from app.settings import Settings, get_settings
 from app.storage import store
 
+# Per-project JWKS client cache (ES256 / asymmetric Supabase tokens)
+_jwks_clients: dict[str, PyJWKClient] = {}
 
-AuthMode = Literal["disabled", "beta", "supabase"]
-Role = Literal["anonymous", "legacy_beta", "user", "admin"]
+
+AuthMode = Literal["disabled", "supabase"]
+Role = Literal["anonymous", "user", "admin"]
 
 
 @dataclass(frozen=True)
@@ -29,7 +33,7 @@ class AuthContext:
 
     @property
     def is_authenticated(self) -> bool:
-        return self.user_id is not None or self.role in {"legacy_beta", "admin"}
+        return self.user_id is not None or self.role == "admin"
 
     @property
     def is_admin(self) -> bool:
@@ -57,31 +61,6 @@ def authenticate_request(request: Request, settings: Settings | None = None) -> 
         _persist_user(auth)
         return auth
 
-    if resolved.beta_access_keys:
-        beta_auth = authenticate_beta_key(request, resolved)
-        if beta_auth:
-            return beta_auth
-
-    return None
-
-
-def authenticate_beta_key(request: Request, settings: Settings | None = None) -> AuthContext | None:
-    resolved = settings or get_settings()
-    provided_key = request.headers.get("X-Beta-Access-Key", "").strip()
-    if not provided_key:
-        return None
-
-    provided_key_hash = hashlib.sha256(provided_key.encode("utf-8")).hexdigest()
-    for access_key in resolved.beta_access_keys:
-        if secrets.compare_digest(provided_key_hash, access_key.key_hash):
-            store.audit(
-                "auth.beta.accepted",
-                "auth",
-                {"key_label": access_key.label},
-            )
-            return AuthContext(role="legacy_beta", auth_mode="beta")
-
-    store.audit("auth.beta.rejected", "auth")
     return None
 
 
@@ -89,10 +68,8 @@ def authenticate_bearer_token(token: str, settings: Settings | None = None) -> A
     resolved = settings or get_settings()
     if resolved.auth_provider != "supabase":
         raise HTTPException(status_code=403, detail="Bearer authentication is not enabled.")
-    if not resolved.supabase_jwt_secret:
-        raise HTTPException(status_code=503, detail="SUPABASE_JWT_SECRET is not configured.")
 
-    payload = _decode_hs256_jwt(token, resolved.supabase_jwt_secret)
+    payload = _decode_supabase_jwt(token, resolved)
     _validate_supabase_claims(payload, resolved)
     subject = str(payload.get("sub") or "").strip()
     if not subject:
@@ -152,18 +129,32 @@ def _role_from_payload(payload: dict[str, Any], email: str | None, settings: Set
     return "user"
 
 
-def _decode_hs256_jwt(token: str, secret: str) -> dict[str, Any]:
+def _decode_supabase_jwt(token: str, settings: Settings) -> dict[str, Any]:
+    """Dispatch to HS256 or ES256 decoder based on the JWT header algorithm."""
     parts = token.split(".")
     if len(parts) != 3:
         raise HTTPException(status_code=403, detail="Invalid JWT format.")
-
     try:
         header = json.loads(_base64url_decode(parts[0]))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise HTTPException(status_code=403, detail="Invalid JWT payload.") from exc
+        raise HTTPException(status_code=403, detail="Invalid JWT header.") from exc
 
-    if header.get("alg") != "HS256":
+    alg = header.get("alg")
+    if alg == "HS256":
+        if not settings.supabase_jwt_secret:
+            raise HTTPException(status_code=503, detail="SUPABASE_JWT_SECRET is not configured.")
+        return _decode_hs256_jwt(token, settings.supabase_jwt_secret, parts)
+    elif alg == "ES256":
+        if not settings.supabase_project_url:
+            raise HTTPException(status_code=503, detail="SUPABASE_PROJECT_URL required for ES256 JWT validation.")
+        return _decode_es256_jwt(token, settings.supabase_project_url)
+    else:
         raise HTTPException(status_code=403, detail="Unsupported JWT algorithm.")
+
+
+def _decode_hs256_jwt(token: str, secret: str, parts: list[str] | None = None) -> dict[str, Any]:
+    if parts is None:
+        parts = token.split(".")
 
     signing_input = f"{parts[0]}.{parts[1]}".encode("utf-8")
     expected_signature = hmac.new(secret.encode("utf-8"), signing_input, hashlib.sha256).digest()
@@ -184,6 +175,24 @@ def _decode_hs256_jwt(token: str, secret: str) -> dict[str, Any]:
         raise HTTPException(status_code=403, detail="Invalid JWT expiration.") from exc
 
     return payload
+
+
+def _decode_es256_jwt(token: str, project_url: str) -> dict[str, Any]:
+    if project_url not in _jwks_clients:
+        jwks_url = f"{project_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
+        _jwks_clients[project_url] = PyJWKClient(jwks_url, cache_keys=True)
+    try:
+        signing_key = _jwks_clients[project_url].get_signing_key_from_jwt(token)
+        return pyjwt.decode(
+            token,
+            signing_key.key,
+            algorithms=["ES256"],
+            audience="authenticated",
+        )
+    except pyjwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="JWT is expired.")
+    except pyjwt.InvalidTokenError as exc:
+        raise HTTPException(status_code=403, detail=f"Invalid JWT: {exc}")
 
 
 def _validate_supabase_claims(payload: dict[str, Any], settings: Settings) -> None:

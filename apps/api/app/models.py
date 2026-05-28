@@ -38,6 +38,7 @@ class IntakeRequest(BaseModel):
     session_id: UUID
     project_description: str = Field(min_length=10, max_length=4000)
     address: str = Field(min_length=5, max_length=500)
+    legal_ack_at: str | None = None
 
 
 class IntakeResponse(BaseModel):
@@ -327,8 +328,6 @@ class PipelineStageReport(BaseModel):
     details: list[str] = Field(default_factory=list)
 
 
-# Backward-compatible name for existing imports and response consumers.
-AgentReport = PipelineStageReport
 
 
 class PipelineMetadata(BaseModel):
@@ -441,6 +440,7 @@ class ProjectRecord(BaseModel):
     latitude: float | None = None
     longitude: float | None = None
     status: Literal["created", "analyzed"] = "created"
+    legal_ack_at: datetime | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -464,8 +464,8 @@ class UserRecord(BaseModel):
 class CurrentUserResponse(BaseModel):
     user_id: str | None = None
     email: str | None = None
-    role: Literal["anonymous", "legacy_beta", "user", "admin"] = "anonymous"
-    auth_mode: Literal["disabled", "beta", "supabase"] = "disabled"
+    role: Literal["anonymous", "user", "admin"] = "anonymous"
+    auth_mode: Literal["disabled", "supabase"] = "disabled"
     public_signups_enabled: bool = True
 
 

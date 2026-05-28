@@ -4,31 +4,26 @@ import type {
   FollowUpQuestion,
 } from "@zoning-agent/shared-schema";
 
-const DEFAULT_API_URL = import.meta.env.PROD
-  ? "https://zoning-agent-api.onrender.com"
-  : "http://localhost:8000";
-
-const API_ORIGIN = (import.meta.env.VITE_API_URL ?? DEFAULT_API_URL).replace(/\/$/, "");
+const RAW_API_URL = import.meta.env.VITE_API_URL ?? "";
+if (import.meta.env.PROD && !RAW_API_URL) {
+  throw new Error(
+    "VITE_API_URL is not configured. Set it explicitly for production builds.",
+  );
+}
+const API_ORIGIN = (RAW_API_URL || "http://localhost:8000").replace(/\/$/, "");
 const API_BASE = `${API_ORIGIN}/api/v1`;
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? "";
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? "";
-const BETA_ACCESS_STORAGE_KEY = "zoning-agent.betaAccessKey";
+if (import.meta.env.PROD && (!SUPABASE_URL || !SUPABASE_ANON_KEY)) {
+  throw new Error(
+    "VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set for production builds.",
+  );
+}
 const ADMIN_ACCESS_STORAGE_KEY = "zoning-agent.adminAccessKey";
 let authToken = "";
 
-function isLocalApiUrl(): boolean {
-  try {
-    const hostname = new URL(API_ORIGIN).hostname;
-    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
-  } catch {
-    return true;
-  }
-}
-
-export const requiresBetaAccess = !isLocalApiUrl();
-export const authMode: "disabled" | "beta" | "supabase" =
-  (import.meta.env.VITE_AUTH_MODE as "disabled" | "beta" | "supabase" | undefined) ??
-  (SUPABASE_URL && SUPABASE_ANON_KEY ? "supabase" : requiresBetaAccess ? "beta" : "disabled");
+export const authMode: "disabled" | "supabase" =
+  SUPABASE_URL && SUPABASE_ANON_KEY ? "supabase" : "disabled";
 export const supabaseConfig = {
   url: SUPABASE_URL,
   anonKey: SUPABASE_ANON_KEY,
@@ -36,23 +31,6 @@ export const supabaseConfig = {
 
 export function setAuthToken(value: string): void {
   authToken = value;
-}
-
-export function getBetaAccessKey(): string {
-  return window.sessionStorage.getItem(BETA_ACCESS_STORAGE_KEY) ?? "";
-}
-
-export function setBetaAccessKey(value: string): void {
-  const trimmed = value.trim();
-  if (trimmed) {
-    window.sessionStorage.setItem(BETA_ACCESS_STORAGE_KEY, trimmed);
-  } else {
-    window.sessionStorage.removeItem(BETA_ACCESS_STORAGE_KEY);
-  }
-}
-
-export function clearBetaAccessKey(): void {
-  window.sessionStorage.removeItem(BETA_ACCESS_STORAGE_KEY);
 }
 
 export function getAdminAccessKey(): string {
@@ -76,12 +54,10 @@ function requestHeaders(
   headers: Record<string, string> = {},
   options: { includeAdminAccess?: boolean } = {},
 ): HeadersInit {
-  const betaAccessKey = getBetaAccessKey();
   const adminAccessKey = options.includeAdminAccess ? getAdminAccessKey() : "";
   return {
     ...headers,
     ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-    ...(betaAccessKey ? { "X-Beta-Access-Key": betaAccessKey } : {}),
     ...(adminAccessKey ? { "X-Admin-Access-Key": adminAccessKey } : {}),
   };
 }
@@ -89,8 +65,8 @@ function requestHeaders(
 export interface CurrentUser {
   userId?: string | null;
   email?: string | null;
-  role: "anonymous" | "legacy_beta" | "user" | "admin";
-  authMode: "disabled" | "beta" | "supabase";
+  role: "anonymous" | "user" | "admin";
+  authMode: "disabled" | "supabase";
   publicSignupsEnabled: boolean;
 }
 
@@ -210,7 +186,10 @@ function toFollowUpQuestions(questions: string[]): FollowUpQuestion[] {
   }));
 }
 
-async function parseError(response: Response, fallback: string): Promise<string> {
+async function parseError(
+  response: Response,
+  fallback: string,
+): Promise<string> {
   try {
     const payload = (await response.json()) as { detail?: string };
     return payload.detail || fallback;
@@ -219,7 +198,10 @@ async function parseError(response: Response, fallback: string): Promise<string>
   }
 }
 
-async function parseAdminActionError(response: Response, action: string): Promise<string> {
+async function parseAdminActionError(
+  response: Response,
+  action: string,
+): Promise<string> {
   const detail = await parseError(response, `${action} failed`);
   if (response.status === 401) {
     return `${detail} Enter the source admin key, then retry ${action.toLowerCase()}.`;
@@ -354,18 +336,24 @@ export async function deleteMyData(): Promise<{ deletedProjects: number }> {
     headers: requestHeaders(),
   });
   if (!response.ok) {
-    throw new Error(await parseError(response, "Failed to delete account data"));
+    throw new Error(
+      await parseError(response, "Failed to delete account data"),
+    );
   }
   const payload = (await response.json()) as { deleted_projects: number };
   return { deletedProjects: payload.deleted_projects };
 }
 
-export async function fetchJurisdictionRequestSummaries(): Promise<JurisdictionRequestSummary[]> {
+export async function fetchJurisdictionRequestSummaries(): Promise<
+  JurisdictionRequestSummary[]
+> {
   const response = await fetch(`${API_BASE}/admin/jurisdiction-requests`, {
     headers: requestHeaders({}, { includeAdminAccess: true }),
   });
   if (!response.ok) {
-    throw new Error(await parseAdminActionError(response, "Load jurisdiction requests"));
+    throw new Error(
+      await parseAdminActionError(response, "Load jurisdiction requests"),
+    );
   }
   const payload = (await response.json()) as {
     requests: Array<{
@@ -389,7 +377,9 @@ export async function fetchJurisdictionRequestSummaries(): Promise<JurisdictionR
   }));
 }
 
-export async function fetchJurisdictionCoverage(): Promise<JurisdictionCoverage[]> {
+export async function fetchJurisdictionCoverage(): Promise<
+  JurisdictionCoverage[]
+> {
   const response = await fetch(`${API_BASE}/jurisdictions/coverage`, {
     headers: requestHeaders(),
   });
@@ -443,7 +433,9 @@ export async function requestJurisdictionSupport(input: {
     }),
   });
   if (!response.ok) {
-    throw new Error(await parseError(response, "Failed to request jurisdiction support"));
+    throw new Error(
+      await parseError(response, "Failed to request jurisdiction support"),
+    );
   }
   const payload = (await response.json()) as {
     status: "created" | "existing";
@@ -463,6 +455,7 @@ export async function intakeProject(input: {
   session_id: string;
   project_description: string;
   address: string;
+  legal_ack_at?: string;
 }): Promise<IntakeResponse> {
   const response = await fetch(`${API_BASE}/projects/intake`, {
     method: "POST",
@@ -635,7 +628,8 @@ export async function analyzeProject(
     trustIndicators: payload.trust_indicators
       ? {
           jurisdictionAnalyzed: payload.trust_indicators.jurisdiction_analyzed,
-          jurisdictionSupported: payload.trust_indicators.jurisdiction_supported,
+          jurisdictionSupported:
+            payload.trust_indicators.jurisdiction_supported,
           jurisdictionName: payload.trust_indicators.jurisdiction_name,
           zoningDistrict: payload.trust_indicators.zoning_district,
           districtConfidence: payload.trust_indicators.district_confidence,
@@ -652,13 +646,13 @@ export async function analyzeProject(
           citationCoverage: payload.citation_validation.citation_coverage,
           unsupportedClaims: payload.citation_validation.unsupported_claims,
           invalidCitationIds: payload.citation_validation.invalid_citation_ids,
-          confidenceAdjustment: payload.citation_validation.confidence_adjustment,
+          confidenceAdjustment:
+            payload.citation_validation.confidence_adjustment,
           warnings: payload.citation_validation.warnings,
           jurisdictionId: payload.citation_validation.jurisdiction_id,
         }
       : null,
     pipelineStages: payload.pipeline_stages,
-    agents: payload.agents,
     feasibility: payload.feasibility,
     compliance: payload.compliance
       ? {
@@ -708,12 +702,16 @@ export async function analyzeProject(
   };
 }
 
-export async function fetchProjectResult(projectId: string): Promise<AnalyzeResponse> {
+export async function fetchProjectResult(
+  projectId: string,
+): Promise<AnalyzeResponse> {
   const response = await fetch(`${API_BASE}/projects/${projectId}/result`, {
     headers: requestHeaders(),
   });
   if (!response.ok) {
-    throw new Error(await parseError(response, "Failed to load project result"));
+    throw new Error(
+      await parseError(response, "Failed to load project result"),
+    );
   }
   return mapAnalyzePayload(await response.json());
 }
@@ -738,7 +736,8 @@ function mapAnalyzePayload(payload: any): AnalyzeResponse {
     trustIndicators: payload.trust_indicators
       ? {
           jurisdictionAnalyzed: payload.trust_indicators.jurisdiction_analyzed,
-          jurisdictionSupported: payload.trust_indicators.jurisdiction_supported,
+          jurisdictionSupported:
+            payload.trust_indicators.jurisdiction_supported,
           jurisdictionName: payload.trust_indicators.jurisdiction_name,
           zoningDistrict: payload.trust_indicators.zoning_district,
           districtConfidence: payload.trust_indicators.district_confidence,
@@ -755,13 +754,13 @@ function mapAnalyzePayload(payload: any): AnalyzeResponse {
           citationCoverage: payload.citation_validation.citation_coverage,
           unsupportedClaims: payload.citation_validation.unsupported_claims,
           invalidCitationIds: payload.citation_validation.invalid_citation_ids,
-          confidenceAdjustment: payload.citation_validation.confidence_adjustment,
+          confidenceAdjustment:
+            payload.citation_validation.confidence_adjustment,
           warnings: payload.citation_validation.warnings,
           jurisdictionId: payload.citation_validation.jurisdiction_id,
         }
       : null,
     pipelineStages: payload.pipeline_stages,
-    agents: payload.agents ?? [],
     feasibility: payload.feasibility,
     compliance: payload.compliance
       ? {
@@ -841,15 +840,18 @@ export async function submitFeedback(input: {
   helpful: boolean;
   comment?: string;
 }): Promise<void> {
-  const response = await fetch(`${API_BASE}/projects/${input.projectId}/feedback`, {
-    method: "POST",
-    headers: requestHeaders({ "Content-Type": "application/json" }),
-    body: JSON.stringify({
-      project_id: input.projectId,
-      helpful: input.helpful,
-      comment: input.comment?.trim() || null,
-    }),
-  });
+  const response = await fetch(
+    `${API_BASE}/projects/${input.projectId}/feedback`,
+    {
+      method: "POST",
+      headers: requestHeaders({ "Content-Type": "application/json" }),
+      body: JSON.stringify({
+        project_id: input.projectId,
+        helpful: input.helpful,
+        comment: input.comment?.trim() || null,
+      }),
+    },
+  );
 
   if (!response.ok) {
     throw new Error(await parseError(response, "Feedback request failed"));
@@ -921,7 +923,9 @@ export async function fetchSourceIndexStatus(): Promise<SourceIndexStatus> {
     headers: requestHeaders(),
   });
   if (!response.ok) {
-    throw new Error(await parseError(response, "Failed to load source index status"));
+    throw new Error(
+      await parseError(response, "Failed to load source index status"),
+    );
   }
 
   const payload = (await response.json()) as {
@@ -1069,7 +1073,9 @@ export async function importLocalDocuments(
     body: JSON.stringify({ directory: directory?.trim() || null }),
   });
   if (!response.ok) {
-    throw new Error(await parseAdminActionError(response, "Import local documents"));
+    throw new Error(
+      await parseAdminActionError(response, "Import local documents"),
+    );
   }
 
   const payload = (await response.json()) as {
@@ -1086,7 +1092,9 @@ export async function importLocalDocuments(
   };
 }
 
-export async function importSourcePacks(directory?: string): Promise<LocalDocumentImportResult> {
+export async function importSourcePacks(
+  directory?: string,
+): Promise<LocalDocumentImportResult> {
   const response = await fetch(`${API_BASE}/ingestion/import-source-packs`, {
     method: "POST",
     headers: requestHeaders(
@@ -1096,7 +1104,9 @@ export async function importSourcePacks(directory?: string): Promise<LocalDocume
     body: JSON.stringify({ directory: directory?.trim() || null }),
   });
   if (!response.ok) {
-    throw new Error(await parseAdminActionError(response, "Import source packs"));
+    throw new Error(
+      await parseAdminActionError(response, "Import source packs"),
+    );
   }
 
   const payload = (await response.json()) as {

@@ -1,5 +1,5 @@
 import type { Session } from "@supabase/supabase-js";
-import { authMode, requiresBetaAccess, type CurrentUser } from "../api";
+import { authMode, type CurrentUser } from "../api";
 import { DISCLAIMER } from "../constants/legal";
 import type { Workspace } from "../types/app";
 
@@ -10,7 +10,6 @@ export function WorkspaceHeader({
   authSession,
   onWorkspaceChange,
   onSignOut,
-  onChangePrivateBetaKey,
 }: {
   workspace: Workspace;
   canUseAdminTools: boolean;
@@ -18,7 +17,6 @@ export function WorkspaceHeader({
   authSession: Session | null;
   onWorkspaceChange: (workspace: Workspace) => void;
   onSignOut: () => void;
-  onChangePrivateBetaKey: () => void;
 }) {
   return (
     <section className="mb-5 grid gap-5 rounded-[28px] border border-pine/10 bg-white/90 p-6 shadow-card backdrop-blur lg:grid-cols-[minmax(0,1.5fr)_320px]">
@@ -84,15 +82,6 @@ export function WorkspaceHeader({
               </button>
             </div>
           </div>
-        )}
-        {authMode === "beta" && requiresBetaAccess && (
-          <button
-            type="button"
-            onClick={onChangePrivateBetaKey}
-            className="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
-          >
-            Change beta key
-          </button>
         )}
       </div>
     </section>

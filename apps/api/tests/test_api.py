@@ -21,8 +21,6 @@ from app.storage import store
 @pytest.fixture(autouse=True)
 def clear_store(monkeypatch: pytest.MonkeyPatch) -> None:
     for name in [
-        "BETA_ACCESS_KEY",
-        "BETA_ACCESS_KEYS",
         "ADMIN_ACCESS_KEY",
         "APP_ENV",
         "AUTH_PROVIDER",
@@ -105,8 +103,8 @@ def test_intake_missing_google_key_returns_503(monkeypatch):
     assert "GOOGLE_MAPS_API_KEY" in response.json()["detail"]
 
 
-def test_health_endpoint_does_not_require_beta_key(monkeypatch):
-    monkeypatch.setenv("BETA_ACCESS_KEY", "secret-beta-key")
+def test_health_endpoint_does_not_require_auth(monkeypatch):
+    _enable_auth(monkeypatch)
     client = TestClient(app)
 
     response = client.get("/health")
@@ -116,65 +114,6 @@ def test_health_endpoint_does_not_require_beta_key(monkeypatch):
     assert body["status"] in {"ok", "warning"}
     assert "source_index_ready" in body
     assert "warnings" in body
-
-
-def test_beta_access_key_protects_api_routes(monkeypatch):
-    monkeypatch.setenv("BETA_ACCESS_KEY", "secret-beta-key")
-    client = TestClient(app)
-
-    missing_response = client.post("/api/v1/sessions")
-    wrong_response = client.post(
-        "/api/v1/sessions",
-        headers={"X-Beta-Access-Key": "wrong-key"},
-    )
-    accepted_response = client.post(
-        "/api/v1/sessions",
-        headers={"X-Beta-Access-Key": "secret-beta-key"},
-    )
-
-    assert missing_response.status_code == 401
-    assert wrong_response.status_code == 403
-    assert accepted_response.status_code == 200
-
-
-def test_beta_access_keys_accept_multiple_labeled_keys(monkeypatch):
-    monkeypatch.setenv("BETA_ACCESS_KEYS", "alice:alice-key,bob:bob-key")
-    client = TestClient(app)
-
-    alice_response = client.post(
-        "/api/v1/sessions",
-        headers={"X-Beta-Access-Key": "alice-key"},
-    )
-    bob_response = client.post(
-        "/api/v1/sessions",
-        headers={"X-Beta-Access-Key": "bob-key"},
-    )
-    wrong_response = client.post(
-        "/api/v1/sessions",
-        headers={"X-Beta-Access-Key": "alice"},
-    )
-
-    assert alice_response.status_code == 200
-    assert bob_response.status_code == 200
-    assert wrong_response.status_code == 403
-
-
-def test_beta_access_keys_preserve_single_key_compatibility(monkeypatch):
-    monkeypatch.setenv("BETA_ACCESS_KEY", "legacy-key")
-    monkeypatch.setenv("BETA_ACCESS_KEYS", "tester:new-key")
-    client = TestClient(app)
-
-    legacy_response = client.post(
-        "/api/v1/sessions",
-        headers={"X-Beta-Access-Key": "legacy-key"},
-    )
-    new_response = client.post(
-        "/api/v1/sessions",
-        headers={"X-Beta-Access-Key": "new-key"},
-    )
-
-    assert legacy_response.status_code == 200
-    assert new_response.status_code == 200
 
 
 def test_auth_required_accepts_supabase_jwt(monkeypatch):
@@ -272,32 +211,22 @@ def test_disabled_user_cannot_authenticate(monkeypatch):
     assert store.get_user("user-1").disabled_at is not None
 
 
-def test_auth_required_allows_legacy_beta_key_when_configured(monkeypatch):
-    _enable_auth(monkeypatch)
-    monkeypatch.setenv("BETA_ACCESS_KEY", "legacy-key")
-    client = TestClient(app)
-
-    response = client.post("/api/v1/sessions", headers={"X-Beta-Access-Key": "legacy-key"})
-
-    assert response.status_code == 200
-
-
 def test_admin_access_key_protects_source_write_routes(monkeypatch):
-    monkeypatch.setenv("BETA_ACCESS_KEY", "beta-key")
+    _enable_auth(monkeypatch)
     monkeypatch.setenv("ADMIN_ACCESS_KEY", "admin-key")
     client = TestClient(app)
-    beta_headers = {"X-Beta-Access-Key": "beta-key"}
+    user_headers = _auth_headers("user-1")
 
-    status_response = client.get("/api/v1/ingestion/status", headers=beta_headers)
-    list_response = client.get("/api/v1/ingestion/sources", headers=beta_headers)
-    missing_admin_response = client.post("/api/v1/ingestion/reindex", headers=beta_headers)
+    status_response = client.get("/api/v1/ingestion/status", headers=user_headers)
+    list_response = client.get("/api/v1/ingestion/sources", headers=user_headers)
+    missing_admin_response = client.post("/api/v1/ingestion/reindex", headers=user_headers)
     wrong_admin_response = client.post(
         "/api/v1/ingestion/reindex",
-        headers={**beta_headers, "X-Admin-Access-Key": "wrong-admin-key"},
+        headers={**user_headers, "X-Admin-Access-Key": "wrong-admin-key"},
     )
     accepted_response = client.post(
         "/api/v1/ingestion/reindex",
-        headers={**beta_headers, "X-Admin-Access-Key": "admin-key"},
+        headers={**user_headers, "X-Admin-Access-Key": "admin-key"},
     )
 
     assert status_response.status_code == 200
@@ -344,11 +273,10 @@ def test_project_list_requires_authenticated_user(monkeypatch):
     anonymous_response = client.get("/api/v1/projects")
 
     _enable_auth(monkeypatch)
-    monkeypatch.setenv("BETA_ACCESS_KEY", "legacy-key")
-    beta_response = client.get("/api/v1/projects", headers={"X-Beta-Access-Key": "legacy-key"})
+    unauth_response = client.get("/api/v1/projects")
 
     assert anonymous_response.status_code == 401
-    assert beta_response.status_code == 401
+    assert unauth_response.status_code == 401
 
 
 def test_intake_invalid_address_returns_invalid_status(monkeypatch):

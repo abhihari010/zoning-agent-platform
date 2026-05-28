@@ -8,30 +8,23 @@ from typing import Literal, cast
 
 
 AppEnvName = Literal["local", "staging", "production"]
-AIProviderName = Literal["deterministic", "openai", "watsonx", "local"]
-RAGProviderName = Literal["source_registry", "hybrid_local", "watsonx"]
+AIProviderName = Literal["deterministic", "openai", "local"]
+RAGProviderName = Literal["source_registry", "hybrid_local"]
 EmbeddingProviderName = Literal["none", "local", "openai"]
-VectorProviderName = Literal["none", "chroma"]
+VectorProviderName = Literal["none", "qdrant"]
 
 VALID_APP_ENVS: set[str] = {"local", "staging", "production"}
-VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "watsonx", "local"}
-VALID_RAG_PROVIDERS: set[str] = {"source_registry", "hybrid_local", "watsonx"}
+VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "local"}
+VALID_RAG_PROVIDERS: set[str] = {"source_registry", "hybrid_local"}
 VALID_EMBEDDING_PROVIDERS: set[str] = {"none", "local", "openai"}
-VALID_VECTOR_PROVIDERS: set[str] = {"none", "chroma"}
+VALID_VECTOR_PROVIDERS: set[str] = {"none", "qdrant"}
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent / "data" / "app.sqlite3"
-DEFAULT_CHROMA_PATH = Path(__file__).resolve().parent / "data" / "chroma"
 PRODUCTION_FRONTEND_ORIGIN = "https://zoning-agent-platform.vercel.app"
 
 
 class ConfigurationError(RuntimeError):
     """Raised when environment configuration is invalid."""
-
-
-@dataclass(frozen=True)
-class AccessKey:
-    label: str
-    key_hash: str
 
 
 def _env(name: str, default: str = "") -> str:
@@ -57,25 +50,6 @@ def _hash_access_key(key: str) -> str:
     return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
 
-def _parse_labeled_access_keys(raw_value: str) -> tuple[AccessKey, ...]:
-    keys: list[AccessKey] = []
-    for index, entry in enumerate(raw_value.split(","), start=1):
-        entry = entry.strip()
-        if not entry:
-            continue
-        if ":" in entry:
-            label, key = entry.split(":", 1)
-            label = label.strip()
-            key = key.strip()
-        else:
-            label = f"beta-{index}"
-            key = entry
-        if not key:
-            raise ConfigurationError("BETA_ACCESS_KEYS entries must include a non-empty key")
-        keys.append(AccessKey(label=label or f"beta-{index}", key_hash=_hash_access_key(key)))
-    return tuple(keys)
-
-
 def _parse_csv(raw_value: str) -> tuple[str, ...]:
     return tuple(item.strip() for item in raw_value.split(",") if item.strip())
 
@@ -88,9 +62,9 @@ class Settings:
     embedding_provider: EmbeddingProviderName
     vector_provider: VectorProviderName
     embedding_model: str
-    chroma_path: Path
-    chroma_collection: str
-    chroma_reset_on_reindex: bool
+    qdrant_url: str
+    qdrant_api_key: str
+    qdrant_collection: str
     database_url: str
     database_path: Path
     google_maps_api_key: str
@@ -103,14 +77,6 @@ class Settings:
     local_model_name: str
     local_model_timeout_seconds: float
     local_model_api_key: str
-    watsonx_api_key: str
-    watsonx_url: str
-    watsonx_project_id: str
-    watsonx_model_id: str
-    watsonx_vector_index_id: str
-    watsonx_timeout_seconds: float
-    beta_access_key: str
-    beta_access_keys: tuple[AccessKey, ...]
     admin_access_key: str
     admin_access_key_hash: str
     auth_provider: Literal["disabled", "supabase"]
@@ -126,6 +92,7 @@ class Settings:
     startup_reindex_enabled: bool
     source_registry_version: str
     cors_allow_origins: tuple[str, ...]
+    cors_allow_origin_regex: str
     # ---------------------------------------------------------------------------
     # Workstream A — Cache settings (appended; do not reorder above fields)
     # ---------------------------------------------------------------------------
@@ -134,10 +101,6 @@ class Settings:
     cache_default_ttl: int = 3600  # seconds
     source_index_version: str = ""
     prompt_version: str = "1.0"
-
-    @property
-    def uses_watsonx(self) -> bool:
-        return self.ai_provider == "watsonx" or self.rag_provider == "watsonx"
 
     @property
     def uses_openai(self) -> bool:
@@ -149,22 +112,8 @@ class Settings:
 
 
 def get_settings() -> Settings:
-    legacy_watsonx_enabled = _env("WATSONX_ENABLED", "false").lower() in {
-        "1",
-        "true",
-        "yes",
-        "on",
-    }
-    default_ai_provider = "watsonx" if legacy_watsonx_enabled else "deterministic"
-    default_rag_provider = "watsonx" if legacy_watsonx_enabled else "source_registry"
     database_url = _env("DATABASE_URL")
     database_path = _env("ZONING_DB_PATH") or _env("IBM_ZONING_DB_PATH")
-    beta_access_key = _env("BETA_ACCESS_KEY")
-    beta_access_keys = (
-        (AccessKey(label="legacy", key_hash=_hash_access_key(beta_access_key)),)
-        if beta_access_key
-        else ()
-    ) + _parse_labeled_access_keys(_env("BETA_ACCESS_KEYS"))
     admin_access_key = _env("ADMIN_ACCESS_KEY")
     admin_user_emails = tuple(
         email.strip().lower()
@@ -179,11 +128,11 @@ def get_settings() -> Settings:
         ),
         ai_provider=cast(
             AIProviderName,
-            _provider_name("AI_PROVIDER", default_ai_provider, VALID_AI_PROVIDERS),
+            _provider_name("AI_PROVIDER", "deterministic", VALID_AI_PROVIDERS),
         ),
         rag_provider=cast(
             RAGProviderName,
-            _provider_name("RAG_PROVIDER", default_rag_provider, VALID_RAG_PROVIDERS),
+            _provider_name("RAG_PROVIDER", "source_registry", VALID_RAG_PROVIDERS),
         ),
         embedding_provider=cast(
             EmbeddingProviderName,
@@ -194,9 +143,9 @@ def get_settings() -> Settings:
             _provider_name("VECTOR_PROVIDER", "none", VALID_VECTOR_PROVIDERS),
         ),
         embedding_model=_env("EMBEDDING_MODEL", "text-embedding-3-small"),
-        chroma_path=Path(_env("CHROMA_PATH")) if _env("CHROMA_PATH") else DEFAULT_CHROMA_PATH,
-        chroma_collection=_env("CHROMA_COLLECTION", "zoning_source_chunks"),
-        chroma_reset_on_reindex=_env_bool("CHROMA_RESET_ON_REINDEX", False),
+        qdrant_url=_env("QDRANT_URL").rstrip("/"),
+        qdrant_api_key=_env("QDRANT_API_KEY"),
+        qdrant_collection=_env("QDRANT_COLLECTION", "zoning_source_chunks"),
         database_url=database_url,
         database_path=Path(database_path) if database_path else DEFAULT_DB_PATH,
         google_maps_api_key=_env("GOOGLE_MAPS_API_KEY"),
@@ -209,14 +158,6 @@ def get_settings() -> Settings:
         local_model_name=_env("LOCAL_MODEL_NAME", "llama3.1:8b"),
         local_model_timeout_seconds=float(_env("LOCAL_MODEL_TIMEOUT_SECONDS", "60")),
         local_model_api_key=_env("LOCAL_MODEL_API_KEY"),
-        watsonx_api_key=_env("WATSONX_API_KEY"),
-        watsonx_url=_env("WATSONX_URL", "https://us-south.ml.cloud.ibm.com").rstrip("/"),
-        watsonx_project_id=_env("WATSONX_PROJECT_ID"),
-        watsonx_model_id=_env("WATSONX_MODEL_ID"),
-        watsonx_vector_index_id=_env("WATSONX_VECTOR_INDEX_ID"),
-        watsonx_timeout_seconds=float(_env("WATSONX_TIMEOUT_SECONDS", "20")),
-        beta_access_key=beta_access_key,
-        beta_access_keys=beta_access_keys,
         admin_access_key=admin_access_key,
         admin_access_key_hash=_hash_access_key(admin_access_key) if admin_access_key else "",
         auth_provider=cast(
@@ -235,6 +176,7 @@ def get_settings() -> Settings:
         startup_reindex_enabled=_env_bool("STARTUP_REINDEX_ENABLED", True),
         source_registry_version=_env("SOURCE_REGISTRY_VERSION"),
         cors_allow_origins=_parse_csv(_env("CORS_ALLOW_ORIGINS")),
+        cors_allow_origin_regex=_env("CORS_ALLOW_ORIGIN_REGEX"),
         # Workstream A — cache settings
         cache_enabled=_env_bool("CACHE_ENABLED", True),
         cache_db_path=Path(_env("CACHE_DB_PATH")) if _env("CACHE_DB_PATH") else Path("app/data/cache.sqlite3"),
@@ -263,6 +205,10 @@ def validate_production_settings(settings: Settings) -> None:
         missing.append("SUPABASE_JWT_SECRET")
     if not settings.google_maps_api_key:
         missing.append("GOOGLE_MAPS_API_KEY")
+    if settings.ai_provider == "openai" and not settings.openai_api_key:
+        missing.append("OPENAI_API_KEY")
+    if settings.vector_provider == "qdrant" and not settings.qdrant_url:
+        missing.append("QDRANT_URL")
     if "*" in settings.cors_allow_origins:
         missing.append("CORS_ALLOW_ORIGINS must not be *")
     if PRODUCTION_FRONTEND_ORIGIN not in settings.cors_allow_origins:
@@ -272,36 +218,6 @@ def validate_production_settings(settings: Settings) -> None:
         raise ConfigurationError(
             "Production configuration is incomplete: " + ", ".join(missing)
         )
-
-
-def require_watsonx_settings(settings: Settings | None = None) -> Settings:
-    resolved = settings or get_settings()
-    missing: list[str] = []
-
-    if resolved.ai_provider == "watsonx":
-        for name, value in {
-            "WATSONX_API_KEY": resolved.watsonx_api_key,
-            "WATSONX_URL": resolved.watsonx_url,
-            "WATSONX_PROJECT_ID": resolved.watsonx_project_id,
-            "WATSONX_MODEL_ID": resolved.watsonx_model_id,
-        }.items():
-            if not value:
-                missing.append(name)
-
-    if resolved.rag_provider == "watsonx":
-        for name, value in {
-            "WATSONX_API_KEY": resolved.watsonx_api_key,
-            "WATSONX_PROJECT_ID": resolved.watsonx_project_id,
-            "WATSONX_VECTOR_INDEX_ID": resolved.watsonx_vector_index_id,
-        }.items():
-            if not value:
-                missing.append(name)
-
-    if missing:
-        missing_list = ", ".join(dict.fromkeys(missing))
-        raise ConfigurationError(f"Missing required WatsonX setting(s): {missing_list}")
-
-    return resolved
 
 
 def require_openai_settings(settings: Settings | None = None) -> Settings:

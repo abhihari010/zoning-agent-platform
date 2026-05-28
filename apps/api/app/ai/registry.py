@@ -9,7 +9,6 @@ from app.ai.interfaces import AnalysisProvider, EmbeddingProvider, RetrievalProv
 from app.ai.local_model_provider import LocalModelAnalysisProvider
 from app.ai.openai_provider import OpenAIAnalysisProvider, OpenAIEmbeddingProvider
 from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider
-from app.ai.watsonx_provider import WatsonXAnalysisProvider, WatsonXRetrievalProvider
 from app.settings import Settings, get_settings
 
 
@@ -35,15 +34,11 @@ def get_analysis_provider(settings: Settings | None = None) -> AnalysisProvider:
         return OpenAIAnalysisProvider()
     if resolved.ai_provider == "local":
         return LocalModelAnalysisProvider()
-    if resolved.ai_provider == "watsonx":
-        return WatsonXAnalysisProvider()
     return DeterministicAnalysisProvider()
 
 
 def get_retrieval_provider(settings: Settings | None = None) -> RetrievalProvider:
     resolved = settings or get_settings()
-    if resolved.rag_provider == "watsonx":
-        return WatsonXRetrievalProvider()
     if resolved.rag_provider == "hybrid_local":
         return HybridLocalRetrievalProvider(embedding_provider=get_embedding_provider(resolved))
     return SourceRegistryRetrievalProvider()

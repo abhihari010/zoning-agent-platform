@@ -20,26 +20,36 @@ services:
       - key: AUTH_REQUIRED
         value: "true"
       - key: AI_PROVIDER
-        value: deterministic
+        value: openai
       - key: RAG_PROVIDER
         value: hybrid_local
       - key: EMBEDDING_PROVIDER
-        value: local
+        value: openai
+      - key: EMBEDDING_MODEL
+        value: text-embedding-3-small
       - key: VECTOR_PROVIDER
-        value: none
+        value: qdrant
       - key: STARTUP_REINDEX_ENABLED
         value: "true"
       - key: CORS_ALLOW_ORIGINS
         value: https://zoning-agent-platform.vercel.app
       - key: GOOGLE_MAPS_API_KEY
         sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
       - key: SUPABASE_PROJECT_URL
         sync: false
       - key: SUPABASE_JWT_SECRET
         sync: false
-      - key: BETA_ACCESS_KEYS
-        sync: false
       - key: ADMIN_ACCESS_KEY
         sync: false
       - key: ADMIN_USER_EMAILS
+        sync: false
+      - key: SENTRY_DSN
         sync: false

@@ -22,13 +22,11 @@ export function useSourcesAdmin({
   canLoadPrivateData,
   canUseAdminTools,
   authSession,
-  betaAccessKey,
   onWorkspaceChange,
 }: {
   canLoadPrivateData: boolean;
   canUseAdminTools: boolean;
   authSession: Session | null;
-  betaAccessKey: string;
   onWorkspaceChange: (workspace: Workspace) => void;
 }) {
   const [sources, setSources] = useState<SourceRegistryEntry[]>([]);
@@ -86,7 +84,7 @@ export function useSourcesAdmin({
     return () => {
       cancelled = true;
     };
-  }, [canLoadPrivateData, canUseAdminTools, authSession, betaAccessKey, adminAccessKey]);
+  }, [canLoadPrivateData, canUseAdminTools, authSession, adminAccessKey]);
 
   useEffect(() => {
     if (!canLoadPrivateData) {
@@ -123,7 +121,7 @@ export function useSourcesAdmin({
     return () => {
       cancelled = true;
     };
-  }, [canLoadPrivateData, authSession, betaAccessKey]);
+  }, [canLoadPrivateData, authSession]);
 
   async function refreshSources(message?: string) {
     const [nextSources, nextIndexStatus] = await Promise.all([

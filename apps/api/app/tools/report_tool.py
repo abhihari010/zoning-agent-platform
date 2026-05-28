@@ -55,11 +55,7 @@ class ReportTool:
                 key="retrieval",
                 label="Retrieve Sources",
                 status="completed",
-                headline=(
-                    f"Retrieved {len(citations)} ordinance passages from the watsonx knowledge index."
-                    if retrieval_provider_name == "watsonx"
-                    else f"Retrieved {len(citations)} relevant zoning source excerpts for review."
-                ),
+                headline=f"Retrieved {len(citations)} relevant zoning source excerpts for review.",
                 details=[
                     f"District searched: {district}",
                     f"Use searched: {inferred_use}",
@@ -71,17 +67,9 @@ class ReportTool:
             key="retrieval",
             label="Retrieve Sources",
             status="warning",
-            headline=(
-                "watsonx retrieval did not return matching ordinance passages for this request."
-                if retrieval_provider_name == "watsonx"
-                else "No relevant municipal ordinances were found in the current source registry."
-            ),
+            headline="No relevant municipal ordinances were found in the current source registry.",
             details=[
-                (
-                    "The watsonx ordinance index did not return enough zoning text for this district and use."
-                    if retrieval_provider_name == "watsonx"
-                    else "The system could not retrieve matching zoning text for this district and use."
-                ),
+                "The system could not retrieve matching zoning text for this district and use.",
                 "A human review with the planning department is recommended before acting.",
             ],
         )

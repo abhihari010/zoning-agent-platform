@@ -12,9 +12,7 @@ from app.ai.interfaces import AnalysisProviderRequest, EmbeddingProviderRequest,
 from app.ai.local_model_provider import LocalModelAnalysisProvider
 from app.ingestion import build_source_chunks
 from app.ai.source_registry_retriever import SourceRegistryRetrievalProvider
-from app.ai.watsonx_provider import WatsonXAnalysisProvider, WatsonXRetrievalProvider
 from app.models import SourceRegistryEntry
-from app.settings import ConfigurationError
 from app.storage import SQLiteStore
 
 
@@ -170,11 +168,12 @@ def test_hybrid_local_retriever_uses_indexed_chunks() -> None:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
 
-def test_hybrid_local_retriever_returns_empty_when_chroma_has_no_hits(
+def test_hybrid_local_retriever_returns_empty_when_qdrant_has_no_hits(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setenv("VECTOR_PROVIDER", "chroma")
-    temp_dir = Path(__file__).resolve().parent / "_tmp_hybrid_empty_chroma"
+    monkeypatch.setenv("VECTOR_PROVIDER", "qdrant")
+    monkeypatch.setenv("QDRANT_URL", "http://localhost:6333")
+    temp_dir = Path(__file__).resolve().parent / "_tmp_hybrid_empty_qdrant"
     if temp_dir.exists():
         shutil.rmtree(temp_dir)
     temp_dir.mkdir(parents=True)
@@ -193,7 +192,7 @@ def test_hybrid_local_retriever_returns_empty_when_chroma_has_no_hits(
             )
         )
         source_store.replace_source_chunks(build_source_chunks(source_store.list_sources()))
-        monkeypatch.setattr("app.rag.vector_store.ChromaVectorStore.query", lambda *args, **kwargs: [])
+        monkeypatch.setattr("app.rag.vector_store.QdrantVectorStore.query", lambda *args, **kwargs: [])
 
         result = HybridLocalRetrievalProvider(
             source_store,
@@ -262,35 +261,3 @@ def test_local_model_provider_uses_openai_compatible_chat_endpoint(
     assert result.required_permits == ["Zoning Permit"]
 
 
-def test_watsonx_providers_require_credentials_by_selection(monkeypatch: pytest.MonkeyPatch) -> None:
-    for name in [
-        "AI_PROVIDER",
-        "RAG_PROVIDER",
-        "WATSONX_API_KEY",
-        "WATSONX_PROJECT_ID",
-        "WATSONX_MODEL_ID",
-        "WATSONX_VECTOR_INDEX_ID",
-    ]:
-        monkeypatch.delenv(name, raising=False)
-
-    monkeypatch.setenv("AI_PROVIDER", "watsonx")
-    with pytest.raises(ConfigurationError):
-        WatsonXAnalysisProvider().generate_analysis(
-            AnalysisProviderRequest(
-                project_description="Open a bakery.",
-                district="mixed-use-core",
-                citation_excerpts=[],
-                missing_fields=[],
-            )
-        )
-
-    monkeypatch.setenv("AI_PROVIDER", "deterministic")
-    monkeypatch.setenv("RAG_PROVIDER", "watsonx")
-    with pytest.raises(ConfigurationError):
-        WatsonXRetrievalProvider().retrieve(
-            RetrievalProviderRequest(
-                district="mixed-use-core",
-                inferred_use="home-based-food-business",
-                project_description="Open a bakery.",
-            )
-        )

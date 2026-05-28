@@ -11,17 +11,29 @@ import {
   fetchProjectResult,
   intakeProject,
   listProjects,
-  requiresBetaAccess,
   requestJurisdictionSupport,
   type IntakeResponse,
   type JurisdictionCoverage,
   type JurisdictionRequestSummary,
   type ProjectSummary,
 } from "./api";
-import { LOADING_PIPELINE_STAGES, PIPELINE_STAGE_COUNT } from "./constants/pipeline";
-import type { IntakeFacts, LegalPage, Phase, ResultView, Workspace } from "./types/app";
+import {
+  LOADING_PIPELINE_STAGES,
+  PIPELINE_STAGE_COUNT,
+} from "./constants/pipeline";
+import type {
+  IntakeFacts,
+  LegalPage,
+  Phase,
+  ResultView,
+  Workspace,
+} from "./types/app";
 import { buildChecklistDownload, downloadTextFile } from "./utils/downloads";
-import { buildProjectContext, emptyIntakeFacts, intakeErrorMessage } from "./utils/intake";
+import {
+  buildProjectContext,
+  emptyIntakeFacts,
+  intakeErrorMessage,
+} from "./utils/intake";
 import { LegalFooter } from "./components/LegalFooter";
 import { LegalModal } from "./components/LegalModal";
 import { WorkspaceHeader } from "./components/WorkspaceHeader";
@@ -33,7 +45,6 @@ import { SourceEditorForm } from "./features/admin/SourceEditorForm";
 import { SourceHealthPanel } from "./features/admin/SourceHealthPanel";
 import { PipelineProgress } from "./features/assistant/PipelineProgress";
 import { ProjectIntakePanel } from "./features/assistant/ProjectIntakePanel";
-import { BetaAccessGate } from "./features/auth/BetaAccessGate";
 import { PublicAuthScreen } from "./features/landing/PublicAuthScreen";
 import { CaseSnapshot } from "./features/projects/CaseSnapshot";
 import { ReviewSignalsPanel } from "./features/projects/ReviewSignalsPanel";
@@ -41,9 +52,9 @@ import { SavedProjectsPanel } from "./features/projects/SavedProjectsPanel";
 import { ClarificationModal } from "./features/results/ClarificationModal";
 import { ResultSection } from "./features/results/ResultSection";
 import { useAddressAutocomplete } from "./hooks/useAddressAutocomplete";
-import { useBetaAccess } from "./hooks/useBetaAccess";
 import { useCoverage } from "./hooks/useCoverage";
 import { useFeedback } from "./hooks/useFeedback";
+import { useLegalAck } from "./hooks/useLegalAck";
 import { useSourcesAdmin } from "./hooks/useSourcesAdmin";
 import { useSupabaseAuth } from "./hooks/useSupabaseAuth";
 import { useTrace } from "./hooks/useTrace";
@@ -52,18 +63,12 @@ export function App() {
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [projectsLoading, setProjectsLoading] = useState(false);
   const [projectsMessage, setProjectsMessage] = useState("");
-  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(
+    null,
+  );
   const resetAuthState = useCallback(() => {
     setProjects([]);
   }, []);
-  const {
-    betaAccessKey,
-    betaAccessInput,
-    betaAccessError,
-    setBetaAccessInput,
-    unlockPrivateBeta,
-    changePrivateBetaKey,
-  } = useBetaAccess();
   const {
     authSession,
     authLoading,
@@ -77,7 +82,6 @@ export function App() {
     signUp,
     signOut,
   } = useSupabaseAuth({
-    betaAccessKey,
     onAuthStateReset: resetAuthState,
   });
   const {
@@ -89,8 +93,12 @@ export function App() {
     coverageByJurisdictionName,
   } = useCoverage();
   const [legalPage, setLegalPage] = useState<LegalPage>(null);
-  const [jurisdictionRequestMessage, setJurisdictionRequestMessage] = useState("");
-  const [jurisdictionRequestSubmitting, setJurisdictionRequestSubmitting] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
+  const { isAcknowledged, acknowledge } = useLegalAck();
+  const [jurisdictionRequestMessage, setJurisdictionRequestMessage] =
+    useState("");
+  const [jurisdictionRequestSubmitting, setJurisdictionRequestSubmitting] =
+    useState(false);
   const [workspace, setWorkspace] = useState<Workspace>("assistant");
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
   const [projectDescription, setProjectDescription] = useState("");
@@ -122,13 +130,17 @@ export function App() {
   } = useFeedback(intake);
   const [resultView, setResultView] = useState<ResultView>("checklist");
   const [clarificationOpen, setClarificationOpen] = useState(false);
-  const [clarificationQuestions, setClarificationQuestions] = useState<FollowUpQuestion[]>([]);
-  const [clarificationAnswers, setClarificationAnswers] = useState<Record<string, string>>({});
+  const [clarificationQuestions, setClarificationQuestions] = useState<
+    FollowUpQuestion[]
+  >([]);
+  const [clarificationAnswers, setClarificationAnswers] = useState<
+    Record<string, string>
+  >({});
   const [clarificationSubmitting, setClarificationSubmitting] = useState(false);
-  const isSupabaseAuthenticated = authMode !== "supabase" || Boolean(authSession);
-  const canUseBetaAccess = authMode === "beta" && (!requiresBetaAccess || Boolean(betaAccessKey));
+  const isSupabaseAuthenticated =
+    authMode !== "supabase" || Boolean(authSession);
   const canLoadPrivateData =
-    authMode === "supabase" ? Boolean(authSession) : authMode === "beta" ? canUseBetaAccess : true;
+    authMode === "supabase" ? Boolean(authSession) : true;
   const canUseAdminTools =
     authMode === "supabase" ? currentUser?.role === "admin" : true;
   const {
@@ -163,11 +175,11 @@ export function App() {
     canLoadPrivateData,
     canUseAdminTools,
     authSession,
-    betaAccessKey,
     onWorkspaceChange: setWorkspace,
   });
   const currentCoverage = useMemo(
-    () => coverage.find((item) => item.jurisdictionId === intake?.jurisdictionId),
+    () =>
+      coverage.find((item) => item.jurisdictionId === intake?.jurisdictionId),
     [coverage, intake?.jurisdictionId],
   );
 
@@ -209,18 +221,20 @@ export function App() {
   const displayedStages = useMemo(() => {
     return result?.pipelineStages?.length
       ? result.pipelineStages
-      : result?.agents.length
-        ? result.agents
-        : LOADING_PIPELINE_STAGES;
+      : LOADING_PIPELINE_STAGES;
   }, [result]);
 
   const assistantPrompts = useMemo(() => {
     const prompts: string[] = [];
     if (intake) {
-      prompts.push(...intake.followUpQuestions.map((question) => question.question));
+      prompts.push(
+        ...intake.followUpQuestions.map((question) => question.question),
+      );
     }
     if (result) {
-      prompts.push(...result.followUpQuestions.map((question) => question.question));
+      prompts.push(
+        ...result.followUpQuestions.map((question) => question.question),
+      );
       prompts.push(...result.warnings);
     }
     return Array.from(new Set(prompts));
@@ -228,7 +242,9 @@ export function App() {
 
   const sourceHealthById = useMemo(() => {
     const entries = indexStatus?.sourcesMissingMetadata ?? [];
-    return new Map(entries.map((source) => [source.sourceId, source.missingFields]));
+    return new Map(
+      entries.map((source) => [source.sourceId, source.missingFields]),
+    );
   }, [indexStatus]);
 
   const sourceIndexIssuesById = useMemo(() => {
@@ -252,7 +268,9 @@ export function App() {
       }
     }
     if (request.jurisdictionName) {
-      return coverageByJurisdictionName.get(request.jurisdictionName.toLowerCase());
+      return coverageByJurisdictionName.get(
+        request.jurisdictionName.toLowerCase(),
+      );
     }
     return undefined;
   }
@@ -270,7 +288,9 @@ export function App() {
       }
     } catch (projectError) {
       setProjectsMessage(
-        projectError instanceof Error ? projectError.message : "Failed to load projects.",
+        projectError instanceof Error
+          ? projectError.message
+          : "Failed to load projects.",
       );
     } finally {
       setProjectsLoading(false);
@@ -282,37 +302,34 @@ export function App() {
     resetWorkspace();
   }
 
-  function onChangePrivateBetaKey() {
-    changePrivateBetaKey();
-    resetSourceState();
-  }
-
-  async function runAnalysis(projectId: string, answers?: Record<string, string>) {
+  async function runAnalysis(
+    projectId: string,
+    answers?: Record<string, string>,
+  ) {
     setPhase("analyzing");
     setActiveStageIndex(0);
     const analysis = await analyzeProject(projectId, answers);
     setResult(analysis);
     setPhase("done");
 
-    if (analysis.status === "needs_clarification" && analysis.followUpQuestions.length > 0) {
-      const nextAnswers = analysis.followUpQuestions.reduce<Record<string, string>>(
-        (accumulator, question) => {
-          accumulator[question.question] = clarificationAnswers[question.question] ?? "";
-          return accumulator;
-        },
-        {},
-      );
+    if (
+      analysis.status === "needs_clarification" &&
+      analysis.followUpQuestions.length > 0
+    ) {
+      const nextAnswers = analysis.followUpQuestions.reduce<
+        Record<string, string>
+      >((accumulator, question) => {
+        accumulator[question.question] =
+          clarificationAnswers[question.question] ?? "";
+        return accumulator;
+      }, {});
       setClarificationQuestions(analysis.followUpQuestions);
       setClarificationAnswers(nextAnswers);
       setClarificationOpen(true);
     }
   }
 
-  async function onSubmit() {
-    if (!canSubmit) {
-      return;
-    }
-
+  async function runSubmitFlow() {
     setError(null);
     setResult(null);
     setIntake(null);
@@ -327,11 +344,15 @@ export function App() {
     try {
       setPhase("intake");
       const sessionId = await createSession();
-      const projectContext = buildProjectContext(projectDescription, intakeFacts);
+      const projectContext = buildProjectContext(
+        projectDescription,
+        intakeFacts,
+      );
       const intakeResult = await intakeProject({
         session_id: sessionId,
         project_description: projectContext,
         address: address.trim(),
+        legal_ack_at: localStorage.getItem("legal_ack_at") ?? undefined,
       });
       setIntake(intakeResult);
 
@@ -352,9 +373,25 @@ export function App() {
     } catch (submitError) {
       setPhase("error");
       setError(
-        submitError instanceof Error ? submitError.message : "Something went wrong during analysis.",
+        submitError instanceof Error
+          ? submitError.message
+          : "Something went wrong during analysis.",
       );
     }
+  }
+
+  async function onSubmit() {
+    if (!canSubmit) {
+      return;
+    }
+
+    if (!isAcknowledged) {
+      setPendingSubmit(true);
+      setLegalPage("disclaimer");
+      return;
+    }
+
+    await runSubmitFlow();
   }
 
   async function onSubmitClarifications() {
@@ -366,7 +403,9 @@ export function App() {
       (question) => !clarificationAnswers[question.question]?.trim(),
     );
     if (unanswered) {
-      setError("Please answer each clarification so we can continue the review.");
+      setError(
+        "Please answer each clarification so we can continue the review.",
+      );
       return;
     }
 
@@ -410,7 +449,9 @@ export function App() {
       setResultView("checklist");
     } catch (projectError) {
       setProjectsMessage(
-        projectError instanceof Error ? projectError.message : "Failed to open saved project.",
+        projectError instanceof Error
+          ? projectError.message
+          : "Failed to open saved project.",
       );
     }
   }
@@ -419,7 +460,9 @@ export function App() {
     if (!intake?.projectId) {
       return;
     }
-    const confirmed = window.confirm("Delete this saved zoning review? This cannot be undone.");
+    const confirmed = window.confirm(
+      "Delete this saved zoning review? This cannot be undone.",
+    );
     if (!confirmed) {
       return;
     }
@@ -427,12 +470,16 @@ export function App() {
       setDeletingProjectId(intake.projectId);
       setProjectsMessage("");
       await deleteProject(intake.projectId);
-      setProjects((current) => current.filter((item) => item.projectId !== intake.projectId));
+      setProjects((current) =>
+        current.filter((item) => item.projectId !== intake.projectId),
+      );
       resetWorkspace();
       setProjectsMessage("Project deleted.");
     } catch (projectError) {
       setProjectsMessage(
-        projectError instanceof Error ? projectError.message : "Failed to delete project.",
+        projectError instanceof Error
+          ? projectError.message
+          : "Failed to delete project.",
       );
     } finally {
       setDeletingProjectId(null);
@@ -446,7 +493,11 @@ export function App() {
 
     downloadTextFile(
       "zoning-checklist.txt",
-      buildChecklistDownload(intake, result, buildProjectContext(projectDescription, intakeFacts)),
+      buildChecklistDownload(
+        intake,
+        result,
+        buildProjectContext(projectDescription, intakeFacts),
+      ),
     );
   }
 
@@ -498,7 +549,8 @@ export function App() {
   }
 
   const showHumanFallback =
-    result?.status === "low_confidence" || result?.feasibility.decision === "unknown";
+    result?.status === "low_confidence" ||
+    result?.feasibility.decision === "unknown";
 
   if (authMode === "supabase" && (authLoading || !isSupabaseAuthenticated)) {
     return (
@@ -526,17 +578,6 @@ export function App() {
     );
   }
 
-  if (authMode === "beta" && requiresBetaAccess && !betaAccessKey) {
-    return (
-      <BetaAccessGate
-        accessInput={betaAccessInput}
-        error={betaAccessError}
-        onAccessInputChange={setBetaAccessInput}
-        onUnlock={unlockPrivateBeta}
-      />
-    );
-  }
-
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(217,120,85,0.10),transparent_24%),linear-gradient(180deg,#f8f3ea_0%,#efe5d5_100%)] text-slate-900">
       <div className="mx-auto max-w-6xl px-4 py-5 md:px-8 md:py-8">
@@ -549,7 +590,6 @@ export function App() {
           onSignOut={() => {
             void onSignOut();
           }}
-          onChangePrivateBetaKey={onChangePrivateBetaKey}
         />
 
         {workspace === "assistant" ? (
@@ -644,7 +684,10 @@ export function App() {
         ) : (
           <section className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
             <div className="space-y-6">
-              <SourceHealthPanel indexStatus={indexStatus} sourceCount={sources.length} />
+              <SourceHealthPanel
+                indexStatus={indexStatus}
+                sourceCount={sources.length}
+              />
 
               <JurisdictionRequestsPanel
                 requests={jurisdictionRequests}
@@ -702,7 +745,25 @@ export function App() {
         <LegalFooter onSelectPage={setLegalPage} />
       </div>
 
-      {legalPage && <LegalModal page={legalPage} onClose={() => setLegalPage(null)} />}
+      {legalPage && (
+        <LegalModal
+          page={legalPage}
+          onClose={() => {
+            setLegalPage(null);
+            setPendingSubmit(false);
+          }}
+          onAcknowledge={
+            pendingSubmit && legalPage === "disclaimer"
+              ? () => {
+                  acknowledge();
+                  setLegalPage(null);
+                  setPendingSubmit(false);
+                  void runSubmitFlow();
+                }
+              : undefined
+          }
+        />
+      )}
 
       {clarificationOpen && (
         <ClarificationModal
