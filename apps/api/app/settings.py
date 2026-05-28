@@ -92,6 +92,7 @@ class Settings:
     startup_reindex_enabled: bool
     source_registry_version: str
     cors_allow_origins: tuple[str, ...]
+    cors_allow_origin_regex: str
     # ---------------------------------------------------------------------------
     # Workstream A — Cache settings (appended; do not reorder above fields)
     # ---------------------------------------------------------------------------
@@ -175,6 +176,7 @@ def get_settings() -> Settings:
         startup_reindex_enabled=_env_bool("STARTUP_REINDEX_ENABLED", True),
         source_registry_version=_env("SOURCE_REGISTRY_VERSION"),
         cors_allow_origins=_parse_csv(_env("CORS_ALLOW_ORIGINS")),
+        cors_allow_origin_regex=_env("CORS_ALLOW_ORIGIN_REGEX"),
         # Workstream A — cache settings
         cache_enabled=_env_bool("CACHE_ENABLED", True),
         cache_db_path=Path(_env("CACHE_DB_PATH")) if _env("CACHE_DB_PATH") else Path("app/data/cache.sqlite3"),

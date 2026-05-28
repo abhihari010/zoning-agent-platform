@@ -154,6 +154,7 @@ async def add_request_id_and_log(request: Request, call_next):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_allow_origins,
+    allow_origin_regex=_settings_for_cors.cors_allow_origin_regex or None,
     allow_credentials=_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
