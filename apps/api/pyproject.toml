@@ -35,3 +35,4 @@ include = ["app*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+addopts = "--basetemp=.pytest_tmp"
