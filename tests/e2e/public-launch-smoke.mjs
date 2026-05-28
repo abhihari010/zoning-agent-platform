@@ -443,6 +443,11 @@ async function runWorkspaceFlow() {
     .fill("Open a small retail studio with customer pickup and light interior work.");
   await page.getByLabel("Property address").fill("100 Main St, Blacksburg, VA");
   await page.getByRole("button", { name: "Run zoning review" }).click();
+  // Dismiss legal disclaimer modal on first run (appears when legal_ack_at not in localStorage)
+  const disclaimerModal = page.getByRole("heading", { name: "Disclaimer" });
+  if (await disclaimerModal.isVisible({ timeout: 2_000 }).catch(() => false)) {
+    await page.getByRole("button", { name: /I understand/i }).click();
+  }
   await page.getByRole("heading", { name: "Conditional" }).waitFor({ timeout: 10_000 });
   await expectBodyIncludes("Blacksburg, VA", "Zoning permit", "Evidence Snapshot");
 

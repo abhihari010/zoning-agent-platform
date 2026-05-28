@@ -146,7 +146,7 @@ def test_stable_chunk_ids_change_only_when_source_text_changes() -> None:
         full_text="Coffee shops require parking review.",
         section_ref="Sec 1",
     )
-    changed = dict(**base, excerpt="Coffee shops require parking and signage review.", full_text="Coffee shops require parking and signage review.")
+    changed = {**base, "excerpt": "Coffee shops require parking and signage review.", "full_text": "Coffee shops require parking and signage review."}
 
     first_ids = [c.chunk_id for c in build_source_chunks([SourceRegistryEntry(**base)])]
     unchanged_ids = [c.chunk_id for c in build_source_chunks([SourceRegistryEntry(**base)])]

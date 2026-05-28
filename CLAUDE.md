@@ -93,3 +93,4 @@ Key invariant: if retrieval returns no citations, the orchestrator must return `
 - When adding a jurisdiction, extend `data/source_registry.json` and the jurisdiction/district mappings — do not add Blacksburg-style hard-coded checks.
 - When changing API shapes, update both `apps/api/app/models.py` and `packages/shared-schema/src/index.ts`, and check `apps/web/src/api.ts` callers.
 - Many `.tmp-*` directories at the repo root are old worktree leftovers; ignore them and never commit them.
+- Never include "Co-Authored-By: Claude" in commit messages or PR descriptions.
