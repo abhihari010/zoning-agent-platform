@@ -145,6 +145,8 @@ GEMINI_EMBEDDING_DIMENSIONS=768               # optional, default 768 (set 0 for
 >
 > A `429` during reindex is non-fatal — it returns a `vector_warnings` entry (now including the quota message from the error body) and leaves the SQL chunks intact; just re-run reindex.
 
+> **Troubleshooting — `429 "prepayment credits are depleted"`:** this is NOT a rate limit. It means your `GEMINI_API_KEY` belongs to a Google Cloud project with **billing enabled** (paid tier) whose prepaid balance is depleted, so every request is rejected. Fix: generate a new key in a **free-tier** project at AI Studio (or top up billing on the paid project). Confirmed working 2026-05-29 with a free-tier key → reindex reported 12 chunks / 12 vectors. The AI Studio usage dashboard showing generous limits + zero usage does not mean the key will work if its project is on depleted prepay.
+
 After deploying, trigger reindex to populate Qdrant with the existing 27 VA sources:
 ```
 POST https://zoning-agent-api.onrender.com/api/v1/ingestion/reindex
