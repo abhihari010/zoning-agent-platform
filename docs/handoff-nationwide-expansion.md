@@ -70,6 +70,8 @@ Stage 5 — Generate Checklist + Report (apps/api/app/tools/report_tool.py)
 
 Sources live in: `apps/api/app/data/source_registry.json` (27 entries, manually written excerpt paragraphs — NOT scraped text)
 
+> **⚠️ Editing `source_registry.json`? You MUST bump `SOURCE_REGISTRY_VERSION`.** Seeding (`ensure_seed_sources`, `apps/api/app/ai/source_registry_retriever.py`) only runs when the DB is empty **or** `SOURCE_REGISTRY_VERSION` is set to a value not yet seeded. On an already-seeded DB (e.g. production Postgres), edits/additions to the file are **silently ignored** until you change `SOURCE_REGISTRY_VERSION` to a new string and redeploy — then it upserts all entries (idempotent by `source_id`) and reindex picks them up. Symptom of forgetting: reindex reports fewer sources than the file has (we hit exactly this — DB stuck at 12 while the file had 27). Re-seeding does not require an empty DB; the version bump is the trigger.
+
 ---
 
 ## The critical RAG misconception to understand
