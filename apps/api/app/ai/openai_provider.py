@@ -37,7 +37,9 @@ ANALYSIS_SCHEMA: dict[str, Any] = {
     ],
 }
 
-_RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
+# 429 is excluded: retrying rate-limit errors wastes quota and delays the deterministic fallback.
+# Transient server errors (5xx) are still worth retrying.
+_RETRYABLE_STATUS_CODES = {500, 502, 503, 504}
 _MAX_ATTEMPTS = 3
 
 
@@ -87,7 +89,13 @@ class OpenAIAnalysisProvider:
                         "role": "system",
                         "content": (
                             "You are a zoning compliance drafting assistant. Use only the supplied "
-                            "citation excerpts and missing-field list. Do not invent citations."
+                            "citation excerpts and missing-field list. Do not invent citations.\n\n"
+                            "Respond with a JSON object containing exactly these fields:\n"
+                            '  "decision": one of "likely_allowed", "conditional", "restricted", "unknown"\n'
+                            '  "summary": string\n'
+                            '  "required_permits": array of strings\n'
+                            '  "follow_up_questions": array of strings\n'
+                            '  "warnings": array of strings'
                         ),
                     },
                     {
@@ -102,14 +110,7 @@ class OpenAIAnalysisProvider:
                         ),
                     },
                 ],
-                "response_format": {
-                    "type": "json_schema",
-                    "json_schema": {
-                        "name": "zoning_analysis",
-                        "schema": ANALYSIS_SCHEMA,
-                        "strict": True,
-                    },
-                },
+                "response_format": {"type": "json_object"},
             },
             timeout=settings.openai_timeout_seconds,
         )
