@@ -133,15 +133,17 @@ GEMINI_EMBEDDING_MODEL=gemini-embedding-001   # optional, this is the default
 GEMINI_EMBEDDING_DIMENSIONS=768               # optional, default 768 (set 0 for full 3072)
 ```
 
-`EMBEDDING_PROVIDER=gemini` uses `GeminiEmbeddingProvider` (`apps/api/app/ai/embedding_provider.py`) — Google's `gemini-embedding-001` via its OpenAI-compatible endpoint (`https://generativelanguage.googleapis.com/v1beta/openai/embeddings`). Free tier, semantically meaningful, 768 dims by default (Matryoshka-truncated). Needs a free `GEMINI_API_KEY` from Google AI Studio — separate from the Google Maps key. Unlike the old `local` SHA256 hash embeddings (64-dim, non-semantic), this produces real semantic similarity so queries like "run a food truck" will match "mobile food vendor ordinance".
+`EMBEDDING_PROVIDER=gemini` uses `GeminiEmbeddingProvider` (`apps/api/app/ai/embedding_provider.py`) — Google's `gemini-embedding-001` via the **native** batch endpoint (`{base}/models/gemini-embedding-001:batchEmbedContents`, auth via `x-goog-api-key`). Free tier, semantically meaningful, 768 dims by default (Matryoshka-truncated). Needs a free `GEMINI_API_KEY` from Google AI Studio — separate from the Google Maps key. Unlike the old `local` SHA256 hash embeddings (64-dim, non-semantic), this produces real semantic similarity so queries like "run a food truck" will match "mobile food vendor ordinance".
+
+> **Why native, not OpenAI-compat:** the OpenAI-compatible shim (`/v1beta/openai/embeddings`) is throttled separately from the documented per-model quota and returns `429` even when the native quota is completely idle (the AI Studio usage dashboard tracks only the native endpoint). The native `batchEmbedContents` endpoint gets the real documented limits (3,000 RPM / 1M TPM / unlimited RPD on free tier as of 2026-05). Do not switch back to the compat shim.
 
 > **Note:** Groq has no embeddings API (only chat/speech models), so `AI_PROVIDER=groq` for compliance analysis and `EMBEDDING_PROVIDER=gemini` for retrieval are intentionally two different providers. The embeddings provider normalizes vectors to unit length, so the truncated 768-dim output is valid for both Qdrant cosine search and the hybrid retriever's dot-product scoring.
 
-**Free-tier rate limits:** Gemini's free tier is RPM/TPM/RPD limited *per Google Cloud project* (not per key). The embedding provider batches inputs and retries `429` responses with exponential backoff honoring `Retry-After`, so reindex survives transient rate limits. Tunables (env vars, all optional):
-> - `GEMINI_EMBEDDING_BATCH_SIZE` (default 32) — inputs per request
+**Rate limits / resilience:** the native endpoint's free-tier limits (3,000 RPM / 1M TPM / unlimited RPD, per Google Cloud project) are generous enough for nationwide ingestion. The provider still batches inputs and retries `429` with exponential backoff (honoring `Retry-After` and Gemini's `retryDelay`) for safety. Tunables (env vars, all optional):
+> - `GEMINI_EMBEDDING_BATCH_SIZE` (default 32) — inputs per `batchEmbedContents` request
 > - `GEMINI_EMBEDDING_REQUEST_INTERVAL_SECONDS` (default 1.0) — pause between batches
 >
-> If reindex still 429s at nationwide scale (thousands of chunks), lower the batch size / raise the interval, or set up billing to reach Tier 1. A `429` during reindex is non-fatal — it returns a `vector_warnings` entry and leaves the SQL chunks intact; just re-run reindex.
+> A `429` during reindex is non-fatal — it returns a `vector_warnings` entry (now including the quota message from the error body) and leaves the SQL chunks intact; just re-run reindex.
 
 After deploying, trigger reindex to populate Qdrant with the existing 27 VA sources:
 ```
