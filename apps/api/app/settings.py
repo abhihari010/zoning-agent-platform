@@ -10,13 +10,13 @@ from typing import Literal, cast
 AppEnvName = Literal["local", "staging", "production"]
 AIProviderName = Literal["deterministic", "openai", "local", "groq"]
 RAGProviderName = Literal["source_registry", "hybrid_local"]
-EmbeddingProviderName = Literal["none", "local", "openai", "groq"]
+EmbeddingProviderName = Literal["none", "local", "openai", "gemini"]
 VectorProviderName = Literal["none", "qdrant"]
 
 VALID_APP_ENVS: set[str] = {"local", "staging", "production"}
 VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "local", "groq"}
 VALID_RAG_PROVIDERS: set[str] = {"source_registry", "hybrid_local"}
-VALID_EMBEDDING_PROVIDERS: set[str] = {"none", "local", "openai", "groq"}
+VALID_EMBEDDING_PROVIDERS: set[str] = {"none", "local", "openai", "gemini"}
 VALID_VECTOR_PROVIDERS: set[str] = {"none", "qdrant"}
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent / "data" / "app.sqlite3"
@@ -76,7 +76,10 @@ class Settings:
     groq_api_key: str
     groq_model: str
     groq_timeout_seconds: float
-    groq_embedding_model: str
+    gemini_api_key: str
+    gemini_embedding_model: str
+    gemini_embedding_dimensions: int
+    gemini_timeout_seconds: float
     local_model_base_url: str
     local_model_name: str
     local_model_timeout_seconds: float
@@ -166,7 +169,10 @@ def get_settings() -> Settings:
         groq_api_key=_env("GROQ_API_KEY"),
         groq_model=_env("GROQ_MODEL", "llama-3.3-70b-versatile"),
         groq_timeout_seconds=float(_env("GROQ_TIMEOUT_SECONDS", "20")),
-        groq_embedding_model=_env("GROQ_EMBEDDING_MODEL", "nomic-embed-text-v1_5"),
+        gemini_api_key=_env("GEMINI_API_KEY"),
+        gemini_embedding_model=_env("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001"),
+        gemini_embedding_dimensions=int(_env("GEMINI_EMBEDDING_DIMENSIONS", "768")),
+        gemini_timeout_seconds=float(_env("GEMINI_TIMEOUT_SECONDS", "20")),
         local_model_base_url=_env("LOCAL_MODEL_BASE_URL", "http://localhost:11434/v1").rstrip("/"),
         local_model_name=_env("LOCAL_MODEL_NAME", "llama3.1:8b"),
         local_model_timeout_seconds=float(_env("LOCAL_MODEL_TIMEOUT_SECONDS", "60")),
@@ -223,6 +229,8 @@ def validate_production_settings(settings: Settings) -> None:
         missing.append("OPENAI_API_KEY")
     if settings.ai_provider == "groq" and not settings.groq_api_key:
         missing.append("GROQ_API_KEY")
+    if settings.embedding_provider == "gemini" and not settings.gemini_api_key:
+        missing.append("GEMINI_API_KEY")
     if settings.vector_provider == "qdrant" and not settings.qdrant_url:
         missing.append("QDRANT_URL")
     if "*" in settings.cors_allow_origins:

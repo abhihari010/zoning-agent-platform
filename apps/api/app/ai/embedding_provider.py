@@ -6,7 +6,8 @@ import re
 
 from app.ai.interfaces import EmbeddingProviderRequest, EmbeddingProviderResult
 
-GROQ_EMBEDDINGS_URL = "https://api.groq.com/openai/v1/embeddings"
+# Gemini exposes an OpenAI-compatible embeddings endpoint. Groq has no embeddings API.
+GEMINI_EMBEDDINGS_URL = "https://generativelanguage.googleapis.com/v1beta/openai/embeddings"
 
 
 TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
@@ -44,8 +45,8 @@ class LocalHashEmbeddingProvider:
         return [value / magnitude for value in vector]
 
 
-class GroqEmbeddingProvider:
-    name = "groq"
+class GeminiEmbeddingProvider:
+    name = "gemini"
 
     def embed(self, request: EmbeddingProviderRequest) -> EmbeddingProviderResult:
         from app.ai.openai_provider import _post_with_retry
@@ -55,25 +56,40 @@ class GroqEmbeddingProvider:
             return EmbeddingProviderResult(embeddings=[])
 
         settings = get_settings()
+        body: dict = {
+            "model": settings.gemini_embedding_model,
+            "input": request.texts,
+            "encoding_format": "float",
+        }
+        # gemini-embedding-001 uses Matryoshka Representation Learning; request a
+        # smaller, storage-friendly vector when configured (default 3072 if 0/unset).
+        if settings.gemini_embedding_dimensions:
+            body["dimensions"] = settings.gemini_embedding_dimensions
+
         payload = _post_with_retry(
-            url=GROQ_EMBEDDINGS_URL,
+            url=GEMINI_EMBEDDINGS_URL,
             headers={
-                "Authorization": f"Bearer {settings.groq_api_key}",
+                "Authorization": f"Bearer {settings.gemini_api_key}",
                 "Content-Type": "application/json",
             },
-            body={
-                "model": settings.groq_embedding_model,
-                "input": request.texts,
-                "encoding_format": "float",
-            },
-            timeout=settings.groq_timeout_seconds,
+            body=body,
+            timeout=settings.gemini_timeout_seconds,
         )
         data = payload.get("data", [])
+        # Gemini returns un-normalized vectors when dimensions are truncated below
+        # 3072. Normalize so dot-product cosine (used in the hybrid retriever) is valid.
         embeddings = [
-            item.get("embedding", [])
+            _normalize(item.get("embedding", []))
             for item in sorted(data, key=lambda item: item.get("index", 0))
         ]
         return EmbeddingProviderResult(embeddings=embeddings)
+
+
+def _normalize(vector: list[float]) -> list[float]:
+    magnitude = math.sqrt(sum(value * value for value in vector))
+    if magnitude == 0:
+        return vector
+    return [value / magnitude for value in vector]
 
 
 def cosine_similarity(left: list[float], right: list[float]) -> float:

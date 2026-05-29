@@ -127,11 +127,15 @@ Once the SQL fix is in, switch Render env vars:
 
 ```
 RAG_PROVIDER=hybrid_local
-EMBEDDING_PROVIDER=groq
-GROQ_EMBEDDING_MODEL=nomic-embed-text-v1_5
+EMBEDDING_PROVIDER=gemini
+GEMINI_API_KEY=<free AI Studio key>
+GEMINI_EMBEDDING_MODEL=gemini-embedding-001   # optional, this is the default
+GEMINI_EMBEDDING_DIMENSIONS=768               # optional, default 768 (set 0 for full 3072)
 ```
 
-`EMBEDDING_PROVIDER=groq` uses `GroqEmbeddingProvider` (`apps/api/app/ai/embedding_provider.py`) — Groq's `nomic-embed-text-v1_5` model (768 dims, semantically meaningful, free tier). Reuses the existing `GROQ_API_KEY`. Unlike the old `local` SHA256 hash embeddings (64-dim, non-semantic), this produces real semantic similarity so queries like "run a food truck" will match "mobile food vendor ordinance".
+`EMBEDDING_PROVIDER=gemini` uses `GeminiEmbeddingProvider` (`apps/api/app/ai/embedding_provider.py`) — Google's `gemini-embedding-001` via its OpenAI-compatible endpoint (`https://generativelanguage.googleapis.com/v1beta/openai/embeddings`). Free tier, semantically meaningful, 768 dims by default (Matryoshka-truncated). Needs a free `GEMINI_API_KEY` from Google AI Studio — separate from the Google Maps key. Unlike the old `local` SHA256 hash embeddings (64-dim, non-semantic), this produces real semantic similarity so queries like "run a food truck" will match "mobile food vendor ordinance".
+
+> **Note:** Groq has no embeddings API (only chat/speech models), so `AI_PROVIDER=groq` for compliance analysis and `EMBEDDING_PROVIDER=gemini` for retrieval are intentionally two different providers. The embeddings provider normalizes vectors to unit length, so the truncated 768-dim output is valid for both Qdrant cosine search and the hybrid retriever's dot-product scoring.
 
 After deploying, trigger reindex to populate Qdrant with the existing 27 VA sources:
 ```
