@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Protocol
 from uuid import UUID
 
-from sqlalchemy import delete, desc, func, insert, select, text, update
+from sqlalchemy import delete, desc, func, insert, or_, select, text, update
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.database import (
@@ -42,7 +42,7 @@ from app.models import (
     SourceRegistryEntry,
     UserRecord,
 )
-from app.jurisdictions import source_applies_to_jurisdiction
+from app.jurisdictions import get_jurisdiction_scope, source_applies_to_jurisdiction
 
 
 class DatabaseStorageError(RuntimeError):
@@ -189,6 +189,8 @@ class SQLAlchemyStore:
                 "jurisdiction_id": "VARCHAR(200)",
                 "source_type": "VARCHAR(200)",
                 "source_version": "VARCHAR(120)",
+                "districts_csv": "VARCHAR(2000)",
+                "uses_csv": "VARCHAR(2000)",
             },
             "audit_events": {
                 "user_id": "VARCHAR(200)",
@@ -858,6 +860,8 @@ class SQLAlchemyStore:
                                 "jurisdiction_id": chunk.jurisdiction_id,
                                 "source_type": chunk.source_type,
                                 "source_version": chunk.source_version,
+                                "districts_csv": _make_filter_csv(chunk.districts),
+                                "uses_csv": _make_filter_csv(chunk.uses),
                                 "payload_json": chunk.model_dump(mode="json"),
                                 "created_at": now,
                                 "updated_at": now,
@@ -891,12 +895,50 @@ class SQLAlchemyStore:
         use: str | None = None,
         source_type: str | None = None,
     ) -> list[SourceChunk]:
+        try:
+            with self.engine.connect() as connection:
+                stmt = select(source_chunks.c.payload_json)
+
+                if source_id:
+                    stmt = stmt.where(source_chunks.c.source_id == source_id)
+                if source_type:
+                    stmt = stmt.where(source_chunks.c.source_type == source_type)
+                if jurisdiction_id:
+                    scope = get_jurisdiction_scope(jurisdiction_id)
+                    parent_id = scope.parent_jurisdiction_id if scope else None
+                    jid_conditions = [
+                        source_chunks.c.jurisdiction_id == jurisdiction_id,
+                        source_chunks.c.jurisdiction_id == "*",
+                    ]
+                    if parent_id:
+                        jid_conditions.append(source_chunks.c.jurisdiction_id == parent_id)
+                    stmt = stmt.where(or_(*jid_conditions))
+                if district and district != "unknown":
+                    stmt = stmt.where(
+                        or_(
+                            source_chunks.c.districts_csv.is_(None),
+                            source_chunks.c.districts_csv.like(f"%,{district},%"),
+                            source_chunks.c.districts_csv.like("%,*,%"),
+                        )
+                    )
+                if use:
+                    stmt = stmt.where(
+                        or_(
+                            source_chunks.c.uses_csv.is_(None),
+                            source_chunks.c.uses_csv.like(f"%,{use},%"),
+                            source_chunks.c.uses_csv.like("%,general,%"),
+                        )
+                    )
+
+                rows = connection.execute(stmt).all()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not filter source chunks: {exc}") from exc
+
+        chunks = [SourceChunk.model_validate(_coerce_payload(row.payload_json)) for row in rows]
+
+        # Post-filter: full jurisdiction wildcard logic + district/use for pre-migration NULL-column chunks
         filtered: list[SourceChunk] = []
-        for chunk in self.list_source_chunks():
-            if source_id and chunk.source_id != source_id:
-                continue
-            if source_type and chunk.source_type != source_type:
-                continue
+        for chunk in chunks:
             if jurisdiction_id and not source_applies_to_jurisdiction(
                 source_jurisdiction_id=chunk.jurisdiction_id,
                 source_metadata=chunk.metadata,
@@ -913,10 +955,18 @@ class SQLAlchemyStore:
     def get_source_chunks_by_ids(self, chunk_ids: list[str]) -> list[SourceChunk]:
         if not chunk_ids:
             return []
-        wanted = set(chunk_ids)
-        ordered = {chunk_id: index for index, chunk_id in enumerate(chunk_ids)}
-        chunks = [chunk for chunk in self.list_source_chunks() if chunk.chunk_id in wanted]
-        return sorted(chunks, key=lambda chunk: ordered.get(chunk.chunk_id, len(ordered)))
+        try:
+            with self.engine.connect() as connection:
+                rows = connection.execute(
+                    select(source_chunks.c.payload_json).where(
+                        source_chunks.c.chunk_id.in_(chunk_ids)
+                    )
+                ).all()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not load source chunks by ids: {exc}") from exc
+        ordered = {chunk_id: idx for idx, chunk_id in enumerate(chunk_ids)}
+        result = [SourceChunk.model_validate(_coerce_payload(row.payload_json)) for row in rows]
+        return sorted(result, key=lambda chunk: ordered.get(chunk.chunk_id, len(ordered)))
 
     def get_source_chunk_count(self) -> int:
         try:
@@ -941,6 +991,10 @@ class SQLAlchemyStore:
         if not row:
             return None
         return _coerce_datetime(row.created_at)
+
+
+def _make_filter_csv(values: list[str]) -> str:
+    return "," + ",".join(values) + ","
 
 
 def _coerce_datetime(value: Any) -> datetime:

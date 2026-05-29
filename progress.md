@@ -1,6 +1,6 @@
 # Production Readiness — Progress Tracker
 
-_Last updated: 2026-05-28 (session 3 end)_
+_Last updated: 2026-05-29 (session 9 — Groq provider live, all issues resolved)_
 
 ---
 
@@ -138,3 +138,109 @@ VECTOR_PROVIDER=qdrant AI_PROVIDER=openai uvicorn app.main:app --reload --port 8
 - `tests/test_repositories.py` — 2 errors (same cause)
 - `tests/test_jurisdiction_tool.py` — 3 errors (pre-existing setup issue)
 - `tests/test_source_pack_validation.py` — 4 errors (pre-existing)
+
+---
+
+## Public Beta Launch — Smoke Testing & AI Provider Work (sessions 6–8)
+
+### What was done
+
+#### Auth / CORS fixes (all merged in PR #40 to main)
+| Fix | Commit | Detail |
+|-----|--------|--------|
+| Pass Supabase anon key as `apikey` header to JWKS endpoint | `96cf124` | `PyJWKClient` was getting 401 from Supabase → cascaded to CORS errors in browser |
+| Catch `PyJWKClientConnectionError` → 503 | `96cf124` | Unhandled exception was stripping CORS headers before browser saw response |
+| Add ES256 JWT support | `dfad412` | Supabase uses ES256; library defaulted RS256 only |
+| Move `CORSMiddleware` to outermost middleware position | `e756e8b` | Error responses from inner middleware weren't getting CORS headers |
+| Add `CORS_ALLOW_ORIGIN_REGEX` env var | `61cf146` | Allows wildcard matching for Vercel preview URLs |
+
+#### RAG / AI provider fixes (merged in PR #40)
+| Fix | Detail |
+|-----|--------|
+| `RAG_PROVIDER=source_registry` set on Render | Was `hybrid_local` — vector index empty + OpenAI 429 on embeddings → 0 citations. Fix: use structured source registry (12 sources, no embedding needed) |
+| Fail fast on HTTP 429 | Removed 429 from `_RETRYABLE_STATUS_CODES` in `openai_provider.py` — was burning 3 attempts + ~6s before falling back to deterministic |
+| Switch `response_format` to `json_object` | Was `json_schema` strict (OpenAI-only). Now uses `json_object` + inline schema in system prompt — works with Groq, Together, any OpenAI-compatible endpoint |
+
+#### Smoke test results (production — https://zoning-agent-platform.vercel.app)
+| Test | Result |
+|------|--------|
+| Legal modal on first submission | PASSED ✓ |
+| Modal suppressed on second submission | PASSED ✓ |
+| Supported address (Blacksburg, VA) → citations + feasibility | PASSED ✓ — `citation_count: 5`, `feasibility: conditional`, confidence: 97% |
+| Unsupported jurisdiction (Austin, TX) → distinct error | PASSED ✓ — "not covered" message, no pipeline run |
+
+#### Branch / PR cleanup
+- Branch renamed from `codex/production-readiness-public-beta` → `production-readiness-public-beta`
+- PR #40 created and squash-merged to `main`
+- Remote branch deleted
+
+---
+
+## Session 9 — Groq provider + frontend fixes (2026-05-29)
+
+### What was done
+
+#### Groq as a first-class AI provider (PR merged to main, Render redeployed)
+
+The previous session left a note to verify Groq via `OPENAI_BASE_URL`. Instead, a proper
+`AI_PROVIDER=groq` provider was implemented so Groq settings are fully independent of OpenAI.
+
+| File | Change |
+|------|--------|
+| `apps/api/app/ai/groq_provider.py` | New `GroqAnalysisProvider` — uses Groq's OpenAI-compatible endpoint (`https://api.groq.com/openai/v1`), reads `GROQ_API_KEY` + `GROQ_MODEL` + `GROQ_TIMEOUT_SECONDS` |
+| `apps/api/app/settings.py` | Added `"groq"` to `AIProviderName` + `VALID_AI_PROVIDERS`; added `groq_api_key`, `groq_model` (default `llama-3.3-70b-versatile`), `groq_timeout_seconds` fields; added `uses_groq` property; production validation checks `GROQ_API_KEY` when `AI_PROVIDER=groq` |
+| `apps/api/app/ai/registry.py` | `get_analysis_provider()` routes `ai_provider == "groq"` → `GroqAnalysisProvider()` |
+
+**Render env vars set by user:**
+| Var | Value |
+|-----|-------|
+| `AI_PROVIDER` | `groq` |
+| `GROQ_API_KEY` | Groq API key |
+| `GROQ_MODEL` | `llama-3.3-70b-versatile` |
+| `OPENAI_BASE_URL` | removed (not needed — Groq provider hardcodes its own base URL) |
+
+#### Frontend fixes (same PR)
+
+| File | Fix |
+|------|-----|
+| `apps/web/src/hooks/useTrace.ts` | Added `isAdmin?: boolean` param (default `false`). Trace fetch is now skipped entirely for non-admin users — eliminates the 4 × 403 console errors per analysis run. |
+| `apps/web/src/App.tsx` | Passes `isAdmin: authMode === "supabase" ? currentUser?.role === "admin" : true` to `useTrace` |
+| `apps/web/src/features/projects/SavedProjectsPanel.tsx` | Replaced corrupted `Â·` literal with `&middot;` — project list subtitle now renders correctly as e.g. `Blacksburg, VA · CONDITIONAL` |
+
+---
+
+### Live E2E verification — Groq confirmed (2026-05-29)
+
+**Test:** `400 Clay St SW, Blacksburg, VA 24060` — home-based bakery, full pipeline run
+**Signed in as:** `abhihari010@gmail.com`
+
+| Check | Result |
+|-------|--------|
+| All 5 pipeline stages | COMPLETED ✓ |
+| `Pipeline` field in Evidence Snapshot | **`groq / source_registry`** ✓ — explicit UI confirmation |
+| `ai_provider` reported by API | `groq` ✓ |
+| Decision | `conditional` ✓ |
+| Confidence | `97%` ✓ |
+| Citations | `5 sources`, `100% validation coverage` ✓ |
+| `"openai analysis fallback engaged"` warning | **ABSENT** ✓ — Groq answered without fallback |
+| LLM-generated follow-up questions (Groq output) | "What is the floor area of the proposed bakery within the attached garage?", "Will the bakery use any hazardous materials or have outside storage?", "How will the bakery manage traffic and parking volumes during pickup hours?" ✓ |
+| Groq-generated warnings | Compliance with VA Building Code; 25% floor area limit; plan review + health inspection required ✓ |
+| `/trace` fetch for non-admin user | **ABSENT** ✓ — no 403 errors, useTrace fix confirmed |
+| All network API calls | All `200` — `/sessions`, `/intake`, `/analyze`, `/projects` ✓ |
+| Saved Projects encoding | `Blacksburg, VA · Conditional` renders correctly ✓ |
+| Checklist | 3 steps (Zoning letter, Change-of-use permit, Fire + health inspections) ✓ |
+| Trace ID | `trace-46e19d9a-2d83-4de5-ab0d-b91201bb1bbb` |
+
+**No regressions observed.** Previous test 4 (unsupported jurisdiction) behavior unchanged.
+
+---
+
+### Current status — all known issues resolved
+
+| Issue | Status |
+|-------|--------|
+| OpenAI 429 / fallback on compliance stage | **RESOLVED** ✓ — replaced by Groq (`llama-3.3-70b-versatile`), no rate limit issues |
+| `useTrace` 403 console errors for non-admin users | **RESOLVED** ✓ — fetch skipped when not admin |
+| `Â·` encoding artifact in saved project list | **RESOLVED** ✓ — `&middot;` entity used |
+
+**The platform is fully operational with Groq as the AI provider. No remaining known issues.**

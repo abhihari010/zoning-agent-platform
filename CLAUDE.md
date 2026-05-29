@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Repository Shape
 
 Monorepo with two deployable apps and a shared schema package:
@@ -13,7 +11,7 @@ Monorepo with two deployable apps and a shared schema package:
 - `scripts/` — operational Python scripts (smoke tests, config checks, source discovery/validation). Run from repo root.
 - `tests/e2e/` — Playwright-based end-to-end smoke test (`public-launch-smoke.mjs`).
 
-`AGENT.md` rule: `.agents/`, `.codex/`, `skills-lock.json`, and the many `.tmp-*` directories at the repo root are local/private scratch state and must stay out of commits.
+See `AGENT.md` for what to exclude from commits (scratch dirs, codex state, etc.).
 
 ## Common Commands
 
@@ -42,8 +40,6 @@ Backend tests do not require any external credentials; the deterministic provide
 - `python scripts/smoke_public_api.py` — public-beta smoke test driven by `PUBLIC_BASE_API_URL`, `PUBLIC_AUTH_TOKEN`, `PUBLIC_TEST_SUPPORTED_ADDRESS`, `PUBLIC_TEST_UNSUPPORTED_ADDRESS`.
 - `scripts/smoke_beta_api.py` is the legacy beta-key variant — keep it only while invite keys still exist.
 - `scripts/discover_jurisdiction_sources.py`, `validate_source_packs.py`, `check_source_freshness.py`, `check_public_support_candidates.py` — source registry maintenance.
-
-CI lives in `.github/workflows/` (`ci.yml`, `production-smoke.yml`, `source-freshness.yml`).
 
 ## Architecture
 
@@ -92,5 +88,7 @@ Key invariant: if retrieval returns no citations, the orchestrator must return `
 - When adding a new provider, register it in `app/ai/registry.py` and cover it with `tests/test_ai_providers.py`-style tests; existing tests assume the deterministic path is the default.
 - When adding a jurisdiction, extend `data/source_registry.json` and the jurisdiction/district mappings — do not add Blacksburg-style hard-coded checks.
 - When changing API shapes, update both `apps/api/app/models.py` and `packages/shared-schema/src/index.ts`, and check `apps/web/src/api.ts` callers.
-- Many `.tmp-*` directories at the repo root are old worktree leftovers; ignore them and never commit them.
-- Never include "Co-Authored-By: Claude" in commit messages or PR descriptions.
+
+## gstack
+
+Use `/browse` from gstack for all web browsing tasks. Never use `mcp__claude-in-chrome__*` tools.

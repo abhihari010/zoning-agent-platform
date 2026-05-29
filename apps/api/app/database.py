@@ -126,6 +126,8 @@ source_chunks = Table(
     Column("jurisdiction_id", String(200), nullable=True, index=True),
     Column("source_type", String(200), nullable=True),
     Column("source_version", String(120), nullable=True),
+    Column("districts_csv", String(2000), nullable=True),
+    Column("uses_csv", String(2000), nullable=True),
     Column("payload_json", JSON, nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("updated_at", DateTime(timezone=True), nullable=False),
