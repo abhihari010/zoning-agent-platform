@@ -48,7 +48,7 @@ export function SavedProjectsPanel({
                 {project.normalizedAddress}
               </p>
               <p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-500">
-                {project.jurisdictionName ?? project.jurisdictionId ?? "Unknown"} Â·{" "}
+                {project.jurisdictionName ?? project.jurisdictionId ?? "Unknown"} &middot;{" "}
                 {project.decision ? decisionLabel(project.decision) : project.status}
               </p>
             </button>

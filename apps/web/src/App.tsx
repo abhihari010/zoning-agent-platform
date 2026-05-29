@@ -119,7 +119,12 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
   const [intake, setIntake] = useState<IntakeResponse | null>(null);
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
-  const { trace, setTrace, traceLoading } = useTrace({ intake, result, phase });
+  const { trace, setTrace, traceLoading } = useTrace({
+    intake,
+    result,
+    phase,
+    isAdmin: authMode === "supabase" ? currentUser?.role === "admin" : true,
+  });
   const {
     feedbackNote,
     setFeedbackNote,

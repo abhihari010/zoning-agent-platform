@@ -7,16 +7,18 @@ export function useTrace({
   intake,
   result,
   phase,
+  isAdmin = false,
 }: {
   intake: IntakeResponse | null;
   result: AnalyzeResponse | null;
   phase: Phase;
+  isAdmin?: boolean;
 }) {
   const [trace, setTrace] = useState<AuditEvent[]>([]);
   const [traceLoading, setTraceLoading] = useState(false);
 
   useEffect(() => {
-    if (!intake || intake.status !== "created") {
+    if (!isAdmin || !intake || intake.status !== "created") {
       setTrace([]);
       return;
     }
@@ -46,7 +48,7 @@ export function useTrace({
     return () => {
       cancelled = true;
     };
-  }, [intake, result, phase]);
+  }, [intake, result, phase, isAdmin]);
 
   return { trace, setTrace, traceLoading };
 }

@@ -8,13 +8,13 @@ from typing import Literal, cast
 
 
 AppEnvName = Literal["local", "staging", "production"]
-AIProviderName = Literal["deterministic", "openai", "local"]
+AIProviderName = Literal["deterministic", "openai", "local", "groq"]
 RAGProviderName = Literal["source_registry", "hybrid_local"]
 EmbeddingProviderName = Literal["none", "local", "openai"]
 VectorProviderName = Literal["none", "qdrant"]
 
 VALID_APP_ENVS: set[str] = {"local", "staging", "production"}
-VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "local"}
+VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "local", "groq"}
 VALID_RAG_PROVIDERS: set[str] = {"source_registry", "hybrid_local"}
 VALID_EMBEDDING_PROVIDERS: set[str] = {"none", "local", "openai"}
 VALID_VECTOR_PROVIDERS: set[str] = {"none", "qdrant"}
@@ -73,6 +73,9 @@ class Settings:
     openai_model: str
     openai_base_url: str
     openai_timeout_seconds: float
+    groq_api_key: str
+    groq_model: str
+    groq_timeout_seconds: float
     local_model_base_url: str
     local_model_name: str
     local_model_timeout_seconds: float
@@ -106,6 +109,10 @@ class Settings:
     @property
     def uses_openai(self) -> bool:
         return self.ai_provider == "openai" or self.embedding_provider == "openai"
+
+    @property
+    def uses_groq(self) -> bool:
+        return self.ai_provider == "groq"
 
     @property
     def uses_local_model(self) -> bool:
@@ -155,6 +162,9 @@ def get_settings() -> Settings:
         openai_model=_env("OPENAI_MODEL", "gpt-4o-mini"),
         openai_base_url=_env("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/"),
         openai_timeout_seconds=float(_env("OPENAI_TIMEOUT_SECONDS", "20")),
+        groq_api_key=_env("GROQ_API_KEY"),
+        groq_model=_env("GROQ_MODEL", "llama-3.3-70b-versatile"),
+        groq_timeout_seconds=float(_env("GROQ_TIMEOUT_SECONDS", "20")),
         local_model_base_url=_env("LOCAL_MODEL_BASE_URL", "http://localhost:11434/v1").rstrip("/"),
         local_model_name=_env("LOCAL_MODEL_NAME", "llama3.1:8b"),
         local_model_timeout_seconds=float(_env("LOCAL_MODEL_TIMEOUT_SECONDS", "60")),
@@ -209,6 +219,8 @@ def validate_production_settings(settings: Settings) -> None:
         missing.append("GOOGLE_MAPS_API_KEY")
     if settings.ai_provider == "openai" and not settings.openai_api_key:
         missing.append("OPENAI_API_KEY")
+    if settings.ai_provider == "groq" and not settings.groq_api_key:
+        missing.append("GROQ_API_KEY")
     if settings.vector_provider == "qdrant" and not settings.qdrant_url:
         missing.append("QDRANT_URL")
     if "*" in settings.cors_allow_origins:

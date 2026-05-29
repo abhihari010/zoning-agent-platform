@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from app.ai.deterministic_provider import DeterministicAnalysisProvider
 from app.ai.embedding_provider import DisabledEmbeddingProvider, LocalHashEmbeddingProvider
+from app.ai.groq_provider import GroqAnalysisProvider
 from app.ai.hybrid_local_retriever import HybridLocalRetrievalProvider
 from app.ai.interfaces import AnalysisProvider, EmbeddingProvider, RetrievalProvider
 from app.ai.local_model_provider import LocalModelAnalysisProvider
@@ -32,6 +33,8 @@ def get_analysis_provider(settings: Settings | None = None) -> AnalysisProvider:
     resolved = settings or get_settings()
     if resolved.ai_provider == "openai":
         return OpenAIAnalysisProvider()
+    if resolved.ai_provider == "groq":
+        return GroqAnalysisProvider()
     if resolved.ai_provider == "local":
         return LocalModelAnalysisProvider()
     return DeterministicAnalysisProvider()
