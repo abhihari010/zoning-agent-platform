@@ -78,15 +78,17 @@ def require_project_access(project_id: UUID, auth: AuthContext) -> ProjectRecord
     project = store.get_project(project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
+    if auth.is_admin:
+        return project
     settings = get_settings()
     if settings.auth_required:
-        if auth.is_admin:
-            return project
         if not auth.user_id:
             raise HTTPException(status_code=401, detail="Authentication required.")
         if project.user_id != auth.user_id:
             raise HTTPException(status_code=404, detail="Project not found")
-    elif auth.user_id and project.user_id not in {None, auth.user_id} and not auth.is_admin:
+    elif project.user_id and project.user_id != auth.user_id:
+        # In non-auth-required mode, unowned projects (user_id=None) are accessible,
+        # but owned projects still require a matching user.
         raise HTTPException(status_code=404, detail="Project not found")
     return project
 

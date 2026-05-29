@@ -125,6 +125,15 @@ async def enforce_api_auth(request: Request, call_next):
 
 
 @app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
+
+@app.middleware("http")
 async def add_request_id_and_log(request: Request, call_next):
     request_id = request.headers.get("X-Request-ID", "").strip() or uuid4().hex
     request.state.request_id = request_id
@@ -156,8 +165,8 @@ app.add_middleware(
     allow_origins=_allow_origins,
     allow_origin_regex=_settings_for_cors.cors_allow_origin_regex or None,
     allow_credentials=_allow_credentials,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Admin-Access-Key", "X-Request-ID"],
 )
 
 
