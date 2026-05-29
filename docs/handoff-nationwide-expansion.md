@@ -137,6 +137,12 @@ GEMINI_EMBEDDING_DIMENSIONS=768               # optional, default 768 (set 0 for
 
 > **Note:** Groq has no embeddings API (only chat/speech models), so `AI_PROVIDER=groq` for compliance analysis and `EMBEDDING_PROVIDER=gemini` for retrieval are intentionally two different providers. The embeddings provider normalizes vectors to unit length, so the truncated 768-dim output is valid for both Qdrant cosine search and the hybrid retriever's dot-product scoring.
 
+**Free-tier rate limits:** Gemini's free tier is RPM/TPM/RPD limited *per Google Cloud project* (not per key). The embedding provider batches inputs and retries `429` responses with exponential backoff honoring `Retry-After`, so reindex survives transient rate limits. Tunables (env vars, all optional):
+> - `GEMINI_EMBEDDING_BATCH_SIZE` (default 32) — inputs per request
+> - `GEMINI_EMBEDDING_REQUEST_INTERVAL_SECONDS` (default 1.0) — pause between batches
+>
+> If reindex still 429s at nationwide scale (thousands of chunks), lower the batch size / raise the interval, or set up billing to reach Tier 1. A `429` during reindex is non-fatal — it returns a `vector_warnings` entry and leaves the SQL chunks intact; just re-run reindex.
+
 After deploying, trigger reindex to populate Qdrant with the existing 27 VA sources:
 ```
 POST https://zoning-agent-api.onrender.com/api/v1/ingestion/reindex

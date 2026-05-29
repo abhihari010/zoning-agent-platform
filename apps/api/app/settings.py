@@ -80,6 +80,8 @@ class Settings:
     gemini_embedding_model: str
     gemini_embedding_dimensions: int
     gemini_timeout_seconds: float
+    gemini_embedding_batch_size: int
+    gemini_embedding_request_interval_seconds: float
     local_model_base_url: str
     local_model_name: str
     local_model_timeout_seconds: float
@@ -173,6 +175,10 @@ def get_settings() -> Settings:
         gemini_embedding_model=_env("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001"),
         gemini_embedding_dimensions=int(_env("GEMINI_EMBEDDING_DIMENSIONS", "768")),
         gemini_timeout_seconds=float(_env("GEMINI_TIMEOUT_SECONDS", "20")),
+        gemini_embedding_batch_size=int(_env("GEMINI_EMBEDDING_BATCH_SIZE", "32")),
+        gemini_embedding_request_interval_seconds=float(
+            _env("GEMINI_EMBEDDING_REQUEST_INTERVAL_SECONDS", "1.0")
+        ),
         local_model_base_url=_env("LOCAL_MODEL_BASE_URL", "http://localhost:11434/v1").rstrip("/"),
         local_model_name=_env("LOCAL_MODEL_NAME", "llama3.1:8b"),
         local_model_timeout_seconds=float(_env("LOCAL_MODEL_TIMEOUT_SECONDS", "60")),

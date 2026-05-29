@@ -48,14 +48,23 @@ def _post_with_retry(
     headers: dict[str, str],
     body: dict[str, Any],
     timeout: float,
+    *,
+    extra_retry_statuses: set[int] | None = None,
+    max_attempts: int = _MAX_ATTEMPTS,
 ) -> dict[str, Any]:
+    # Analysis (user-facing) path keeps the default behaviour: 429 is NOT retried so
+    # we fail fast to the deterministic fallback. Batch paths (e.g. embedding reindex)
+    # can opt into retrying 429 by passing extra_retry_statuses={429}.
+    retry_statuses = _RETRYABLE_STATUS_CODES | (extra_retry_statuses or set())
     last_exc: Exception = RuntimeError("No attempts made")
-    for attempt in range(_MAX_ATTEMPTS):
+    retry_after_seconds = 0.0
+    for attempt in range(max_attempts):
         if attempt > 0:
-            time.sleep(2**attempt)
+            time.sleep(max(2**attempt, retry_after_seconds))
         try:
             response = httpx.post(url, headers=headers, json=body, timeout=timeout)
-            if response.status_code in _RETRYABLE_STATUS_CODES:
+            if response.status_code in retry_statuses:
+                retry_after_seconds = _retry_after_seconds(response)
                 last_exc = httpx.HTTPStatusError(
                     f"HTTP {response.status_code}",
                     request=response.request,
@@ -67,8 +76,17 @@ def _post_with_retry(
         except httpx.TimeoutException as exc:
             last_exc = exc
     raise RuntimeError(
-        f"OpenAI request failed after {_MAX_ATTEMPTS} attempts: {last_exc}"
+        f"OpenAI request failed after {max_attempts} attempts: {last_exc}"
     ) from last_exc
+
+
+def _retry_after_seconds(response: httpx.Response) -> float:
+    """Parse a Retry-After header (delta-seconds form) into a float; 0.0 if absent."""
+    raw = response.headers.get("retry-after", "")
+    try:
+        return max(0.0, float(raw))
+    except (TypeError, ValueError):
+        return 0.0
 
 
 class OpenAIAnalysisProvider:

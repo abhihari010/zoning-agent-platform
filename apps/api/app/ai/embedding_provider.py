@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import math
 import re
+import time
 
 from app.ai.interfaces import EmbeddingProviderRequest, EmbeddingProviderResult
 
@@ -56,32 +57,47 @@ class GeminiEmbeddingProvider:
             return EmbeddingProviderResult(embeddings=[])
 
         settings = get_settings()
-        body: dict = {
-            "model": settings.gemini_embedding_model,
-            "input": request.texts,
-            "encoding_format": "float",
+        batch_size = settings.gemini_embedding_batch_size or len(request.texts)
+        headers = {
+            "Authorization": f"Bearer {settings.gemini_api_key}",
+            "Content-Type": "application/json",
         }
-        # gemini-embedding-001 uses Matryoshka Representation Learning; request a
-        # smaller, storage-friendly vector when configured (default 3072 if 0/unset).
-        if settings.gemini_embedding_dimensions:
-            body["dimensions"] = settings.gemini_embedding_dimensions
 
-        payload = _post_with_retry(
-            url=GEMINI_EMBEDDINGS_URL,
-            headers={
-                "Authorization": f"Bearer {settings.gemini_api_key}",
-                "Content-Type": "application/json",
-            },
-            body=body,
-            timeout=settings.gemini_timeout_seconds,
-        )
-        data = payload.get("data", [])
-        # Gemini returns un-normalized vectors when dimensions are truncated below
-        # 3072. Normalize so dot-product cosine (used in the hybrid retriever) is valid.
-        embeddings = [
-            _normalize(item.get("embedding", []))
-            for item in sorted(data, key=lambda item: item.get("index", 0))
-        ]
+        embeddings: list[list[float]] = []
+        total = len(request.texts)
+        for start in range(0, total, batch_size):
+            batch = request.texts[start : start + batch_size]
+            body: dict = {
+                "model": settings.gemini_embedding_model,
+                "input": batch,
+                "encoding_format": "float",
+            }
+            # gemini-embedding-001 uses Matryoshka Representation Learning; request a
+            # smaller, storage-friendly vector when configured (default 3072 if 0/unset).
+            if settings.gemini_embedding_dimensions:
+                body["dimensions"] = settings.gemini_embedding_dimensions
+
+            payload = _post_with_retry(
+                url=GEMINI_EMBEDDINGS_URL,
+                headers=headers,
+                body=body,
+                timeout=settings.gemini_timeout_seconds,
+                # Free-tier Gemini is RPM/TPM limited; retry 429s instead of failing the
+                # whole reindex on the first rate-limit response.
+                extra_retry_statuses={429},
+                max_attempts=5,
+            )
+            data = payload.get("data", [])
+            # Gemini returns un-normalized vectors when dimensions are truncated below
+            # 3072. Normalize so dot-product cosine (hybrid retriever) stays valid.
+            embeddings.extend(
+                _normalize(item.get("embedding", []))
+                for item in sorted(data, key=lambda item: item.get("index", 0))
+            )
+            # Space out batches to stay under the free-tier requests-per-minute limit.
+            if start + batch_size < total and settings.gemini_embedding_request_interval_seconds > 0:
+                time.sleep(settings.gemini_embedding_request_interval_seconds)
+
         return EmbeddingProviderResult(embeddings=embeddings)
 
 
