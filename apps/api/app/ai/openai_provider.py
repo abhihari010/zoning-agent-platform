@@ -66,7 +66,7 @@ def _post_with_retry(
             if response.status_code in retry_statuses:
                 retry_after_seconds = _retry_after_seconds(response)
                 last_exc = httpx.HTTPStatusError(
-                    f"HTTP {response.status_code}",
+                    f"HTTP {response.status_code}: {_error_detail(response)}",
                     request=response.request,
                     response=response,
                 )
@@ -80,13 +80,48 @@ def _post_with_retry(
     ) from last_exc
 
 
+def _error_detail(response: httpx.Response) -> str:
+    """Return a short human-readable reason from an error response body.
+
+    Gemini/OpenAI 429s carry the exceeded quota name (e.g. per-minute vs per-day)
+    in the body; surfacing it turns an opaque 'HTTP 429' into an actionable warning.
+    """
+    try:
+        message = response.json().get("error", {}).get("message", "")
+    except Exception:
+        message = ""
+    if not message:
+        message = response.text
+    return message.strip().replace("\n", " ")[:300]
+
+
 def _retry_after_seconds(response: httpx.Response) -> float:
-    """Parse a Retry-After header (delta-seconds form) into a float; 0.0 if absent."""
+    """Seconds to wait before the next retry.
+
+    Prefers the Retry-After header (delta-seconds); falls back to Gemini's
+    `retryDelay` hint inside error.details (e.g. "27s"). Returns 0.0 if neither
+    is present.
+    """
     raw = response.headers.get("retry-after", "")
     try:
-        return max(0.0, float(raw))
+        header_seconds = max(0.0, float(raw))
     except (TypeError, ValueError):
+        header_seconds = 0.0
+    if header_seconds:
+        return header_seconds
+
+    try:
+        details = response.json().get("error", {}).get("details", [])
+    except Exception:
         return 0.0
+    for detail in details:
+        delay = detail.get("retryDelay") if isinstance(detail, dict) else None
+        if isinstance(delay, str) and delay.endswith("s"):
+            try:
+                return max(0.0, float(delay[:-1]))
+            except ValueError:
+                continue
+    return 0.0
 
 
 class OpenAIAnalysisProvider:
