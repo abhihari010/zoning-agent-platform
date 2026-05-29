@@ -10,13 +10,13 @@ from typing import Literal, cast
 AppEnvName = Literal["local", "staging", "production"]
 AIProviderName = Literal["deterministic", "openai", "local", "groq"]
 RAGProviderName = Literal["source_registry", "hybrid_local"]
-EmbeddingProviderName = Literal["none", "local", "openai"]
+EmbeddingProviderName = Literal["none", "local", "openai", "groq"]
 VectorProviderName = Literal["none", "qdrant"]
 
 VALID_APP_ENVS: set[str] = {"local", "staging", "production"}
 VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "local", "groq"}
 VALID_RAG_PROVIDERS: set[str] = {"source_registry", "hybrid_local"}
-VALID_EMBEDDING_PROVIDERS: set[str] = {"none", "local", "openai"}
+VALID_EMBEDDING_PROVIDERS: set[str] = {"none", "local", "openai", "groq"}
 VALID_VECTOR_PROVIDERS: set[str] = {"none", "qdrant"}
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent / "data" / "app.sqlite3"
@@ -76,6 +76,7 @@ class Settings:
     groq_api_key: str
     groq_model: str
     groq_timeout_seconds: float
+    groq_embedding_model: str
     local_model_base_url: str
     local_model_name: str
     local_model_timeout_seconds: float
@@ -165,6 +166,7 @@ def get_settings() -> Settings:
         groq_api_key=_env("GROQ_API_KEY"),
         groq_model=_env("GROQ_MODEL", "llama-3.3-70b-versatile"),
         groq_timeout_seconds=float(_env("GROQ_TIMEOUT_SECONDS", "20")),
+        groq_embedding_model=_env("GROQ_EMBEDDING_MODEL", "nomic-embed-text-v1_5"),
         local_model_base_url=_env("LOCAL_MODEL_BASE_URL", "http://localhost:11434/v1").rstrip("/"),
         local_model_name=_env("LOCAL_MODEL_NAME", "llama3.1:8b"),
         local_model_timeout_seconds=float(_env("LOCAL_MODEL_TIMEOUT_SECONDS", "60")),

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from app.ai.deterministic_provider import DeterministicAnalysisProvider
-from app.ai.embedding_provider import DisabledEmbeddingProvider, LocalHashEmbeddingProvider
+from app.ai.embedding_provider import DisabledEmbeddingProvider, GroqEmbeddingProvider, LocalHashEmbeddingProvider
 from app.ai.groq_provider import GroqAnalysisProvider
 from app.ai.hybrid_local_retriever import HybridLocalRetrievalProvider
 from app.ai.interfaces import AnalysisProvider, EmbeddingProvider, RetrievalProvider
@@ -51,6 +51,8 @@ def get_embedding_provider(settings: Settings | None = None) -> EmbeddingProvide
     resolved = settings or get_settings()
     if resolved.embedding_provider == "openai":
         return OpenAIEmbeddingProvider()
+    if resolved.embedding_provider == "groq":
+        return GroqEmbeddingProvider()
     if resolved.embedding_provider == "local":
         return LocalHashEmbeddingProvider()
     return DisabledEmbeddingProvider()
