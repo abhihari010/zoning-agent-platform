@@ -24,6 +24,7 @@ qdrant_client = pytest.importorskip("qdrant_client", reason="qdrant-client not i
 class FakeQdrantClient:
     def __init__(self) -> None:
         self._collections: dict[str, dict] = {}
+        self.payload_indexes: list[tuple[str, str, object]] = []
 
     def get_collections(self) -> object:
         return type("R", (), {"collections": list(self._collections)})()
@@ -35,6 +36,16 @@ class FakeQdrantClient:
 
     def create_collection(self, collection_name: str, vectors_config: object) -> None:
         self._collections[collection_name] = {"vectors_config": vectors_config, "points": {}}
+
+    def create_payload_index(
+        self,
+        collection_name: str,
+        field_name: str,
+        field_schema: object,
+        wait: bool = True,
+    ) -> None:
+        self._ensure_col(collection_name)
+        self.payload_indexes.append((collection_name, field_name, field_schema))
 
     def delete_collection(self, collection_name: str) -> None:
         self._collections.pop(collection_name, None)
@@ -198,6 +209,43 @@ def test_qdrant_store_upserts_queries_and_deletes() -> None:
     assert store.count() == 1
     assert store.delete_missing_chunk_ids(set()) == 1
     assert store.count() == 0
+
+
+def test_qdrant_store_creates_payload_indexes_for_filtered_fields() -> None:
+    fake_client = FakeQdrantClient()
+    store = _make_store(fake_client)
+    source = SourceRegistryEntry(
+        source_id="coffee-rule",
+        title="Coffee Rule",
+        excerpt="Coffee shops are reviewed as food service uses.",
+        section_ref="Sec 3",
+        jurisdiction_id="blacksburg-va",
+        districts=["mixed-use-core"],
+        uses=["food-service"],
+        source_type="zoning_ordinance",
+    )
+    chunks = build_source_chunks([source])
+
+    store.upsert_chunks(chunks, [[0.1, 0.2, 0.3] for _ in chunks])
+    store.query(
+        [0.1, 0.2, 0.3],
+        filters={
+            "jurisdiction_id": "blacksburg-va",
+            "district": "mixed-use-core",
+            "use": "food-service",
+        },
+    )
+
+    indexed_fields = {field_name for _, field_name, _ in fake_client.payload_indexes}
+    assert {
+        "jurisdiction_id",
+        "state",
+        "source_id",
+        "source_type",
+        "source_version",
+        "districts",
+        "uses",
+    }.issubset(indexed_fields)
 
 
 def test_qdrant_store_surfaces_query_errors() -> None:

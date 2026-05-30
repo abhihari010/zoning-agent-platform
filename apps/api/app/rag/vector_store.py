@@ -10,6 +10,15 @@ from app.models import SourceChunk
 from app.settings import Settings, get_settings
 
 _CHUNK_ID_NAMESPACE = uuid.NAMESPACE_URL
+_KEYWORD_PAYLOAD_INDEX_FIELDS = (
+    "jurisdiction_id",
+    "state",
+    "source_id",
+    "source_type",
+    "source_version",
+    "districts",
+    "uses",
+)
 
 
 @dataclass(frozen=True)
@@ -77,6 +86,26 @@ class QdrantVectorStore:
                 collection_name=self.collection_name,
                 vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE),
             )
+        self._ensure_payload_indexes()
+
+    def _ensure_payload_indexes(self) -> None:
+        """Create keyword indexes for payload fields used in Qdrant filters."""
+        from qdrant_client.models import PayloadSchemaType
+
+        client = self._get_client()
+        for field_name in _KEYWORD_PAYLOAD_INDEX_FIELDS:
+            try:
+                client.create_payload_index(
+                    collection_name=self.collection_name,
+                    field_name=field_name,
+                    field_schema=PayloadSchemaType.KEYWORD,
+                    wait=True,
+                )
+            except Exception:
+                # Existing indexes and providers that do not require explicit
+                # payload indexes should not block indexing or retrieval. If an
+                # index is truly missing, query_points will surface the error.
+                continue
 
     def is_available(self) -> bool:
         try:
@@ -152,6 +181,8 @@ class QdrantVectorStore:
         filters = filters or {}
         qdrant_filter = _build_qdrant_filter(filters)
         client = self._get_client()
+        if qdrant_filter is not None:
+            self._ensure_payload_indexes()
 
         try:
             # qdrant-client removed .search() in favour of .query_points() (the
