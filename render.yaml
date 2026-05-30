@@ -24,13 +24,18 @@ services:
       - key: RAG_PROVIDER
         value: hybrid_local
       - key: EMBEDDING_PROVIDER
-        value: openai
-      - key: EMBEDDING_MODEL
-        value: text-embedding-3-small
+        value: gemini
+      - key: GEMINI_EMBEDDING_MODEL
+        value: gemini-embedding-001
+      - key: GEMINI_API_KEY
+        sync: false
       - key: VECTOR_PROVIDER
         value: qdrant
+      # Reindex is an explicit admin action (POST /ingestion/reindex), not a
+      # boot-time task. Re-embedding the whole corpus on every deploy blocks the
+      # lifespan startup long enough for Render's port scan to time out.
       - key: STARTUP_REINDEX_ENABLED
-        value: "true"
+        value: "false"
       - key: CORS_ALLOW_ORIGINS
         value: https://zoning-agent-platform.vercel.app
       - key: GOOGLE_MAPS_API_KEY
