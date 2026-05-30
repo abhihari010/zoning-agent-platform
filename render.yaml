@@ -20,7 +20,7 @@ services:
       - key: AUTH_REQUIRED
         value: "true"
       - key: AI_PROVIDER
-        value: openai
+        value: groq
       - key: RAG_PROVIDER
         value: hybrid_local
       - key: EMBEDDING_PROVIDER
@@ -40,10 +40,12 @@ services:
         value: https://zoning-agent-platform.vercel.app
       - key: GOOGLE_MAPS_API_KEY
         sync: false
-      - key: OPENAI_API_KEY
+      - key: GROQ_API_KEY
         sync: false
-      - key: OPENAI_MODEL
-        value: gpt-4o-mini
+      # GROQ_MODEL is dashboard-managed so blueprint re-syncs do not clobber a
+      # tuned model choice; defaults to llama-3.3-70b-versatile when unset.
+      - key: GROQ_MODEL
+        sync: false
       - key: QDRANT_URL
         sync: false
       - key: QDRANT_API_KEY
