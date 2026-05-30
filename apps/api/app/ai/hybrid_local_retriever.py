@@ -91,29 +91,11 @@ class HybridLocalRetrievalProvider:
                 result = self._retrieve_with_qdrant(request, start)
             except Exception as exc:
                 # Qdrant failed; fall through to SQL-backed keyword retrieval.
-                fallback_reason = str(exc)
-                chunks = self.source_store.list_source_chunks_filtered(
-                    jurisdiction_id=request.jurisdiction_id,
-                    district=request.district,
-                    use=request.inferred_use,
-                )
-                sql_result = self._sql_keyword_retrieve(request, chunks, start)
-                result = RetrievalProviderResult(
-                    citations=sql_result.citations,
-                    diagnostics=RetrievalDiagnostics(
-                        query_text=request.query,
-                        filters={
-                            "jurisdiction_id": request.jurisdiction_id,
-                            "district": request.district,
-                            "use": request.inferred_use,
-                        },
-                        sql_chunk_count=len(chunks),
-                        vector_hit_count=None,
-                        vector_provider=settings.vector_provider,
-                        fallback_used=True,
-                        fallback_reason=f"Qdrant error: {fallback_reason}",
-                        elapsed_ms=(time.monotonic() - start) * 1000,
-                    ),
+                result = self._fallback_to_sql(
+                    request,
+                    start,
+                    vector_hit_count=None,
+                    reason=f"Qdrant error: {exc}",
                 )
 
         if result is None:
@@ -264,17 +246,12 @@ class HybridLocalRetrievalProvider:
         )
 
         if not vector_hits:
-            diag = RetrievalDiagnostics(
-                query_text=request.query,
-                filters=vector_filters,
-                sql_chunk_count=0,
+            return self._fallback_to_sql(
+                request,
+                start,
                 vector_hit_count=0,
-                vector_provider=settings.vector_provider,
-                fallback_used=False,
-                fallback_reason=None,
-                elapsed_ms=(time.monotonic() - start) * 1000,
+                reason="Qdrant returned no matching points",
             )
-            return RetrievalProviderResult(citations=[], chunks=[], diagnostics=diag)
 
         chunks = self.source_store.get_source_chunks_by_ids([hit.chunk_id for hit in vector_hits])
         chunk_by_id = {chunk.chunk_id: chunk for chunk in chunks}
@@ -322,6 +299,40 @@ class HybridLocalRetrievalProvider:
             ],
             chunks=[chunk for _, chunk in ranked[:5]],
             diagnostics=diag,
+        )
+
+    def _fallback_to_sql(
+        self,
+        request: RetrievalProviderRequest,
+        start: float,
+        *,
+        vector_hit_count: int | None,
+        reason: str,
+    ) -> RetrievalProviderResult:
+        settings = get_settings()
+        chunks = self.source_store.list_source_chunks_filtered(
+            jurisdiction_id=request.jurisdiction_id,
+            district=request.district,
+            use=request.inferred_use,
+        )
+        sql_result = self._sql_keyword_retrieve(request, chunks, start)
+        return RetrievalProviderResult(
+            citations=sql_result.citations,
+            chunks=sql_result.chunks,
+            diagnostics=RetrievalDiagnostics(
+                query_text=request.query,
+                filters={
+                    "jurisdiction_id": request.jurisdiction_id,
+                    "district": request.district,
+                    "use": request.inferred_use,
+                },
+                sql_chunk_count=len(chunks),
+                vector_hit_count=vector_hit_count,
+                vector_provider=settings.vector_provider,
+                fallback_used=True,
+                fallback_reason=reason,
+                elapsed_ms=(time.monotonic() - start) * 1000,
+            ),
         )
 
 

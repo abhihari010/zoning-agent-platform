@@ -200,6 +200,17 @@ def test_qdrant_store_upserts_queries_and_deletes() -> None:
     assert store.count() == 0
 
 
+def test_qdrant_store_surfaces_query_errors() -> None:
+    class BrokenQueryClient(FakeQdrantClient):
+        def query_points(self, *args, **kwargs) -> object:
+            raise ValueError("vector size mismatch")
+
+    store = _make_store(BrokenQueryClient())
+
+    with pytest.raises(RuntimeError, match="Qdrant query failed: vector size mismatch"):
+        store.query([0.1, 0.2, 0.3], filters={"jurisdiction_id": "blacksburg-va"})
+
+
 def test_qdrant_jurisdiction_filter_prevents_cross_jurisdiction_hits() -> None:
     store = _make_store()
     sources = [

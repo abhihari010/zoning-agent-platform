@@ -168,7 +168,7 @@ def test_hybrid_local_retriever_uses_indexed_chunks() -> None:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
 
-def test_hybrid_local_retriever_returns_empty_when_qdrant_has_no_hits(
+def test_hybrid_local_retriever_falls_back_to_sql_when_qdrant_has_no_hits(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("VECTOR_PROVIDER", "qdrant")
@@ -206,7 +206,12 @@ def test_hybrid_local_retriever_returns_empty_when_qdrant_has_no_hits(
             )
         )
 
-        assert result.citations == []
+        assert [citation.source_id for citation in result.citations] == ["coffee-rule"]
+        assert result.chunks
+        assert result.diagnostics is not None
+        assert result.diagnostics.vector_hit_count == 0
+        assert result.diagnostics.fallback_used is True
+        assert result.diagnostics.fallback_reason == "Qdrant returned no matching points"
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
 

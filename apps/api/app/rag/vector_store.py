@@ -155,9 +155,7 @@ class QdrantVectorStore:
 
         try:
             # qdrant-client removed .search() in favour of .query_points() (the
-            # response carries the ScoredPoints under .points). Using the old API
-            # raised AttributeError that the broad except below silently swallowed,
-            # making every retrieval return zero hits.
+            # response carries the ScoredPoints under .points).
             hits = client.query_points(
                 collection_name=self.collection_name,
                 query=query_embedding,
@@ -166,8 +164,8 @@ class QdrantVectorStore:
                 with_payload=True,
                 with_vectors=False,
             ).points
-        except Exception:
-            return []
+        except Exception as exc:
+            raise RuntimeError(f"Qdrant query failed: {exc}") from exc
 
         results: list[VectorQueryResult] = []
         for hit in hits:
