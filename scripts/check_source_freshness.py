@@ -16,7 +16,7 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_REGISTRY = REPO_ROOT / "apps" / "api" / "app" / "data" / "source_registry.json"
-SOURCE_PACK_ROOT = REPO_ROOT / "services" / "ingestion" / "source_packs"
+SOURCE_PACK_ROOT = REPO_ROOT / "apps" / "api" / "app" / "data" / "source_packs"
 PUBLIC_SUPPORTED = "public_supported"
 
 

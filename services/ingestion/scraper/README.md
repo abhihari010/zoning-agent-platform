@@ -30,7 +30,7 @@ python -m pytest services/ingestion/scraper/tests -q
 ```
 
 The default output root is `.tmp/source_pack_drafts`, so a scrape **never**
-overwrites the curated packs in `services/ingestion/source_packs/`. Promotion of
+overwrites the curated packs in `apps/api/app/data/source_packs/`. Promotion of
 a draft into the curated tree happens later, after district mapping + golden QA.
 
 ### CLI options

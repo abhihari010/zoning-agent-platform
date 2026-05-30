@@ -10,7 +10,7 @@ Two effects (see docs/handoff-nationwide-expansion.md, WS2):
    demo's district/use precision is kept.
 
 2. BREADTH — write the full scraped corpus to
-   ``services/ingestion/source_packs/va/{city}/manifest.json`` (coverage
+   ``apps/api/app/data/source_packs/va/{city}/manifest.json`` (coverage
    ``source_indexed``, ``districts: ["unknown"]``).  The curated jurisdiction
    block (real FIPS + planning contact) is kept; only the ``sources`` array is
    replaced with the scraped sections.  Sections already used for enrichment are
@@ -31,7 +31,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DRAFT_ROOT = REPO_ROOT / ".tmp" / "source_pack_drafts" / "va"
-SOURCE_PACKS = REPO_ROOT / "services" / "ingestion" / "source_packs" / "va"
+SOURCE_PACKS = REPO_ROOT / "apps" / "api" / "app" / "data" / "source_packs" / "va"
 REGISTRY_PATH = REPO_ROOT / "apps" / "api" / "app" / "data" / "source_registry.json"
 
 # curated registry source_id -> scraped section_ref whose real text grounds it.
@@ -114,7 +114,7 @@ def main() -> int:
     print(f"[ws2] breadth pack blacksburg-va:    {bburg} sources (excluded {len(used_refs)} enriched).")
     print(f"[ws2] breadth pack christiansburg-va: {cburg} sources.")
     print("[ws2] validate: python scripts/validate_source_packs.py "
-          "--source-packs-dir services/ingestion/source_packs")
+          "--source-packs-dir apps/api/app/data/source_packs")
     return 0
 
 

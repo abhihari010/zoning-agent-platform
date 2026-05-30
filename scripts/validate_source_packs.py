@@ -103,7 +103,7 @@ class ValidationResult:
 
 
 def default_source_pack_dir() -> Path:
-    return Path(__file__).resolve().parents[1] / "services" / "ingestion" / "source_packs"
+    return Path(__file__).resolve().parents[1] / "apps" / "api" / "app" / "data" / "source_packs"
 
 
 def validate_source_packs(base_dir: str | Path | None = None) -> ValidationResult:

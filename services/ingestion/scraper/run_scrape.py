@@ -13,7 +13,7 @@ This:
 4. Writes it to ``<output-root>/{state}/{jurisdiction-id}/manifest.json``.
 
 The default output root is ``.tmp/source_pack_drafts`` so a real scrape never
-overwrites the curated ``services/ingestion/source_packs`` manifests.  Validate
+overwrites the curated ``apps/api/app/data/source_packs`` manifests.  Validate
 the result with::
 
     python scripts/validate_source_packs.py --source-packs-dir <output-root>

@@ -18,7 +18,29 @@ def _resolve_default_docs_path() -> Path:
 
 
 DEFAULT_INGESTION_DOCS_PATH = _resolve_default_docs_path()
-DEFAULT_SOURCE_PACKS_PATH = DEFAULT_INGESTION_DOCS_PATH.parent / "source_packs"
+
+
+def _resolve_default_source_packs_path() -> Path:
+    """Source packs ship *inside* the API package (``app/data/source_packs``).
+
+    Keeping them under ``app/`` means ``COPY app ./app`` carries them into the
+    Docker image — the build context is ``apps/api`` (see ``render.yaml``), so
+    anything outside it (e.g. the old ``services/ingestion/source_packs``) never
+    reaches the container and ``import_source_packs`` silently finds nothing.
+    A legacy repo-root location is kept as a fallback for older checkouts.
+    """
+    in_package = Path(__file__).resolve().parent / "data" / "source_packs"
+    if in_package.exists():
+        return in_package
+    here = Path(__file__).resolve()
+    if len(here.parents) >= 4:
+        legacy = here.parents[3] / "services" / "ingestion" / "source_packs"
+        if legacy.exists():
+            return legacy
+    return in_package
+
+
+DEFAULT_SOURCE_PACKS_PATH = _resolve_default_source_packs_path()
 SUPPORTED_FILE_SUFFIXES = {".md", ".txt", ".json"}
 DEFAULT_CHUNK_MAX_CHARS = 900
 MIN_CHUNK_CHARS = 50
