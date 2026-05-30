@@ -154,14 +154,18 @@ class QdrantVectorStore:
         client = self._get_client()
 
         try:
-            hits = client.search(
+            # qdrant-client removed .search() in favour of .query_points() (the
+            # response carries the ScoredPoints under .points). Using the old API
+            # raised AttributeError that the broad except below silently swallowed,
+            # making every retrieval return zero hits.
+            hits = client.query_points(
                 collection_name=self.collection_name,
-                query_vector=query_embedding,
+                query=query_embedding,
                 query_filter=qdrant_filter,
                 limit=limit * 2,
                 with_payload=True,
                 with_vectors=False,
-            )
+            ).points
         except Exception:
             return []
 

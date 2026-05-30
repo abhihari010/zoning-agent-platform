@@ -85,24 +85,24 @@ class FakeQdrantClient:
         for pid in points_selector.points:
             col["points"].pop(pid, None)
 
-    def search(
+    def query_points(
         self,
         collection_name: str,
-        query_vector: list[float],
+        query: list[float],
         query_filter: object | None = None,
         limit: int = 10,
         with_payload: bool = True,
         with_vectors: bool = False,
-    ) -> list:
+    ) -> object:
         col = self._ensure_col(collection_name)
         results = []
         for pid, data in col["points"].items():
             vec = data["vector"]
-            score = sum(a * b for a, b in zip(query_vector, vec))
+            score = sum(a * b for a, b in zip(query, vec))
             payload = data["payload"] if with_payload else {}
             results.append(type("Hit", (), {"id": pid, "score": score, "payload": payload})())
         results.sort(key=lambda x: x.score, reverse=True)
-        return results[:limit]
+        return type("QueryResponse", (), {"points": results[:limit]})()
 
     def count(self, collection_name: str, exact: bool = True) -> object:
         col = self._ensure_col(collection_name)
