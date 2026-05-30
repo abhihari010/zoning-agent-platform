@@ -411,13 +411,24 @@ def ingestion_status() -> SourceIndexStatusResponse:
     response_model=ReindexResponse,
     dependencies=[Depends(require_admin_access)],
 )
-def reindex_sources() -> ReindexResponse:
+def reindex_sources(
+    full_rebuild: bool = Query(
+        False,
+        description=(
+            "Wipe the vector collection and re-embed every chunk. Default is "
+            "incremental: only chunks missing from Qdrant are embedded, so a "
+            "retry after a timeout resumes instead of starting over."
+        ),
+    ),
+) -> ReindexResponse:
     settings = get_settings()
     ensure_seed_sources()
     sources = store.list_sources()
     chunks = build_source_chunks(sources)
     store.replace_source_chunks(chunks)
-    vector_result = sync_vector_index(chunks, get_embedding_provider(settings), settings)
+    vector_result = sync_vector_index(
+        chunks, get_embedding_provider(settings), settings, full_rebuild=full_rebuild
+    )
     invalidate_source_dependent_caches()
     store.audit(
         "source.reindex.completed",

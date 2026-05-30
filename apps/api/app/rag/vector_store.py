@@ -149,6 +149,20 @@ class QdrantVectorStore:
             )
         return len(stale_chunk_ids)
 
+    def existing_chunk_ids(self) -> set[str]:
+        """Chunk ids already stored in Qdrant.
+
+        Used to make reindexing incremental: a chunk_id encodes its source's
+        content hash, so an unchanged source keeps the same id and can be
+        skipped instead of re-embedded. Returns an empty set if the collection
+        does not exist yet (nothing has been indexed), so callers treat a fresh
+        collection as "embed everything".
+        """
+        try:
+            return set(self._scroll_all_chunk_ids())
+        except Exception:
+            return set()
+
     def _scroll_all_chunk_ids(self) -> list[str]:
         client = self._get_client()
         chunk_ids: list[str] = []
@@ -267,7 +281,17 @@ def sync_vector_index(
     chunks: list[SourceChunk],
     embedding_provider: EmbeddingProvider,
     settings: Settings | None = None,
+    *,
+    full_rebuild: bool = False,
 ) -> VectorIndexSyncResult:
+    """Reconcile Qdrant with ``chunks``, embedding only what is missing.
+
+    Incremental by default: chunks whose id is already in Qdrant are skipped
+    (their content is unchanged because the id encodes the content hash), so
+    re-running after a partial/timed-out reindex resumes instead of starting
+    over. Stale points are pruned at the end via ``delete_missing_chunk_ids``.
+    Pass ``full_rebuild=True`` to wipe the collection and re-embed everything.
+    """
     resolved = settings or get_settings()
     if resolved.vector_provider == "none":
         return VectorIndexSyncResult(
@@ -280,20 +304,23 @@ def sync_vector_index(
 
     store = QdrantVectorStore(settings=resolved)
     try:
-        if resolved.vector_provider == "qdrant":
+        if resolved.vector_provider == "qdrant" and full_rebuild:
             store.reset_collection()
-        embeddings = embedding_provider.embed(
-            EmbeddingProviderRequest(texts=[chunk.chunk_text for chunk in chunks])
-        ).embeddings
-        if chunks and (not embeddings or any(not embedding for embedding in embeddings)):
-            return VectorIndexSyncResult(
-                provider=resolved.vector_provider,
-                collection=resolved.qdrant_collection,
-                ready=False,
-                count=0,
-                warnings=["Embedding provider returned empty vectors; Qdrant index was not updated."],
-            )
-        store.upsert_chunks(chunks, embeddings)
+        existing_ids = set() if full_rebuild else store.existing_chunk_ids()
+        pending = [chunk for chunk in chunks if chunk.chunk_id not in existing_ids]
+        if pending:
+            embeddings = embedding_provider.embed(
+                EmbeddingProviderRequest(texts=[chunk.chunk_text for chunk in pending])
+            ).embeddings
+            if not embeddings or any(not embedding for embedding in embeddings):
+                return VectorIndexSyncResult(
+                    provider=resolved.vector_provider,
+                    collection=resolved.qdrant_collection,
+                    ready=False,
+                    count=0,
+                    warnings=["Embedding provider returned empty vectors; Qdrant index was not updated."],
+                )
+            store.upsert_chunks(pending, embeddings)
         store.delete_missing_chunk_ids({chunk.chunk_id for chunk in chunks})
         count = store.count()
     except Exception as exc:
