@@ -1,0 +1,66 @@
+{
+  "schema_version": "source-classification-rules/v1",
+  "_notes": "Rules are first-match; mixed-use/downtown rules come before the broad COMMERCIAL rule so DOWNTOWN COMMERCIAL DISTRICT maps to mixed-use-core, not commercial-employment. Unmapped overlays (UNIVERSITY, CREEK VALLEY, FHO FLOODPLAIN, etc.) stay unknown intentionally.",
+  "rules": [
+    {
+      "article_contains": "ARTICLE III. - DISTRICT STANDARDS",
+      "division_contains": "RESIDENTIAL",
+      "districts": ["unknown", "residential-low-density"],
+      "uses": ["general"]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT STANDARDS",
+      "division_contains": "MIXED USE",
+      "districts": ["unknown", "mixed-use-core"],
+      "uses": ["general"]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT STANDARDS",
+      "division_contains": "DOWNTOWN",
+      "districts": ["unknown", "mixed-use-core"],
+      "uses": ["general"]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT STANDARDS",
+      "division_contains": "LIVE/WORK/SELL",
+      "districts": ["unknown", "mixed-use-core"],
+      "uses": ["general"]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT STANDARDS",
+      "division_contains": "COMMERCIAL",
+      "districts": ["unknown", "commercial-employment"],
+      "uses": ["general"]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT STANDARDS",
+      "division_contains": "OFFICE",
+      "districts": ["unknown", "commercial-employment"],
+      "uses": ["general"]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT STANDARDS",
+      "division_contains": "INDUSTRIAL",
+      "districts": ["unknown", "industrial-zone"],
+      "uses": ["general"]
+    },
+    {
+      "article_contains": "ARTICLE IV. - USE AND DESIGN STANDARDS",
+      "division_contains": "COMMERCIAL USES",
+      "districts": ["unknown"],
+      "uses": ["food-service", "food-business", "general"]
+    },
+    {
+      "article_contains": "ARTICLE IV. - USE AND DESIGN STANDARDS",
+      "division_contains": "RESIDENTIAL USES",
+      "districts": ["unknown"],
+      "uses": ["home-based-food-business", "general"]
+    },
+    {
+      "article_contains": "ARTICLE IV. - USE AND DESIGN STANDARDS",
+      "title_contains": "Home occupation",
+      "districts": ["unknown"],
+      "uses": ["home-based-food-business", "general"]
+    }
+  ]
+}

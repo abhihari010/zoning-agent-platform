@@ -149,6 +149,24 @@ class QdrantVectorStore:
             )
         return len(stale_chunk_ids)
 
+    def update_chunk_payloads(self, payloads_by_chunk_id: dict[str, dict[str, Any]]) -> int:
+        if not payloads_by_chunk_id:
+            return 0
+
+        client = self._get_client()
+        updated = 0
+        for chunk_id, payload in payloads_by_chunk_id.items():
+            if not payload:
+                continue
+            client.set_payload(
+                collection_name=self.collection_name,
+                payload=payload,
+                points=[_chunk_id_to_point_id(chunk_id)],
+                wait=True,
+            )
+            updated += 1
+        return updated
+
     def existing_chunk_ids(self) -> set[str]:
         """Chunk ids already stored in Qdrant.
 

@@ -353,17 +353,14 @@ def _score_chunk(
         return 0.0
 
     score = 0.0
-    # A chunk tagged districts=["unknown"] is unclassified-by-district and earns
-    # district credit for any query, mirroring the uses/"general" wildcard below.
-    # Without this, district-tagged seeds keep a +2.0 head start over the
-    # unclassified scraped-ordinance corpus and dominate the top results.
-    if (
-        request.district in chunk.districts
-        or "*" in chunk.districts
-        or "unknown" in chunk.districts
-        or request.district == "unknown"
-    ):
+    # Exact district matches rank ahead of the "unknown" wildcard, but unknown
+    # still receives enough credit to preserve recall for unclassified sections.
+    if request.district == "unknown":
+        score += 1.0
+    elif request.district in chunk.districts or "*" in chunk.districts:
         score += 2.0
+    elif "unknown" in chunk.districts:
+        score += 1.2
     if request.inferred_use in chunk.uses or "general" in chunk.uses:
         score += 2.0
 
@@ -404,6 +401,8 @@ def _source_index_version(source_store: SQLiteStore, configured_version: str) ->
                 "chunk_id": chunk.chunk_id,
                 "source_text_hash": chunk.source_text_hash,
                 "source_version": chunk.source_version,
+                "districts": sorted(chunk.districts),
+                "uses": sorted(chunk.uses),
             }
             for chunk in sorted(chunks, key=lambda item: item.chunk_id)
         ],
