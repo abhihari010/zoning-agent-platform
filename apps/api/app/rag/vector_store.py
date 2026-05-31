@@ -411,7 +411,18 @@ def _build_qdrant_filter(filters: dict[str, Any]) -> Any | None:
 
     district = filters.get("district")
     if district and district not in {"unknown", "*", ""}:
-        must.append(FieldCondition(key="districts", match=MatchValue(value=district)))
+        # A chunk tagged districts=["unknown"] is unclassified-by-district and
+        # applies to any queried district, mirroring the uses/"general" wildcard
+        # below. Without the "unknown" branch, the unclassified scraped-ordinance
+        # corpus is filtered out of every district-specific query.
+        must.append(
+            Filter(
+                should=[
+                    FieldCondition(key="districts", match=MatchValue(value=district)),
+                    FieldCondition(key="districts", match=MatchValue(value="unknown")),
+                ]
+            )
+        )
 
     use = filters.get("use")
     if use and use not in {"general", "*", ""}:
@@ -439,8 +450,11 @@ def _metadata_matches(metadata: dict[str, Any], filters: dict[str, Any]) -> bool
     ):
         return False
     district = filters.get("district")
-    if district and district != "unknown" and not _list_value_contains(
-        metadata.get("districts"), district, wildcard="*"
+    if (
+        district
+        and district != "unknown"
+        and not _list_value_contains(metadata.get("districts"), district, wildcard="*")
+        and not _list_value_contains(metadata.get("districts"), "unknown")
     ):
         return False
     use = filters.get("use")

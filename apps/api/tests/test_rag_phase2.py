@@ -292,6 +292,52 @@ def test_qdrant_jurisdiction_filter_prevents_cross_jurisdiction_hits() -> None:
     assert {hit.metadata["source_id"] for hit in hits} == {"roanoke-cafe-rule"}
 
 
+def test_qdrant_unknown_district_chunk_surfaces_for_concrete_district_query() -> None:
+    # Reproduces the Blacksburg bug: the scraped-ordinance corpus is tagged
+    # districts=["unknown"] (unclassified), while only a handful of hand-tagged
+    # seeds carry a concrete district. A query that resolves a concrete district
+    # (mixed-use-core) must still see the unknown-tagged ordinance chunk, and must
+    # NOT see a chunk tagged with a *different* concrete district.
+    store = _make_store()
+    sources = [
+        SourceRegistryEntry(
+            source_id="blacksburg-permitted-uses-3061",
+            title="Sec. 3061 - Permitted uses",
+            excerpt="Restaurants and cafes are permitted uses subject to site standards.",
+            section_ref="Sec. 3061",
+            jurisdiction_id="blacksburg-va",
+            districts=["unknown"],
+            uses=["general"],
+            source_type="zoning_ordinance",
+        ),
+        SourceRegistryEntry(
+            source_id="blacksburg-residential-only-rule",
+            title="Residential-only rule",
+            excerpt="This standard applies only in the residential low density district.",
+            section_ref="Sec. 9000",
+            jurisdiction_id="blacksburg-va",
+            districts=["residential-low-density"],
+            uses=["general"],
+            source_type="zoning_ordinance",
+        ),
+    ]
+    chunks = build_source_chunks(sources)
+    store.upsert_chunks(chunks, [[0.1, 0.2, 0.3] for _ in chunks])
+
+    hits = store.query(
+        [0.1, 0.2, 0.3],
+        filters={
+            "jurisdiction_id": "blacksburg-va",
+            "district": "mixed-use-core",
+            "use": "food-service",
+        },
+        limit=10,
+    )
+    returned = {hit.metadata["source_id"] for hit in hits}
+    assert "blacksburg-permitted-uses-3061" in returned
+    assert "blacksburg-residential-only-rule" not in returned
+
+
 def test_qdrant_global_source_included_for_matching_state() -> None:
     store = _make_store()
     sources = [
@@ -345,6 +391,16 @@ def test_metadata_matches_use_general_wildcard() -> None:
     assert not _metadata_matches({"uses": ["retail"]}, {"use": "food_service"})
 
 
+def test_metadata_matches_district_unknown_wildcard() -> None:
+    # A chunk tagged districts=["unknown"] is unclassified-by-district and must
+    # match ANY queried district, mirroring the uses=["general"] wildcard.
+    # Without this, the unclassified scraped-ordinance corpus is invisible to any
+    # district-specific query and only hand-tagged seeds survive.
+    assert _metadata_matches({"districts": ["unknown"]}, {"district": "mixed-use-core"})
+    # A chunk tagged with a *different* concrete district is still excluded.
+    assert not _metadata_matches({"districts": ["R-2"]}, {"district": "R-1"})
+
+
 def test_metadata_matches_effective_date_filter() -> None:
     assert _metadata_matches({"effective_date": "2023-06-01"}, {"effective_on_or_before": "2024-01-01"})
     assert _metadata_matches({"effective_date": ""}, {"effective_on_or_before": "2024-01-01"})
@@ -381,3 +437,14 @@ def test_build_qdrant_filter_use_produces_should_clause() -> None:
     assert result is not None
     assert "food_service" in str(result)
     assert "general" in str(result)
+
+
+def test_build_qdrant_filter_district_produces_should_with_unknown() -> None:
+    # A concrete query district must match either the tagged district OR the
+    # "unknown" wildcard, so unclassified scraped-ordinance chunks are not
+    # filtered out of the candidate set (symmetric with the use/"general" clause).
+    result = _build_qdrant_filter({"district": "mixed-use-core"})
+    assert result is not None
+    rendered = str(result)
+    assert "mixed-use-core" in rendered
+    assert "unknown" in rendered

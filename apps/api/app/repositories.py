@@ -914,11 +914,15 @@ class SQLAlchemyStore:
                         jid_conditions.append(source_chunks.c.jurisdiction_id == parent_id)
                     stmt = stmt.where(or_(*jid_conditions))
                 if district and district != "unknown":
+                    # ",unknown," is the unclassified-by-district wildcard, mirroring
+                    # the ",general," use wildcard below — without it the unclassified
+                    # scraped-ordinance corpus is filtered out of district-specific queries.
                     stmt = stmt.where(
                         or_(
                             source_chunks.c.districts_csv.is_(None),
                             source_chunks.c.districts_csv.like(f"%,{district},%"),
                             source_chunks.c.districts_csv.like("%,*,%"),
+                            source_chunks.c.districts_csv.like("%,unknown,%"),
                         )
                     )
                 if use:
@@ -945,7 +949,13 @@ class SQLAlchemyStore:
                 target_jurisdiction_id=jurisdiction_id,
             ):
                 continue
-            if district and district != "unknown" and district not in chunk.districts and "*" not in chunk.districts:
+            if (
+                district
+                and district != "unknown"
+                and district not in chunk.districts
+                and "*" not in chunk.districts
+                and "unknown" not in chunk.districts
+            ):
                 continue
             if use and use not in chunk.uses and "general" not in chunk.uses:
                 continue
