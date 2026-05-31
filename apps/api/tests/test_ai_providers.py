@@ -266,3 +266,95 @@ def test_local_model_provider_uses_openai_compatible_chat_endpoint(
     assert result.required_permits == ["Zoning Permit"]
 
 
+def _blacksburg_chunk(districts: list[str]):
+    source = SourceRegistryEntry(
+        source_id="sec-3061",
+        title="Sec. 3061 - Permitted uses",
+        excerpt="Restaurants and cafes are permitted uses subject to site standards.",
+        section_ref="Sec. 3061",
+        jurisdiction_id="blacksburg-va",
+        districts=districts,
+        uses=["general"],
+        source_type="zoning_ordinance",
+    )
+    return build_source_chunks([source])[0]
+
+
+def test_hybrid_local_sql_path_surfaces_unknown_district_ordinance() -> None:
+    # End-to-end fallback (SQL) path. An unclassified ordinance chunk
+    # (districts=["unknown"]) must be retrievable for a concrete-district query,
+    # while a chunk tagged with a *different* concrete district stays excluded.
+    # Guards both list_source_chunks_filtered (candidate gate) and _score_chunk
+    # (re-ranker) against the district-asymmetry bug.
+    temp_dir = Path(__file__).resolve().parent / "_tmp_hybrid_unknown_district"
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
+    temp_dir.mkdir(parents=True)
+
+    try:
+        source_store = SQLiteStore(temp_dir / "sources.sqlite3")
+        source_store.upsert_source(
+            SourceRegistryEntry(
+                source_id="sec-3061-permitted-uses",
+                title="Sec. 3061 - Permitted uses",
+                excerpt="Restaurants and cafes are permitted uses in the district subject to site standards.",
+                section_ref="Sec. 3061",
+                jurisdiction_id="blacksburg-va",
+                districts=["unknown"],
+                uses=["general"],
+            )
+        )
+        source_store.upsert_source(
+            SourceRegistryEntry(
+                source_id="residential-only-rule",
+                title="Residential-only standard",
+                excerpt="This standard applies only in the residential low density district.",
+                section_ref="Sec. 9000",
+                jurisdiction_id="blacksburg-va",
+                districts=["residential-low-density"],
+                uses=["general"],
+            )
+        )
+        source_store.replace_source_chunks(build_source_chunks(source_store.list_sources()))
+
+        result = HybridLocalRetrievalProvider(
+            source_store,
+            embedding_provider=LocalHashEmbeddingProvider(),
+        ).retrieve(
+            RetrievalProviderRequest(
+                district="mixed-use-core",
+                inferred_use="food-service",
+                project_description="Open a small coffee shop in an existing storefront",
+                jurisdiction_id="blacksburg-va",
+            )
+        )
+
+        returned = {citation.source_id for citation in result.citations}
+        assert "sec-3061-permitted-uses" in returned
+        assert "residential-only-rule" not in returned
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_score_chunk_unknown_district_not_penalized() -> None:
+    # Re-ranker symmetry: an unclassified (districts=["unknown"]) chunk must earn
+    # the same district credit as a chunk tagged with the queried district,
+    # mirroring how uses=["general"] is treated as a wildcard. Otherwise unlocking
+    # the unknown-tagged ordinance corpus in the filter is moot — the home-occupation
+    # seeds (tagged with the district) keep a +2.0 head start and still win top-5.
+    from app.ai.hybrid_local_retriever import _score_chunk, _tokens
+
+    request = RetrievalProviderRequest(
+        district="mixed-use-core",
+        inferred_use="food-service",
+        project_description="Open a small coffee shop in an existing storefront",
+        jurisdiction_id="blacksburg-va",
+    )
+    query_tokens = _tokens(request.query)
+
+    unknown_score = _score_chunk(_blacksburg_chunk(["unknown"]), request, query_tokens)
+    tagged_score = _score_chunk(_blacksburg_chunk(["mixed-use-core"]), request, query_tokens)
+
+    assert unknown_score == tagged_score
+
+

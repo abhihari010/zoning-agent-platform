@@ -32,3 +32,4 @@ apps/api/tests/golden/traces/
 
 .vercel
 .env*
+.gstack/
