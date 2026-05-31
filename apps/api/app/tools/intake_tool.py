@@ -39,8 +39,12 @@ class IntakeTool:
             context.address_confidence = 0.8 if context.normalized_address else 0.0
             context.jurisdiction_confidence = jurisdiction_result.confidence
             context.jurisdiction_method = jurisdiction_result.method
-            context.district_confidence = 0.8 if context.district != "unknown" else 0.0
-            context.district_method = "persisted" if context.district != "unknown" else "persisted_unknown"
+            if context.district == "unknown":
+                context.district_confidence = 0.0
+                context.district_method = "persisted_unknown"
+            elif context.district_method == "unknown":
+                context.district_confidence = 0.0
+                context.district_method = "persisted_unverified"
             return _intent_result(context, service_helpers)
 
         address_input = context.normalized_address or context.raw_address or ""

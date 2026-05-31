@@ -48,6 +48,9 @@ class AddressNormalizationResult:
     coverage_status: str | None = None
     planning_contact: dict[str, str] | None = None
     official_source_urls: list[str] | None = None
+    district_confidence: float = 0.0
+    district_method: str = "unknown"
+    parcel_id: str | None = None
 
 
 def _slugify(text: str) -> str:
@@ -232,8 +235,13 @@ def normalize_address(address: str) -> AddressNormalizationResult:
         jurisdiction.jurisdiction_id or "",
     )
     district = parcel.zoning_district or _extract_district_from_components(address_result.address_components)
+    district_confidence = parcel.confidence if parcel.zoning_district else 0.3 if district != "unknown" else 0.0
+    district_method = parcel.method if parcel.zoning_district else "component_rule" if district != "unknown" else "unknown"
     if district == "unknown":
         district = _district_from_keywords(address_result.normalized_address, _load_keyword_district_rules())
+        if district != "unknown":
+            district_confidence = 0.3
+            district_method = "keyword_fallback"
 
     warnings: list[str] = [*address_result.warnings, *parcel.warnings]
     if district == "unknown":
@@ -242,6 +250,8 @@ def normalize_address(address: str) -> AddressNormalizationResult:
     return AddressNormalizationResult(
         normalized_address=address_result.normalized_address,
         district=district,
+        district_confidence=district_confidence,
+        district_method=district_method,
         place_id=address_result.place_id,
         latitude=address_result.lat,
         longitude=address_result.lng,
@@ -253,6 +263,7 @@ def normalize_address(address: str) -> AddressNormalizationResult:
         coverage_status=jurisdiction.coverage_status,
         planning_contact=jurisdiction.planning_contact,
         official_source_urls=jurisdiction.official_source_urls,
+        parcel_id=parcel.parcel_id,
     )
 
 
@@ -394,6 +405,8 @@ def _dedupe_follow_up_questions(questions: list[str]) -> list[str]:
 def analyze_project(
     project_description: str,
     district: str,
+    district_confidence: float = 0.0,
+    district_method: str = "unknown",
     jurisdiction_id: str | None = None,
     jurisdiction_name: str | None = None,
     normalized_address: str | None = None,
@@ -406,6 +419,8 @@ def analyze_project(
     return ZoningOrchestrator().analyze_project(
         project_description=project_description,
         district=district,
+        district_confidence=district_confidence,
+        district_method=district_method,
         jurisdiction_id=jurisdiction_id,
         jurisdiction_name=jurisdiction_name,
         normalized_address=normalized_address,

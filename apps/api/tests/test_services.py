@@ -85,9 +85,37 @@ def test_normalize_address_success(monkeypatch: pytest.MonkeyPatch) -> None:
     assert result.latitude == 40.1
     assert result.longitude == -74.5
     assert result.district == "mixed-use-core"
+    assert result.district_confidence == 0.3
+    assert result.district_method == "component_rule"
     assert result.support_status == "supported"
     assert result.jurisdiction_id == "blacksburg-va"
     assert result.jurisdiction_name == "Blacksburg, VA"
+
+
+def test_normalize_address_does_not_default_blacksburg_to_mixed_use_core(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("GOOGLE_MAPS_API_KEY", "demo-key")
+    _mock_google_address(
+        monkeypatch,
+        {
+            "formatted_address": "400 Clay St SW, Blacksburg, VA 24060, USA",
+            "place_id": "place-clay",
+            "address_components": [
+                {"long_name": "Blacksburg", "types": ["locality"]},
+                {"long_name": "Montgomery County", "types": ["administrative_area_level_2"]},
+                {"long_name": "Virginia", "types": ["administrative_area_level_1"]},
+            ],
+            "geometry": {"location": {"lat": 37.2, "lng": -80.4}},
+        },
+    )
+
+    result = services.normalize_address("400 Clay St SW Blacksburg VA")
+
+    assert result.is_valid is True
+    assert result.district == "unknown"
+    assert result.district_confidence == 0.0
+    assert result.district_method == "unknown"
 
 
 def test_normalize_address_zero_results(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -384,6 +412,37 @@ def test_analyze_project_without_matching_citations_is_unknown_low_confidence(
         assert any("No relevant ordinances" in warning for warning in result.warnings)
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def test_analyze_project_uses_unknown_effective_district_when_confidence_is_low(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class CapturingRetriever:
+        name = "capturing"
+
+        def __init__(self) -> None:
+            self.district = None
+
+        def retrieve(self, request):
+            from app.ai.interfaces import RetrievalProviderResult
+
+            self.district = request.district
+            return RetrievalProviderResult(citations=[], chunks=[])
+
+    retriever = CapturingRetriever()
+    monkeypatch.setattr(services, "get_analysis_provider", lambda: DeterministicAnalysisProvider())
+    monkeypatch.setattr(services, "get_retrieval_provider", lambda: retriever)
+
+    services.analyze_project(
+        project_description="Open a small coffee shop with employees, hours, and renovation plans.",
+        district="mixed-use-core",
+        district_confidence=0.3,
+        district_method="keyword_fallback",
+        jurisdiction_id="blacksburg-va",
+        normalized_address="400 Clay St SW, Blacksburg, VA 24060",
+    )
+
+    assert retriever.district == "unknown"
 
 
 def test_dedupe_follow_up_questions_prefers_specific_prompt() -> None:
