@@ -336,7 +336,7 @@ def test_hybrid_local_sql_path_surfaces_unknown_district_ordinance() -> None:
         shutil.rmtree(temp_dir, ignore_errors=True)
 
 
-def test_score_chunk_unknown_district_not_penalized() -> None:
+def test_score_chunk_exact_district_beats_unknown_wildcard() -> None:
     # Re-ranker symmetry: an unclassified (districts=["unknown"]) chunk must earn
     # the same district credit as a chunk tagged with the queried district,
     # mirroring how uses=["general"] is treated as a wildcard. Otherwise unlocking
@@ -355,6 +355,58 @@ def test_score_chunk_unknown_district_not_penalized() -> None:
     unknown_score = _score_chunk(_blacksburg_chunk(["unknown"]), request, query_tokens)
     tagged_score = _score_chunk(_blacksburg_chunk(["mixed-use-core"]), request, query_tokens)
 
-    assert unknown_score == tagged_score
+    assert unknown_score > 0
+    assert tagged_score > unknown_score
+
+
+def test_score_chunk_additive_tag_outranks_wrong_district_wildcard() -> None:
+    # Layer-2 precision: after additive tagging a chunk gets both "unknown" AND a
+    # real district. For a concrete-district query, the chunk whose canonical district
+    # matches earns an exact-match bonus (+2.0) while the chunk whose canonical
+    # district doesn't match only earns the wildcard credit (+1.2), and both stay > 0
+    # (recall preserved).
+    from app.ai.hybrid_local_retriever import _score_chunk, _tokens
+
+    request = RetrievalProviderRequest(
+        district="residential-low-density",
+        inferred_use="general",
+        project_description="Build a residential addition",
+        jurisdiction_id="blacksburg-va",
+    )
+    query_tokens = _tokens(request.query)
+
+    residential_chunk = _blacksburg_chunk(["unknown", "residential-low-density"])
+    commercial_chunk = _blacksburg_chunk(["unknown", "commercial-employment"])
+
+    res_score = _score_chunk(residential_chunk, request, query_tokens)
+    com_score = _score_chunk(commercial_chunk, request, query_tokens)
+
+    assert res_score > 0
+    assert com_score > 0
+    assert res_score > com_score
+
+
+def test_source_index_version_changes_when_only_tags_change(tmp_path: Path) -> None:
+    from app.ai.hybrid_local_retriever import _source_index_version
+
+    source_store = SQLiteStore(tmp_path / "sources.sqlite3")
+    base = SourceRegistryEntry(
+        source_id="stable-rule",
+        title="Stable Rule",
+        excerpt="Coffee shops require zoning review with sufficient text for chunking.",
+        full_text="Coffee shops require zoning review with sufficient text for chunking.",
+        section_ref="Sec. 1",
+        jurisdiction_id="blacksburg-va",
+        districts=["unknown"],
+        uses=["general"],
+    )
+    source_store.replace_source_chunks(build_source_chunks([base]))
+    first = _source_index_version(source_store, "")
+
+    tagged = base.model_copy(update={"districts": ["unknown", "commercial-employment"]})
+    source_store.replace_source_chunks(build_source_chunks([tagged]))
+    second = _source_index_version(source_store, "")
+
+    assert first != second
 
 

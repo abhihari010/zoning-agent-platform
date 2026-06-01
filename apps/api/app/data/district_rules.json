@@ -1,7 +1,6 @@
 {
   "city_defaults": {
-    "default": "unknown",
-    "Blacksburg": "mixed-use-core"
+    "default": "unknown"
   },
   "component_rules": [
     {

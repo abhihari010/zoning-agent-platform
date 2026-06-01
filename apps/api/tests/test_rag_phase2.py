@@ -96,6 +96,17 @@ class FakeQdrantClient:
         for pid in points_selector.points:
             col["points"].pop(pid, None)
 
+    def set_payload(
+        self,
+        collection_name: str,
+        payload: dict,
+        points: list,
+        wait: bool = True,
+    ) -> None:
+        col = self._ensure_col(collection_name)
+        for pid in points:
+            col["points"][pid]["payload"].update(payload)
+
     def query_points(
         self,
         collection_name: str,
@@ -246,6 +257,40 @@ def test_qdrant_store_creates_payload_indexes_for_filtered_fields() -> None:
         "districts",
         "uses",
     }.issubset(indexed_fields)
+
+
+def test_qdrant_store_updates_payload_without_reembedding() -> None:
+    fake_client = FakeQdrantClient()
+    store = _make_store(fake_client)
+    source = SourceRegistryEntry(
+        source_id="coffee-rule",
+        title="Coffee Rule",
+        excerpt="Coffee shops are reviewed as food service uses.",
+        section_ref="Sec 3",
+        jurisdiction_id="blacksburg-va",
+        districts=["unknown"],
+        uses=["general"],
+        source_type="zoning_ordinance",
+    )
+    chunks = build_source_chunks([source])
+    store.upsert_chunks(chunks, [[0.1, 0.2, 0.3] for _ in chunks])
+
+    updated = store.update_chunk_payloads(
+        {
+            chunks[0].chunk_id: {
+                "districts": ["unknown", "commercial-employment"],
+                "uses": ["food-service", "general"],
+            }
+        }
+    )
+    hits = store.query(
+        [0.1, 0.2, 0.3],
+        filters={"district": "commercial-employment", "use": "food-service"},
+    )
+
+    assert updated == 1
+    assert hits[0].metadata["districts"] == ["unknown", "commercial-employment"]
+    assert hits[0].metadata["uses"] == ["food-service", "general"]
 
 
 def test_qdrant_store_surfaces_query_errors() -> None:

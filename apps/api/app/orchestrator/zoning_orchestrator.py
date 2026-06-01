@@ -44,6 +44,8 @@ class ZoningOrchestrator:
         *,
         project_description: str,
         district: str,
+        district_confidence: float = 0.0,
+        district_method: str = "unknown",
         jurisdiction_id: str | None = None,
         jurisdiction_name: str | None = None,
         normalized_address: str | None = None,
@@ -64,6 +66,8 @@ class ZoningOrchestrator:
             project_description=project_description,
             combined_description=combined_description,
             district=district,
+            district_confidence=district_confidence,
+            district_method=district_method,
             location_already_resolved=normalized_address is not None,
             jurisdiction_id=jurisdiction_id,
             jurisdiction_name=jurisdiction_name,
@@ -156,10 +160,11 @@ class ZoningOrchestrator:
 
         recorder.record("retrieval", "started")
         retrieval_result: "RetrievalProviderResult | None" = None
+        effective_district = district if intake.district_confidence >= 0.7 else "unknown"
         try:
             retrieval_result = retrieval_provider.retrieve(
                 RetrievalProviderRequest(
-                    district=district,
+                    district=effective_district,
                     inferred_use=intake.inferred_use,
                     project_description=context.combined_description,
                     jurisdiction_id=jurisdiction_id,

@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from app.models import SourceChunk, SourceRegistryEntry
+from app.source_classifier import classify_source, load_classification_rules
 
 
 def _resolve_default_docs_path() -> Path:
@@ -342,6 +343,7 @@ def _sources_from_pack(pack: SourcePackManifest) -> list[SourceRegistryEntry]:
         raise ValueError(f"Source pack is missing jurisdiction_id: {pack.path}")
 
     entries: list[SourceRegistryEntry] = []
+    classification_rules = load_classification_rules(pack.path)
     for raw_source in sources_payload:
         if not isinstance(raw_source, dict):
             raise ValueError(f"Source pack source must be an object: {pack.path}")
@@ -365,7 +367,17 @@ def _sources_from_pack(pack: SourcePackManifest) -> list[SourceRegistryEntry]:
             "source_pack": pack.jurisdiction_id,
             "source_pack_manifest": str(pack.path),
         }
-        entries.append(SourceRegistryEntry.model_validate(source))
+        entry = SourceRegistryEntry.model_validate(source)
+        if classification_rules:
+            classified_districts, classified_uses = classify_source(entry, classification_rules)
+            updates: dict[str, Any] = {}
+            if entry.districts == ["unknown"]:
+                updates["districts"] = classified_districts
+            if entry.uses == ["general"]:
+                updates["uses"] = classified_uses
+            if updates:
+                entry = entry.model_copy(update=updates)
+        entries.append(entry)
     return entries
 
 
