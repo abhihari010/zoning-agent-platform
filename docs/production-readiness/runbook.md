@@ -1,13 +1,13 @@
 # Production Readiness Runbook
 
-Last updated: May 25, 2026
+Last updated: June 1, 2026
 
 ## Architecture
 
 - Frontend: Vercel project `zoning-agent-platform` at `https://zoning-agent-platform.vercel.app`.
 - Backend: Render web service `zoning-agent-api` at `https://zoning-agent-api.onrender.com`.
 - Database: Supabase free Postgres for public beta through `DATABASE_URL`.
-- Retrieval: SQL source chunks are the production source of truth. `VECTOR_PROVIDER=none` is the public-beta default.
+- Retrieval: `hybrid_local` RAG over a **Qdrant** vector index (`VECTOR_PROVIDER=qdrant`), embeddings via **Gemini**, analysis via **Groq**. SQL source chunks remain the rebuildable source of truth; Qdrant is reindexed from them via the offline retag script.
 - Auth: Supabase Auth bearer tokens. Beta keys are temporary QA/migration access only.
 
 ## Environment Matrix
@@ -34,12 +34,19 @@ Render production:
 - `SUPABASE_JWT_SECRET=<Supabase JWT secret>`
 - `GOOGLE_MAPS_API_KEY=<restricted Google Maps key>`
 - `CORS_ALLOW_ORIGINS=https://zoning-agent-platform.vercel.app`
-- `AI_PROVIDER=deterministic`
+- `AI_PROVIDER=groq`
+- `GROQ_API_KEY=<Groq key>`
 - `RAG_PROVIDER=hybrid_local`
-- `EMBEDDING_PROVIDER=local`
-- `VECTOR_PROVIDER=none`
-- `STARTUP_REINDEX_ENABLED=true`
+- `EMBEDDING_PROVIDER=gemini`
+- `GEMINI_API_KEY=<Gemini key>`
+- `VECTOR_PROVIDER=qdrant`
+- `QDRANT_URL=<Qdrant cluster URL>`
+- `QDRANT_API_KEY=<Qdrant key>`
+- `STARTUP_REINDEX_ENABLED=false` (boot-time reindex blocks Render's port scan — keep OFF; retag via the offline `scripts/update_source_classification.py`)
+- `CORS_ALLOW_ORIGIN_REGEX=https://zoning-agent-platform[^.]*\.vercel\.app` (covers Vercel previews + production)
 - Optional during migration: `BETA_ACCESS_KEYS`, `ADMIN_ACCESS_KEY`, `ADMIN_USER_EMAILS`
+
+> Render is **blueprint-synced** via `render.yaml`. Dashboard edits get reset on the next deploy — change provider/env values in `render.yaml`, not the dashboard. Provider/DB secrets (`GROQ_API_KEY`, `GEMINI_API_KEY`, `QDRANT_API_KEY`, `DATABASE_URL` password) live only in the dashboard/secret store, never in the repo.
 
 Vercel production:
 
