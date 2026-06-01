@@ -143,8 +143,14 @@ def _url_reachable(url: str, timeout: float) -> bool:
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 return 200 <= response.status < 400
         except urllib.error.HTTPError as exc:
-            if method == "HEAD" and exc.code in {403, 405}:
+            if method == "HEAD" and exc.code in {403, 405, 429}:
                 continue
+            # 403/429 mean the server responded and the resource is not gone —
+            # it is just blocking automated clients (common for WAF-protected
+            # government sites). Treat as reachable; only 404/410/5xx and
+            # connection failures count as a dead link.
+            if exc.code in {403, 429}:
+                return True
             return 200 <= exc.code < 400
         except (urllib.error.URLError, TimeoutError):
             continue

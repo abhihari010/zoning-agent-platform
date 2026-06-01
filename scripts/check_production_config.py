@@ -28,10 +28,10 @@ def request(method: str, url: str, *, headers: dict[str, str] | None = None) -> 
     try:
         with urllib.request.urlopen(req, timeout=30) as response:
             text = response.read().decode("utf-8", errors="replace")
-            return Response(response.status, _parse_json(text), dict(response.headers.items()))
+            return Response(response.status, _parse_json(text), {k.lower(): v for k, v in response.headers.items()})
     except urllib.error.HTTPError as exc:
         text = exc.read().decode("utf-8", errors="replace")
-        return Response(exc.code, _parse_json(text), dict(exc.headers.items()))
+        return Response(exc.code, _parse_json(text), {k.lower(): v for k, v in exc.headers.items()})
     except (TimeoutError, urllib.error.URLError) as exc:
         raise CheckFailure(f"{method} {url} failed to connect: {exc}") from exc
 
@@ -75,7 +75,7 @@ def check(api_url: str, web_origin: str) -> dict[str, Any]:
     )
     if preflight.status not in {200, 204}:
         raise CheckFailure(f"CORS preflight returned HTTP {preflight.status}")
-    allowed_origin = preflight.headers.get("Access-Control-Allow-Origin", "")
+    allowed_origin = preflight.headers.get("access-control-allow-origin", "")
     if allowed_origin not in {web_origin, "*"}:
         raise CheckFailure(
             f"CORS preflight allowed origin {allowed_origin!r}, expected {web_origin!r}"
