@@ -33,3 +33,8 @@ apps/api/tests/golden/traces/
 .vercel
 .env*
 .gstack/
+
+# Local-only progress/scratch tracking — never commit
+progress.md
+testing-progress.md
+.playwright-mcp/
