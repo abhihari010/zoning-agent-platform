@@ -7,6 +7,35 @@ All ordinance references are to the scraped corpus at
 
 ---
 
+## Known limitation — Ch5 use-table fidelity
+
+Franklin's zoning ordinance was published exclusively via a FlippingBook viewer
+(`web.franklintn.gov/flippingbook/FranklinZoningOrdinance`). The Chapter 5 permitted-use table
+renders per-district permission markers (solid dots, half-black dots, blank cells) as image-only
+glyphs in the page image layer. The FlippingBook HTML text layer contains the use names and section
+headers (e.g. "AGRICULTURAL USES", "INDUSTRIAL USES") but **zero** permission glyphs for any
+district column. FlippingBook download is disabled (403/404 on asset paths), so the matrix is not
+recoverable by re-scraping.
+
+**Part A search result (2026-06-02):** Checked four sources — (1) `franklintn.gov` planning/zoning
+page returns only the FlippingBook viewer; (2) Granicus/Legistar BOMA agenda packets for Ordinance
+2025-25 — no direct PDF surfaced in search results; (3) Municode Title 14 — previously confirmed to
+be an MTAS stub, not the 2026 ordinance; (4) Williamson County GIS / APA knowledgebase — no
+text-layer export found. **No qualifying text-layer PDF was found.** The FlippingBook viewer is the
+sole published source for the adopted ordinance.
+
+**How scenarios compensate:** The pipeline can reason from (a) use classification (section header
+grouping in the text layer), (b) §5.1.4 additional use regulation prose (full text in corpus),
+(c) Chapter 20 review-procedure lists, and (d) Chapter 3 district purpose statements and dimensional
+standards. Scenarios are grounded in one or more of these text-readable sources. No scenario relies
+on reading a specific dot in the use-table matrix. See per-scenario rationale below.
+
+**Promotion blocker:** `coverage_status` stays `source_indexed`. Promotion to `public_supported`
+requires a text-layer use table (structured permission-matrix feed) — a deferred future workstream
+separate from this pilot.
+
+---
+
 ### franklin-tn-sfr-r3
 - **Project:** Build a new single-family home on a 10,500 sq ft lot in a residential subdivision.
 - **Expected:** `likely_allowed`
@@ -42,9 +71,12 @@ All ordinance references are to the scraped corpus at
 ### franklin-tn-vape-nc
 - **Project:** Open a vape shop and e-cigarette store in a Neighborhood Commercial strip mall.
 - **Expected:** `restricted`
-- **Basis:** Chapter 5 (§5.1.3 — "Vape Shops" appears in the INDUSTRIAL USES section of the principal use table, alongside uses like Self-Storage Facilities, Vehicle Repair Facilities, and Wrecker Service — not in the commercial use section); NC is a commercial district and would not permit industrial uses.
-- **Why this decision:** The Ch5 table explicitly categorizes Vape Shops as an industrial use, not a commercial/retail use. NC district permits commercial and civic uses; it does not permit industrial uses. A blank cell in the table for NC × Vape Shops means not permitted.
-- **Uncertainty flag:** The actual dot-pattern in the scraped PDF table is not machine-readable; the industrial classification is inferred from the section header grouping. **Human reviewer: verify which districts show a dot for Vape Shops in the physical ordinance.**
+- **Basis (re-anchored from dot lookup to prose):**
+  - Chapter 5 §5.1.3 text layer: "Vape Shops" is listed under the **INDUSTRIAL USES** section header alongside Machinery Assembly and Repair Facilities, Self-Storage Facilities, Vehicle Repair Facilities, and Wrecker Service. Section headers are present as text (unlike the dots); this classification is corpus-readable.
+  - Chapter 5 §5.1.4.AB: Vape shops carry a mandatory 500-foot setback from any dwelling or residential lot, any CI-zoned property, any recreation use, any day care center, any funeral home, or another vape shop.
+  - Chapter 3 §3.13 NC purpose: "pedestrian-oriented, small-scale commercial nodes that **serve surrounding residential neighborhoods**." By design, NC sites are proximate to residential lots.
+- **Why this decision:** The specific scenario — a strip mall at 720 Hillsboro Rd in an NC district that serves nearby residents — cannot comply with the §5.1.4.AB 500-foot residential setback. NC districts are expressly sited to serve surrounding residential neighborhoods, making the proximity requirement practically unmet. The industrial use classification (readable from the §5.1.3 section header) additionally signals this is not a commercial use the NC district is designed to accommodate. Together, these produce a `restricted` outcome grounded entirely in corpus prose and use classification text, without relying on the missing per-district dot.
+- **Changed from prior label?** The `decision_in: ["restricted"]` is unchanged. The rationale is re-anchored from the unavailable use-table dot to §5.1.4.AB + §3.13 prose (both text-readable). Uncertainty flag removed.
 
 ---
 

@@ -17,9 +17,12 @@
     "zoning_map_url": null,
     "planning_contact": {
       "url": "https://web.franklintn.gov/flippingbook/FranklinZoningOrdinance"
-    }
+    },
+    "known_limitations": [
+      "Chapter 5 permitted-use table: per-district permission markers are image-only in the FlippingBook source and are absent from the extracted text. Use-by-district determinations rely on Sec 5.1.4 prose and Chapter 20 procedures, not exact use-table cell lookups. Blocks promotion to public_supported until a text-layer use table is ingested."
+    ]
   },
-  "verification_notes": "WS1 scraped source pack generated on 2026-06-02 (24 ordinance section(s)). Coverage status is 'source_indexed'; promote to public_supported only after district mapping and golden QA pass. Fetcher: flippingbook.",
+  "verification_notes": "WS1 scraped source pack generated on 2026-06-02 (24 ordinance section(s)). Coverage status is 'source_indexed'; promote to public_supported only after district mapping and golden QA pass. Fetcher: flippingbook. Known limitation: Ch5 permitted-use table per-district dots are image-only and absent from extracted text — see known_limitations in jurisdiction block.",
   "sources": [
     {
       "source_id": "franklin-tn-chapter-1",
