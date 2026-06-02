@@ -30,12 +30,12 @@ from pathlib import Path
 # as well as a module (``python -m services.ingestion.scraper.run_scrape``).
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-    from services.ingestion.scraper.fetchers import GenericHtmlFetcher, MunicodeFetcher
+    from services.ingestion.scraper.fetchers import FlippingBookFetcher, GenericHtmlFetcher, MunicodeFetcher
     from services.ingestion.scraper.fetchers.base import Fetcher
     from services.ingestion.scraper.http_client import FetchBlockedError
     from services.ingestion.scraper.manifest_builder import build_manifest, slugify
 else:  # pragma: no cover - exercised via module execution
-    from .fetchers import GenericHtmlFetcher, MunicodeFetcher
+    from .fetchers import FlippingBookFetcher, GenericHtmlFetcher, MunicodeFetcher
     from .fetchers.base import Fetcher
     from .http_client import FetchBlockedError
     from .manifest_builder import build_manifest, slugify
@@ -63,6 +63,15 @@ def _build_fetcher(args: argparse.Namespace, *, raw_dir: Path) -> Fetcher:
             args.url,
             cache_dir=raw_dir,
             request_delay=args.delay,
+        )
+    if args.fetcher == "flippingbook":
+        if not args.url or len(args.url) != 1:
+            raise SystemExit("--fetcher flippingbook requires exactly one --url (the publication root).")
+        return FlippingBookFetcher(
+            args.url[0],
+            cache_dir=raw_dir,
+            request_delay=args.delay,
+            max_sections=args.max_sections,
         )
     raise SystemExit(f"Unknown fetcher: {args.fetcher}")
 
@@ -127,7 +136,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--state", required=True, help="Two-letter state code, e.g. VA.")
     parser.add_argument(
         "--fetcher",
-        choices=["municode", "generic_html"],
+        choices=["municode", "generic_html", "flippingbook"],
         default="municode",
         help="Which fetcher to use (default: municode).",
     )
