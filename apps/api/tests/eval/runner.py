@@ -94,15 +94,36 @@ def _citations_valid(
 
 
 def _corpus_section_refs(source_store: Any, jurisdiction_id: str) -> set[str]:
-    """All section_refs present in the source corpus for this jurisdiction."""
+    """Every section_ref that can legitimately appear in a citation for this jurisdiction.
+
+    Citations in the hybrid_local path carry the *chunk's* section_ref. For
+    markdown-imported sources that section_ref is a heading extracted from inside the
+    source body and is NOT present on the parent registry entry (see
+    ``ingestion.build_source_chunks``). So the corpus of "real" section_refs must be
+    drawn from the chunk store, not just ``list_sources()``; otherwise a perfectly
+    legitimate heading-level citation is falsely flagged as hallucinated and the
+    =0.0 gate fails. We union sources and chunks so the check is also correct under
+    the source_registry retriever, which cites registry entries directly.
+    """
     if source_store is None:
         return set()
-    return {
-        src.section_ref
-        for src in source_store.list_sources()
-        if src.section_ref
-        and (src.jurisdiction_id is None or src.jurisdiction_id == jurisdiction_id)
-    }
+
+    def _belongs(obj: Any) -> bool:
+        jid = getattr(obj, "jurisdiction_id", None)
+        return jid is None or jid == jurisdiction_id
+
+    refs: set[str] = set()
+    for src in source_store.list_sources():
+        if src.section_ref and _belongs(src):
+            refs.add(src.section_ref)
+
+    list_chunks = getattr(source_store, "list_source_chunks", None)
+    if callable(list_chunks):
+        for chunk in list_chunks():
+            if chunk.section_ref and _belongs(chunk):
+                refs.add(chunk.section_ref)
+
+    return refs
 
 
 def _check_permit_path(result: AnalyzeResult, expected_items: list[str]) -> bool:
