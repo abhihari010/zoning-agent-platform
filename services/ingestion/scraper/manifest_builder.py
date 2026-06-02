@@ -70,6 +70,7 @@ def section_to_source(
     used_ids: set[str],
     retrieved_at: str,
     fallback_effective_date: str,
+    fallback_date_source: str = "unknown",
 ) -> dict[str, Any]:
     """Convert one SectionRecord into a manifest source dict."""
     full_text = " ".join(record.text.split())[:_FULL_TEXT_MAX]
@@ -82,7 +83,7 @@ def section_to_source(
     if record.breadcrumb:
         metadata["breadcrumb"] = record.breadcrumb
     if not record.effective_date:
-        metadata["effective_date_source"] = "retrieval_date"
+        metadata["effective_date_source"] = fallback_date_source
 
     return {
         "source_id": _make_source_id(jurisdiction_id, record, used_ids),
@@ -116,6 +117,9 @@ def build_manifest(
     effective_date: str | None = None,
     provenance: dict[str, Any] | None = None,
     base_manifest: dict[str, Any] | None = None,
+    county_fips: str | None = None,
+    place_fips: str | None = None,
+    county_name: str | None = None,
 ) -> dict[str, Any]:
     """Produce a complete ``source-pack/v1`` manifest dict.
 
@@ -137,6 +141,12 @@ def build_manifest(
 
     jurisdiction = dict(skeleton["jurisdiction"])
     jurisdiction["coverage_status"] = coverage_status
+    if county_fips is not None:
+        jurisdiction["county_fips"] = county_fips
+    if place_fips is not None:
+        jurisdiction["place_fips"] = place_fips
+    if county_name is not None:
+        jurisdiction["county_name"] = county_name
 
     urls = list(official_source_urls or jurisdiction.get("official_source_urls") or [])
     if not urls and provenance and provenance.get("source_home_url"):
@@ -156,6 +166,7 @@ def build_manifest(
     resolved_jurisdiction_id = str(jurisdiction["jurisdiction_id"])
     retrieved_at = datetime.now(timezone.utc).date().isoformat()
     fallback_effective = effective_date or retrieved_at
+    fallback_source = "parsed_from_document" if effective_date else "unknown"
 
     used_ids: set[str] = set()
     sources = [
@@ -165,6 +176,7 @@ def build_manifest(
             used_ids=used_ids,
             retrieved_at=retrieved_at,
             fallback_effective_date=fallback_effective,
+            fallback_date_source=fallback_source,
         )
         for record in records
     ]
