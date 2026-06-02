@@ -20,7 +20,7 @@ from app.models import (
     SourceCitation,
     TrustIndicators,
 )
-from app.models import SourceRegistryEntry
+from app.models import SourceChunk, SourceRegistryEntry
 from app.storage import SQLiteStore
 from tests.eval.dataset_schema import EvalScenario, ScenarioExpect
 from tests.eval.runner import (
@@ -232,6 +232,63 @@ def test_hallucinated_section_metric(tmp_path: Path) -> None:
     assert scorecard.hallucinated_section_rate > 0.0
     assert not scorecard.gates_passed
     assert any("hallucinated" in f for f in scorecard.gate_failures)
+
+
+def test_chunk_section_ref_not_flagged_hallucinated(tmp_path: Path) -> None:
+    """A citation carrying a chunk-level heading section_ref (absent from the parent
+    registry entry) must NOT be flagged as hallucinated.
+
+    Regression guard: ingestion.build_source_chunks assigns markdown headings as the
+    chunk section_ref, so legitimate citations routinely reference a section_ref that
+    only exists on a chunk, not on any list_sources() entry. The corpus check must
+    include chunk section_refs, otherwise the =0.0 hallucination gate falsely fails
+    every markdown-imported city.
+    """
+    heading_ref = "Sec. 14-201. Permitted Uses"  # a chunk heading, not on the source entry
+
+    store = SQLiteStore(tmp_path / "synth.sqlite3")
+    store.upsert_source(_SYNTHVILLE_SOURCE)  # registry entry has section_ref "Sec. 1.1"
+    store.replace_source_chunks(
+        [
+            SourceChunk(
+                chunk_id="syn-ordinance-bakery:chunk:0:abc123abc123:deadbeef",
+                source_id="syn-ordinance-bakery",
+                title="Bakery Use Standard",
+                chunk_text="Bakeries are permitted in commercial zones with a site plan review.",
+                chunk_index=0,
+                source_text_hash="0" * 64,
+                section_ref=heading_ref,
+                jurisdiction_id=_SYNTHVILLE_JURISDICTION,
+                effective_date="2026-01-01",
+            )
+        ]
+    )
+
+    citation = SourceCitation(
+        source_id="syn-ordinance-bakery",
+        title="Bakery Use Standard",
+        excerpt="Bakeries are permitted in commercial zones.",
+        section_ref=heading_ref,
+        jurisdiction_id=_SYNTHVILLE_JURISDICTION,
+        effective_date="2026-01-01",
+    )
+    scenario = EvalScenario(
+        id="synthville-heading-citation",
+        address="123 Main St, Synthville, SY 00001",
+        project_description="Open a small retail bakery in a commercial storefront.",
+        jurisdiction_id=_SYNTHVILLE_JURISDICTION,
+        expect=ScenarioExpect(decision_in=["likely_allowed"], should_abstain=False),
+    )
+    mock_results = [_make_result("likely_allowed", 0.85, citations=[citation])]
+    scorecard = run_eval(
+        [scenario],
+        _SYNTHVILLE_JURISDICTION,
+        orchestrator=_MockOrchestrator(mock_results),
+        source_store=store,
+        output_dir=tmp_path / "reports",
+    )
+    assert scorecard.hallucinated_section_rate == 0.0, scorecard.outcomes
+    assert scorecard.gates_passed, scorecard.gate_failures
 
 
 def test_required_citation_recall_metric(tmp_path: Path) -> None:
