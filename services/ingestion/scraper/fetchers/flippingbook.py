@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import re
 import sys
+from datetime import datetime
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
@@ -46,6 +47,21 @@ _CHAPTER_HEADING_RE = re.compile(
     # (e.g. "CHAPTER 2 NONCONFORMITIES 2.1 General..." must NOT capture the trailing "2").
     r"CHAPTER\s+(\d+)\.?\s*([A-Z][A-Z ,&'—–\-]+)?",
 )
+
+_EFFECTIVE_DATE_RE = re.compile(
+    r"\bEffective\s+([A-Z][a-z]+\s+\d{1,2},\s+\d{4})\b"
+)
+
+
+def _parse_effective_date(text: str) -> str | None:
+    """Return the ordinance effective date as ISO YYYY-MM-DD, or None."""
+    m = _EFFECTIVE_DATE_RE.search(text)
+    if not m:
+        return None
+    try:
+        return datetime.strptime(m.group(1), "%B %d, %Y").date().isoformat()
+    except ValueError:
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -213,6 +229,21 @@ def _group_into_chapters(pages: list[str], *, base_url: str) -> list[SectionReco
             continue
         chapter_num = int(chapter_num_str)
 
+        # Fix 2: strip running-header residue, e.g. "43 ZONING DISTRICTS"
+        if chapter_title_suffix:
+            body = re.sub(
+                rf"\b\d{{1,3}}\s+{re.escape(chapter_title_suffix)}\b",
+                "",
+                body,
+            )
+        # Fix 3: strip TOC page numbers — bare 1-3 digit number between a title
+        # and the next N.N section marker (leaves real dimensions like "60 feet" intact)
+        body = re.sub(r"\s+\d{1,3}(?=\s+\d+\.\d+(?:\.\d+)?\b)", "", body)
+        # Collapse whitespace introduced by stripping
+        body = re.sub(r"[ \t]{2,}", " ", body)
+        body = re.sub(r"\n{3,}", "\n\n", body)
+        body = body.strip()
+
         existing_title, existing_body = chapter_best.get(chapter_num, ("", ""))
         # Prefer the occurrence with the most body text (real chapter over TOC stub)
         if len(body) > len(existing_body):
@@ -291,11 +322,13 @@ class FlippingBookFetcher:
         cache_dir: Path | None = None,
         request_delay: float = 1.0,
         max_sections: int | None = None,
+        effective_date: str | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.cache_dir = cache_dir
         self.request_delay = request_delay
         self.max_sections = max_sections  # applied as a page cap for smoke runs
+        self.effective_date = effective_date
 
     def fetch(self, *, city: str, state: str) -> FetchResult:
         state = state.upper()
@@ -332,10 +365,13 @@ class FlippingBookFetcher:
             )
 
             pages: list[str] = []
+            parsed_effective_date: str | None = None
             for page_num in range(1, fetch_up_to + 1):
                 url = f"{self.base_url}/{page_num}/"
                 html = client.get_text(url, cache_suffix=f".page_{page_num:04d}.html")
                 raw_text = _extract_page_text(html)
+                if parsed_effective_date is None:
+                    parsed_effective_date = _parse_effective_date(raw_text)
                 stripped = _strip_boilerplate(raw_text, title)
                 if stripped:
                     pages.append(stripped)
@@ -356,7 +392,7 @@ class FlippingBookFetcher:
         return FetchResult(
             sections=sections,
             source_home_url=self.base_url,
-            effective_date="2026-01-13",
+            effective_date=self.effective_date or parsed_effective_date,
             provenance={
                 "fetcher": self.name,
                 "base_url": self.base_url,

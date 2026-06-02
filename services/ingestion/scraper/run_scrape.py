@@ -112,6 +112,9 @@ def run(args: argparse.Namespace) -> int:
         coverage_status=args.coverage_status,
         effective_date=result.effective_date,
         provenance=provenance,
+        county_fips=args.county_fips,
+        place_fips=args.place_fips,
+        county_name=args.county_name,
     )
 
     manifest_path = pack_dir / "manifest.json"
@@ -154,6 +157,9 @@ def build_parser() -> argparse.ArgumentParser:
         default="source_indexed",
         help="Coverage status for the pack (default: source_indexed).",
     )
+    parser.add_argument("--county-fips", default=None, help="3-digit county FIPS code.")
+    parser.add_argument("--place-fips", default=None, help="5-digit Census place FIPS code.")
+    parser.add_argument("--county-name", default=None, help="County name (sets county_name without deriving parent_jurisdiction_id).")
     parser.add_argument("--delay", type=float, default=1.0, help="Min seconds between requests.")
     parser.add_argument(
         "--max-sections",
