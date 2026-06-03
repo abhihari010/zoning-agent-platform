@@ -1,0 +1,132 @@
+[
+  {
+    "id": "franklin-tn-sfr-r3",
+    "address": "312 Oak Creek Dr, Franklin, TN 37064",
+    "project_description": "Build a new single-family home on a vacant 10,500 square foot lot in a residential subdivision.",
+    "jurisdiction_id": "franklin-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Chapter 3", "Chapter 5"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "franklin-tn-restaurant-dd",
+    "address": "125 5th Ave N, Franklin, TN 37064",
+    "project_description": "Open a full-service sit-down restaurant with a full bar in an existing ground-floor storefront in the Downtown District.",
+    "jurisdiction_id": "franklin-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Chapter 5"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "franklin-tn-retail-nc",
+    "address": "615 Hillsboro Rd, Franklin, TN 37069",
+    "project_description": "Open a small clothing boutique and gift shop in a neighborhood commercial strip center that serves nearby residents.",
+    "jurisdiction_id": "franklin-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Chapter 5"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "franklin-tn-manufacturing-r2",
+    "address": "2800 Del Rio Pike, Franklin, TN 37069",
+    "project_description": "Establish a small metal fabrication and light manufacturing shop on a property in an R2 residential neighborhood.",
+    "jurisdiction_id": "franklin-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Chapter 5"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "franklin-tn-vape-nc",
+    "address": "720 Hillsboro Rd, Franklin, TN 37069",
+    "project_description": "Open a vape shop and e-cigarette retail store in a Neighborhood Commercial district strip mall.",
+    "jurisdiction_id": "franklin-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Chapter 5"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "franklin-tn-gas-station-rc4",
+    "address": "4400 Carothers Pkwy, Franklin, TN 37067",
+    "project_description": "Develop a new gas station with fuel pumps, a canopy, and a convenience store on a vacant parcel along a regional commercial corridor.",
+    "jurisdiction_id": "franklin-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": ["site plan", "FMPC"],
+      "must_cite_section_refs": ["Chapter 5", "Chapter 20"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "franklin-tn-event-venue-dd",
+    "address": "219 Main St, Franklin, TN 37064",
+    "project_description": "Convert a historic commercial building in the Downtown District into an event and wedding venue with capacity for up to 250 guests.",
+    "jurisdiction_id": "franklin-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": ["site plan", "FMPC"],
+      "must_cite_section_refs": ["Chapter 5", "Chapter 20"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "franklin-tn-multifamily-cc",
+    "address": "455 S Royal Oaks Blvd, Franklin, TN 37064",
+    "project_description": "Develop a multi-story residential apartment building with 45 units in the Central Commercial district along a major commercial corridor.",
+    "jurisdiction_id": "franklin-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": ["site plan"],
+      "must_cite_section_refs": ["Chapter 5"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "franklin-tn-stvr-r4",
+    "address": "810 W Main St, Franklin, TN 37064",
+    "project_description": "List my historic single-family home in the R4 district as a short-term vacation rental on Airbnb while I continue to live there as my primary residence.",
+    "jurisdiction_id": "franklin-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Chapter 5"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "franklin-tn-craft-brewery-standalone",
+    "address": "1250 Murfreesboro Rd, Franklin, TN 37064",
+    "project_description": "Open a standalone craft brewery as the primary business operation, producing beer on-site and serving it directly to the public through an on-site taproom.",
+    "jurisdiction_id": "franklin-tn",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
