@@ -122,11 +122,11 @@
     "project_description": "Open a standalone craft brewery as the primary business operation, producing beer on-site and serving it directly to the public through an on-site taproom.",
     "jurisdiction_id": "franklin-tn",
     "expect": {
-      "decision_in": ["unknown"],
+      "decision_in": ["restricted"],
       "permit_path_includes": [],
-      "must_cite_section_refs": [],
+      "must_cite_section_refs": ["Chapter 5"],
       "min_confidence": 0.0,
-      "should_abstain": true
+      "should_abstain": false
     }
   }
 ]

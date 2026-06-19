@@ -231,6 +231,7 @@ def run_eval(
             district_method="eval",
             jurisdiction_id=scenario.jurisdiction_id,
             normalized_address=scenario.address,
+            bypass_support_gate=True,   # eval gate measures pre-promotion cities
         )
         outcomes.append(_evaluate_scenario(scenario, result, corpus_refs, source_store))
 

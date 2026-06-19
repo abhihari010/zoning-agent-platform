@@ -196,6 +196,7 @@ class HybridLocalRetrievalProvider:
         ]
         ranked = [(score, chunk) for score, chunk in sorted(scored, key=lambda item: item[0], reverse=True) if score > 0]
 
+        top = _diversify_ranked(ranked)
         return RetrievalProviderResult(
             citations=[
                 SourceCitation(
@@ -212,10 +213,18 @@ class HybridLocalRetrievalProvider:
                     score=round(score, 4),
                     metadata=chunk.metadata,
                 )
-                for score, chunk in ranked[:5]
+                for score, chunk in top
             ],
-            chunks=[chunk for _, chunk in ranked[:5]],
+            chunks=[chunk for _, chunk in top],
         )
+
+    # Secondary query injected alongside the primary to ensure procedural and
+    # use-classification chapters surface even when the project description is
+    # too use-specific to rank them densely on its own.
+    _PERMIT_PATH_QUERY = (
+        "permitted uses additional use regulations site plan "
+        "planning commission FMPC approval permit requirements"
+    )
 
     def _retrieve_with_qdrant(
         self,
@@ -225,11 +234,16 @@ class HybridLocalRetrievalProvider:
         if not self.embedding_provider:
             return None
 
-        query_embedding = self.embedding_provider.embed(
-            EmbeddingProviderRequest(texts=[request.query])
-        ).embeddings[0]
+        # Batch both embeddings in one API call to avoid double round-trip.
+        emb_resp = self.embedding_provider.embed(
+            EmbeddingProviderRequest(texts=[request.query, self._PERMIT_PATH_QUERY])
+        ).embeddings
+        if not emb_resp:
+            return None
+        query_embedding = emb_resp[0]
         if not query_embedding:
             return None
+        permit_embedding = emb_resp[1] if len(emb_resp) > 1 else None
 
         from app.rag.vector_store import QdrantVectorStore  # lazy import to avoid circular dependency
 
@@ -239,11 +253,24 @@ class HybridLocalRetrievalProvider:
             "district": request.district,
             "use": request.inferred_use,
         }
-        vector_hits = QdrantVectorStore().query(
-            query_embedding,
-            filters=vector_filters,
-            limit=20,
+        vs = QdrantVectorStore()
+        primary_hits = vs.query(query_embedding, filters=vector_filters, limit=20)
+
+        # Supplement with a permit-path query so procedural chapters (e.g.
+        # site-plan requirements) are not crowded out by use-type chunks.
+        permit_hits = (
+            vs.query(permit_embedding, filters=vector_filters, limit=10)
+            if permit_embedding
+            else []
         )
+
+        # Merge: keep the highest score seen for each chunk across both queries.
+        hit_by_id: dict[str, object] = {}
+        for hit in primary_hits + permit_hits:
+            existing = hit_by_id.get(hit.chunk_id)
+            if existing is None or hit.score > existing.score:
+                hit_by_id[hit.chunk_id] = hit
+        vector_hits = list(hit_by_id.values())
 
         if not vector_hits:
             return self._fallback_to_sql(
@@ -279,6 +306,7 @@ class HybridLocalRetrievalProvider:
             fallback_reason=None,
             elapsed_ms=(time.monotonic() - start) * 1000,
         )
+        top = _diversify_ranked(ranked)
         return RetrievalProviderResult(
             citations=[
                 SourceCitation(
@@ -295,9 +323,9 @@ class HybridLocalRetrievalProvider:
                     score=round(score, 4),
                     metadata=chunk.metadata,
                 )
-                for score, chunk in ranked[:5]
+                for score, chunk in top
             ],
-            chunks=[chunk for _, chunk in ranked[:5]],
+            chunks=[chunk for _, chunk in top],
             diagnostics=diag,
         )
 
@@ -334,6 +362,31 @@ class HybridLocalRetrievalProvider:
                 elapsed_ms=(time.monotonic() - start) * 1000,
             ),
         )
+
+
+def _diversify_ranked(
+    ranked: list[tuple[float, "SourceChunk"]],
+    *,
+    top_n: int = 8,
+    max_per_section: int = 2,
+) -> list[tuple[float, "SourceChunk"]]:
+    """Return up to top_n chunks, capping at max_per_section per section_ref.
+
+    Prevents a single high-scoring chapter from crowding out procedural or
+    classification chapters that are needed for conditional/restricted decisions.
+    Chunks without a section_ref are each counted as their own group so they
+    are never unfairly penalised.
+    """
+    section_counts: dict[str, int] = {}
+    result: list[tuple[float, "SourceChunk"]] = []
+    for score, chunk in ranked:
+        key = chunk.section_ref or chunk.chunk_id
+        if section_counts.get(key, 0) < max_per_section:
+            result.append((score, chunk))
+            section_counts[key] = section_counts.get(key, 0) + 1
+        if len(result) >= top_n:
+            break
+    return result
 
 
 def _tokens(text: str) -> set[str]:

@@ -27,6 +27,8 @@ ANALYSIS_SCHEMA: dict[str, Any] = {
         "required_permits": {"type": "array", "items": {"type": "string"}},
         "follow_up_questions": {"type": "array", "items": {"type": "string"}},
         "warnings": {"type": "array", "items": {"type": "string"}},
+        "matched_use_term": {"type": "string"},
+        "unlisted_use_determination": {"type": "boolean"},
     },
     "required": [
         "decision",
@@ -141,14 +143,63 @@ class OpenAIAnalysisProvider:
                     {
                         "role": "system",
                         "content": (
-                            "You are a zoning compliance drafting assistant. Use only the supplied "
-                            "citation excerpts and missing-field list. Do not invent citations.\n\n"
-                            "Respond with a JSON object containing exactly these fields:\n"
-                            '  "decision": one of "likely_allowed", "conditional", "restricted", "unknown"\n'
-                            '  "summary": string\n'
-                            '  "required_permits": array of strings\n'
-                            '  "follow_up_questions": array of strings\n'
-                            '  "warnings": array of strings'
+                            "You are a zoning compliance assistant. Given a project description "
+                            "and citation excerpts from a jurisdiction's zoning ordinance, output "
+                            "a JSON zoning analysis. Decide from the cited ordinance text — "
+                            "especially any permitted-use table in the excerpts (e.g. a Subsection "
+                            "5.1.3 'Permitted Principal Uses by Zoning District' table) — not from "
+                            "prior knowledge.\n\n"
+                            "STEP 0 — Is the proposed use classifiable from the table? A use is "
+                            "classifiable ONLY if a row in the permitted-use table names it or "
+                            "plainly and uncontroversially covers it (e.g. a clothing boutique is a "
+                            "'Retail' use; an apartment building is 'Multifamily Residential'). A use "
+                            "is NOT classifiable when matching it to a row would require a "
+                            "similar-use determination — i.e. asserting the use is 'substantially "
+                            "similar to' a listed use because no row actually describes it. Per "
+                            "Subsection 5.1.1.C that determination may be made ONLY by the "
+                            "jurisdiction (the Department of Building and Neighborhood Services with "
+                            "Planning), never by you. Specialized production uses that are not named "
+                            "— for example a brewery, distillery, or winery, even one with an "
+                            "on-site taproom — are NOT classifiable; do NOT file them under 'Light "
+                            "Industrial Uses', 'Heavy Industrial Uses', 'Restaurants', or any other "
+                            "row. If the use is not classifiable, set unlisted_use_determination to "
+                            "true, set decision to 'unknown', and stop. Otherwise set "
+                            "unlisted_use_determination to false and continue.\n\n"
+                            "STEP 1 — Identify the proposed principal use and the zoning district "
+                            "from the project_description. If the 'district' field is 'unknown', "
+                            "infer the district from the description: a named district (e.g. "
+                            "'Downtown District', 'Neighborhood Commercial', 'the R3 district') or "
+                            "a phrase like 'residential subdivision' or 'commercial corridor'. Map "
+                            "district names to their codes using the district definitions in the "
+                            "excerpts (e.g. Downtown District = DD, Neighborhood Commercial = NC, "
+                            "Central Commercial = CC, Regional Commerce = RC4/RC6/RC12).\n\n"
+                            "STEP 2 — Look the proposed use up in the permitted-use table in the "
+                            "excerpts and read its status for the identified district. Set "
+                            "matched_use_term to the exact row label you relied on (copied verbatim "
+                            "from the table). Then apply the matching rule:\n"
+                            "  • likely_allowed — the use is permitted by right in that district.\n"
+                            "  • conditional — the use is permitted in that district subject to "
+                            "additional use regulations (e.g. Subsection 5.1.4) or to "
+                            "planning-commission / site-plan approval (e.g. Chapter 20 / §20.12). "
+                            "Name the controlling provision in the summary and list the permits.\n"
+                            "  • restricted — the use IS listed as a principal use in the table, "
+                            "but the identified district is NOT among the districts permitted for "
+                            "that use (i.e. not permitted there).\n\n"
+                            "STEP 3 — unknown: use this when the corpus does not let you decide. "
+                            "In particular, if the proposed use does not appear as a NAMED row in "
+                            "the permitted-use table, return unknown — do NOT substitute a broader "
+                            "category to force an answer (e.g. do not treat a 'brewery', "
+                            "'distillery', 'brewpub', or other unlisted business as 'Light "
+                            "Industrial Uses', 'Heavy Industrial Uses', or any other table row). "
+                            "Reclassifying an unlisted use is a similar-use determination that only "
+                            "the jurisdiction may make (Subsection 5.1.1.C), so the honest answer is "
+                            "unknown. Also return unknown when the district cannot be determined, or "
+                            "the excerpts contain no permitted-use information for the use. "
+                            "Do not guess.\n\n"
+                            "Output JSON with these fields: decision, summary, "
+                            "required_permits (array), follow_up_questions (array), "
+                            "warnings (array), matched_use_term (string), "
+                            "unlisted_use_determination (boolean)."
                         ),
                     },
                     {
@@ -164,17 +215,31 @@ class OpenAIAnalysisProvider:
                     },
                 ],
                 "response_format": {"type": "json_object"},
+                "temperature": 0,
             },
             timeout=settings.openai_timeout_seconds,
         )
         content = payload["choices"][0]["message"]["content"]
         result = json.loads(content)
+        decision = result["decision"]
+        warnings = list(result.get("warnings", []))
+        # Enforce the Subsection 5.1.1.C invariant structurally: an unlisted use cannot
+        # be classified by reclassifying it under a broader row (a similar-use determination
+        # only the jurisdiction may make). If the model flags the use as unlisted, the honest
+        # answer is unknown regardless of any row it may have reached for.
+        if bool(result.get("unlisted_use_determination", False)) and decision != "unknown":
+            decision = "unknown"
+            warnings.append(
+                "The proposed use is not a listed principal use in the permitted-use table; "
+                "classifying it requires a Subsection 5.1.1.C similar-use determination made "
+                "only by the jurisdiction, so no zoning conclusion can be drawn here."
+            )
         return AnalysisProviderResult(
-            decision=result["decision"],
+            decision=decision,
             summary=result["summary"],
             required_permits=list(result.get("required_permits", [])),
             follow_up_questions=list(result.get("follow_up_questions", [])),
-            warnings=list(result.get("warnings", [])),
+            warnings=warnings,
         )
 
 
