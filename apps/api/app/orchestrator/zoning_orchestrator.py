@@ -51,6 +51,7 @@ class ZoningOrchestrator:
         normalized_address: str | None = None,
         project_id: str | None = None,
         clarification_answers: dict[str, str] | None = None,
+        bypass_support_gate: bool = False,  # eval-harness only; must stay False for all real requests
         trace_recorder: PipelineTraceRecorder | None = None,
     ) -> AnalyzeResult:
         from app import services as service_helpers
@@ -134,7 +135,11 @@ class ZoningOrchestrator:
                 "district": district,
             },
         )
-        if context.jurisdiction_id and context.jurisdiction_supported is False:
+        if (
+            context.jurisdiction_id
+            and context.jurisdiction_supported is False
+            and not bypass_support_gate
+        ):
             recorder.record(
                 "unsupported_jurisdiction_early_exit",
                 "warning",

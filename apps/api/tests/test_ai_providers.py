@@ -386,6 +386,174 @@ def test_score_chunk_additive_tag_outranks_wrong_district_wildcard() -> None:
     assert res_score > com_score
 
 
+def test_openai_compatible_provider_posts_and_coerces_unlisted_use(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from app.ai.openai_compatible import OpenAICompatibleAnalysisProvider
+
+    class FakeResponse:
+        status_code = 200
+
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict:
+            # Model commits to 'restricted' but flags the use as unlisted; the
+            # provider must structurally coerce the decision to 'unknown'.
+            return {
+                "choices": [
+                    {
+                        "message": {
+                            "content": (
+                                '{"decision":"restricted","summary":"Industrial reading.",'
+                                '"required_permits":[],"follow_up_questions":[],"warnings":[],'
+                                '"unlisted_use_determination":true}'
+                            )
+                        }
+                    }
+                ]
+            }
+
+    captured: dict = {}
+
+    def fake_post(url: str, headers: dict, json: dict, timeout: float):
+        captured["url"] = url
+        captured["headers"] = headers
+        captured["json"] = json
+        return FakeResponse()
+
+    monkeypatch.setattr("app.ai.openai_provider.httpx.post", fake_post)
+
+    provider = OpenAICompatibleAnalysisProvider(
+        name="cerebras",
+        base_url="https://api.cerebras.ai/v1",
+        api_key="test-key",
+        model="llama-3.3-70b",
+        timeout=20.0,
+    )
+    result = provider.generate_analysis(
+        AnalysisProviderRequest(
+            project_description="Open a standalone craft brewery with a taproom.",
+            district="unknown",
+            citation_excerpts=["Subsection 5.2.7.I.3 industrial classification."],
+            missing_fields=[],
+        )
+    )
+
+    assert captured["url"] == "https://api.cerebras.ai/v1/chat/completions"
+    assert captured["json"]["model"] == "llama-3.3-70b"
+    assert captured["headers"]["Authorization"] == "Bearer test-key"
+    assert result.decision == "unknown"
+    assert any("similar-use determination" in w for w in result.warnings)
+
+
+def test_openai_compatible_provider_requires_api_key() -> None:
+    from app.ai.openai_compatible import OpenAICompatibleAnalysisProvider
+
+    provider = OpenAICompatibleAnalysisProvider(
+        name="openrouter",
+        base_url="https://openrouter.ai/api/v1",
+        api_key="",
+        model="x",
+        timeout=20.0,
+    )
+    with pytest.raises(RuntimeError):
+        provider.generate_analysis(
+            AnalysisProviderRequest(
+                project_description="x", district="unknown", citation_excerpts=[], missing_fields=[]
+            )
+        )
+
+
+class _BoomProvider:
+    name = "boom"
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def generate_analysis(self, request):  # noqa: ANN001
+        self.calls += 1
+        raise RuntimeError("rate limited")
+
+
+class _OkProvider:
+    def __init__(self, name: str = "ok") -> None:
+        self.name = name
+        self.calls = 0
+
+    def generate_analysis(self, request):  # noqa: ANN001
+        from app.ai.interfaces import AnalysisProviderResult
+
+        self.calls += 1
+        return AnalysisProviderResult(decision="likely_allowed", summary=f"{self.name} ok")
+
+
+def test_failover_advances_to_next_provider_on_failure() -> None:
+    from app.ai.failover_provider import FailoverAnalysisProvider
+
+    boom = _BoomProvider()
+    ok = _OkProvider("cerebras")
+    request = AnalysisProviderRequest(
+        project_description="x", district="unknown", citation_excerpts=[], missing_fields=[]
+    )
+
+    result = FailoverAnalysisProvider([boom, ok]).generate_analysis(request)
+
+    assert result.summary == "cerebras ok"
+    assert boom.calls == 1
+    assert ok.calls == 1
+
+
+def test_failover_short_circuits_on_primary_success() -> None:
+    from app.ai.failover_provider import FailoverAnalysisProvider
+
+    primary = _OkProvider("groq")
+    secondary = _OkProvider("cerebras")
+    request = AnalysisProviderRequest(
+        project_description="x", district="unknown", citation_excerpts=[], missing_fields=[]
+    )
+
+    FailoverAnalysisProvider([primary, secondary]).generate_analysis(request)
+
+    assert primary.calls == 1
+    assert secondary.calls == 0  # never reached
+
+
+def test_failover_reraises_when_all_providers_fail() -> None:
+    from app.ai.failover_provider import FailoverAnalysisProvider
+
+    request = AnalysisProviderRequest(
+        project_description="x", district="unknown", citation_excerpts=[], missing_fields=[]
+    )
+    with pytest.raises(RuntimeError):
+        FailoverAnalysisProvider([_BoomProvider(), _BoomProvider()]).generate_analysis(request)
+
+
+def test_registry_wraps_failover_only_when_configured(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.ai.failover_provider import FailoverAnalysisProvider
+    from app.ai.groq_provider import GroqAnalysisProvider
+    from app.ai.registry import get_analysis_provider
+    from app.settings import get_settings
+
+    monkeypatch.setenv("APP_ENV", "local")
+    monkeypatch.setenv("AI_PROVIDER", "groq")
+    monkeypatch.setenv("GROQ_API_KEY", "g")
+    monkeypatch.setenv("CEREBRAS_API_KEY", "c")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "")  # keyless fallback must be skipped
+
+    # No fallbacks configured -> single pinned provider (this is the eval path).
+    monkeypatch.setenv("AI_PROVIDER_FALLBACKS", "")
+    pinned = get_analysis_provider(get_settings())
+    assert isinstance(pinned, GroqAnalysisProvider)
+
+    # Fallbacks configured -> failover chain, skipping the keyless openrouter.
+    monkeypatch.setenv("AI_PROVIDER_FALLBACKS", "cerebras,openrouter")
+    chained = get_analysis_provider(get_settings())
+    assert isinstance(chained, FailoverAnalysisProvider)
+    assert "cerebras" in chained.name
+    assert "openrouter" not in chained.name
+
+
 def test_source_index_version_changes_when_only_tags_change(tmp_path: Path) -> None:
     from app.ai.hybrid_local_retriever import _source_index_version
 

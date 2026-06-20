@@ -8,13 +8,13 @@ from typing import Literal, cast
 
 
 AppEnvName = Literal["local", "staging", "production"]
-AIProviderName = Literal["deterministic", "openai", "local", "groq"]
+AIProviderName = Literal["deterministic", "openai", "local", "groq", "cerebras", "openrouter"]
 RAGProviderName = Literal["source_registry", "hybrid_local"]
 EmbeddingProviderName = Literal["none", "local", "openai", "gemini"]
 VectorProviderName = Literal["none", "qdrant"]
 
 VALID_APP_ENVS: set[str] = {"local", "staging", "production"}
-VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "local", "groq"}
+VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "local", "groq", "cerebras", "openrouter"}
 VALID_RAG_PROVIDERS: set[str] = {"source_registry", "hybrid_local"}
 VALID_EMBEDDING_PROVIDERS: set[str] = {"none", "local", "openai", "gemini"}
 VALID_VECTOR_PROVIDERS: set[str] = {"none", "qdrant"}
@@ -111,6 +111,21 @@ class Settings:
     cache_default_ttl: int = 3600  # seconds
     source_index_version: str = ""
     prompt_version: str = "1.0"
+    # ---------------------------------------------------------------------------
+    # Analysis-provider failover (production resilience). Ordered fallback names
+    # tried when the primary analysis provider exhausts its retries. Empty by
+    # default, so the eval gate (which never sets AI_PROVIDER_FALLBACKS) always
+    # runs against a single pinned provider for reproducibility.
+    # ---------------------------------------------------------------------------
+    ai_provider_fallbacks: tuple[str, ...] = ()
+    cerebras_api_key: str = ""
+    cerebras_model: str = "llama-3.3-70b"
+    cerebras_base_url: str = "https://api.cerebras.ai/v1"
+    cerebras_timeout_seconds: float = 20.0
+    openrouter_api_key: str = ""
+    openrouter_model: str = "meta-llama/llama-3.3-70b-instruct:free"
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    openrouter_timeout_seconds: float = 20.0
 
     @property
     def uses_openai(self) -> bool:
@@ -209,6 +224,15 @@ def get_settings() -> Settings:
         cache_default_ttl=int(_env("CACHE_DEFAULT_TTL", "3600")),
         source_index_version=_env("SOURCE_INDEX_VERSION"),
         prompt_version=_env("PROMPT_VERSION", "1.0"),
+        ai_provider_fallbacks=_parse_csv(_env("AI_PROVIDER_FALLBACKS").lower()),
+        cerebras_api_key=_env("CEREBRAS_API_KEY"),
+        cerebras_model=_env("CEREBRAS_MODEL", "llama-3.3-70b"),
+        cerebras_base_url=_env("CEREBRAS_BASE_URL", "https://api.cerebras.ai/v1").rstrip("/"),
+        cerebras_timeout_seconds=float(_env("CEREBRAS_TIMEOUT_SECONDS", "20")),
+        openrouter_api_key=_env("OPENROUTER_API_KEY"),
+        openrouter_model=_env("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free"),
+        openrouter_base_url=_env("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").rstrip("/"),
+        openrouter_timeout_seconds=float(_env("OPENROUTER_TIMEOUT_SECONDS", "20")),
     )
     validate_production_settings(settings)
     return settings
