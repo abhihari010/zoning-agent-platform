@@ -449,6 +449,10 @@ def _build_qdrant_filter(filters: dict[str, Any]) -> Any | None:
                 should=[
                     FieldCondition(key="uses", match=MatchValue(value=use)),
                     FieldCondition(key="uses", match=MatchValue(value="general")),
+                    # The permitted-use matrix covers every use; it must never be
+                    # filtered out by a use-specific query (it is the primary
+                    # evidence for the decision). Treat it as a use wildcard.
+                    FieldCondition(key="uses", match=MatchValue(value="principal_uses")),
                 ]
             )
         )
@@ -479,6 +483,8 @@ def _metadata_matches(metadata: dict[str, Any], filters: dict[str, Any]) -> bool
     if use and not (
         _list_value_contains(metadata.get("uses"), use, wildcard="general")
         or _list_value_contains(metadata.get("uses"), "general")
+        # The permitted-use matrix covers every use; never filter it out.
+        or _list_value_contains(metadata.get("uses"), "principal_uses")
     ):
         return False
     effective_on_or_before = filters.get("effective_on_or_before")

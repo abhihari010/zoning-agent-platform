@@ -226,6 +226,18 @@ class HybridLocalRetrievalProvider:
         "planning commission FMPC approval permit requirements"
     )
 
+    # Tertiary query that surfaces the zoning-district definitions ("legend").
+    # Permitted-use tables list districts by code (e.g. DD, NC, RC4) while a
+    # request names the district in prose (e.g. "Downtown District", "regional
+    # commercial corridor"). A jurisdiction-neutral analysis prompt can only map
+    # name->code when this legend is in the excerpts, so we retrieve and reserve
+    # a slot for it (see _ensure_district_definitions).
+    _DISTRICT_DEFINITIONS_QUERY = (
+        "zoning district definitions and designations: names, codes, and "
+        "purpose of each residential, commercial, mixed-use, and industrial "
+        "zoning district in the jurisdiction"
+    )
+
     def _retrieve_with_qdrant(
         self,
         request: RetrievalProviderRequest,
@@ -234,9 +246,11 @@ class HybridLocalRetrievalProvider:
         if not self.embedding_provider:
             return None
 
-        # Batch both embeddings in one API call to avoid double round-trip.
+        # Batch all supplementary embeddings in one API call to avoid extra round-trips.
         emb_resp = self.embedding_provider.embed(
-            EmbeddingProviderRequest(texts=[request.query, self._PERMIT_PATH_QUERY])
+            EmbeddingProviderRequest(
+                texts=[request.query, self._PERMIT_PATH_QUERY, self._DISTRICT_DEFINITIONS_QUERY]
+            )
         ).embeddings
         if not emb_resp:
             return None
@@ -244,6 +258,7 @@ class HybridLocalRetrievalProvider:
         if not query_embedding:
             return None
         permit_embedding = emb_resp[1] if len(emb_resp) > 1 else None
+        district_embedding = emb_resp[2] if len(emb_resp) > 2 else None
 
         from app.rag.vector_store import QdrantVectorStore  # lazy import to avoid circular dependency
 
@@ -264,9 +279,17 @@ class HybridLocalRetrievalProvider:
             else []
         )
 
-        # Merge: keep the highest score seen for each chunk across both queries.
+        # Supplement with a district-definitions query so the district "legend"
+        # (name->code mapping) is available for district inference.
+        district_hits = (
+            vs.query(district_embedding, filters=vector_filters, limit=6)
+            if district_embedding
+            else []
+        )
+
+        # Merge: keep the highest score seen for each chunk across all queries.
         hit_by_id: dict[str, object] = {}
-        for hit in primary_hits + permit_hits:
+        for hit in primary_hits + permit_hits + district_hits:
             existing = hit_by_id.get(hit.chunk_id)
             if existing is None or hit.score > existing.score:
                 hit_by_id[hit.chunk_id] = hit
@@ -307,6 +330,14 @@ class HybridLocalRetrievalProvider:
             elapsed_ms=(time.monotonic() - start) * 1000,
         )
         top = _diversify_ranked(ranked)
+        # Guarantee the district legend is present even when the keyword gate or
+        # the top_n cutoff would otherwise drop it (it rarely shares tokens with a
+        # use-specific request), so a generic prompt can map district name->code.
+        top = _ensure_district_definitions(top, district_hits, chunk_by_id, vector_score_by_id)
+        # Guarantee the permitted-use table row for the inferred use survives: it
+        # is the primary evidence for the decision but shares a section_ref with
+        # the chapter narrative, so the per-section diversify cap can drop it.
+        top = _ensure_use_table_rows(top, ranked)
         return RetrievalProviderResult(
             citations=[
                 SourceCitation(
@@ -362,6 +393,76 @@ class HybridLocalRetrievalProvider:
                 elapsed_ms=(time.monotonic() - start) * 1000,
             ),
         )
+
+
+def _ensure_district_definitions(
+    top: list[tuple[float, "SourceChunk"]],
+    district_hits: list,
+    chunk_by_id: dict[str, "SourceChunk"],
+    vector_score_by_id: dict[str, float],
+    *,
+    reserve: int = 2,
+) -> list[tuple[float, "SourceChunk"]]:
+    """Append the best district-definition chunk(s) when not already included.
+
+    Permitted-use tables list districts by code (DD, NC, RC4, ...) while a request
+    names the district in prose ("Downtown District", "regional commercial
+    corridor"). A jurisdiction-neutral analysis prompt can only bridge name->code
+    when the district-definitions section is in the excerpts. That section seldom
+    shares tokens with a use-specific request, so the keyword gate and the top_n
+    cutoff tend to drop it; reserve up to ``reserve`` slots for it here, ranked by
+    the district-definitions query. Generic (no hard-coded chapter/section names).
+    """
+    if not district_hits:
+        return top
+    existing = {chunk.chunk_id for _, chunk in top}
+    augmented = list(top)
+    added = 0
+    for hit in district_hits:
+        if added >= reserve:
+            break
+        chunk = chunk_by_id.get(hit.chunk_id)
+        if chunk is None or chunk.chunk_id in existing:
+            continue
+        score = vector_score_by_id.get(chunk.chunk_id, getattr(hit, "score", 0.0))
+        augmented.append((score, chunk))
+        existing.add(chunk.chunk_id)
+        added += 1
+    return augmented
+
+
+def _ensure_use_table_rows(
+    top: list[tuple[float, "SourceChunk"]],
+    ranked: list[tuple[float, "SourceChunk"]],
+    *,
+    reserve: int = 2,
+) -> list[tuple[float, "SourceChunk"]]:
+    """Guarantee the permitted-use table row(s) for the inferred use are present.
+
+    The permitted-use matrix is the primary evidence for a use decision, yet it is
+    typically split across many chunks that share one section_ref with the
+    chapter's narrative and additional-use-regulation text. The per-section
+    diversify cap can therefore drop the matching table row, leaving only narrative
+    conditions — which makes a use look merely "conditional" when the table in fact
+    does not permit it in the identified district at all. Reserve up to ``reserve``
+    slots for the highest-ranked permitted-use-table chunks (tagged via the
+    ingestion-level ``principal_uses`` use marker). Generic across jurisdictions.
+    """
+    present = sum(1 for _, chunk in top if "principal_uses" in chunk.uses)
+    need = reserve - present
+    if need <= 0:
+        return top
+    existing = {chunk.chunk_id for _, chunk in top}
+    augmented = list(top)
+    for score, chunk in ranked:
+        if need <= 0:
+            break
+        if "principal_uses" not in chunk.uses or chunk.chunk_id in existing:
+            continue
+        augmented.append((score, chunk))
+        existing.add(chunk.chunk_id)
+        need -= 1
+    return augmented
 
 
 def _diversify_ranked(

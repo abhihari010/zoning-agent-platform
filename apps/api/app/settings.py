@@ -8,13 +8,13 @@ from typing import Literal, cast
 
 
 AppEnvName = Literal["local", "staging", "production"]
-AIProviderName = Literal["deterministic", "openai", "local", "groq"]
+AIProviderName = Literal["deterministic", "openai", "local", "groq", "cerebras", "openrouter"]
 RAGProviderName = Literal["source_registry", "hybrid_local"]
 EmbeddingProviderName = Literal["none", "local", "openai", "gemini"]
 VectorProviderName = Literal["none", "qdrant"]
 
 VALID_APP_ENVS: set[str] = {"local", "staging", "production"}
-VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "local", "groq"}
+VALID_AI_PROVIDERS: set[str] = {"deterministic", "openai", "local", "groq", "cerebras", "openrouter"}
 VALID_RAG_PROVIDERS: set[str] = {"source_registry", "hybrid_local"}
 VALID_EMBEDDING_PROVIDERS: set[str] = {"none", "local", "openai", "gemini"}
 VALID_VECTOR_PROVIDERS: set[str] = {"none", "qdrant"}
