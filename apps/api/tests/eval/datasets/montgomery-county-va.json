@@ -1,0 +1,158 @@
+[
+  {
+    "id": "montgomery-county-va-r1-min-lot-area",
+    "address": "100 Den Hill Dr, Blacksburg, VA 24060",
+    "project_description": "What is the minimum lot area for a single-family dwelling in the R-1 Residential district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-24"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-r1-front-setback",
+    "address": "100 Den Hill Dr, Blacksburg, VA 24060",
+    "project_description": "What is the minimum front yard setback in the R-1 Residential district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-24"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-r1-side-setback",
+    "address": "100 Den Hill Dr, Blacksburg, VA 24060",
+    "project_description": "What is the minimum side yard setback in the R-1 Residential district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-24"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-r1-min-lot-width",
+    "address": "100 Den Hill Dr, Blacksburg, VA 24060",
+    "project_description": "What is the minimum lot width in the R-1 Residential district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-24"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-r2-min-lot-area",
+    "address": "200 Glade Rd, Blacksburg, VA 24060",
+    "project_description": "What is the minimum lot area for a dwelling in the R-2 Residential district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-25"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-r3-min-lot-area",
+    "address": "300 Prices Fork Rd, Blacksburg, VA 24060",
+    "project_description": "What is the minimum lot area for a dwelling in the R-3 Residential district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-26"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-r3-front-setback",
+    "address": "300 Prices Fork Rd, Blacksburg, VA 24060",
+    "project_description": "What is the minimum front yard setback in the R-3 Residential district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-26"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-rm1-townhouse-min-lot-area",
+    "address": "400 Toms Creek Rd, Blacksburg, VA 24060",
+    "project_description": "What is the minimum lot area per townhouse dwelling unit in the RM-1 Residential Multifamily district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-27"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-a1-max-height",
+    "address": "500 Mount Tabor Rd, Blacksburg, VA 24060",
+    "project_description": "What is the maximum building height in the A-1 Agricultural district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-21"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-gb-max-height",
+    "address": "600 N Main St, Blacksburg, VA 24060",
+    "project_description": "What is the maximum building height in the GB General Business district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-28"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-cb-max-height",
+    "address": "700 S Main St, Blacksburg, VA 24060",
+    "project_description": "What is the maximum building height in the CB Central Business district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-29"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "montgomery-county-va-m1-min-setback",
+    "address": "800 Industrial Park Rd, Christiansburg, VA 24073",
+    "project_description": "What is the minimum setback in the M-1 Industrial district?",
+    "jurisdiction_id": "montgomery-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["10-30"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]

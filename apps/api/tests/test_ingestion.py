@@ -5,6 +5,7 @@ import pytest
 
 from app.ingestion import (
     MIN_CHUNK_CHARS,
+    _apply_header_stamp,
     _split_markdown_by_sections,
     build_source_chunks,
 )
@@ -179,3 +180,70 @@ def test_long_markdown_body_is_further_chunked() -> None:
     assert len(chunks) > 1
     # All should have the section heading as section_ref
     assert all(chunk.section_ref == "Long Section" for chunk in chunks)
+
+
+# ---------------------------------------------------------------------------
+# _apply_header_stamp
+# ---------------------------------------------------------------------------
+
+
+def test_header_stamp_prepends_title_to_normal_chunk() -> None:
+    title = "Sec. 10-24 - R-1 Residential District"
+    text = "Minimum lot area. 20,000 square feet."
+    stamped = _apply_header_stamp(title, text)
+    assert stamped == f"[{title}] {text}"
+    # The district label now co-occurs with the measurement in the same chunk.
+    assert "R-1" in stamped
+    assert "20,000 square feet" in stamped
+
+
+def test_header_stamp_does_not_double_stamp_when_chunk_starts_with_title() -> None:
+    title = "Sec. 10-24 - R-1 Residential District"
+    # First chunk of a section-led source already opens with the title text.
+    text = f"{title}. Minimum lot area shall be 20,000 square feet."
+    stamped = _apply_header_stamp(title, text)
+    assert stamped == text
+    # No leading "[...]" wrapper was added.
+    assert not stamped.startswith("[")
+
+
+def test_header_stamp_ignores_leading_whitespace_when_detecting_double_stamp() -> None:
+    title = "Sec. 10-24 - R-1 Residential District"
+    text = f"   {title} continues here with the rest of the section body."
+    stamped = _apply_header_stamp(title, text)
+    # lstrip() comparison means the already-titled chunk is left untouched.
+    assert stamped == text
+
+
+@pytest.mark.parametrize("title", [None, "", "   "])
+def test_header_stamp_returns_text_unchanged_for_empty_title(title: str | None) -> None:
+    text = "Some chunk text that should pass through untouched."
+    assert _apply_header_stamp(title, text) == text
+
+
+def test_header_stamp_token_count_computed_from_stamped_text() -> None:
+    """build_source_chunks must compute token_count from the post-stamp text."""
+    full_text = (
+        "Minimum lot area in this district shall be twenty thousand square feet "
+        "and the front yard setback shall be forty feet from the property line."
+    )
+    source = SourceRegistryEntry(
+        source_id="stamp-token-src",
+        title="Sec. 10-24 - R-1 Residential District",
+        excerpt=full_text[:200],
+        full_text=full_text,
+        section_ref="Sec. 10-24",
+        jurisdiction_id="blacksburg-va",
+        districts=["R-1"],
+        uses=["residential"],
+        source_type="zoning_ordinance",
+        metadata={},  # not a .md import: stays as a single plain-text chunk
+    )
+    chunks = build_source_chunks([source])
+    assert chunks, "expected at least one chunk"
+    chunk = chunks[0]
+    # The stamp was applied (title not already at the chunk start).
+    assert chunk.chunk_text.startswith(f"[{source.title}] ")
+    # token_count reflects the stamped text, not the pre-stamp body.
+    assert chunk.token_count == len(chunk.chunk_text.split())
+    assert chunk.token_count > len(full_text.split())

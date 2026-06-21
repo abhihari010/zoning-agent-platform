@@ -20,6 +20,71 @@ from app.storage import SQLiteStore, store
 
 TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
 
+# Dimensional-question intent: the request asks for a bulk/area/setback number
+# rather than a use permission. Generic across jurisdictions — keyed only on the
+# question vocabulary, never a city/section name.
+#
+# Two layers:
+#   * ``_DIMENSIONAL_INTENT_PATTERN`` — the broad GATE. Fires on both ordinance
+#     vocabulary AND plain-English phrasings ("how tall", "how big", "size of the
+#     lot", "minimum size", "how many stories") so a natural-language dimensional
+#     question still triggers the reserve instead of silently abstaining. Used
+#     only via ``.search()`` to decide whether the reserve runs at all.
+#   * ``_DIMENSIONAL_METRIC_PATTERN`` — the narrow TARGETING vocabulary. Only the
+#     metric phrases that actually appear in ordinance chunk text (lot area,
+#     setback, height, ...). Used via ``.finditer()`` to build ``target_phrases``
+#     for pass-1 chunk matching. Plain-English phrasings are deliberately absent
+#     here: they never appear in code text, so they would make pass-1 match
+#     nothing — instead they fall through to the pass-2 number-bearing fallback.
+#
+# FAR is matched only as the real term ("floor area ratio") or the acronym
+# ("F.A.R." / "FAR", case-sensitive) so the English word "far" cannot trigger it.
+_FAR_TERM = r"floor\s+area\s+ratio"
+# Case-sensitive even though the surrounding pattern is IGNORECASE: the inline
+# ``(?-i:...)`` scope keeps the acronym upper-case-only so the English word "far"
+# can never match the Floor-Area-Ratio acronym.
+_FAR_ACRONYM = r"(?-i:F\.?A\.?R\.?)"
+
+_DIMENSIONAL_METRIC_PATTERN = re.compile(
+    r"\b(?:lot\s+area|lot\s+size|lot\s+width|lot\s+coverage|lot\s+frontage|"
+    r"setback|set\s*back|yard|height|frontage|square\s+feet|square\s+foot|"
+    r"sq\.?\s*ft|acreage|acre|density|floor\s+area|" + _FAR_TERM + r"|bulk|"
+    r"dimensional)\b|\b" + _FAR_ACRONYM + r"\b",
+    re.IGNORECASE,
+)
+
+# Plain-English dimensional phrasings that do NOT appear in ordinance text. These
+# extend the GATE only (never targeting). Carefully scoped so use-permissibility
+# queries ("retail store", "backyard shed", "graveyard business") never match:
+# the "how <adj>" forms require a measurement adjective, and the bare "stories"/
+# "size" forms are anchored to size/story vocabulary, not "store"/"yard".
+_DIMENSIONAL_PLAIN_PATTERN = re.compile(
+    r"how\s+(?:tall|big|large|small|wide|high|deep|far\s+back|much\s+land)\b|"
+    r"how\s+many\s+stor(?:ies|eys)\b|"
+    r"\b(?:size\s+of\s+(?:the\s+|my\s+|a\s+)?lot|lot\s+size)\b|"
+    r"\b(?:smallest|largest|biggest)\s+(?:permitted\s+|allowable\s+|allowed\s+)?lot\b|"
+    r"\b(?:minimum|maximum|max|min)\s+(?:lot\s+)?(?:size|area|dimensions?)\b|"
+    r"\bstor(?:ies|eys)\b",
+    re.IGNORECASE,
+)
+
+_DIMENSIONAL_INTENT_PATTERN = re.compile(
+    "(?:" + _DIMENSIONAL_METRIC_PATTERN.pattern + ")|(?:"
+    + _DIMENSIONAL_PLAIN_PATTERN.pattern + ")",
+    re.IGNORECASE,
+)
+
+# A chunk actually carries a dimensional measurement: a number followed by a
+# length/area unit. Tolerates the ``Spelled-out (12,345) square feet`` ordinance
+# style — codes routinely parenthesize the numeral, so the digits are followed by
+# ``)`` (and sometimes a period/comma) before the unit. Kept tight otherwise so it
+# does not match arbitrary numeric prose (cross-references, dates, fee amounts).
+_DIMENSIONAL_VALUE_PATTERN = re.compile(
+    r"\d[\d,]*\s*\)?[.,]?\s*(?:square\s+feet|square\s+foot|sq\.?\s*ft|"
+    r"acres?\b|feet\b|foot\b|ft\.?\b)",
+    re.IGNORECASE,
+)
+
 _CACHE_NAMESPACE = "retrieval"
 
 
@@ -338,6 +403,13 @@ class HybridLocalRetrievalProvider:
         # is the primary evidence for the decision but shares a section_ref with
         # the chapter narrative, so the per-section diversify cap can drop it.
         top = _ensure_use_table_rows(top, ranked)
+        # Guarantee a number-bearing chunk survives for a dimensional question
+        # (minimum lot area, setback, height, ...). The target district section is
+        # retrieved, but the chunk holding the literal measurement sentence often
+        # loses the per-section diversify cap to its siblings, so the model never
+        # sees the number and abstains. Only fires on dimensional intent, so
+        # use-permissibility queries are unaffected.
+        top = _ensure_dimensional_rows(top, ranked, request)
         return RetrievalProviderResult(
             citations=[
                 SourceCitation(
@@ -462,6 +534,77 @@ def _ensure_use_table_rows(
         augmented.append((score, chunk))
         existing.add(chunk.chunk_id)
         need -= 1
+    return augmented
+
+
+def _ensure_dimensional_rows(
+    top: list[tuple[float, "SourceChunk"]],
+    ranked: list[tuple[float, "SourceChunk"]],
+    request: "RetrievalProviderRequest",
+    *,
+    reserve: int = 2,
+) -> list[tuple[float, "SourceChunk"]]:
+    """Guarantee number-bearing chunk(s) survive for a dimensional question.
+
+    For a bulk/area/setback question (minimum lot area, front yard setback, max
+    height, ...) the target district section emits several sibling chunks that
+    share one section_ref. The chunk holding the literal measurement sentence
+    ("Minimum lot area. 20,000 square feet.") often scores just below its
+    siblings and is evicted by the per-section diversify cap, so the
+    number-bearing text never reaches the model and it honestly abstains. The
+    right *section* is retrieved; only the right *sentence* is dropped.
+
+    Only acts when the request expresses dimensional intent (so use-permissibility
+    queries are unaffected). A district section carries many number-bearing
+    siblings (lot width, setbacks, height, coverage, ...), so simply reserving the
+    top-ranked number-bearing chunks tends to pull a *different* measurement than
+    the one asked about; the chunk holding the requested metric (e.g. the "lot
+    area" sentence) often ranks several places lower. So reservation runs in two
+    passes:
+
+      1. Targeted: reserve number-bearing chunks that also mention the specific
+         metric phrase from the question (lot area, setback, height, ...), so the
+         requested measurement wins its slot over unrelated dimensions.
+      2. Fallback: if budget remains, reserve any remaining number-bearing chunk.
+
+    There is no ingestion-level dimensional use marker (unlike ``principal_uses``
+    for the permitted-use table), so a chunk's measurement is detected with a tight
+    number+unit content regex. Generic across jurisdictions — no
+    city/section/Montgomery hard-coding.
+    """
+    if not _DIMENSIONAL_INTENT_PATTERN.search(request.query):
+        return top
+    # The specific metric phrase(s) the question is about, e.g. {"lot area"}.
+    # Built from the narrow METRIC vocabulary only — these are the phrases that
+    # actually appear in ordinance chunk text, so pass-1 targeting can match them.
+    # Plain-English gate phrasings ("how tall") are intentionally excluded here:
+    # they never appear in code text, so they fall through to the pass-2 fallback.
+    target_phrases = {m.group(0).lower() for m in _DIMENSIONAL_METRIC_PATTERN.finditer(request.query)}
+
+    existing = {chunk.chunk_id for _, chunk in top}
+    augmented = list(top)
+    need = reserve
+
+    def _reserve(require_target_phrase: bool) -> None:
+        nonlocal need
+        for score, chunk in ranked:
+            if need <= 0:
+                break
+            if chunk.chunk_id in existing:
+                continue
+            text = chunk.chunk_text or ""
+            if not _DIMENSIONAL_VALUE_PATTERN.search(text):
+                continue
+            if require_target_phrase and target_phrases:
+                lowered = text.lower()
+                if not any(phrase in lowered for phrase in target_phrases):
+                    continue
+            augmented.append((score, chunk))
+            existing.add(chunk.chunk_id)
+            need -= 1
+
+    _reserve(require_target_phrase=True)
+    _reserve(require_target_phrase=False)
     return augmented
 
 
