@@ -93,6 +93,26 @@ def _chunk_text(text: str, max_chars: int = DEFAULT_CHUNK_MAX_CHARS) -> list[str
     return chunks
 
 
+def _apply_header_stamp(title: str | None, chunk_text: str) -> str:
+    """Prepend a ``[title]`` header stamp to a chunk's text.
+
+    Generic across all jurisdictions: the stamp is derived purely from the
+    source's own ``title`` metadata (e.g. ``"Sec. 10-24 - R-1 Residential
+    District"``), so the section/district label is embedded alongside the
+    numbers in every chunk — including fragments that were split off the middle
+    of a long district section and would otherwise contain no district token.
+
+    Skipped when ``title`` is empty or when the chunk already begins with the
+    title (avoids double-stamping the first chunk of a section-led source).
+    """
+    stamp = (title or "").strip()
+    if not stamp:
+        return chunk_text
+    if chunk_text.lstrip().startswith(stamp):
+        return chunk_text
+    return f"[{stamp}] {chunk_text}"
+
+
 def _split_markdown_by_sections(text: str) -> list[tuple[str, str]]:
     """Split markdown text on ## and ### headings.
 
@@ -167,6 +187,15 @@ def build_source_chunks(sources: list[SourceRegistryEntry]) -> list[SourceChunk]
 
         chunk_index = 0
         for section_ref, chunk_text in selected_section_chunks:
+            # Header-stamp every chunk with the source's own title so the
+            # section/district label co-occurs with number-bearing text even
+            # when a long district section is split mid-list (the number-bearing
+            # fragment otherwise carries no district token and bleeds across
+            # districts at retrieval time). Derived generically from
+            # ``source.title`` — no per-city/section logic. Skip when the chunk
+            # already starts with the title to avoid double-stamping the first
+            # chunk of a section-led source.
+            chunk_text = _apply_header_stamp(source.title, chunk_text)
 
             stable_key = f"{source.source_id}|{section_ref}|{chunk_index}|{source_text_hash[:16]}"
             digest = hashlib.sha256(stable_key.encode("utf-8")).hexdigest()[:16]
