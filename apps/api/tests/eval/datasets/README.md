@@ -48,6 +48,53 @@ for that city. The runner auto-discovers files here by jurisdiction ID.
 - `must_cite_section_refs` should reference section headings exactly as they appear in
   the scraped ordinance — they are matched verbatim against `citation.section_ref`.
 
+## Running the real-pipeline eval
+
+The harness runs the **real** `ZoningOrchestrator` against an indexed corpus.
+Always run it against throwaway infrastructure — never production data:
+
+- Index + run against a **throwaway Qdrant collection**
+  (`QDRANT_COLLECTION=zoning_eval_<city>`) and an **isolated SQLite** DB (leave
+  `DATABASE_URL` empty so the SQLite fallback is used).
+- Set `CACHE_ENABLED=false` so cached responses can't mask a regression.
+- Use the **prod analysis model (Groq)** — **never OpenRouter**.
+- **Delete the throwaway collection afterward**; prod stays clean until a human
+  approves promotion. See `docs/handoff-pilot-city-eval-gate.md` for the full plan.
+
+### Montgomery County VA — dimensional run
+
+`montgomery-county-va.json` holds 12 positive dimensional scenarios covering
+ordinance sections 10-21, 10-24, 10-25, 10-26, 10-27, 10-28, 10-29, 10-30
+(district → section: A-1→10-21, R-1→10-24, R-2→10-25, R-3→10-26, RM-1→10-27,
+GB→10-28, CB→10-29, M-1→10-30).
+
+**Pass bar: 12/12 fully-correct** — every scenario must return the expected
+decision AND surface its required dimensional citation.
+
+CI-safe integrity guard (no providers, runs in CI):
+
+```
+cd apps/api
+pytest tests/eval/test_montgomery_dataset.py -q
+```
+
+Real-pipeline run (manual, throwaway infra only):
+
+```
+cd apps/api
+# repo-root .env: AI_PROVIDER=groq, RAG_PROVIDER=hybrid_local,
+# EMBEDDING_PROVIDER=gemini, VECTOR_PROVIDER=qdrant
+export QDRANT_COLLECTION=zoning_eval_montgomery   # throwaway collection
+export CACHE_ENABLED=false
+unset DATABASE_URL                                # isolated SQLite fallback
+
+# 1. Index the Montgomery County VA source pack into the throwaway collection
+#    (local API: POST /api/v1/ingestion/reindex with X-Admin-Access-Key).
+# 2. Run the harness:
+python -m tests.eval.runner --jurisdiction montgomery-county-va
+# 3. Delete the throwaway Qdrant collection afterward.
+```
+
 ## No files here yet
 
 Franklin, TN (the first pilot city) scenarios are authored in Phase 3, after the

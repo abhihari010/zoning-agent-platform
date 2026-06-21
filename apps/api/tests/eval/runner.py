@@ -313,6 +313,24 @@ def run_eval(
     return scorecard
 
 
+def _ensure_console_encoding() -> None:
+    """Make stdout resilient to non-encodable glyphs.
+
+    The scorecard summary uses box-drawing/em-dash glyphs. On a Windows console
+    (cp1252) printing U+2500 raises UnicodeEncodeError *after* the scorecard JSON
+    has already been written, crashing an otherwise-successful run. Switch the
+    stream's error handler to ``backslashreplace`` so such glyphs degrade
+    gracefully instead of aborting; capable (utf-8) terminals are unaffected.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(errors="backslashreplace")
+            except (ValueError, OSError):  # pragma: no cover - stream may be wrapped
+                pass
+
+
 def _print_summary(scorecard: ScorecardResult) -> None:
     sep = "─" * 60
     print(f"\nEval scorecard: {scorecard.jurisdiction_id}  ({scorecard.run_date})  n={scorecard.scenario_count}")
@@ -353,6 +371,8 @@ def main(argv: list[str] | None = None) -> int:
         help="Directory to write the scorecard JSON",
     )
     args = parser.parse_args(argv)
+
+    _ensure_console_encoding()
 
     scenarios = load_dataset(args.jurisdiction, dataset_dir=Path(args.dataset_dir))
     print(f"Loaded {len(scenarios)} scenario(s) for '{args.jurisdiction}'.")
