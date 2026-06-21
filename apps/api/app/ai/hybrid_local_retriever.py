@@ -23,10 +23,54 @@ TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
 # Dimensional-question intent: the request asks for a bulk/area/setback number
 # rather than a use permission. Generic across jurisdictions — keyed only on the
 # question vocabulary, never a city/section name.
-_DIMENSIONAL_INTENT_PATTERN = re.compile(
+#
+# Two layers:
+#   * ``_DIMENSIONAL_INTENT_PATTERN`` — the broad GATE. Fires on both ordinance
+#     vocabulary AND plain-English phrasings ("how tall", "how big", "size of the
+#     lot", "minimum size", "how many stories") so a natural-language dimensional
+#     question still triggers the reserve instead of silently abstaining. Used
+#     only via ``.search()`` to decide whether the reserve runs at all.
+#   * ``_DIMENSIONAL_METRIC_PATTERN`` — the narrow TARGETING vocabulary. Only the
+#     metric phrases that actually appear in ordinance chunk text (lot area,
+#     setback, height, ...). Used via ``.finditer()`` to build ``target_phrases``
+#     for pass-1 chunk matching. Plain-English phrasings are deliberately absent
+#     here: they never appear in code text, so they would make pass-1 match
+#     nothing — instead they fall through to the pass-2 number-bearing fallback.
+#
+# FAR is matched only as the real term ("floor area ratio") or the acronym
+# ("F.A.R." / "FAR", case-sensitive) so the English word "far" cannot trigger it.
+_FAR_TERM = r"floor\s+area\s+ratio"
+# Case-sensitive even though the surrounding pattern is IGNORECASE: the inline
+# ``(?-i:...)`` scope keeps the acronym upper-case-only so the English word "far"
+# can never match the Floor-Area-Ratio acronym.
+_FAR_ACRONYM = r"(?-i:F\.?A\.?R\.?)"
+
+_DIMENSIONAL_METRIC_PATTERN = re.compile(
     r"\b(?:lot\s+area|lot\s+size|lot\s+width|lot\s+coverage|lot\s+frontage|"
     r"setback|set\s*back|yard|height|frontage|square\s+feet|square\s+foot|"
-    r"sq\.?\s*ft|acreage|acre|density|floor\s+area|far\b|bulk|dimensional)\b",
+    r"sq\.?\s*ft|acreage|acre|density|floor\s+area|" + _FAR_TERM + r"|bulk|"
+    r"dimensional)\b|\b" + _FAR_ACRONYM + r"\b",
+    re.IGNORECASE,
+)
+
+# Plain-English dimensional phrasings that do NOT appear in ordinance text. These
+# extend the GATE only (never targeting). Carefully scoped so use-permissibility
+# queries ("retail store", "backyard shed", "graveyard business") never match:
+# the "how <adj>" forms require a measurement adjective, and the bare "stories"/
+# "size" forms are anchored to size/story vocabulary, not "store"/"yard".
+_DIMENSIONAL_PLAIN_PATTERN = re.compile(
+    r"how\s+(?:tall|big|large|small|wide|high|deep|far\s+back|much\s+land)\b|"
+    r"how\s+many\s+stor(?:ies|eys)\b|"
+    r"\b(?:size\s+of\s+(?:the\s+|my\s+|a\s+)?lot|lot\s+size)\b|"
+    r"\b(?:smallest|largest|biggest)\s+(?:permitted\s+|allowable\s+|allowed\s+)?lot\b|"
+    r"\b(?:minimum|maximum|max|min)\s+(?:lot\s+)?(?:size|area|dimensions?)\b|"
+    r"\bstor(?:ies|eys)\b",
+    re.IGNORECASE,
+)
+
+_DIMENSIONAL_INTENT_PATTERN = re.compile(
+    "(?:" + _DIMENSIONAL_METRIC_PATTERN.pattern + ")|(?:"
+    + _DIMENSIONAL_PLAIN_PATTERN.pattern + ")",
     re.IGNORECASE,
 )
 
@@ -531,7 +575,11 @@ def _ensure_dimensional_rows(
     if not _DIMENSIONAL_INTENT_PATTERN.search(request.query):
         return top
     # The specific metric phrase(s) the question is about, e.g. {"lot area"}.
-    target_phrases = {m.group(0).lower() for m in _DIMENSIONAL_INTENT_PATTERN.finditer(request.query)}
+    # Built from the narrow METRIC vocabulary only — these are the phrases that
+    # actually appear in ordinance chunk text, so pass-1 targeting can match them.
+    # Plain-English gate phrasings ("how tall") are intentionally excluded here:
+    # they never appear in code text, so they fall through to the pass-2 fallback.
+    target_phrases = {m.group(0).lower() for m in _DIMENSIONAL_METRIC_PATTERN.finditer(request.query)}
 
     existing = {chunk.chunk_id for _, chunk in top}
     augmented = list(top)
