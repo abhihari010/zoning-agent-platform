@@ -30,12 +30,22 @@ from pathlib import Path
 # as well as a module (``python -m services.ingestion.scraper.run_scrape``).
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-    from services.ingestion.scraper.fetchers import FlippingBookFetcher, GenericHtmlFetcher, MunicodeFetcher
+    from services.ingestion.scraper.fetchers import (
+        FlippingBookFetcher,
+        GenericHtmlFetcher,
+        MunicipalCodeOnlineFetcher,
+        MunicodeFetcher,
+    )
     from services.ingestion.scraper.fetchers.base import Fetcher
     from services.ingestion.scraper.http_client import FetchBlockedError
     from services.ingestion.scraper.manifest_builder import build_manifest, slugify
 else:  # pragma: no cover - exercised via module execution
-    from .fetchers import FlippingBookFetcher, GenericHtmlFetcher, MunicodeFetcher
+    from .fetchers import (
+        FlippingBookFetcher,
+        GenericHtmlFetcher,
+        MunicipalCodeOnlineFetcher,
+        MunicodeFetcher,
+    )
     from .fetchers.base import Fetcher
     from .http_client import FetchBlockedError
     from .manifest_builder import build_manifest, slugify
@@ -72,6 +82,14 @@ def _build_fetcher(args: argparse.Namespace, *, raw_dir: Path) -> Fetcher:
             cache_dir=raw_dir,
             request_delay=args.delay,
             max_sections=args.max_sections,
+        )
+    if args.fetcher == "municipalcodeonline":
+        return MunicipalCodeOnlineFetcher(
+            cache_dir=raw_dir,
+            request_delay=args.delay,
+            max_sections=args.max_sections,
+            host_slug=args.host_slug,
+            chapters=args.chapters or None,
         )
     raise SystemExit(f"Unknown fetcher: {args.fetcher}")
 
@@ -139,9 +157,21 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--state", required=True, help="Two-letter state code, e.g. VA.")
     parser.add_argument(
         "--fetcher",
-        choices=["municode", "generic_html", "flippingbook"],
+        choices=["municode", "generic_html", "flippingbook", "municipalcodeonline"],
         default="municode",
         help="Which fetcher to use (default: municode).",
+    )
+    parser.add_argument(
+        "--host-slug",
+        default=None,
+        help="municipalcodeonline subdomain slug (default: first word of --city).",
+    )
+    parser.add_argument(
+        "--chapters",
+        action="append",
+        default=[],
+        help="municipalcodeonline chapter node id(s) to fetch, e.g. 10_ZONING "
+        "(repeatable). Default: the zoning chapter, found by heading.",
     )
     parser.add_argument(
         "--url",
