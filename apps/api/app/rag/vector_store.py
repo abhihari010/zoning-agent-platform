@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import uuid
 from dataclasses import dataclass, field
 from typing import Any
@@ -10,6 +11,7 @@ from app.models import SourceChunk
 from app.settings import Settings, get_settings
 
 _CHUNK_ID_NAMESPACE = uuid.NAMESPACE_URL
+_log = logging.getLogger(__name__)
 _KEYWORD_PAYLOAD_INDEX_FIELDS = (
     "jurisdiction_id",
     "state",
@@ -338,6 +340,7 @@ def sync_vector_index(
         existing_ids = set() if full_rebuild else store.existing_chunk_ids()
         pending = [chunk for chunk in chunks if chunk.chunk_id not in existing_ids]
     except Exception as exc:
+        _log.error("Vector index sync failed during setup: %s", exc)
         return VectorIndexSyncResult(
             provider=resolved.vector_provider,
             collection=resolved.qdrant_collection,
@@ -355,26 +358,32 @@ def sync_vector_index(
                     EmbeddingProviderRequest(texts=[chunk.chunk_text for chunk in batch])
                 ).embeddings
             except Exception as exc:
-                warnings.append(
+                msg = (
                     f"Embedding failed on batch starting at index {batch_start} "
                     f"({batches_committed} batch(es) already committed): {exc}"
                 )
+                _log.error(msg)
+                warnings.append(msg)
                 break
 
             if not batch_embeddings or any(not emb for emb in batch_embeddings):
-                warnings.append(
+                msg = (
                     f"Embedding provider returned empty vectors for batch starting at index "
                     f"{batch_start}; stopping (prior {batches_committed} batch(es) committed)."
                 )
+                _log.error(msg)
+                warnings.append(msg)
                 break
 
             try:
                 store.upsert_chunks(batch, batch_embeddings)
             except Exception as exc:
-                warnings.append(
+                msg = (
                     f"Upsert failed on batch starting at index {batch_start} "
                     f"({batches_committed} batch(es) already committed): {exc}"
                 )
+                _log.error(msg)
+                warnings.append(msg)
                 break
 
             batches_committed += 1

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import threading
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Protocol
@@ -43,6 +44,10 @@ from app.models import (
     UserRecord,
 )
 from app.jurisdictions import get_jurisdiction_scope, source_applies_to_jurisdiction
+
+# Prevents concurrent reindex transactions from racing on the source_chunks table
+# (delete-then-insert is not safe under concurrent access with READ COMMITTED isolation).
+_REINDEX_LOCK = threading.Lock()
 
 
 class DatabaseStorageError(RuntimeError):
@@ -845,32 +850,33 @@ class SQLAlchemyStore:
 
     def replace_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]:
         now = datetime.now(timezone.utc)
-        try:
-            with self.engine.begin() as connection:
-                connection.execute(delete(source_chunks))
-                if chunks:
-                    connection.execute(
-                        insert(source_chunks),
-                        [
-                            {
-                                "chunk_id": chunk.chunk_id,
-                                "source_id": chunk.source_id,
-                                "chunk_index": chunk.chunk_index,
-                                "source_text_hash": chunk.source_text_hash,
-                                "jurisdiction_id": chunk.jurisdiction_id,
-                                "source_type": chunk.source_type,
-                                "source_version": chunk.source_version,
-                                "districts_csv": _make_filter_csv(chunk.districts),
-                                "uses_csv": _make_filter_csv(chunk.uses),
-                                "payload_json": chunk.model_dump(mode="json"),
-                                "created_at": now,
-                                "updated_at": now,
-                            }
-                            for chunk in chunks
-                        ],
-                    )
-        except SQLAlchemyError as exc:
-            raise DatabaseStorageError(f"Could not replace source chunks: {exc}") from exc
+        with _REINDEX_LOCK:
+            try:
+                with self.engine.begin() as connection:
+                    connection.execute(delete(source_chunks))
+                    if chunks:
+                        connection.execute(
+                            insert(source_chunks),
+                            [
+                                {
+                                    "chunk_id": chunk.chunk_id,
+                                    "source_id": chunk.source_id,
+                                    "chunk_index": chunk.chunk_index,
+                                    "source_text_hash": chunk.source_text_hash,
+                                    "jurisdiction_id": chunk.jurisdiction_id,
+                                    "source_type": chunk.source_type,
+                                    "source_version": chunk.source_version,
+                                    "districts_csv": _make_filter_csv(chunk.districts),
+                                    "uses_csv": _make_filter_csv(chunk.uses),
+                                    "payload_json": chunk.model_dump(mode="json"),
+                                    "created_at": now,
+                                    "updated_at": now,
+                                }
+                                for chunk in chunks
+                            ],
+                        )
+            except SQLAlchemyError as exc:
+                raise DatabaseStorageError(f"Could not replace source chunks: {exc}") from exc
 
         self.audit("source.chunks.reindexed", f"{len(chunks)} chunks")
         return chunks
