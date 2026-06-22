@@ -118,6 +118,7 @@ class Settings:
     # runs against a single pinned provider for reproducibility.
     # ---------------------------------------------------------------------------
     ai_provider_fallbacks: tuple[str, ...] = ()
+    vector_reindex_batch_size: int = 100
     cerebras_api_key: str = ""
     cerebras_model: str = "llama-3.3-70b"
     cerebras_base_url: str = "https://api.cerebras.ai/v1"
@@ -225,6 +226,7 @@ def get_settings() -> Settings:
         source_index_version=_env("SOURCE_INDEX_VERSION"),
         prompt_version=_env("PROMPT_VERSION", "1.0"),
         ai_provider_fallbacks=_parse_csv(_env("AI_PROVIDER_FALLBACKS").lower()),
+        vector_reindex_batch_size=int(_env("VECTOR_REINDEX_BATCH_SIZE", "100")),
         cerebras_api_key=_env("CEREBRAS_API_KEY"),
         cerebras_model=_env("CEREBRAS_MODEL", "llama-3.3-70b"),
         cerebras_base_url=_env("CEREBRAS_BASE_URL", "https://api.cerebras.ai/v1").rstrip("/"),

@@ -493,3 +493,173 @@ def test_build_qdrant_filter_district_produces_should_with_unknown() -> None:
     rendered = str(result)
     assert "mixed-use-core" in rendered
     assert "unknown" in rendered
+
+
+# ---------------------------------------------------------------------------
+# A.5 — sync_vector_index batching and resumability tests
+# ---------------------------------------------------------------------------
+
+
+from app.ai.interfaces import EmbeddingProviderResult
+from app.settings import Settings
+
+
+def _make_settings(batch_size: int = 2) -> Settings:
+    """Return a minimal in-memory Settings with qdrant vector provider and a small batch size."""
+    import dataclasses
+    from app.settings import get_settings
+
+    base = get_settings()
+    return dataclasses.replace(
+        base,
+        vector_provider="qdrant",  # type: ignore[arg-type]
+        qdrant_url="http://fake-qdrant:6333",
+        qdrant_collection="test",
+        vector_reindex_batch_size=batch_size,
+    )
+
+
+def _make_chunks(n: int) -> list:
+    """Return n distinct SourceChunks using build_source_chunks."""
+    sources = [
+        SourceRegistryEntry(
+            source_id=f"rule-{i}",
+            title=f"Rule {i}",
+            excerpt=f"Zoning rule number {i} for testing batch reindex.",
+            section_ref=f"Sec {i}",
+            jurisdiction_id="blacksburg-va",
+            districts=["mixed-use-core"],
+            uses=["general"],
+        )
+        for i in range(n)
+    ]
+    # build_source_chunks may produce >n chunks for multi-chunk sources;
+    # take the first n so the count is predictable.
+    all_chunks = build_source_chunks(sources)
+    return all_chunks[:n]
+
+
+class FakeEmbeddingProvider:
+    """Embedding provider that records batch call arguments and returns fixed vectors."""
+
+    name = "fake"
+
+    def __init__(self, dims: int = 3, fail_on_batch: int | None = None) -> None:
+        self._dims = dims
+        self._fail_on_batch = fail_on_batch
+        self.call_count = 0
+        self.batch_sizes: list[int] = []
+
+    def embed(self, request: "EmbeddingProviderRequest") -> EmbeddingProviderResult:  # type: ignore[name-defined]
+        self.call_count += 1
+        self.batch_sizes.append(len(request.texts))
+        if self._fail_on_batch is not None and self.call_count == self._fail_on_batch:
+            raise RuntimeError(f"Simulated embedding failure on batch {self.call_count}")
+        return EmbeddingProviderResult(
+            embeddings=[[0.1, 0.2, 0.3][: self._dims] for _ in request.texts]
+        )
+
+
+def _make_sync_store(fake_client: FakeQdrantClient, settings: Settings) -> QdrantVectorStore:
+    """Return a QdrantVectorStore backed by fake_client, bound to the given settings."""
+    store = QdrantVectorStore(
+        url=settings.qdrant_url,
+        collection_name=settings.qdrant_collection,
+        client=fake_client,
+        settings=settings,
+    )
+    return store
+
+
+def test_sync_vector_index_multi_batch_commits_all_chunks() -> None:
+    """All chunks are committed and upsert is called more than once when chunks > batch_size."""
+    fake_client = FakeQdrantClient()
+    settings = _make_settings(batch_size=2)
+    chunks = _make_chunks(5)  # 5 chunks, batch_size=2 → 3 batches
+
+    embed_provider = FakeEmbeddingProvider(dims=3)
+
+    # Monkey-patch sync_vector_index to inject our fake client into the store
+    # by patching QdrantVectorStore.__init__ to set _client.
+    original_init = QdrantVectorStore.__init__
+
+    def patched_init(self, **kwargs):
+        original_init(self, **kwargs)
+        self._client = fake_client
+
+    QdrantVectorStore.__init__ = patched_init  # type: ignore[method-assign]
+    try:
+        result = sync_vector_index(chunks, embed_provider, settings=settings)
+    finally:
+        QdrantVectorStore.__init__ = original_init  # type: ignore[method-assign]
+
+    assert result.count == len(chunks), f"Expected {len(chunks)}, got {result.count}"
+    assert result.ready is True
+    assert embed_provider.call_count > 1, "Expected multiple embed calls (batching)"
+    assert all(bs <= 2 for bs in embed_provider.batch_sizes), "Each batch must be <= batch_size"
+    assert not result.warnings
+
+
+def test_sync_vector_index_partial_failure_commits_prior_batches() -> None:
+    """When batch N fails, batches 0..N-1 are durably committed; count > 0; warning present."""
+    fake_client = FakeQdrantClient()
+    settings = _make_settings(batch_size=2)
+    chunks = _make_chunks(6)  # 6 chunks, batch_size=2 → 3 batches; fail on batch 2
+
+    # fail_on_batch=2 → first batch (call 1) succeeds, second (call 2) raises
+    embed_provider = FakeEmbeddingProvider(dims=3, fail_on_batch=2)
+
+    original_init = QdrantVectorStore.__init__
+
+    def patched_init(self, **kwargs):
+        original_init(self, **kwargs)
+        self._client = fake_client
+
+    QdrantVectorStore.__init__ = patched_init  # type: ignore[method-assign]
+    try:
+        result = sync_vector_index(chunks, embed_provider, settings=settings)
+    finally:
+        QdrantVectorStore.__init__ = original_init  # type: ignore[method-assign]
+
+    # First batch (2 chunks) committed; result must reflect committed progress.
+    assert result.count > 0, "Prior batches should be committed even when a later batch fails"
+    assert result.count < len(chunks), "Not all chunks should be committed (later batch failed)"
+    assert result.ready is False
+    assert any("Embedding failed" in w or "already committed" in w for w in result.warnings)
+
+
+def test_sync_vector_index_resume_after_partial_failure() -> None:
+    """Re-running after a partial failure skips already-present ids and finishes the rest."""
+    fake_client = FakeQdrantClient()
+    settings = _make_settings(batch_size=2)
+    chunks = _make_chunks(6)  # 3 batches of 2; first run fails on batch 2
+
+    failing_embed = FakeEmbeddingProvider(dims=3, fail_on_batch=2)
+
+    original_init = QdrantVectorStore.__init__
+
+    def patched_init(self, **kwargs):
+        original_init(self, **kwargs)
+        self._client = fake_client
+
+    QdrantVectorStore.__init__ = patched_init  # type: ignore[method-assign]
+    try:
+        first_result = sync_vector_index(chunks, failing_embed, settings=settings)
+        committed_after_first_run = first_result.count
+
+        # Second run with a working provider — should skip already-indexed ids.
+        working_embed = FakeEmbeddingProvider(dims=3)
+        second_result = sync_vector_index(chunks, working_embed, settings=settings)
+    finally:
+        QdrantVectorStore.__init__ = original_init  # type: ignore[method-assign]
+
+    assert committed_after_first_run > 0, "First run must commit at least one batch"
+    assert second_result.count == len(chunks), (
+        f"Second run should complete the index: expected {len(chunks)}, got {second_result.count}"
+    )
+    assert second_result.ready is True
+    # The second run must embed fewer chunks than the total (already-present ones are skipped).
+    total_embedded_second_run = sum(working_embed.batch_sizes)
+    assert total_embedded_second_run < len(chunks), (
+        "Second run should skip already-committed chunks"
+    )

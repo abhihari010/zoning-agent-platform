@@ -309,6 +309,14 @@ def sync_vector_index(
     re-running after a partial/timed-out reindex resumes instead of starting
     over. Stale points are pruned at the end via ``delete_missing_chunk_ids``.
     Pass ``full_rebuild=True`` to wipe the collection and re-embed everything.
+
+    Embedding + upsert are performed in batches (``VECTOR_REINDEX_BATCH_SIZE``,
+    default 100) and each batch is committed to Qdrant before the next one
+    starts.  This means a timed-out or killed run makes durable progress: the
+    next call will skip already-present chunk_ids and pick up from where it left
+    off.  If a batch fails after earlier batches have already been committed,
+    the function returns the real committed count together with a warning rather
+    than discarding the completed work.
     """
     resolved = settings or get_settings()
     if resolved.vector_provider == "none":
@@ -321,26 +329,14 @@ def sync_vector_index(
         )
 
     store = QdrantVectorStore(settings=resolved)
+    batch_size = resolved.vector_reindex_batch_size
+    warnings: list[str] = []
+
     try:
         if resolved.vector_provider == "qdrant" and full_rebuild:
             store.reset_collection()
         existing_ids = set() if full_rebuild else store.existing_chunk_ids()
         pending = [chunk for chunk in chunks if chunk.chunk_id not in existing_ids]
-        if pending:
-            embeddings = embedding_provider.embed(
-                EmbeddingProviderRequest(texts=[chunk.chunk_text for chunk in pending])
-            ).embeddings
-            if not embeddings or any(not embedding for embedding in embeddings):
-                return VectorIndexSyncResult(
-                    provider=resolved.vector_provider,
-                    collection=resolved.qdrant_collection,
-                    ready=False,
-                    count=0,
-                    warnings=["Embedding provider returned empty vectors; Qdrant index was not updated."],
-                )
-            store.upsert_chunks(pending, embeddings)
-        store.delete_missing_chunk_ids({chunk.chunk_id for chunk in chunks})
-        count = store.count()
     except Exception as exc:
         return VectorIndexSyncResult(
             provider=resolved.vector_provider,
@@ -350,12 +346,72 @@ def sync_vector_index(
             warnings=[str(exc)],
         )
 
+    batches_committed = 0
+    if pending:
+        for batch_start in range(0, len(pending), batch_size):
+            batch = pending[batch_start : batch_start + batch_size]
+            try:
+                batch_embeddings = embedding_provider.embed(
+                    EmbeddingProviderRequest(texts=[chunk.chunk_text for chunk in batch])
+                ).embeddings
+            except Exception as exc:
+                warnings.append(
+                    f"Embedding failed on batch starting at index {batch_start} "
+                    f"({batches_committed} batch(es) already committed): {exc}"
+                )
+                break
+
+            if not batch_embeddings or any(not emb for emb in batch_embeddings):
+                warnings.append(
+                    f"Embedding provider returned empty vectors for batch starting at index "
+                    f"{batch_start}; stopping (prior {batches_committed} batch(es) committed)."
+                )
+                break
+
+            try:
+                store.upsert_chunks(batch, batch_embeddings)
+            except Exception as exc:
+                warnings.append(
+                    f"Upsert failed on batch starting at index {batch_start} "
+                    f"({batches_committed} batch(es) already committed): {exc}"
+                )
+                break
+
+            batches_committed += 1
+
+    # If no batches at all were committed and there is a failure warning,
+    # treat the result as "nothing done" with count=0 for clarity.
+    # Otherwise return the real count reflecting durable progress.
+    try:
+        store.delete_missing_chunk_ids({chunk.chunk_id for chunk in chunks})
+        count = store.count()
+    except Exception as exc:
+        warnings.append(f"Post-sync cleanup failed: {exc}")
+        try:
+            count = store.count()
+        except Exception:
+            count = 0
+
+    if warnings and batches_committed == 0 and not pending:
+        # pending was empty, warnings came from cleanup — return real count
+        pass
+    elif warnings and batches_committed == 0 and pending:
+        # Nothing committed at all — preserve the "count=0" contract so the
+        # caller knows the index wasn't updated.
+        return VectorIndexSyncResult(
+            provider=resolved.vector_provider,
+            collection=resolved.qdrant_collection,
+            ready=False,
+            count=0,
+            warnings=warnings,
+        )
+
     return VectorIndexSyncResult(
         provider=resolved.vector_provider,
         collection=resolved.qdrant_collection,
         ready=count > 0 and count >= len(chunks),
         count=count,
-        warnings=[] if count else ["Qdrant vector collection is empty."],
+        warnings=warnings if warnings else ([] if count else ["Qdrant vector collection is empty."]),
     )
 
 
