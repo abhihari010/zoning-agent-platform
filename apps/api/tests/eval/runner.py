@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -93,6 +94,22 @@ def _citations_valid(
     return not validation.invalid_citation_ids
 
 
+def _normalize_section_ref(ref: str | None) -> str:
+    """Canonicalize a section_ref for robust string matching.
+
+    Strips a leading section marker (``Sec.`` / ``Section`` / ``§``), collapses
+    internal whitespace, and case-folds, so that harmless format drift
+    (``"10-24"`` vs ``"Sec. 10-24"`` vs ``"SEC. 10-24"``) does not silently zero
+    the required-citation gate. This is *test-harness* robustness only —
+    production retrieval is semantic and never string-matches ``section_ref``.
+    Returns ``""`` for falsy input so empty refs never match.
+    """
+    if not ref:
+        return ""
+    s = re.sub(r"^\s*(?:§+|sec(?:tion)?\.?)\s*", "", ref.strip(), flags=re.IGNORECASE)
+    return re.sub(r"\s+", " ", s).strip().casefold()
+
+
 def _corpus_section_refs(source_store: Any, jurisdiction_id: str) -> set[str]:
     """Every section_ref that can legitimately appear in a citation for this jurisdiction.
 
@@ -115,14 +132,15 @@ def _corpus_section_refs(source_store: Any, jurisdiction_id: str) -> set[str]:
     refs: set[str] = set()
     for src in source_store.list_sources():
         if src.section_ref and _belongs(src):
-            refs.add(src.section_ref)
+            refs.add(_normalize_section_ref(src.section_ref))
 
     list_chunks = getattr(source_store, "list_source_chunks", None)
     if callable(list_chunks):
         for chunk in list_chunks():
             if chunk.section_ref and _belongs(chunk):
-                refs.add(chunk.section_ref)
+                refs.add(_normalize_section_ref(chunk.section_ref))
 
+    refs.discard("")
     return refs
 
 
@@ -149,14 +167,17 @@ def _evaluate_scenario(
     hallucinated = False
     if corpus_refs:
         for c in result.citations:
-            if c.section_ref and c.section_ref not in corpus_refs:
+            if c.section_ref and _normalize_section_ref(c.section_ref) not in corpus_refs:
                 hallucinated = True
                 break
 
+    actual_refs = {
+        _normalize_section_ref(c.section_ref) for c in result.citations if c.section_ref
+    }
     found: list[str] = []
     missing: list[str] = []
     for ref in scenario.expect.must_cite_section_refs:
-        if any(c.section_ref == ref for c in result.citations):
+        if _normalize_section_ref(ref) in actual_refs:
             found.append(ref)
         else:
             missing.append(ref)

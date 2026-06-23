@@ -15,6 +15,11 @@ The authoritative golden mapping (district -> ordinance section -> metric):
     GB   -> Sec. 10-28 (max height 50)
     CB   -> Sec. 10-29 (max height 35)
     M-1  -> Sec. 10-30 (front setback 75, else 35)
+
+Section refs use the 'Sec. 10-XX' format, matching source_packs/manifest.json
+exactly.  Chunks inherit section_ref verbatim from the non-markdown source
+path, so citations carry 'Sec. 10-24' — not the bare '10-24' that was
+originally authored in this dataset (corrected 2026-06-22).
 """
 from __future__ import annotations
 
@@ -34,33 +39,36 @@ from tests.eval.runner import load_dataset, run_eval
 _JURISDICTION = "montgomery-county-va"
 _EXPECTED_SCENARIO_COUNT = 12
 
-# Section refs as they actually appear in the dataset's must_cite_section_refs.
-# NOTE: the dataset stores bare ordinance numbers ("10-24"), not "Sec. 10-24".
+# Section refs as they actually appear in the corpus chunks — sourced from
+# the source_packs manifest (montgomery-county-va/manifest.json), which sets
+# section_ref='Sec. 10-24' etc. on each ordinance source.  Chunks inherit
+# that value verbatim (non-markdown path), so citations carry 'Sec. 10-24',
+# not the bare '10-24'. The dataset must match the corpus exactly.
 _EXPECTED_SECTION_UNION = {
-    "10-21",
-    "10-24",
-    "10-25",
-    "10-26",
-    "10-27",
-    "10-28",
-    "10-29",
-    "10-30",
+    "Sec. 10-21",
+    "Sec. 10-24",
+    "Sec. 10-25",
+    "Sec. 10-26",
+    "Sec. 10-27",
+    "Sec. 10-28",
+    "Sec. 10-29",
+    "Sec. 10-30",
 }
 
 # Scenario id -> required section ref(s). Locks the district->section mapping.
 _EXPECTED_SCENARIO_SECTIONS = {
-    "montgomery-county-va-r1-min-lot-area": ["10-24"],
-    "montgomery-county-va-r1-front-setback": ["10-24"],
-    "montgomery-county-va-r1-side-setback": ["10-24"],
-    "montgomery-county-va-r1-min-lot-width": ["10-24"],
-    "montgomery-county-va-r2-min-lot-area": ["10-25"],
-    "montgomery-county-va-r3-min-lot-area": ["10-26"],
-    "montgomery-county-va-r3-front-setback": ["10-26"],
-    "montgomery-county-va-rm1-townhouse-min-lot-area": ["10-27"],
-    "montgomery-county-va-a1-max-height": ["10-21"],
-    "montgomery-county-va-gb-max-height": ["10-28"],
-    "montgomery-county-va-cb-max-height": ["10-29"],
-    "montgomery-county-va-m1-min-setback": ["10-30"],
+    "montgomery-county-va-r1-min-lot-area": ["Sec. 10-24"],
+    "montgomery-county-va-r1-front-setback": ["Sec. 10-24"],
+    "montgomery-county-va-r1-side-setback": ["Sec. 10-24"],
+    "montgomery-county-va-r1-min-lot-width": ["Sec. 10-24"],
+    "montgomery-county-va-r2-min-lot-area": ["Sec. 10-25"],
+    "montgomery-county-va-r3-min-lot-area": ["Sec. 10-26"],
+    "montgomery-county-va-r3-front-setback": ["Sec. 10-26"],
+    "montgomery-county-va-rm1-townhouse-min-lot-area": ["Sec. 10-27"],
+    "montgomery-county-va-a1-max-height": ["Sec. 10-21"],
+    "montgomery-county-va-gb-max-height": ["Sec. 10-28"],
+    "montgomery-county-va-cb-max-height": ["Sec. 10-29"],
+    "montgomery-county-va-m1-min-setback": ["Sec. 10-30"],
 }
 
 
