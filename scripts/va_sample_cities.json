@@ -1,0 +1,30 @@
+[
+  {
+    "city": "Blacksburg",
+    "state": "VA",
+    "county": "Montgomery",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "max_sections": 5,
+    "_note": "Municode-hosted; smoke-friendly with max_sections cap"
+  },
+  {
+    "city": "Christiansburg",
+    "state": "VA",
+    "county": "Montgomery",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Montgomery County seat, also Municode-hosted"
+  },
+  {
+    "city": "Montgomery County",
+    "state": "VA",
+    "jurisdiction_id": "montgomery-county-va",
+    "jurisdiction_type": "county",
+    "fetcher": "municipalcodeonline",
+    "host_slug": "montgomery",
+    "chapters": ["10_ZONING"],
+    "coverage_status": "source_indexed",
+    "_note": "Full zoning ordinance on Municipal Code Online Chapter 10"
+  }
+]
