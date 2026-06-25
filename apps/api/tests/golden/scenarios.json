@@ -57,7 +57,7 @@
     }
   },
   {
-    "id": "unsupported-jurisdiction-handoff",
+    "id": "christiansburg-source-indexed-served",
     "project_description": "Open a small bakery with two employees, regular operating hours, and renovation plans.",
     "district": "unknown",
     "jurisdiction_id": "christiansburg-va",
@@ -67,14 +67,14 @@
     "expect": {
       "decisions": ["unknown"],
       "statuses": ["low_confidence"],
-      "min_citations": 0,
-      "max_citations": 0,
-      "jurisdiction_supported": false,
-      "required_warning_substrings": ["not currently supported"]
+      "min_citations": 1,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": ["Preliminary coverage"],
+      "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "montgomery-county-va", "roanoke-va", "roanoke-county-va"]
     }
   },
   {
-    "id": "roanoke-source-indexed-handoff",
+    "id": "roanoke-source-indexed-served",
     "project_description": "Open a small cafe with two employees, posted operating hours, and interior renovation plans.",
     "district": "unknown",
     "jurisdiction_id": "roanoke-va",
@@ -84,15 +84,14 @@
     "expect": {
       "decisions": ["unknown"],
       "statuses": ["low_confidence"],
-      "min_citations": 0,
-      "max_citations": 0,
-      "jurisdiction_supported": false,
-      "required_warning_substrings": ["not currently supported"],
+      "min_citations": 1,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": ["Preliminary coverage"],
       "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "montgomery-county-va"]
     }
   },
   {
-    "id": "roanoke-county-source-indexed-handoff",
+    "id": "roanoke-county-source-indexed-served",
     "project_description": "Open a small home bakery with two employees, posted operating hours, and interior renovation plans.",
     "district": "unknown",
     "jurisdiction_id": "roanoke-county-va",
@@ -102,10 +101,9 @@
     "expect": {
       "decisions": ["unknown"],
       "statuses": ["low_confidence"],
-      "min_citations": 0,
-      "max_citations": 0,
-      "jurisdiction_supported": false,
-      "required_warning_substrings": ["not currently supported"],
+      "min_citations": 1,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": ["Preliminary coverage"],
       "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "montgomery-county-va"]
     }
   },

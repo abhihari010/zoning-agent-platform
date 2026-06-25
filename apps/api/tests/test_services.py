@@ -200,7 +200,7 @@ def _mock_google_address(monkeypatch: pytest.MonkeyPatch, payload: dict) -> None
         ),
     ],
 )
-def test_normalize_address_recognized_unsupported_jurisdictions(
+def test_normalize_address_source_indexed_jurisdictions_served_with_caveat(
     monkeypatch: pytest.MonkeyPatch,
     formatted_address: str,
     components: list[dict],
@@ -212,7 +212,7 @@ def test_normalize_address_recognized_unsupported_jurisdictions(
         monkeypatch,
         {
             "formatted_address": formatted_address,
-            "place_id": "place-unsupported",
+            "place_id": "place-source-indexed",
             "address_components": components,
             "geometry": {"location": {"lat": 37.1, "lng": -80.4}},
         },
@@ -220,11 +220,13 @@ def test_normalize_address_recognized_unsupported_jurisdictions(
 
     result = services.normalize_address(formatted_address)
 
-    assert result.is_valid is False
-    assert result.support_status == "unsupported"
+    # source_indexed cities are servable: valid + supported, but carry a coverage caveat.
+    assert result.is_valid is True
+    assert result.support_status == "supported"
+    assert result.coverage_status == "source_indexed"
     assert result.jurisdiction_id == expected_id
     assert result.jurisdiction_name == expected_name
-    assert "does not yet support zoning review" in result.warnings[0]
+    assert any("Preliminary coverage" in w for w in result.warnings)
 
 
 def test_normalize_address_supported_montgomery_county_jurisdiction(

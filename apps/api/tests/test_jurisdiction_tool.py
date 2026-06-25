@@ -24,7 +24,9 @@ def test_resolve_supported_jurisdiction() -> None:
     assert result.confidence >= 0.8
 
 
-def test_resolve_unsupported_jurisdiction() -> None:
+def test_resolve_source_indexed_jurisdiction_carries_coverage_caveat() -> None:
+    """source_indexed jurisdictions (e.g. christiansburg-va) must resolve with a coverage
+    caveat warning, not the hard-unsupported warning."""
     result = JurisdictionTool().resolve(
         "100 Main St, Christiansburg, VA 24073",
         37.1,
@@ -33,9 +35,26 @@ def test_resolve_unsupported_jurisdiction() -> None:
     )
 
     assert result.jurisdiction_id == "christiansburg-va"
-    assert result.supported is False
+    assert result.supported is False          # raw QA flag unchanged
     assert result.coverage_status == "source_indexed"
-    assert result.warnings
+    assert len(result.warnings) == 1
+    assert "Preliminary coverage" in result.warnings[0]
+    assert "not yet fully QA-verified" in result.warnings[0]
+
+
+def test_resolve_public_supported_jurisdiction_no_warnings() -> None:
+    """public_supported jurisdictions must resolve with an empty warnings list."""
+    result = JurisdictionTool().resolve(
+        "250 S Main St, Blacksburg, VA 24060",
+        37.2296,
+        -80.4140,
+        None,
+    )
+
+    assert result.jurisdiction_id == "blacksburg-va"
+    assert result.supported is True
+    assert result.coverage_status == "public_supported"
+    assert result.warnings == []
 
 
 def test_explicit_jurisdiction_takes_priority() -> None:

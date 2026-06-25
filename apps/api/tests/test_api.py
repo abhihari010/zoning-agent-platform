@@ -581,16 +581,16 @@ def test_intake_recognized_unsupported_jurisdiction_returns_metadata(monkeypatch
 
     def fake_normalize(_: str):
         return services.AddressNormalizationResult(
-            normalized_address="100 Main St, Christiansburg, VA 24073, USA",
+            normalized_address="1 Main St, Richmond, VA 23219, USA",
             district="unknown",
             place_id="place-unsupported",
-            latitude=37.1,
-            longitude=-80.4,
+            latitude=37.5,
+            longitude=-77.4,
             is_valid=False,
-            warnings=["This tool does not yet support zoning review for Christiansburg, VA."],
+            warnings=["This tool does not yet support zoning review for Richmond, VA."],
             support_status="unsupported",
-            jurisdiction_id="christiansburg-va",
-            jurisdiction_name="Christiansburg, VA",
+            jurisdiction_id="richmond-va",
+            jurisdiction_name="Richmond, VA",
         )
 
     monkeypatch.setattr("app.routers.api.normalize_address", fake_normalize)
@@ -600,7 +600,7 @@ def test_intake_recognized_unsupported_jurisdiction_returns_metadata(monkeypatch
         json={
             "session_id": str(uuid4()),
             "project_description": "Convert garage to bakery with two employees and set operating hours.",
-            "address": "100 Main St Christiansburg VA",
+            "address": "1 Main St Richmond VA",
         },
     )
 
@@ -608,8 +608,8 @@ def test_intake_recognized_unsupported_jurisdiction_returns_metadata(monkeypatch
     body = response.json()
     assert body["status"] == "invalid_address"
     assert body["support_status"] == "unsupported"
-    assert body["jurisdiction_id"] == "christiansburg-va"
-    assert body["jurisdiction_name"] == "Christiansburg, VA"
+    assert body["jurisdiction_id"] == "richmond-va"
+    assert body["jurisdiction_name"] == "Richmond, VA"
     assert "does not yet support zoning review" in body["follow_up_questions"][-1]
     assert store.get_project(UUID(body["project_id"])) is None
 
