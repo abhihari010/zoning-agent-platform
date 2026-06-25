@@ -224,7 +224,7 @@ class ZoningOrchestrator:
         summary = compliance.summary
         permits_override = compliance.permits_override
         follow_up = list(compliance.follow_up_questions)
-        warnings = list(compliance.warnings)
+        warnings = list(context.warnings) + list(compliance.warnings)
         recorder.record(
             "compliance",
             "skipped" if not citations else ("warning" if compliance.warnings else "completed"),

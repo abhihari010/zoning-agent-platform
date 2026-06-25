@@ -190,6 +190,8 @@ def suggest_addresses(query: str, session_token: str | None = None) -> list[str]
 def normalize_address(address: str) -> AddressNormalizationResult:
     from app.tools import AddressTool, JurisdictionTool, ParcelTool
 
+    from app.tools.jurisdiction_tool import _is_servable
+
     address_result = AddressTool(require_google=True).normalize(address)
     if address_result.confidence <= 0:
         return AddressNormalizationResult(
@@ -210,7 +212,7 @@ def normalize_address(address: str) -> AddressNormalizationResult:
         None,
         address_result.address_components,
     )
-    if not jurisdiction.supported:
+    if not _is_servable(jurisdiction.coverage_status):
         jurisdiction_name = jurisdiction.jurisdiction_name or "this jurisdiction"
         return AddressNormalizationResult(
             normalized_address=address_result.normalized_address,
@@ -219,7 +221,8 @@ def normalize_address(address: str) -> AddressNormalizationResult:
             latitude=address_result.lat,
             longitude=address_result.lng,
             is_valid=False,
-            warnings=[f"This tool does not yet support zoning review for {jurisdiction_name}."],
+            warnings=list(jurisdiction.warnings)
+            or [f"This tool does not yet support zoning review for {jurisdiction_name}."],
             support_status="unsupported",
             jurisdiction_id=jurisdiction.jurisdiction_id,
             jurisdiction_name=jurisdiction.jurisdiction_name,
@@ -243,7 +246,7 @@ def normalize_address(address: str) -> AddressNormalizationResult:
             district_confidence = 0.3
             district_method = "keyword_fallback"
 
-    warnings: list[str] = [*address_result.warnings, *parcel.warnings]
+    warnings: list[str] = [*jurisdiction.warnings, *address_result.warnings, *parcel.warnings]
     if district == "unknown":
         warnings.append("District could not be inferred from returned location context.")
 

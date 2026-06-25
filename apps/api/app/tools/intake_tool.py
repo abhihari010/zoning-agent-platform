@@ -3,7 +3,7 @@ from __future__ import annotations
 from app.models import IntakeResult
 from app.orchestrator.pipeline_context import PipelineContext
 from app.tools.address_tool import AddressTool
-from app.tools.jurisdiction_tool import JurisdictionTool
+from app.tools.jurisdiction_tool import JurisdictionTool, _is_servable
 from app.tools.parcel_tool import ParcelTool
 
 
@@ -32,10 +32,11 @@ class IntakeTool:
                 context.jurisdiction_id,
             )
             context.jurisdiction_supported = (
-                jurisdiction_result.supported
+                _is_servable(jurisdiction_result.coverage_status)
                 if jurisdiction_result.jurisdiction_id and jurisdiction_result.confidence > 0
                 else None
             )
+            context.warnings = list(jurisdiction_result.warnings)
             context.address_confidence = 0.8 if context.normalized_address else 0.0
             context.jurisdiction_confidence = jurisdiction_result.confidence
             context.jurisdiction_method = jurisdiction_result.method
@@ -71,10 +72,11 @@ class IntakeTool:
             context.jurisdiction_name = jurisdiction_result.jurisdiction_name
         context.jurisdiction_confidence = jurisdiction_result.confidence
         context.jurisdiction_supported = (
-            jurisdiction_result.supported
+            _is_servable(jurisdiction_result.coverage_status)
             if jurisdiction_result.jurisdiction_id and jurisdiction_result.confidence > 0
             else None
         )
+        context.warnings = list(jurisdiction_result.warnings)
         context.jurisdiction_method = jurisdiction_result.method
         context.district_confidence = parcel_result.confidence
         context.district_method = parcel_result.method

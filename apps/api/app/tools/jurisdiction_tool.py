@@ -34,7 +34,7 @@ class JurisdictionTool:
                     planning_contact=match.planning_contact or {},
                     official_source_urls=list(match.official_source_urls),
                     zoning_map_url=match.zoning_map_url,
-                    warnings=[] if match.supported else [_unsupported_warning(match.name)],
+                    warnings=_resolve_warnings(match.name, match.coverage_status),
                 )
             return JurisdictionResult(
                 jurisdiction_id=explicit_jurisdiction,
@@ -63,7 +63,7 @@ class JurisdictionTool:
                     planning_contact=match.planning_contact or {},
                     official_source_urls=list(match.official_source_urls),
                     zoning_map_url=match.zoning_map_url,
-                    warnings=[] if match.supported else [_unsupported_warning(match.name or "this jurisdiction")],
+                    warnings=_resolve_warnings(match.name or "this jurisdiction", match.coverage_status),
                 )
 
         normalized_address = (address or "").lower()
@@ -86,7 +86,7 @@ class JurisdictionTool:
                     planning_contact=jurisdiction.planning_contact or {},
                     official_source_urls=list(jurisdiction.official_source_urls),
                     zoning_map_url=jurisdiction.zoning_map_url,
-                    warnings=[] if jurisdiction.supported else [_unsupported_warning(jurisdiction.name)],
+                    warnings=_resolve_warnings(jurisdiction.name, jurisdiction.coverage_status),
                 )
 
         if lat is not None and lng is not None:
@@ -114,6 +114,32 @@ def _by_id(jurisdiction_id: str):
         if jurisdiction.jurisdiction_id == jurisdiction_id:
             return jurisdiction
     return None
+
+
+def _resolve_warnings(name: str, coverage_status: str) -> list[str]:
+    """Return the appropriate warnings list for a resolved jurisdiction."""
+    if coverage_status == "public_supported":
+        return []
+    if coverage_status == "source_indexed":
+        return [_coverage_caveat(name)]
+    return [_unsupported_warning(name)]
+
+
+def _is_servable(coverage_status: str) -> bool:
+    """Return True when a jurisdiction has enough indexed sources to serve answers.
+
+    ``public_supported`` — fully QA-verified, no caveat needed.
+    ``source_indexed``   — corpus indexed but not yet golden-set QA'd; served with caveat.
+    Anything else (``unsupported`` / missing) is blocked.
+    """
+    return coverage_status in ("public_supported", "source_indexed")
+
+
+def _coverage_caveat(name: str) -> str:
+    return (
+        f"Preliminary coverage — sources are indexed for {name} but not yet fully "
+        "QA-verified. Results may be incomplete; confirm with the local planning office."
+    )
 
 
 def _unsupported_warning(name: str) -> str:
