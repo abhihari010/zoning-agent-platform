@@ -31,6 +31,7 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
     from services.ingestion.scraper.fetchers import (
+        ECode360Fetcher,
         FlippingBookFetcher,
         GenericHtmlFetcher,
         MunicipalCodeOnlineFetcher,
@@ -41,6 +42,7 @@ if __package__ in (None, ""):
     from services.ingestion.scraper.manifest_builder import build_manifest, slugify
 else:  # pragma: no cover - exercised via module execution
     from .fetchers import (
+        ECode360Fetcher,
         FlippingBookFetcher,
         GenericHtmlFetcher,
         MunicipalCodeOnlineFetcher,
@@ -90,6 +92,13 @@ def _build_fetcher(args: argparse.Namespace, *, raw_dir: Path) -> Fetcher:
             max_sections=args.max_sections,
             host_slug=args.host_slug,
             chapters=args.chapters or None,
+        )
+    if args.fetcher == "ecode360":
+        return ECode360Fetcher(
+            cache_dir=raw_dir,
+            request_delay=args.delay,
+            max_sections=args.max_sections,
+            code_id=args.code_id,
         )
     raise SystemExit(f"Unknown fetcher: {args.fetcher}")
 
@@ -157,7 +166,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--state", required=True, help="Two-letter state code, e.g. VA.")
     parser.add_argument(
         "--fetcher",
-        choices=["municode", "generic_html", "flippingbook", "municipalcodeonline"],
+        choices=[
+            "municode",
+            "generic_html",
+            "flippingbook",
+            "municipalcodeonline",
+            "ecode360",
+        ],
         default="municode",
         help="Which fetcher to use (default: municode).",
     )
@@ -165,6 +180,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--host-slug",
         default=None,
         help="municipalcodeonline subdomain slug (default: first word of --city).",
+    )
+    parser.add_argument(
+        "--code-id",
+        default=None,
+        help="eCode360 customer code, e.g. MI2395; "
+        "default resolves via /ajax/code/info.",
     )
     parser.add_argument(
         "--chapters",

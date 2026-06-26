@@ -38,8 +38,11 @@ a draft into the curated tree happens later, after district mapping + golden QA.
 | Flag | Default | Purpose |
 | --- | --- | --- |
 | `--city` / `--state` | required | Jurisdiction name + 2-letter state code |
-| `--fetcher` | `municode` | `municode` or `generic_html` |
+| `--fetcher` | `municode` | `municode`, `generic_html`, `flippingbook`, `municipalcodeonline`, or `ecode360` |
 | `--url` | – | Official URL(s); required for `generic_html`, optional override otherwise |
+| `--host-slug` | – | `municipalcodeonline` subdomain slug (default: first word of `--city`) |
+| `--chapters` | – | `municipalcodeonline` chapter node id(s) to fetch (repeatable) |
+| `--code-id` | – | `ecode360` customer code, e.g. `MI2395` (default resolves via `/ajax/code/info`) |
 | `--county` | – | Parent county (sets `parent_jurisdiction_id`) |
 | `--jurisdiction-id` | derived | Override the derived id (`{slug}-{state}`) |
 | `--coverage-status` | `source_indexed` | Pack coverage status |
@@ -58,12 +61,17 @@ services/ingestion/scraper/
   fetchers/
     base.py             # SectionRecord + Fetcher protocol + FetchResult
     municode.py         # PRIMARY: Municode JSON API (TOC walk + content chunk groups)
+    municipalcodeonline.py  # Municipal Code Online SPA backing endpoints (auth-guarded)
+    ecode360.py         # eCode360 / General Code (TOC JSON + server-rendered article HTML)
+    flippingbook.py     # FlippingBook publication fetcher
     generic_html.py     # FALLBACK: fetch an official page, clean HTML → coarse sections
   tests/
-    fixtures/           # saved real Municode JSON + a generic HTML page (NO live network in tests)
+    fixtures/           # saved real Municode/MCO/eCode360 JSON + HTML (NO live network in tests)
     test_html_cleaner.py
     test_manifest_builder.py   # also runs the REAL validate_source_packs validator
     test_municode_parser.py    # parses saved fixtures → SectionRecords
+    test_municipalcodeonline_parser.py
+    test_ecode360_parser.py    # parses saved eCode360 fixtures → SectionRecords
     test_generic_html.py
 ```
 
@@ -122,6 +130,78 @@ below):
 Feeding the Blacksburg manifest through the real
 `apps/api/app/ingestion.build_source_chunks` produced 1,100 coherent chunks,
 each carrying the correct deep-link `url` and `section_ref` (e.g. `Sec. 4211`).
+
+## eCode360 / General Code investigation (findings)
+
+General Code's **eCode360** platform (`ecode360.com`) hosts zoning codes for
+roughly 3,000 municipalities, concentrated in the northeastern US (NY, NJ, PA,
+CT, MA). It is a React SPA whose content is **server-rendered HTML** backed by a
+small set of unauthenticated JSON endpoints. The endpoints were discovered by
+reading the SPA's JavaScript bundle (`/static/index-*.js`) and confirming the
+network traffic. There is a separate *authenticated* REST API at
+`api.ecode360.com` (key + secret, documented at `developer.ecode360.com`) — we
+do **not** use it; the public endpoints below need no credentials.
+
+Endpoints used (all under `https://ecode360.com`):
+
+1. **Resolve city → customer code**
+   `GET /ajax/code/info?name={city}&state={ST}` → JSON array
+   `[{"custId": "MI2395", "name": "Borough of Millersville, PA", ...}]`.
+   We take the first (best-ranked) result's `custId`. Skippable via `--code-id`.
+2. **Full nested table of contents**
+   `GET /toc/{guid}` → a JSON tree of nodes
+   `{guid, title, number, type, label, prefix, href, children[]}`. Passing the
+   customer code (e.g. `/toc/MI2395`) returns the **entire** ordinance structure
+   recursed to leaf `section` nodes in one call; passing any inner node guid
+   returns just that subtree. Node `type` is one of `code` / `division` /
+   `chapter` / `article` / `section`.
+3. **Section content (server-rendered HTML)**
+   `GET /{article_guid}` → an HTML page containing every section in that article
+   as a `<article>` element. Each block carries:
+   - `data-guid="{section_guid}"` and `data-full-title="§ NNN: Heading."`
+   - `<span class="titleNumber">§ NNN</span>`
+   - `<div class="section_content content" id="{guid}_content">` — the body HTML,
+     optionally led by `<div class="history">` containing
+     `<span class="hisdate">M-D-YYYY</span>` amendment dates.
+
+**Deep-link URL** for a section (matches General Code's own recommendation —
+their structure docs link via `<a href="https://ecode360.com/${guid}">`):
+
+```
+https://ecode360.com/{section_guid}
+```
+
+The `DeepLinker` also supports the anchored form
+`https://ecode360.com/{article_guid}#{section_guid}` when a parent article guid
+is supplied.
+
+The zoning chapter is found **data-drivenly** by matching the TOC node title
+against `"zoning"` / `"zoning ordinance"` (excluding `"subdivision"`, `"map"`,
+and `"application for zoning"`), preferring an exact `chapter`-type `"Zoning"`
+node. There is **no hard-coded per-city guid**.
+
+**Cloudflare bot protection (the hard part).** `ecode360.com` sits behind
+Cloudflare Turnstile. Plain `httpx` (its TLS/HTTP fingerprint is trivially
+classified as a bot) is challenged with HTTP 403 *immediately and persistently*.
+A browser-engine fetch (e.g. Bun's `fetch`, which presents a real Chrome-like
+fingerprint) succeeds, but Cloudflare then rate-limits the source IP — roughly
+**one request per ~30 s** before challenges resume; bursts get blocked for a
+cooldown window. Practical consequences:
+
+- The shared `PoliteHttpClient` (httpx) raises `FetchBlockedError` on 401/403, so
+  `run_scrape.py` exits cleanly (code 2) rather than hammering the host.
+- A real scrape needs a generous `--delay` (the fetcher defaults `request_delay`
+  to `2.0`) and benefits from the on-disk response cache: a partial run resumes
+  from cache instead of re-hitting the network.
+- The offline parser tests use **saved real responses** captured from the
+  Borough of Millersville, PA (`custId=MI2395`, Chapter 380 Zoning) plus a
+  reserved-section fixture from Township of Horsham, PA (Chapter 230). No live
+  network is touched in tests.
+
+Like the other fetchers, eCode360 emits **one `SectionRecord` per leaf section**
+(`§ NNN`), each with its own `section_ref`, deep-link `url`, cleaned body text
+(history note stripped), and `effective_date` parsed from the latest `hisdate`.
+Reserved/placeholder sections (`(Reserved)`) are skipped.
 
 ## Design decisions
 
