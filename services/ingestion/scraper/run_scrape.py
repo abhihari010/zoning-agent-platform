@@ -94,11 +94,17 @@ def _build_fetcher(args: argparse.Namespace, *, raw_dir: Path) -> Fetcher:
             chapters=args.chapters or None,
         )
     if args.fetcher == "ecode360":
+        impersonate = (
+            None
+            if str(args.impersonate).strip().lower() in {"none", "off", ""}
+            else args.impersonate
+        )
         return ECode360Fetcher(
             cache_dir=raw_dir,
             request_delay=args.delay,
             max_sections=args.max_sections,
             code_id=args.code_id,
+            impersonate=impersonate,
         )
     raise SystemExit(f"Unknown fetcher: {args.fetcher}")
 
@@ -186,6 +192,13 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="eCode360 customer code, e.g. MI2395; "
         "default resolves via /ajax/code/info.",
+    )
+    parser.add_argument(
+        "--impersonate",
+        default="chrome",
+        help="eCode360 TLS-impersonation profile via curl_cffi "
+        "(e.g. chrome, chrome131, safari); 'none' disables (falls back to httpx, "
+        "which the host blocks with HTTP 403). Default: chrome.",
     )
     parser.add_argument(
         "--chapters",

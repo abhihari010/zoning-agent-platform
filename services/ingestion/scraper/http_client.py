@@ -10,6 +10,20 @@ Responsibilities:
 
 This deliberately avoids any third-party retry library — ``httpx`` is already a
 dependency and the backoff loop here is small and explicit.
+
+Two transports are supported behind one interface:
+
+- ``httpx`` (default) — the standard path used by every fetcher.
+- ``curl_cffi`` (opt-in, ``HttpClientConfig.impersonate``) — routes requests
+  through curl-impersonate so the TLS/JA3 handshake matches a real browser
+  (Chrome, Safari, ...).  Some hosts (eCode360 behind Cloudflare) block the
+  Python/OpenSSL TLS fingerprint outright; presenting Chrome's fingerprint can
+  clear that block.  ``curl_cffi`` is an OPTIONAL dependency — it is imported
+  lazily, only when ``impersonate`` is set, so the default httpx path and the
+  offline test suite never require it.
+
+Both transports share the same retry/backoff/cache/rate-limit and
+fail-closed-on-401/403 semantics.
 """
 
 from __future__ import annotations
@@ -46,6 +60,10 @@ class HttpClientConfig:
     max_retries: int = 3
     backoff_factor: float = 1.5
     cache_dir: Path | None = None
+    # Opt-in TLS-fingerprint impersonation profile (e.g. ``"chrome"``,
+    # ``"chrome131"``, ``"safari"``).  When ``None`` (default) the standard
+    # httpx transport is used and ``curl_cffi`` is never imported.
+    impersonate: str | None = None
 
 
 class PoliteHttpClient:
@@ -60,16 +78,61 @@ class PoliteHttpClient:
     def __init__(self, config: HttpClientConfig | None = None) -> None:
         self.config = config or HttpClientConfig()
         self._last_request_ts: float = 0.0
-        self._client = httpx.Client(
-            timeout=self.config.timeout,
-            follow_redirects=True,
-            headers={
-                "User-Agent": self.config.user_agent,
-                "Accept": "application/json, text/html;q=0.9, */*;q=0.5",
-            },
-        )
+        # Transport exceptions to treat as transient (retryable); populated per
+        # transport so the retry loop stays transport-agnostic.
+        self._transport_exceptions: tuple[type[BaseException], ...] = ()
+        if self.config.impersonate:
+            self._transport = "curl_cffi"
+            self._client = self._build_impersonate_client()
+        else:
+            self._transport = "httpx"
+            self._transport_exceptions = (
+                httpx.TimeoutException,
+                httpx.TransportError,
+            )
+            self._client = httpx.Client(
+                timeout=self.config.timeout,
+                follow_redirects=True,
+                headers={
+                    "User-Agent": self.config.user_agent,
+                    "Accept": "application/json, text/html;q=0.9, */*;q=0.5",
+                },
+            )
         if self.config.cache_dir is not None:
             self.config.cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def _build_impersonate_client(self):
+        """Build a curl_cffi session presenting a browser TLS fingerprint.
+
+        ``curl_cffi`` is imported here (and only here) so it stays an optional
+        dependency: the default httpx path never touches it.
+        """
+        try:
+            from curl_cffi import requests as cffi_requests
+        except ImportError as exc:  # pragma: no cover - exercised via message
+            raise ImportError(
+                "curl_cffi is required for the impersonation transport. "
+                "Install it with: pip install curl_cffi"
+            ) from exc
+
+        # Resolve the transport exception base across curl_cffi versions.
+        try:
+            from curl_cffi.requests.exceptions import RequestException as _CffiError
+        except Exception:  # pragma: no cover - older curl_cffi layout
+            try:
+                from curl_cffi.requests.errors import RequestsError as _CffiError
+            except Exception:
+                _CffiError = Exception  # type: ignore[assignment]
+        self._transport_exceptions = (_CffiError,)
+
+        # The impersonate profile sets a full, browser-consistent header set
+        # (User-Agent, Accept, sec-ch-* hints, ...).  We intentionally do NOT
+        # override those headers so the fingerprint stays internally consistent.
+        return cffi_requests.Session(
+            impersonate=self.config.impersonate,
+            timeout=self.config.timeout,
+            allow_redirects=True,
+        )
 
     def __enter__(self) -> "PoliteHttpClient":
         return self
@@ -126,7 +189,7 @@ class PoliteHttpClient:
             self._respect_rate_limit()
             try:
                 response = self._client.get(url)
-            except (httpx.TimeoutException, httpx.TransportError) as exc:
+            except self._transport_exceptions as exc:
                 last_error = exc
             else:
                 self._last_request_ts = time.monotonic()
@@ -137,9 +200,7 @@ class PoliteHttpClient:
                         "appears to be blocked. Stopping rather than retrying."
                     )
                 if status in _RETRYABLE_STATUS:
-                    last_error = httpx.HTTPStatusError(
-                        f"HTTP {status}", request=response.request, response=response
-                    )
+                    last_error = self._status_error(response, status)
                 elif status >= 400:
                     response.raise_for_status()
                 else:
@@ -154,3 +215,18 @@ class PoliteHttpClient:
         raise RuntimeError(
             f"Failed to fetch {url!r} after {self.config.max_retries} attempts: {last_error}"
         )
+
+    def _status_error(self, response: object, status: int) -> Exception:
+        """Build a transient-status error for the retry loop's ``last_error``.
+
+        Preserves the exact ``httpx.HTTPStatusError`` for the httpx transport
+        (so that path is byte-for-byte unchanged); the curl_cffi transport uses
+        a plain RuntimeError since it has no httpx request/response objects.
+        """
+        if self._transport == "httpx":
+            return httpx.HTTPStatusError(
+                f"HTTP {status}",
+                request=response.request,  # type: ignore[attr-defined]
+                response=response,  # type: ignore[arg-type]
+            )
+        return RuntimeError(f"HTTP {status} (curl_cffi transport)")
