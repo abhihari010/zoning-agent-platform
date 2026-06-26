@@ -1,0 +1,52 @@
+{
+"id": 81348923,
+"doc_id": "0-0-0-9760",
+"orig_doc_id": null,
+"orig_doc_idx": 0,
+"passthru_doc_id": null,
+"parent_doc_id": null,
+"title": "PART ELEVEN - PLANNING AND ZONING CODE",
+"code_uuid": "7989f740-69ad-4c65-b2bf-e47f1b8ae98a",
+"children": [
+{
+"id": 81348924,
+"doc_id": "0-0-0-9827",
+"orig_doc_id": null,
+"orig_doc_idx": 0,
+"passthru_doc_id": null,
+"parent_doc_id": "0-0-0-9760",
+"title": "TITLE ONE - Subdivision Regulations",
+"has_children": true
+},
+{
+"id": 81349008,
+"doc_id": "0-0-0-11572",
+"orig_doc_id": null,
+"orig_doc_idx": 0,
+"passthru_doc_id": null,
+"parent_doc_id": "0-0-0-9760",
+"title": "TITLE THREE - Zoning Administration",
+"has_children": true
+},
+{
+"id": 81349047,
+"doc_id": "0-0-0-12351",
+"orig_doc_id": null,
+"orig_doc_idx": 0,
+"passthru_doc_id": null,
+"parent_doc_id": "0-0-0-9760",
+"title": "TITLE FIVE - Zoning Districts and Regulations",
+"has_children": true
+},
+{
+"id": 81349117,
+"doc_id": "0-0-0-13676",
+"orig_doc_id": null,
+"orig_doc_idx": 0,
+"passthru_doc_id": null,
+"parent_doc_id": "0-0-0-9760",
+"title": "TITLE SEVEN - Additional Zoning Regulations",
+"has_children": true
+}
+]
+}

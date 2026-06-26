@@ -1,0 +1,42 @@
+{
+"id": 81349048,
+"doc_id": "0-0-0-12369",
+"orig_doc_id": null,
+"orig_doc_idx": 0,
+"passthru_doc_id": null,
+"parent_doc_id": "0-0-0-12351",
+"title": "CHAPTER 1141 Zoning District Map",
+"code_uuid": "7989f740-69ad-4c65-b2bf-e47f1b8ae98a",
+"children": [
+{
+"id": 81349049,
+"doc_id": "0-0-0-12382",
+"orig_doc_id": "0-0-0-12369",
+"orig_doc_idx": 1,
+"passthru_doc_id": null,
+"parent_doc_id": "0-0-0-12369",
+"title": "1141.01 ZONING DISTRICT MAP ADOPTED.",
+"has_children": false
+},
+{
+"id": 81349050,
+"doc_id": "0-0-0-12414",
+"orig_doc_id": "0-0-0-12369",
+"orig_doc_idx": 2,
+"passthru_doc_id": null,
+"parent_doc_id": "0-0-0-12369",
+"title": "1141.02 DESIGNATION OF ZONING DISTRICTS.",
+"has_children": false
+},
+{
+"id": 81349051,
+"doc_id": "0-0-0-12423",
+"orig_doc_id": "0-0-0-12369",
+"orig_doc_idx": 3,
+"passthru_doc_id": null,
+"parent_doc_id": "0-0-0-12369",
+"title": "1141.03 INTERPRETATION OF ZONING DISTRICT BOUNDARIES.",
+"has_children": false
+}
+]
+}
