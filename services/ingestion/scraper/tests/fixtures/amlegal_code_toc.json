@@ -1,0 +1,148 @@
+{
+"id": 45955,
+"uuid": "7989f740-69ad-4c65-b2bf-e47f1b8ae98a",
+"slug": "plaincity_oh",
+"title": "Codified Ordinances of Plain City, OH",
+"client_slug": "plaincity",
+"sections": [
+{
+"id": 81347659,
+"doc_id": "0-0-0-5",
+"passthru_doc_id": null,
+"title": "Codified Ordinances of Plain City, Ohio",
+"type": "section",
+"has_children": false,
+"has_section_children": false
+},
+{
+"id": 81347661,
+"doc_id": "0-0-0-15",
+"passthru_doc_id": null,
+"title": "CERTIFICATION",
+"type": "section",
+"has_children": false,
+"has_section_children": false
+},
+{
+"id": 81347663,
+"doc_id": "0-0-0-42",
+"passthru_doc_id": null,
+"title": "ROSTER OF OFFICIALS",
+"type": "section",
+"has_children": false,
+"has_section_children": false
+},
+{
+"id": 81347665,
+"doc_id": "0-0-0-74",
+"passthru_doc_id": null,
+"title": "ADOPTING ORDINANCE: 13-12",
+"type": "section",
+"has_children": false,
+"has_section_children": false
+},
+{
+"id": 81347667,
+"doc_id": "0-0-0-159",
+"passthru_doc_id": null,
+"title": "EDITOR'S NOTE",
+"type": "section",
+"has_children": false,
+"has_section_children": false
+},
+{
+"id": 81347669,
+"doc_id": "0-0-0-173",
+"passthru_doc_id": null,
+"title": "COMPARATIVE SECTION TABLE",
+"type": "section",
+"has_children": false,
+"has_section_children": false
+},
+{
+"id": 81347672,
+"doc_id": "0-0-0-24865",
+"passthru_doc_id": null,
+"title": "CHARTER",
+"type": "section",
+"has_children": true,
+"has_section_children": true
+},
+{
+"id": 81347848,
+"doc_id": "0-0-0-267",
+"passthru_doc_id": null,
+"title": "PART ONE - ADMINISTRATIVE CODE",
+"type": "section",
+"has_children": true,
+"has_section_children": true
+},
+{
+"id": 81348124,
+"doc_id": "0-0-0-1253",
+"passthru_doc_id": null,
+"title": "PART THREE - TRAFFIC CODE",
+"type": "section",
+"has_children": true,
+"has_section_children": true
+},
+{
+"id": 81348471,
+"doc_id": "0-0-0-4637",
+"passthru_doc_id": null,
+"title": "PART FIVE - GENERAL OFFENSES CODE",
+"type": "section",
+"has_children": true,
+"has_section_children": true
+},
+{
+"id": 81348702,
+"doc_id": "0-0-0-8182",
+"passthru_doc_id": null,
+"title": "PART SEVEN - BUSINESS REGULATION CODE",
+"type": "section",
+"has_children": true,
+"has_section_children": true
+},
+{
+"id": 81348742,
+"doc_id": "0-0-0-8601",
+"passthru_doc_id": null,
+"title": "PART NINE - STREETS, UTILITIES AND PUBLIC SERVICES CODE",
+"type": "section",
+"has_children": true,
+"has_section_children": true
+},
+{
+"id": 81348923,
+"doc_id": "0-0-0-9760",
+"passthru_doc_id": null,
+"title": "PART ELEVEN - PLANNING AND ZONING CODE",
+"type": "section",
+"has_children": true,
+"has_section_children": true
+},
+{
+"id": 81349314,
+"doc_id": "0-0-0-15905",
+"passthru_doc_id": null,
+"title": "PART THIRTEEN - BUILDING CODE",
+"type": "section",
+"has_children": true,
+"has_section_children": true
+},
+{
+"id": 81349336,
+"doc_id": "0-0-0-16550",
+"passthru_doc_id": null,
+"title": "PART FIFTEEN - FIRE PREVENTION CODE",
+"type": "section",
+"has_children": true,
+"has_section_children": true
+}
+],
+"is_pdf": false,
+"is_ingesting": false,
+"is_publishing": false,
+"is_deleting": false
+}

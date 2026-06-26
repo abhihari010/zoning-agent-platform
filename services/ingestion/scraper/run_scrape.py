@@ -31,6 +31,7 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
     from services.ingestion.scraper.fetchers import (
+        AmericanLegalFetcher,
         ECode360Fetcher,
         FlippingBookFetcher,
         GenericHtmlFetcher,
@@ -42,6 +43,7 @@ if __package__ in (None, ""):
     from services.ingestion.scraper.manifest_builder import build_manifest, slugify
 else:  # pragma: no cover - exercised via module execution
     from .fetchers import (
+        AmericanLegalFetcher,
         ECode360Fetcher,
         FlippingBookFetcher,
         GenericHtmlFetcher,
@@ -104,6 +106,20 @@ def _build_fetcher(args: argparse.Namespace, *, raw_dir: Path) -> Fetcher:
             request_delay=args.delay,
             max_sections=args.max_sections,
             code_id=args.code_id,
+            impersonate=impersonate,
+        )
+    if args.fetcher == "amlegal":
+        impersonate = (
+            None
+            if str(args.impersonate).strip().lower() in {"none", "off", ""}
+            else args.impersonate
+        )
+        return AmericanLegalFetcher(
+            cache_dir=raw_dir,
+            request_delay=args.delay,
+            max_sections=args.max_sections,
+            client_slug=args.client_slug,
+            code_slug=args.code_slug,
             impersonate=impersonate,
         )
     raise SystemExit(f"Unknown fetcher: {args.fetcher}")
@@ -178,6 +194,7 @@ def build_parser() -> argparse.ArgumentParser:
             "flippingbook",
             "municipalcodeonline",
             "ecode360",
+            "amlegal",
         ],
         default="municode",
         help="Which fetcher to use (default: municode).",
@@ -194,11 +211,23 @@ def build_parser() -> argparse.ArgumentParser:
         "default resolves via /ajax/code/info.",
     )
     parser.add_argument(
+        "--client-slug",
+        default=None,
+        help="amlegal client slug, e.g. plaincity; "
+        "default resolves via /api/clients-search.",
+    )
+    parser.add_argument(
+        "--code-slug",
+        default=None,
+        help="amlegal code slug, e.g. plaincity_oh; "
+        "default resolves from the client landing page.",
+    )
+    parser.add_argument(
         "--impersonate",
         default="chrome",
-        help="eCode360 TLS-impersonation profile via curl_cffi "
+        help="eCode360/amlegal TLS-impersonation profile via curl_cffi "
         "(e.g. chrome, chrome131, safari); 'none' disables (falls back to httpx, "
-        "which the host blocks with HTTP 403). Default: chrome.",
+        "which these Cloudflare-fronted hosts block with HTTP 403). Default: chrome.",
     )
     parser.add_argument(
         "--chapters",

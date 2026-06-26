@@ -1,0 +1,38 @@
+{
+"id": 20,
+"slug": "plaincity",
+"name": "Plain City",
+"splash_content": "",
+"banner": null,
+"logo": "",
+"header_color": null,
+"header_background": null,
+"subheader_background": null,
+"disclaimer": null,
+"exclude_disclaimer": false,
+"address_name": "City of Plain City",
+"address_line_1": "PO Box 167",
+"address_line_2": "800 Village Blvd.",
+"address_city": "Plain City",
+"address_state": "Ohio",
+"address_zip_code": "43064-1240",
+"website_url": "",
+"order_code_url": "",
+"new_legislation_url": "",
+"meeting_minutes_url": "",
+"city_officials": "",
+"versions": [
+{
+"uuid": "1f5e1a17-5277-413d-a417-06155f84aa65",
+"name": "2026-01",
+"currency_info": "Local legislation current through March 31, 2026 | State legislation current through December 31, 2025"
+}
+],
+"minutes_years": [],
+"region": {
+"name": "Ohio",
+"slug": "oh",
+"country_iso_code": "USA"
+},
+"scroll_tables_enabled": true
+}

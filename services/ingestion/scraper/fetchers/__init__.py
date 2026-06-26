@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .amlegal import AmericanLegalFetcher
 from .base import FetchResult, Fetcher, SectionRecord
 from .ecode360 import ECode360Fetcher
 from .flippingbook import FlippingBookFetcher
@@ -12,6 +13,7 @@ from .municode import MunicodeFetcher
 __all__ = [
     "FetchResult",
     "Fetcher",
+    "AmericanLegalFetcher",
     "ECode360Fetcher",
     "FlippingBookFetcher",
     "SectionRecord",

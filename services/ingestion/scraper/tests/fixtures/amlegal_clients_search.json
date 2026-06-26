@@ -1,0 +1,82 @@
+[
+{
+"name": "Columbus",
+"region": {
+"name": "Indiana",
+"slug": "in",
+"country_iso_code": "USA"
+},
+"slug": "columbusin",
+"version_ct": 1
+},
+{
+"name": "Dayton",
+"region": {
+"name": "Kentucky",
+"slug": "ky",
+"country_iso_code": "USA"
+},
+"slug": "dayton",
+"version_ct": 1
+},
+{
+"name": "Columbus",
+"region": {
+"name": "Minnesota",
+"slug": "mn",
+"country_iso_code": "USA"
+},
+"slug": "columbusmn",
+"version_ct": 1
+},
+{
+"name": "Dayton",
+"region": {
+"name": "Minnesota",
+"slug": "mn",
+"country_iso_code": "USA"
+},
+"slug": "daytonmn",
+"version_ct": 1
+},
+{
+"name": "Columbus",
+"region": {
+"name": "Nebraska",
+"slug": "ne",
+"country_iso_code": "USA"
+},
+"slug": "columbus",
+"version_ct": 1
+},
+{
+"name": "Columbus",
+"region": {
+"name": "North Carolina",
+"slug": "nc",
+"country_iso_code": "USA"
+},
+"slug": "columbusnc",
+"version_ct": 1
+},
+{
+"name": "Plain City",
+"region": {
+"name": "Ohio",
+"slug": "oh",
+"country_iso_code": "USA"
+},
+"slug": "plaincity",
+"version_ct": 1
+},
+{
+"name": "Plain City",
+"region": {
+"name": "Utah",
+"slug": "ut",
+"country_iso_code": "USA"
+},
+"slug": "plaincityut",
+"version_ct": 1
+}
+]

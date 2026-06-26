@@ -38,11 +38,14 @@ a draft into the curated tree happens later, after district mapping + golden QA.
 | Flag | Default | Purpose |
 | --- | --- | --- |
 | `--city` / `--state` | required | Jurisdiction name + 2-letter state code |
-| `--fetcher` | `municode` | `municode`, `generic_html`, `flippingbook`, `municipalcodeonline`, or `ecode360` |
+| `--fetcher` | `municode` | `municode`, `generic_html`, `flippingbook`, `municipalcodeonline`, `ecode360`, or `amlegal` |
 | `--url` | – | Official URL(s); required for `generic_html`, optional override otherwise |
 | `--host-slug` | – | `municipalcodeonline` subdomain slug (default: first word of `--city`) |
 | `--chapters` | – | `municipalcodeonline` chapter node id(s) to fetch (repeatable) |
 | `--code-id` | – | `ecode360` customer code, e.g. `MI2395` (default resolves via `/ajax/code/info`) |
+| `--client-slug` | – | `amlegal` client slug, e.g. `plaincity` (default resolves via `/api/clients-search`) |
+| `--code-slug` | – | `amlegal` code slug, e.g. `plaincity_oh` (default resolves from the landing page) |
+| `--impersonate` | `chrome` | `ecode360`/`amlegal` TLS-impersonation profile via curl_cffi; `none` disables |
 | `--county` | – | Parent county (sets `parent_jurisdiction_id`) |
 | `--jurisdiction-id` | derived | Override the derived id (`{slug}-{state}`) |
 | `--coverage-status` | `source_indexed` | Pack coverage status |
@@ -63,15 +66,18 @@ services/ingestion/scraper/
     municode.py         # PRIMARY: Municode JSON API (TOC walk + content chunk groups)
     municipalcodeonline.py  # Municipal Code Online SPA backing endpoints (auth-guarded)
     ecode360.py         # eCode360 / General Code (TOC JSON + server-rendered article HTML)
+    amlegal.py          # American Legal Publishing (clients/code-toc/section-toc/render-section JSON)
     flippingbook.py     # FlippingBook publication fetcher
     generic_html.py     # FALLBACK: fetch an official page, clean HTML → coarse sections
   tests/
-    fixtures/           # saved real Municode/MCO/eCode360 JSON + HTML (NO live network in tests)
+    fixtures/           # saved real Municode/MCO/eCode360/AmLegal JSON + HTML (NO live network in tests)
     test_html_cleaner.py
     test_manifest_builder.py   # also runs the REAL validate_source_packs validator
     test_municode_parser.py    # parses saved fixtures → SectionRecords
     test_municipalcodeonline_parser.py
     test_ecode360_parser.py    # parses saved eCode360 fixtures → SectionRecords
+    test_amlegal_parser.py     # parses saved AmLegal fixtures → SectionRecords
+    test_http_client_transport.py  # transport selection (httpx vs curl_cffi impersonation)
     test_generic_html.py
 ```
 
@@ -202,6 +208,77 @@ Like the other fetchers, eCode360 emits **one `SectionRecord` per leaf section**
 (`§ NNN`), each with its own `section_ref`, deep-link `url`, cleaned body text
 (history note stripped), and `effective_date` parsed from the latest `hisdate`.
 Reserved/placeholder sections (`(Reserved)`) are skipped.
+
+## American Legal Publishing investigation (findings)
+
+American Legal Publishing hosts municipal codes for thousands of US jurisdictions
+at `codelibrary.amlegal.com` — a React SPA backed by a JSON API on the **same
+host** (`/api/...`). The endpoints were discovered by reading the SPA's JS
+bundle (`/assets/main.*.js`) and confirming the live network traffic with a real
+browser. No API key is required.
+
+Endpoints used (all under `https://codelibrary.amlegal.com`):
+
+1. **Resolve city → client slug**
+   `GET /api/clients-search/?s=` → a JSON array of **every** client
+   `[{"name": "Plain City", "region": {"slug": "oh"}, "slug": "plaincity"}, ...]`.
+   The query string is ignored server-side (the full list comes back), so we
+   filter client-side by `name` + `region.slug` (state). State disambiguation
+   matters — e.g. there is both a *Plain City, OH* and a *Plain City, UT*.
+2. **Resolve client → code (uuid + slug)**
+   `GET /codes/{client_slug}/` (the landing HTML) carries `data-codeuuid="..."`
+   (the default code's uuid) and a `/codes/{client_slug}/latest/{code_slug}/...`
+   link from which we read the code slug.
+3. **Code table of contents (top level)**
+   `GET /api/code-toc/{code_uuid}/` → `{uuid, slug, client_slug, sections:
+   [{id, doc_id, title, type, has_children}, ...]}`. Only the top level; children
+   load lazily. (Keyed by uuid — the slug form returns HTTP 500.)
+4. **Expand a node**
+   `GET /api/section-toc/{node_id}/` (the numeric `id`) → that node with a
+   `children` array (`{id, doc_id, orig_doc_id, orig_doc_idx, title,
+   has_children}`), walked recursively to the leaf sections.
+5. **Section content**
+   `GET /api/render-section/{client_slug}/latest/{code_slug}/{orig_doc_id}/
+   {orig_doc_idx}/` → `{doc_id, title, html}` for one leaf section. The `html`
+   uses React-style tags (`<CodeOptions>`, `<AnnotationDrawer>`, `className`) that
+   `clean_html` strips to plain text; the leading `<h4>` section heading is
+   removed so it is not duplicated in the body.
+
+**Deep-link URL** for a section on the public site:
+
+```
+https://codelibrary.amlegal.com/codes/{client_slug}/latest/{code_slug}/{doc_id}
+```
+
+The zoning part/title is found **data-drivenly** by matching the TOC node title
+against `"zoning"` (excluding `"subdivision"` / `"zoning map"`). For Plain City,
+OH that is `PART ELEVEN - PLANNING AND ZONING CODE`; its `TITLE ONE - Subdivision
+Regulations` child is skipped during the walk. There is **no hard-coded per-city
+node id**. Effective dates come from per-section history notes (`(Ord. NN-NN.
+Passed M-D-YY.)`), falling back to the code's currency string
+(`...current through March 31, 2026`).
+
+**Cloudflare TLS-fingerprint block (same as eCode360).** `codelibrary.amlegal.com`
+is behind Cloudflare and returns HTTP 403 to the plain Python/OpenSSL TLS
+fingerprint. Presenting Chrome's fingerprint clears it, so this fetcher defaults
+to `impersonate="chrome"` via the shared `PoliteHttpClient` curl_cffi transport
+(see "Optional impersonation transport" below). Verified live against Plain City,
+OH (`plaincity` / `plaincity_oh`): `--impersonate none` → `BLOCKED: HTTP 403`;
+`--impersonate chrome` → real zoning-administration sections returned. Offline
+parser tests use **saved real responses** and touch no network.
+
+## Optional impersonation transport (curl_cffi)
+
+`PoliteHttpClient` supports an opt-in TLS-fingerprint impersonation transport
+(`HttpClientConfig.impersonate`). When set, requests route through `curl_cffi`
+(`Session(impersonate="chrome")`) so the JA3/JA4 handshake matches a real
+browser; when `None` (the default) the standard `httpx` path is used and
+`curl_cffi` is never imported. Both transports share the same
+retry/backoff/cache/rate-limit and fail-closed-on-401/403 semantics. `curl_cffi`
+is an **optional** dependency (`pip install "apps/api[scraper-impersonation]"`);
+CI installs `.[dev]` and the offline test suite never requires it. The eCode360
+and American Legal fetchers default to Chrome impersonation because their hosts
+block the bare httpx fingerprint.
 
 ## Design decisions
 
