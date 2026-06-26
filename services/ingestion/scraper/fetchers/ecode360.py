@@ -414,6 +414,7 @@ class ECode360Fetcher:
         request_delay: float = 2.0,
         max_sections: int | None = None,
         code_id: str | None = None,
+        impersonate: str | None = "chrome",
     ) -> None:
         self.cache_dir = cache_dir
         # eCode360 is behind Cloudflare; a polite 2-second delay is the minimum.
@@ -421,12 +422,17 @@ class ECode360Fetcher:
         self.max_sections = max_sections
         # Optional explicit customer code (e.g. "MI2395"), bypassing /ajax/code/info.
         self.code_id = code_id
+        # eCode360 fingerprints the TLS handshake (Cloudflare).  Default to a
+        # Chrome impersonation profile via curl_cffi; pass ``None`` to fall back
+        # to the plain httpx transport (which the host blocks with HTTP 403).
+        self.impersonate = impersonate
 
     def fetch(self, *, city: str, state: str) -> FetchResult:
         state = state.upper()
         config = HttpClientConfig(
             request_delay=self.request_delay,
             cache_dir=self.cache_dir,
+            impersonate=self.impersonate,
         )
 
         with PoliteHttpClient(config) as client:
@@ -498,9 +504,10 @@ class ECode360Fetcher:
                 "customer_id": customer_id,
                 "zoning_chapter": zoning_chapter_title,
                 "retrieved_at": datetime.utcnow().date().isoformat(),
+                "impersonate": self.impersonate,
                 "auth_guard": (
-                    "Cloudflare Turnstile — httpx blocked; "
-                    "use request_delay >= 2.0 and on-disk cache"
+                    "Cloudflare TLS-fingerprint block — plain httpx returns 403; "
+                    f"transport impersonates {self.impersonate or 'none'} via curl_cffi"
                 ),
             },
         )

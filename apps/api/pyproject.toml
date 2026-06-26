@@ -25,6 +25,14 @@ dev = [
 monitoring = [
   "sentry-sdk[fastapi]>=2.0.0"
 ]
+# Optional TLS-fingerprint impersonation transport for the ingestion scraper
+# (services/ingestion/scraper). Only needed to scrape hosts that block the
+# default httpx TLS fingerprint (e.g. eCode360 behind Cloudflare). Not pulled
+# in by the base install or by CI (which installs ".[dev]"); the scraper imports
+# curl_cffi lazily and only when impersonation is requested.
+scraper-impersonation = [
+  "curl_cffi>=0.7"
+]
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]
