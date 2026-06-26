@@ -1,0 +1,4 @@
+{
+  "_note": "TEST STUB — not a real LLM response. Used by offline unit tests to simulate a Groq response for a commercial district group.",
+  "response": "{\"districts\": [\"unknown\", \"commercial-employment\"], \"uses\": [\"general\"], \"rationale\": \"This division governs business and commercial districts.\", \"confidence\": 0.88}"
+}
