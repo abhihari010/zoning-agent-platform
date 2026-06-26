@@ -1,0 +1,4 @@
+{
+  "_note": "TEST STUB — not a real LLM response. Used by offline unit tests to simulate a Groq response for a home occupation / residential use standards group.",
+  "response": "{\"districts\": [\"unknown\"], \"uses\": [\"home-based-food-business\", \"general\"], \"rationale\": \"This division covers home occupation regulations applicable across residential zones.\", \"confidence\": 0.85}"
+}
