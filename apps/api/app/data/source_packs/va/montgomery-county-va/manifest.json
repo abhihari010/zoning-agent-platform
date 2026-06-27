@@ -25,7 +25,7 @@
       "phone": "540-394-2148"
     }
   },
-  "verification_notes": "Existing public-supported source pack for unincorporated Montgomery County home occupations, zoning sequence, GIS, building permit, and health review triggers, PLUS the full Chapter 10 (Zoning) and Chapter 8 (Planning & Development) ordinance scraped 2026-06-20 from Municipal Code Online (municipalcodeonline.com; 123 sections, Sec. 10-x / Sec. 8-x with deep-link URLs and full_text). District tagging applied to Chapter-10 base/overlay districts (Sec. 10-21..10-40 -> a-1, c-1, r-r, r-1, r-2, r-3, rm-1, gb, cb, m-1, m-l, pud-tnd, tnd-infill, pin, pud-com, pud-res, pmr, flood-overlay, aso, route-177-overlay, rse-com); all sections retain uses:['general']. Montgomery lists permitted/special uses per-district (no consolidated use matrix), so no principal_uses marker was applied. Validated 2026-06-20 via isolated Qdrant eval (groq llama-3.3-70b + gemini embeddings, hybrid_local): use queries for SFH/R-1, restaurant/GB, retail/CB, manufacturing/M-1, multifamily/RM-1 returned grounded Sec. 10-x citations (likely_allowed); special-use query returned conditional; out-of-corpus query correctly abstained (unknown). Prod re-index intentionally deferred to human deploy decision.",
+  "verification_notes": "Existing public-supported source pack for unincorporated Montgomery County home occupations, zoning sequence, GIS, building permit, and health review triggers, PLUS the full Chapter 10 (Zoning) and Chapter 8 (Planning & Development) ordinance scraped 2026-06-20 from Municipal Code Online (municipalcodeonline.com; 123 sections, Sec. 10-x / Sec. 8-x with deep-link URLs and full_text). District tagging applied to Chapter-10 base/overlay districts (Sec. 10-21..10-40); normalized to 6-bucket closed vocabulary: agricultural (a-1 Agricultural, c-1 Conservation), residential-low-density (r-r Rural Residential, r-1/r-2/r-3 Residential, rm-1 Multiple-Family, pud-res PUD-Residential, pmr Planned Mobile Home), commercial-employment (gb General Business, cb Community Business, pud-com PUD-Commercial), industrial-zone (m-1 Manufacturing, m-l Manufacturing-Light, pin Planned Industrial), mixed-use-core (pud-tnd PUD-TND, tnd-infill TND Infill), unknown (overlays: flood-overlay, aso, route-177-overlay, rse-com — cross-cutting, kept match-all); all sections retain uses:['general']. Montgomery lists permitted/special uses per-district (no consolidated use matrix), so no principal_uses marker was applied. Validated 2026-06-20 via isolated Qdrant eval (groq llama-3.3-70b + gemini embeddings, hybrid_local): use queries for SFH/R-1, restaurant/GB, retail/CB, manufacturing/M-1, multifamily/RM-1 returned grounded Sec. 10-x citations (likely_allowed); special-use query returned conditional; out-of-corpus query correctly abstained (unknown). Prod re-index intentionally deferred to human deploy decision.",
   "sources": [
     {
       "source_id": "montgomery-county-home-occupation-zoning",
@@ -321,7 +321,7 @@
       "effective_date": "2024-02-26",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "a-1"
+        "agricultural"
       ],
       "uses": [
         "general"
@@ -350,7 +350,7 @@
       "effective_date": "2022-07-25",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "c-1"
+        "agricultural"
       ],
       "uses": [
         "general"
@@ -379,7 +379,7 @@
       "effective_date": "2024-02-26",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "r-r"
+        "residential-low-density"
       ],
       "uses": [
         "general"
@@ -408,7 +408,7 @@
       "effective_date": "2022-07-25",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "r-1"
+        "residential-low-density"
       ],
       "uses": [
         "general"
@@ -437,7 +437,7 @@
       "effective_date": "2022-07-25",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "r-2"
+        "residential-low-density"
       ],
       "uses": [
         "general"
@@ -466,7 +466,7 @@
       "effective_date": "2022-07-25",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "r-3"
+        "residential-low-density"
       ],
       "uses": [
         "general"
@@ -495,7 +495,7 @@
       "effective_date": "2022-07-25",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "rm-1"
+        "residential-low-density"
       ],
       "uses": [
         "general"
@@ -524,7 +524,7 @@
       "effective_date": "2024-02-26",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "gb"
+        "commercial-employment"
       ],
       "uses": [
         "general"
@@ -553,7 +553,7 @@
       "effective_date": "2022-07-25",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "cb"
+        "commercial-employment"
       ],
       "uses": [
         "general"
@@ -582,7 +582,7 @@
       "effective_date": "2024-02-26",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "m-1"
+        "industrial-zone"
       ],
       "uses": [
         "general"
@@ -611,7 +611,7 @@
       "effective_date": "2024-02-26",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "m-l"
+        "industrial-zone"
       ],
       "uses": [
         "general"
@@ -640,7 +640,7 @@
       "effective_date": "2020-09-28",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "pud-tnd"
+        "mixed-use-core"
       ],
       "uses": [
         "general"
@@ -669,7 +669,7 @@
       "effective_date": "2020-09-28",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "tnd-infill"
+        "mixed-use-core"
       ],
       "uses": [
         "general"
@@ -698,7 +698,7 @@
       "effective_date": "2024-02-26",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "pin"
+        "industrial-zone"
       ],
       "uses": [
         "general"
@@ -728,7 +728,7 @@
       "effective_date": "2024-02-26",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "pud-com"
+        "commercial-employment"
       ],
       "uses": [
         "general"
@@ -758,7 +758,7 @@
       "effective_date": "2024-02-26",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "pud-res"
+        "residential-low-density"
       ],
       "uses": [
         "general"
@@ -788,7 +788,7 @@
       "effective_date": "2026-06-20",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "pmr"
+        "residential-low-density"
       ],
       "uses": [
         "general"
@@ -819,7 +819,7 @@
       "effective_date": "2009-09-25",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "flood-overlay"
+        "unknown"
       ],
       "uses": [
         "general"
@@ -849,7 +849,7 @@
       "effective_date": "2026-06-20",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "aso"
+        "unknown"
       ],
       "uses": [
         "general"
@@ -880,7 +880,7 @@
       "effective_date": "1995-01-01",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "route-177-overlay"
+        "unknown"
       ],
       "uses": [
         "general"
@@ -910,7 +910,7 @@
       "effective_date": "2026-06-20",
       "retrieved_at": "2026-06-20",
       "districts": [
-        "rse-com"
+        "unknown"
       ],
       "uses": [
         "general"
