@@ -25,16 +25,16 @@ def test_resolve_supported_jurisdiction() -> None:
 
 
 def test_resolve_source_indexed_jurisdiction_carries_coverage_caveat() -> None:
-    """source_indexed jurisdictions (e.g. christiansburg-va) must resolve with a coverage
+    """source_indexed jurisdictions (e.g. roanoke-va) must resolve with a coverage
     caveat warning, not the hard-unsupported warning."""
     result = JurisdictionTool().resolve(
-        "100 Main St, Christiansburg, VA 24073",
-        37.1,
-        -80.4,
+        "215 Church Ave SW, Roanoke, VA 24011",
+        37.27,
+        -79.94,
         None,
     )
 
-    assert result.jurisdiction_id == "christiansburg-va"
+    assert result.jurisdiction_id == "roanoke-va"
     assert result.supported is False          # raw QA flag unchanged
     assert result.coverage_status == "source_indexed"
     assert len(result.warnings) == 1
