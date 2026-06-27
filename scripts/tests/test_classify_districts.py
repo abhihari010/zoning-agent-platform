@@ -125,6 +125,7 @@ class TestClosedVocab:
         assert "mixed-use-core" in cd.DISTRICT_VOCAB
         assert "commercial-employment" in cd.DISTRICT_VOCAB
         assert "industrial-zone" in cd.DISTRICT_VOCAB
+        assert "agricultural" in cd.DISTRICT_VOCAB
         assert "unknown" in cd.DISTRICT_VOCAB
 
     def test_uses_vocab_contents(self):
@@ -135,7 +136,7 @@ class TestClosedVocab:
 
     def test_district_vocab_is_closed(self):
         """No extra terms leaked in."""
-        assert len(cd.DISTRICT_VOCAB) == 5
+        assert len(cd.DISTRICT_VOCAB) == 6
 
     def test_uses_vocab_is_closed(self):
         assert len(cd.USES_VOCAB) == 4

@@ -104,6 +104,7 @@ DISTRICT_VOCAB: frozenset[str] = frozenset(
         "mixed-use-core",
         "commercial-employment",
         "industrial-zone",
+        "agricultural",
         "unknown",
     }
 )
