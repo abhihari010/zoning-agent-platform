@@ -57,19 +57,31 @@
     }
   },
   {
-    "id": "christiansburg-source-indexed-served",
-    "project_description": "Open a small bakery with two employees, regular operating hours, and renovation plans.",
-    "district": "unknown",
+    "id": "christiansburg-public-supported-happy-path",
+    "project_description": "Operate a minor home occupation (small graphic design studio) from a single-family home with two part-time employees, posted business hours, and no exterior renovation or new construction.",
+    "district": "residential-low-density",
     "jurisdiction_id": "christiansburg-va",
     "jurisdiction_name": "Christiansburg, VA",
     "normalized_address": "100 Main St, Christiansburg, VA 24073",
-    "sources": [],
+    "sources": [
+      {
+        "source_id": "christiansburg-va-sec-42-93",
+        "title": "Sec. 42-93. - Permitted uses.",
+        "excerpt": "In the R-1 Single-Family Residential District, structures to be erected or land to be used shall be for one or more of the following uses: (1) Single-family dwellings, including a family and one unrelated individual per unit. ... (5) Minor home occupations. Major home occupations with a conditional use permit.",
+        "section_ref": "Sec. 42-93.",
+        "jurisdiction_id": "christiansburg-va",
+        "url": "https://library.municode.com/va/christiansburg/codes/code_of_ordinances?nodeId=SPBLADERE_CH42ZO_ARTIVSIMIREDIR-_S42-93PEUS",
+        "effective_date": "2022-10-25",
+        "districts": ["residential-low-density"],
+        "uses": ["general"]
+      }
+    ],
     "expect": {
-      "decisions": ["unknown"],
-      "statuses": ["low_confidence"],
+      "decisions": ["likely_allowed", "conditional"],
+      "statuses": ["success"],
       "min_citations": 1,
+      "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": ["Preliminary coverage"],
       "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "montgomery-county-va", "roanoke-va", "roanoke-county-va"]
     }
   },

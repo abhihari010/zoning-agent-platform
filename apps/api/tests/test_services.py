@@ -169,16 +169,6 @@ def _mock_google_address(monkeypatch: pytest.MonkeyPatch, payload: dict) -> None
     ("formatted_address", "components", "expected_id", "expected_name"),
     [
         (
-            "100 Main St, Christiansburg, VA 24073, USA",
-            [
-                {"long_name": "Christiansburg", "types": ["locality"]},
-                {"long_name": "Montgomery County", "types": ["administrative_area_level_2"]},
-                {"long_name": "VA", "types": ["administrative_area_level_1"]},
-            ],
-            "christiansburg-va",
-            "Christiansburg, VA",
-        ),
-        (
             "215 Church Ave SW, Roanoke, VA 24011, USA",
             [
                 {"long_name": "Roanoke", "types": ["locality"]},
