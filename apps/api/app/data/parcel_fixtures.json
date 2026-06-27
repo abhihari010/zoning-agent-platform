@@ -7,5 +7,55 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "fixture"
+  },
+  {
+    "address_pattern": "1865 akers st sw",
+    "jurisdiction_id": "christiansburg-va",
+    "parcel_id": "034029",
+    "zoning_district": "agricultural",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='A') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.11034989 lon:-80.38830444 returning Zoning_Classification='A'"
+  },
+  {
+    "address_pattern": "510 canterbury st sw",
+    "jurisdiction_id": "christiansburg-va",
+    "parcel_id": "070371",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='R1') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.11107165 lon:-80.4066032 returning Zoning_Classification='R-1'"
+  },
+  {
+    "address_pattern": "70 nursery ln ne",
+    "jurisdiction_id": "christiansburg-va",
+    "parcel_id": "031600",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='MU-1') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.139124 lon:-80.340835 returning Zoning_Classification='MU-1'"
+  },
+  {
+    "address_pattern": "1380 mud pike rd nw",
+    "jurisdiction_id": "christiansburg-va",
+    "parcel_id": "030729",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='B3') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.11713677 lon:-80.42287894 returning Zoning_Classification='B-3'"
+  },
+  {
+    "address_pattern": "135 technology dr se",
+    "jurisdiction_id": "christiansburg-va",
+    "parcel_id": "100516",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='I2') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.115511 lon:-80.37622925 returning Zoning_Classification='I-2'"
   }
 ]
