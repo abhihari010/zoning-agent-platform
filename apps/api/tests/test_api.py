@@ -565,7 +565,7 @@ def test_jurisdiction_coverage_and_request_flow(monkeypatch):
     assert coverage_response.status_code == 200
     coverage = coverage_response.json()["jurisdictions"]
     assert any(item["jurisdiction_id"] == "blacksburg-va" and item["coverage_status"] == "public_supported" for item in coverage)
-    assert any(item["jurisdiction_id"] == "christiansburg-va" and item["coverage_status"] == "source_indexed" for item in coverage)
+    assert any(item["jurisdiction_id"] == "roanoke-va" and item["coverage_status"] == "source_indexed" for item in coverage)
     assert request_response.status_code == 200
     assert request_response.json()["status"] == "created"
     assert duplicate_response.status_code == 200
