@@ -70,6 +70,25 @@ def test_build_manifest_one_source_per_section():
     assert first["jurisdiction_id"] == "blacksburg-va"
 
 
+def test_build_manifest_drops_too_short_sections():
+    # A stub section whose body normalises to under the SourceRegistryEntry
+    # excerpt minimum (10 chars) must be dropped so the pack stays ingestible.
+    records = _sample_records() + [
+        SectionRecord(
+            section_ref="Sec. 11-5",
+            heading="Sec. 11-5 - Penalties.",
+            text="None.",
+            url="https://library.municode.com/va/winchester/codes/zoning?nodeId=S11-5",
+            node_id="S11-5",
+        )
+    ]
+    manifest = build_manifest(city="Winchester", state="VA", records=records)
+    refs = {s["section_ref"] for s in manifest["sources"]}
+    assert "Sec. 11-5" not in refs
+    assert len(manifest["sources"]) == 2
+    assert all(len(s["excerpt"]) >= 10 for s in manifest["sources"])
+
+
 def test_unique_source_ids_even_for_duplicate_section_refs():
     records = _sample_records()
     records.append(records[0])  # duplicate Sec. 4211

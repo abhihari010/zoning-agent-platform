@@ -608,3 +608,34 @@ class TestCLI:
                 "--jurisdictions-file", str(tmp_path / "jurisdictions.json"),
             ])
         assert exc.value.code != 0
+
+
+class TestCleanFips:
+    """FIPS sanitization: placeholders and invalid values must not be written."""
+
+    def test_clean_fips_keeps_valid_numeric_codes(self):
+        assert promoter._clean_fips("51") == "51"
+        assert promoter._clean_fips("51840") == "51840"
+
+    def test_clean_fips_drops_todo_placeholders(self):
+        # discover skeleton placeholders exceed JurisdictionRecord max_length=10.
+        assert promoter._clean_fips("TODO_COUNTY_FIPS") is None
+        assert promoter._clean_fips("TODO_PLACE_FIPS") is None
+
+    def test_clean_fips_drops_empty_and_non_string(self):
+        assert promoter._clean_fips("") is None
+        assert promoter._clean_fips(None) is None
+        assert promoter._clean_fips(12345) is None
+
+    def test_build_entry_nulls_placeholder_fips(self):
+        jur = {
+            "jurisdiction_id": "winchester-va",
+            "name": "Winchester, VA",
+            "state": "VA",
+            "county_fips": "TODO_COUNTY_FIPS",
+            "place_fips": "TODO_PLACE_FIPS",
+            "jurisdiction_type": "independent_city",
+        }
+        entry = promoter._build_jurisdiction_entry(jur)
+        assert entry["county_fips"] is None
+        assert entry["place_fips"] is None

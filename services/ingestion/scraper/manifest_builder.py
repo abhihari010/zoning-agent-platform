@@ -27,6 +27,9 @@ from .fetchers.base import SectionRecord
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 _EXCERPT_MAX = 500
 _FULL_TEXT_MAX = 250_000  # matches SourceRegistryEntry.full_text max_length
+# SourceRegistryEntry.excerpt has min_length=10; sections whose body normalises
+# to fewer than this (e.g. a stub "None.") cannot be ingested, so drop them.
+_MIN_TEXT_CHARS = 10
 
 
 def _load_discover_module():
@@ -129,6 +132,12 @@ def build_manifest(
     """
     if not records:
         raise ValueError("Cannot build a manifest with zero sections.")
+
+    # Drop trivially-short sections (e.g. a stub body "None.") that fall below
+    # the SourceRegistryEntry excerpt minimum and would fail ingestion.
+    records = [r for r in records if len(" ".join(r.text.split())) >= _MIN_TEXT_CHARS]
+    if not records:
+        raise ValueError("All sections were below the minimum content length.")
 
     discover = _load_discover_module()
     skeleton = base_manifest or discover.build_draft_manifest(
