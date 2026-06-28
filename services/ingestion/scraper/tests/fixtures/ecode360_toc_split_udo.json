@@ -1,0 +1,180 @@
+{
+  "guid": "FR3526",
+  "title": "City of Fredericksburg, VA",
+  "number": "",
+  "type": "code",
+  "label": "",
+  "href": "",
+  "children": [
+    {
+      "guid": "37741408",
+      "title": "Code of Ordinances",
+      "number": "II",
+      "type": "division",
+      "label": "Division",
+      "href": "",
+      "children": [
+        {
+          "guid": "28963700",
+          "title": "Agencies, Authorities, Boards, Commissions and Committees",
+          "number": "10",
+          "type": "chapter",
+          "label": "Chapter",
+          "href": "",
+          "children": [
+            {
+              "guid": "28963738",
+              "title": "Board of Zoning Appeals of the City of Fredericksburg",
+              "number": "4",
+              "type": "article",
+              "label": "Article",
+              "href": "",
+              "children": [
+                {
+                  "guid": "28963739",
+                  "title": "Established.",
+                  "number": "10-90",
+                  "type": "section",
+                  "label": "Section",
+                  "href": "",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "guid": "29088644",
+          "title": "Unified Development Ordinance",
+          "number": "72",
+          "type": "chapter",
+          "label": "Chapter",
+          "href": "",
+          "children": []
+        },
+        {
+          "guid": "29011368",
+          "title": "General Provisions",
+          "number": "72-1",
+          "type": "chapter",
+          "label": "Chapter",
+          "href": "",
+          "children": [
+            {
+              "guid": "29011371",
+              "title": "Authority and Applicability",
+              "number": "72-11",
+              "type": "article",
+              "label": "Article",
+              "href": "",
+              "children": [
+                {
+                  "guid": "29011372",
+                  "title": "72-11.1: Authority.",
+                  "number": "72-11.1",
+                  "type": "section",
+                  "label": "Section",
+                  "href": "",
+                  "children": []
+                },
+                {
+                  "guid": "29011373",
+                  "title": "72-11.2: Applicability.",
+                  "number": "72-11.2",
+                  "type": "section",
+                  "label": "Section",
+                  "href": "",
+                  "children": []
+                },
+                {
+                  "guid": "29011374",
+                  "title": "72-11.3: (Reserved)",
+                  "number": "72-11.3",
+                  "type": "section",
+                  "label": "Section",
+                  "href": "",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "guid": "29018070",
+          "title": "Enforcement",
+          "number": "72-7",
+          "type": "chapter",
+          "label": "Chapter",
+          "href": "",
+          "children": [
+            {
+              "guid": "29018071",
+              "title": "SECTION 72-70: General Provisions",
+              "number": "SECTION 72-70",
+              "type": "section",
+              "label": "Section",
+              "href": "",
+              "children": []
+            },
+            {
+              "guid": "29018084",
+              "title": "SECTION 72-72: Notice of Zoning Violation",
+              "number": "SECTION 72-72",
+              "type": "section",
+              "label": "Section",
+              "href": "",
+              "children": []
+            }
+          ]
+        },
+        {
+          "guid": "36716400",
+          "title": "Form-Based Zoning Regulations",
+          "number": "72-A",
+          "type": "chapter",
+          "label": "Chapter",
+          "href": "",
+          "children": []
+        },
+        {
+          "guid": "28842272",
+          "title": "Zoning, Planning and Development",
+          "number": "78",
+          "type": "chapter",
+          "label": "Chapter",
+          "href": "",
+          "children": [
+            {
+              "guid": "28842273",
+              "title": "78-1: Legacy provisions.",
+              "number": "78-1",
+              "type": "section",
+              "label": "Section",
+              "href": "",
+              "children": []
+            }
+          ]
+        },
+        {
+          "guid": "28850000",
+          "title": "Subdivision of Land",
+          "number": "80",
+          "type": "chapter",
+          "label": "Chapter",
+          "href": "",
+          "children": [
+            {
+              "guid": "28850001",
+              "title": "80-1: Plat requirements.",
+              "number": "80-1",
+              "type": "section",
+              "label": "Section",
+              "href": "",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
