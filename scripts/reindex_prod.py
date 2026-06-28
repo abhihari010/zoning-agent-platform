@@ -1,5 +1,11 @@
 r"""Bulk-load the source corpus into production Qdrant from a local machine.
 
+It also syncs jurisdiction records from the curated data file into the DB. The
+request-time ``seed_jurisdictions_if_empty`` only runs when the table is empty,
+so a prod DB seeded earlier never picks up newly added/promoted jurisdictions --
+their sources get indexed but address resolution still treats them as unsupported
+until this runs.
+
 The admin "Reindex sources" button embeds the whole corpus *inside one HTTP
 request*. With the full breadth packs (~1,719 chunks) that exceeds the request
 timeout on the rate-limited Gemini free tier, so the call hangs. This script
@@ -45,6 +51,8 @@ import time
 from app.ai.interfaces import EmbeddingProviderRequest
 from app.ai.registry import get_embedding_provider
 from app.ingestion import build_source_chunks, import_source_packs
+from app.jurisdictions import jurisdiction_payloads
+from app.models import JurisdictionRecord
 from app.rag.vector_store import QdrantVectorStore
 from app.services import ensure_seed_sources
 from app.settings import get_settings
@@ -80,6 +88,17 @@ def main() -> int:
     seed_started = time.monotonic()
     ensure_seed_sources()
     _log(f"  seed check done in {time.monotonic() - seed_started:0.0f}s")
+
+    # Sync jurisdiction records from the curated data file. The request-time
+    # seed_jurisdictions_if_empty() only runs when the table is empty, so a prod
+    # DB that was seeded earlier never picks up newly added/promoted jurisdictions
+    # (e.g. the VA breadth cities). Without this, their sources get indexed but
+    # address resolution still treats them as unsupported. upsert is idempotent
+    # and only adds/updates by id -- it never deletes prod-only records.
+    juris_payloads = jurisdiction_payloads()
+    for payload in juris_payloads:
+        store.upsert_jurisdiction(JurisdictionRecord.model_validate(payload))
+    _log(f"synced {len(juris_payloads)} jurisdiction records from the data file into the DB.")
 
     if not args.skip_import:
         entries = import_source_packs()
