@@ -155,6 +155,21 @@ def _derive_match_strategy(jur: dict) -> str:
     return "locality"
 
 
+def _clean_fips(value: object) -> str | None:
+    """Return a valid FIPS code, or None for placeholders/invalid values.
+
+    Draft manifests carry ``TODO_COUNTY_FIPS`` / ``TODO_PLACE_FIPS`` placeholders
+    (from the discovery skeleton) that exceed JurisdictionRecord's max_length of
+    10 and would break ingestion.  Keep only short numeric codes; drop the rest.
+    """
+    if not isinstance(value, str):
+        return None
+    v = value.strip()
+    if not v or not v.isdigit() or len(v) > 10:
+        return None
+    return v
+
+
 def _derive_state_names(state: str) -> list[str]:
     """Return [abbrev, full_name] for known states, else just [abbrev]."""
     abbrev = (state or "").upper()
@@ -183,9 +198,9 @@ def _build_jurisdiction_entry(jur: dict) -> dict:
         "jurisdiction_id": jur["jurisdiction_id"],
         "name": jur["name"],
         "state": jur["state"],
-        "state_fips": jur.get("state_fips"),
-        "county_fips": jur.get("county_fips"),
-        "place_fips": jur.get("place_fips"),
+        "state_fips": _clean_fips(jur.get("state_fips")),
+        "county_fips": _clean_fips(jur.get("county_fips")),
+        "place_fips": _clean_fips(jur.get("place_fips")),
         "jurisdiction_type": jur.get("jurisdiction_type", "municipality"),
         "coverage_status": FORCED_COVERAGE_STATUS,
         "supported": False,
