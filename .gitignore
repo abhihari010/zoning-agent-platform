@@ -28,6 +28,9 @@ apps/api/app/data/chroma/
 # Pytest basetemp directories (created by --basetemp flag)
 .tmp/
 .tmp-*/
+
+# Batch-embedding reindex working dir (request/result/job-state files)
+.batch_reindex/
 apps/api/tests/golden/traces/
 
 .vercel
