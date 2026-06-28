@@ -27,6 +27,14 @@ Flags:
     --slice N        chunks embedded+upserted per checkpoint (default 96)
     --full-rebuild   wipe the Qdrant collection first and re-embed everything
     --skip-import    do not import source packs; reindex existing DB sources only
+    --batch          embed via the async Gemini Batch API at HALF price ($0.075 vs
+                     $0.15 per 1M tokens). Submits one job for all pending chunks,
+                     polls until done (target turnaround up to 24h, usually faster),
+                     then upserts. Resumable: re-run to keep polling an open job.
+                     Requires the optional 'google-genai' dep: pip install -e '.[batch]'
+    --poll-interval  seconds between batch job status polls (default 30)
+    --batch-workdir  dir for the batch request/result/job-state files (default
+                     ./.batch_reindex). Keep it stable so --batch runs can resume.
 """
 from __future__ import annotations
 
@@ -52,6 +60,9 @@ def main() -> int:
     parser.add_argument("--slice", type=int, default=96, help="Chunks per embed/upsert checkpoint.")
     parser.add_argument("--full-rebuild", action="store_true", help="Wipe the collection and re-embed everything.")
     parser.add_argument("--skip-import", action="store_true", help="Skip importing source packs.")
+    parser.add_argument("--batch", action="store_true", help="Embed via the async Gemini Batch API at half price.")
+    parser.add_argument("--poll-interval", type=float, default=30.0, help="Seconds between batch status polls.")
+    parser.add_argument("--batch-workdir", default=".batch_reindex", help="Dir for batch request/result/job-state files.")
     args = parser.parse_args()
 
     settings = get_settings()
@@ -65,18 +76,28 @@ def main() -> int:
     if settings.embedding_provider != "gemini":
         _log(f"WARNING: EMBEDDING_PROVIDER is '{settings.embedding_provider}', expected 'gemini'.")
 
+    _log("seeding base sources (ensure_seed_sources)...")
+    seed_started = time.monotonic()
     ensure_seed_sources()
+    _log(f"  seed check done in {time.monotonic() - seed_started:0.0f}s")
 
     if not args.skip_import:
         entries = import_source_packs()
-        for entry in entries:
+        _log(f"importing {len(entries)} source-pack sources into the DB (one upsert each)...")
+        import_started = time.monotonic()
+        for index, entry in enumerate(entries, start=1):
             store.upsert_source(entry)
+            if index % 100 == 0 or index == len(entries):
+                elapsed = time.monotonic() - import_started
+                _log(f"  upserted {index}/{len(entries)} sources  {elapsed:0.0f}s elapsed")
         _log(f"imported {len(entries)} source-pack sources into the DB.")
 
+    _log("loading sources + building chunks...")
+    build_started = time.monotonic()
     sources = store.list_sources()
     chunks = build_source_chunks(sources)
     store.replace_source_chunks(chunks)
-    _log(f"built {len(chunks)} chunks from {len(sources)} sources.")
+    _log(f"built {len(chunks)} chunks from {len(sources)} sources in {time.monotonic() - build_started:0.0f}s.")
 
     vector_store = QdrantVectorStore(settings=settings)
     if args.full_rebuild:
@@ -90,21 +111,47 @@ def main() -> int:
     pending = [chunk for chunk in chunks if chunk.chunk_id not in existing_ids]
     _log(f"{len(pending)} chunks need embedding.")
 
-    provider = get_embedding_provider(settings)
-    embedded = 0
-    started = time.monotonic()
-    for start in range(0, len(pending), args.slice):
-        batch = pending[start : start + args.slice]
-        embeddings = provider.embed(
-            EmbeddingProviderRequest(texts=[chunk.chunk_text for chunk in batch])
-        ).embeddings
-        if not embeddings or any(not embedding for embedding in embeddings):
-            _log("ERROR: embedding provider returned empty vectors. Stopping; re-run to resume.")
+    if not pending:
+        _log("nothing to embed; collection already up to date.")
+    elif args.batch:
+        from app.ai.gemini_batch_embedding import BatchChunk, run_batch_embedding
+
+        _log(f"batch mode: submitting {len(pending)} chunks to the Gemini Batch API (half price).")
+        vectors = run_batch_embedding(
+            [BatchChunk(chunk_id=chunk.chunk_id, text=chunk.chunk_text) for chunk in pending],
+            api_key=settings.gemini_api_key,
+            model=settings.gemini_embedding_model,
+            dimensions=settings.gemini_embedding_dimensions,
+            work_dir=args.batch_workdir,
+            poll_interval_seconds=args.poll_interval,
+            log=_log,
+        )
+        missing = [chunk for chunk in pending if chunk.chunk_id not in vectors]
+        if missing:
+            _log(f"ERROR: batch returned no vector for {len(missing)} chunks. Re-run to resume.")
             return 1
-        vector_store.upsert_chunks(batch, embeddings)
-        embedded += len(batch)
-        elapsed = time.monotonic() - started
-        _log(f"  embedded {embedded}/{len(pending)} (+{len(batch)})  {elapsed:0.0f}s elapsed")
+        embedded = 0
+        for start in range(0, len(pending), args.slice):
+            batch = pending[start : start + args.slice]
+            vector_store.upsert_chunks(batch, [vectors[chunk.chunk_id] for chunk in batch])
+            embedded += len(batch)
+            _log(f"  upserted {embedded}/{len(pending)} embedded chunks")
+    else:
+        provider = get_embedding_provider(settings)
+        embedded = 0
+        started = time.monotonic()
+        for start in range(0, len(pending), args.slice):
+            batch = pending[start : start + args.slice]
+            embeddings = provider.embed(
+                EmbeddingProviderRequest(texts=[chunk.chunk_text for chunk in batch])
+            ).embeddings
+            if not embeddings or any(not embedding for embedding in embeddings):
+                _log("ERROR: embedding provider returned empty vectors. Stopping; re-run to resume.")
+                return 1
+            vector_store.upsert_chunks(batch, embeddings)
+            embedded += len(batch)
+            elapsed = time.monotonic() - started
+            _log(f"  embedded {embedded}/{len(pending)} (+{len(batch)})  {elapsed:0.0f}s elapsed")
 
     pruned = vector_store.delete_missing_chunk_ids({chunk.chunk_id for chunk in chunks})
     count = vector_store.count()

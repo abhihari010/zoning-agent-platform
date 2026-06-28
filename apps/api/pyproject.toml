@@ -33,6 +33,14 @@ monitoring = [
 scraper-impersonation = [
   "curl_cffi>=0.7"
 ]
+# Optional Google GenAI SDK for the async Gemini Batch API embedding path
+# (scripts/reindex_prod.py --batch). Embeds the full corpus offline at half price
+# ($0.075 vs $0.15 per 1M tokens). Lazily imported in app/ai/gemini_batch_embedding.py;
+# not pulled in by the base install or CI (which installs ".[dev]"). The live
+# retrieval path uses the synchronous httpx provider and never needs this.
+batch = [
+  "google-genai>=1.0.0"
+]
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]
