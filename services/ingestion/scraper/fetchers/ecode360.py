@@ -63,15 +63,34 @@ from .base import FetchResult, SectionRecord
 SITE_BASE = "https://ecode360.com"
 
 # Headings that identify the zoning ordinance chapter, case-insensitive.
-_ZONING_HEADING_HINTS = ("zoning ordinance", "zoning")
+# Ordered most-comprehensive → least specific; the rank (list index) is used
+# to score candidates so a whole "Unified Development Ordinance" beats a partial
+# "...Zoning Districts" sub-chapter.
+_ZONING_HEADING_HINTS = (
+    "unified development ordinance",
+    "unified development code",
+    "land development code",
+    "land development regulations",
+    "development ordinance",
+    "development code",
+    "zoning ordinance",
+    "zoning",
+)
 # Never treat these as the zoning chapter even if they contain a hint.
 _ZONING_HEADING_EXCLUDE = ("subdivision", "map", "application for zoning")
 
-# eCode360 section numbers use § prefix: "§ 380-1", "§ 230-50", "§ 69.69".
-# The number lives in <span class="titleNumber">§ 380-1</span>.
-# data-full-title includes it as "§ 380-1: Title text." — we parse either form.
+# Container node types that group sections and serve a content page at /{guid}.
+_CONTAINER_TYPES = ("chapter", "division", "article", "part")
+
+# eCode360 section numbers come in two flavours:
+#   - § prefix (NY/NJ/PA style): "§ 380-1", "§ 230-50", "§ 69.69".
+#   - bare numbering (VA UDO style): "72-31.2", "72-30.1", "SECTION 72-72".
+# The number lives in <span class="titleNumber">…</span> and is echoed in
+# data-full-title as "§ 380-1: Title text." / "72-31.2: Title text." — we parse
+# either form, with an optional leading "SECTION " word and optional § prefix.
 _SECTION_NUM_RE = re.compile(
-    r"^(§\s*[\d][\w.\-]*)(?:\s*(?:through|[-–]\s*§\s*[\w.]+))?",
+    r"^(?:SECTION\s+)?(§\s*[\d][\w.\-]*|[\d][\w.\-]*)"
+    r"(?:\s*(?:through|[-–]\s*(?:§\s*)?[\w.]+))?",
     re.IGNORECASE,
 )
 _RESERVED_RE = re.compile(r"\(?\s*reserved\s*\)?", re.IGNORECASE)
@@ -115,23 +134,38 @@ def parse_toc(toc_json: str | dict) -> dict[str, Any]:
 
 
 def find_zoning_node(toc_root: str | dict) -> dict[str, Any]:
-    """Return the zoning chapter node from a root TOC, found by heading text.
+    """Return the zoning ordinance node from a root TOC, found by heading text.
 
-    Searches breadth-first; prefers an exact "Zoning" chapter match over
-    a partial match in a deeper node.  Never picks a node whose title
-    contains ``"subdivision"`` or ``"map"``.
+    Handles two layouts:
+
+    1. **Single zoning chapter** (e.g. "Zoning" / "Zoning Ordinance") — returned
+       as-is.  This is the common eCode360 case.
+    2. **Split development code** — some jurisdictions publish a Unified
+       Development Ordinance as an empty placeholder chapter (e.g. Chapter "72",
+       *0 children*) whose substance lives in flat sibling chapters numbered
+       ``"72-1"``, ``"72-2"`` … ``"72-A"``.  Selecting the placeholder yields zero
+       sections, so we detect the numbered group and return a synthetic node that
+       wraps every group member's subtree.
+
+    Candidates are scored by heading-hint rank (a whole "Unified Development
+    Ordinance" beats a partial "Zoning Districts" sub-chapter), then by preferring
+    ``chapter`` nodes.  Never picks a node whose title contains ``"subdivision"``
+    or ``"map"``.
     """
     root = parse_toc(toc_root) if isinstance(toc_root, (str, dict)) else toc_root
 
-    candidates: list[dict[str, Any]] = []
+    all_nodes: list[dict[str, Any]] = []
+    candidates: list[tuple[int, dict[str, Any]]] = []
 
     def walk(node: dict[str, Any]) -> None:
+        all_nodes.append(node)
         lowered = node["title"].lower()
-        if any(bad in lowered for bad in _ZONING_HEADING_EXCLUDE):
-            return
-        if any(hint in lowered for hint in _ZONING_HEADING_HINTS):
-            if node["type"] in ("chapter", "division", "article"):
-                candidates.append(node)
+        if not any(bad in lowered for bad in _ZONING_HEADING_EXCLUDE):
+            if node["type"] in _CONTAINER_TYPES:
+                for rank, hint in enumerate(_ZONING_HEADING_HINTS):
+                    if hint in lowered:
+                        candidates.append((rank, node))
+                        break
         for child in node["children"]:
             walk(child)
 
@@ -141,15 +175,62 @@ def find_zoning_node(toc_root: str | dict) -> dict[str, Any]:
             "Could not locate a zoning chapter in the eCode360 TOC. "
             "Try passing an explicit --code-id."
         )
-    # Prefer nodes whose type is "chapter" and title is exactly "Zoning"
-    # (not e.g. "Zoning Permit" article buried inside another chapter).
-    def score(n: dict) -> tuple:
-        exact = n["title"].strip().lower() == "zoning"
+
+    def score(item: tuple[int, dict]) -> tuple:
+        rank, n = item
+        exact = n["title"].strip().lower() in ("zoning", "zoning ordinance")
         is_chapter = n["type"] == "chapter"
-        return (not exact, not is_chapter, n["title"])
+        return (rank, not exact, not is_chapter, n["title"])
 
     candidates.sort(key=score)
-    return candidates[0]
+    primary = candidates[0][1]
+
+    group = _expand_chapter_group(primary, all_nodes)
+    if len(group) == 1:
+        return group[0]
+
+    # Wrap the split-code group in a synthetic node so the rest of the pipeline
+    # (collect_leaf_sections / _build_breadcrumb) sees one zoning subtree.
+    return {
+        "guid": primary["guid"],
+        "title": primary["title"],
+        "number": primary["number"],
+        "type": primary["type"],
+        "label": primary.get("label", ""),
+        "href": primary.get("href", ""),
+        "children": group,
+    }
+
+
+def _expand_chapter_group(
+    primary: dict[str, Any], all_nodes: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Expand a split development-code placeholder into its numbered group.
+
+    Returns ``[primary]`` for the ordinary single-chapter case.  When ``primary``
+    is a numbered chapter (e.g. number ``"72"``) and there exist sibling
+    chapters/divisions whose number begins with ``"72-"``, returns the group
+    members (and ``primary`` itself when it carries content).
+    """
+    num = primary["number"].strip()
+    if not num:
+        return [primary]
+
+    prefix = f"{num}-"
+    members = [
+        n
+        for n in all_nodes
+        if n["type"] in ("chapter", "division")
+        and n["guid"] != primary["guid"]
+        and n["number"].strip().startswith(prefix)
+    ]
+    if not members:
+        return [primary]
+
+    # Include the placeholder's own subtree only when it actually has children.
+    if primary["children"]:
+        return [primary, *members]
+    return members
 
 
 def collect_leaf_sections(
@@ -158,19 +239,22 @@ def collect_leaf_sections(
     """Walk a TOC subtree and collect (section_node, parent_article_guid) pairs.
 
     eCode360 sections are ``type == "section"`` nodes.  Their content is served
-    by fetching the parent article page (``/{parent_guid}``), which returns all
-    sibling sections together.  We group by parent to minimise fetches.
+    by fetching the nearest container page (``/{container_guid}``), which returns
+    all sibling sections together.  The container is usually an ``article`` but
+    sections can also sit directly under a ``chapter`` (e.g. enforcement
+    sections in a split development code), so we track the nearest container of
+    any container type and group by it to minimise fetches.
     """
     result: list[tuple[dict[str, Any], str]] = []
 
-    def walk(n: dict[str, Any], article_guid: str) -> None:
+    def walk(n: dict[str, Any], container_guid: str) -> None:
         if n["type"] == "section":
-            result.append((n, article_guid))
+            result.append((n, container_guid))
             return
-        # Track the article-level parent guid for content fetching.
-        new_article = n["guid"] if n["type"] == "article" else article_guid
+        # Track the nearest container guid for content fetching.
+        new_container = n["guid"] if n["type"] in _CONTAINER_TYPES else container_guid
         for child in n["children"]:
-            walk(child, new_article)
+            walk(child, new_container)
 
     walk(node, node["guid"])
     return result
@@ -295,25 +379,34 @@ def parse_section(
 
 
 def _section_ref_from_number(raw: str) -> str | None:
-    """``"§ 380-1"`` -> ``"§ 380-1"`` ; ``"§ 230-176"`` -> ``"§ 230-176"``."""
+    """Normalise a raw section number into a section_ref.
+
+    Handles both eCode360 numbering styles:
+      ``"§ 380-1"`` -> ``"§ 380-1"`` (§ preserved);
+      ``"72-31.2"`` -> ``"72-31.2"`` (bare VA UDO style);
+      ``"SECTION 72-72"`` -> ``"72-72"`` (leading word stripped).
+    """
     if not raw:
         return None
-    # Normalise § symbol and collapse whitespace.
+    # Normalise whitespace.
     ref = re.sub(r"\s+", " ", raw).strip()
-    if not ref.startswith("§"):
-        return None
-    # Confirm there's a numeric part after the §.
-    if not re.search(r"§\s*\d", ref):
-        return None
-    return ref
+    # § style (NY/NJ/PA): keep the symbol, require a numeric part after it.
+    if ref.startswith("§"):
+        return ref if re.search(r"§\s*\d", ref) else None
+    # Bare numbering (VA UDO): optional leading "SECTION ", then a digit-led ref.
+    m = re.match(r"(?:SECTION\s+)?(\d[\w.\-]*)", ref, re.IGNORECASE)
+    if m:
+        return m.group(1)
+    return None
 
 
 def _section_ref_from_title(full_title: str) -> str | None:
-    """Fall back: parse ``"§ 380-1: Title text."`` -> ``"§ 380-1"``."""
+    """Fall back: ``"§ 380-1: Title text."`` -> ``"§ 380-1"``;
+    ``"72-31.2: Title text."`` -> ``"72-31.2"``."""
     m = _SECTION_NUM_RE.match(full_title.strip())
     if not m:
         return None
-    return m.group(1).strip()
+    return re.sub(r"\s+", " ", m.group(1)).strip()
 
 
 def _strip_history_div(html: str) -> str:

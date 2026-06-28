@@ -1,0 +1,16 @@
+{
+  "codes": [
+    {
+      "productName": "Code of Ordinances",
+      "productId": 10529,
+      "contentTypeId": "CODES",
+      "hideInLibrary": false
+    },
+    {
+      "productName": "Zoning",
+      "productId": 12653,
+      "contentTypeId": "CODES",
+      "hideInLibrary": false
+    }
+  ]
+}

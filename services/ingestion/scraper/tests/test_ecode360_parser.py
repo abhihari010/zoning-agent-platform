@@ -154,6 +154,86 @@ def test_parse_section_returns_none_for_reserved_block():
     assert record is None
 
 
+def test_find_zoning_node_expands_split_development_code():
+    # Fredericksburg-style UDO: Chapter "72" is an EMPTY placeholder; its
+    # substance lives in flat sibling chapters "72-1".."72-A".  find_zoning_node
+    # must return a synthetic node wrapping the numbered group, not the empty
+    # placeholder and not the decoy "Zoning, Planning and Development" chapter.
+    node = find_zoning_node(load_fixture("ecode360_toc_split_udo.json"))
+    assert node["title"] == "Unified Development Ordinance"
+    assert node["guid"] == "29088644"
+    # The synthetic node carries the numbered group as children.
+    group_numbers = {c["number"] for c in node["children"]}
+    assert {"72-1", "72-7", "72-A"} <= group_numbers
+    # The empty placeholder itself (number "72") is not duplicated in the group.
+    assert "72" not in group_numbers
+    # Decoys must not be pulled in.
+    assert "78" not in group_numbers   # "Zoning, Planning and Development"
+    assert "80" not in group_numbers   # "Subdivision of Land" (excluded)
+
+
+def test_collect_leaf_sections_split_code_tracks_chapter_container():
+    # Sections under an article use the article guid; sections sitting directly
+    # under a chapter (e.g. the "SECTION 72-7x" enforcement sections) fall back
+    # to the chapter guid — never the empty placeholder root.
+    node = find_zoning_node(load_fixture("ecode360_toc_split_udo.json"))
+    pairs = collect_leaf_sections(node)
+    by_guid = {s["guid"]: container for s, container in pairs}
+    # 72-11.x sections are grouped under their article (72-11, guid 29011371).
+    assert by_guid["29011372"] == "29011371"
+    # Enforcement sections sit directly under chapter 72-7 (guid 29018070).
+    assert by_guid["29018071"] == "29018070"
+    assert by_guid["29018084"] == "29018070"
+    # No section is orphaned onto the empty UDO placeholder (guid 29088644).
+    assert "29088644" not in set(by_guid.values())
+
+
+def test_parse_article_page_bare_numbering_no_section_symbol():
+    # VA UDO sections have no § prefix ("72-11.2", not "§ 72-11.2") and the
+    # reserved section must still be dropped.
+    deep_link = DeepLinker(customer_id="FR3526")
+    records = parse_article_page(
+        load_fixture("ecode360_html_udo_bare.html"),
+        deep_link=deep_link,
+        zoning_chapter_title="Unified Development Ordinance",
+        breadcrumb=["Unified Development Ordinance", "General Provisions"],
+    )
+    refs = {r.section_ref for r in records}
+    assert refs == {"72-11.1", "72-11.2"}
+    assert all(not r.section_ref.startswith("§") for r in records)
+    auth = next(r for r in records if r.section_ref == "72-11.1")
+    assert auth.heading == "72-11.1: Authority."
+    assert "Title 15.2 of the Code of Virginia" in auth.text
+    assert auth.effective_date == "2019-03-12"
+
+
+def test_parse_article_page_section_word_prefix_stripped():
+    # "SECTION 72-72" style numbering (direct-under-chapter sections) normalises
+    # to a bare ref; the "Article 72-7" chapter header block is not a section.
+    deep_link = DeepLinker(customer_id="FR3526")
+    records = parse_article_page(
+        load_fixture("ecode360_html_udo_chapter.html"),
+        deep_link=deep_link,
+        zoning_chapter_title="Unified Development Ordinance",
+        breadcrumb=["Unified Development Ordinance", "Enforcement"],
+    )
+    refs = {r.section_ref for r in records}
+    assert refs == {"72-70", "72-72"}
+    notice = next(r for r in records if r.section_ref == "72-72")
+    assert notice.heading == "SECTION 72-72: Notice of Zoning Violation"
+    assert "notice of zoning violation" in notice.text.lower()
+
+
+def test_section_ref_from_number_handles_both_styles():
+    from services.ingestion.scraper.fetchers.ecode360 import _section_ref_from_number
+
+    assert _section_ref_from_number("§ 380-1") == "§ 380-1"
+    assert _section_ref_from_number("72-31.2") == "72-31.2"
+    assert _section_ref_from_number("SECTION 72-72") == "72-72"
+    assert _section_ref_from_number("Article 72-7") is None
+    assert _section_ref_from_number("") is None
+
+
 def test_effective_date_from_history_picks_latest():
     html = load_fixture("ecode360_html_art1.html")
     iso = effective_date_from_history(html)
