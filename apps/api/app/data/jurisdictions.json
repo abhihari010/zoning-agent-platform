@@ -10,9 +10,16 @@
     "coverage_status": "public_supported",
     "supported": true,
     "match_strategy": "locality",
-    "locality_names": ["Blacksburg"],
-    "county_names": ["Montgomery County"],
-    "state_names": ["VA", "Virginia"],
+    "locality_names": [
+      "Blacksburg"
+    ],
+    "county_names": [
+      "Montgomery County"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
     "official_source_urls": [
       "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
       "https://library.municode.com/va/blacksburg"
@@ -36,9 +43,20 @@
     "coverage_status": "public_supported",
     "supported": true,
     "match_strategy": "county",
-    "locality_names": ["Riner", "Shawsville", "Elliston", "Prices Fork", "Merrimac"],
-    "county_names": ["Montgomery County"],
-    "state_names": ["VA", "Virginia"],
+    "locality_names": [
+      "Riner",
+      "Shawsville",
+      "Elliston",
+      "Prices Fork",
+      "Merrimac"
+    ],
+    "county_names": [
+      "Montgomery County"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
     "official_source_urls": [
       "https://www.montgomerycountyva.gov/1/departments-services/planning",
       "https://www.montgomerycountyva.gov/1/departments-services/planning/zoning-permits",
@@ -67,9 +85,16 @@
     "coverage_status": "public_supported",
     "supported": true,
     "match_strategy": "locality",
-    "locality_names": ["Christiansburg"],
-    "county_names": ["Montgomery County"],
-    "state_names": ["VA", "Virginia"],
+    "locality_names": [
+      "Christiansburg"
+    ],
+    "county_names": [
+      "Montgomery County"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
     "official_source_urls": [
       "https://www.christiansburg.org/150/Planning",
       "https://www.christiansburg.org/161/Town-Code",
@@ -96,9 +121,17 @@
     "coverage_status": "source_indexed",
     "supported": false,
     "match_strategy": "locality_and_county",
-    "locality_names": ["Roanoke"],
-    "county_names": ["Roanoke City", "City of Roanoke"],
-    "state_names": ["VA", "Virginia"],
+    "locality_names": [
+      "Roanoke"
+    ],
+    "county_names": [
+      "Roanoke City",
+      "City of Roanoke"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
     "official_source_urls": [
       "https://www.roanokeva.gov/2964/Planning-Zoning-Permitting",
       "https://www.roanokeva.gov/1251/Zoning",
@@ -124,9 +157,21 @@
     "coverage_status": "source_indexed",
     "supported": false,
     "match_strategy": "county",
-    "locality_names": ["Cave Spring", "Hollins", "Vinton", "Salem", "Bent Mountain", "Bonsack"],
-    "county_names": ["Roanoke County"],
-    "state_names": ["VA", "Virginia"],
+    "locality_names": [
+      "Cave Spring",
+      "Hollins",
+      "Vinton",
+      "Salem",
+      "Bent Mountain",
+      "Bonsack"
+    ],
+    "county_names": [
+      "Roanoke County"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
     "official_source_urls": [
       "https://www.roanokecountyva.gov/348/Zoning",
       "https://www.roanokecountyva.gov/305/Planning",
@@ -142,5 +187,546 @@
     },
     "last_verified_at": "2026-05-25",
     "district_mapping_strategy": "source_indexed_until_county_zoning_ordinance_and_map_sources_qa_pass"
+  },
+  {
+    "jurisdiction_id": "albemarle-county-va",
+    "name": "Albemarle County, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "county",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "county",
+    "locality_names": [
+      "Albemarle County"
+    ],
+    "county_names": [
+      "Albemarle County"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/albemarle_county/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/albemarle_county/codes/code_of_ordinances"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "alexandria-va",
+    "name": "Alexandria, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Alexandria"
+    ],
+    "county_names": [
+      "Alexandria City",
+      "City of Alexandria"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/alexandria/codes/zoning"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/alexandria/codes/zoning"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "chesapeake-va",
+    "name": "Chesapeake, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Chesapeake"
+    ],
+    "county_names": [
+      "Chesapeake City",
+      "City of Chesapeake"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/chesapeake/codes/zoning"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/chesapeake/codes/zoning"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "fredericksburg-va",
+    "name": "Fredericksburg, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Fredericksburg"
+    ],
+    "county_names": [
+      "Fredericksburg City",
+      "City of Fredericksburg"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://ecode360.com/FR3526"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://ecode360.com/FR3526"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "hampton-va",
+    "name": "Hampton, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Hampton"
+    ],
+    "county_names": [
+      "Hampton City",
+      "City of Hampton"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/hampton/codes/zoning"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/hampton/codes/zoning"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "henrico-county-va",
+    "name": "Henrico County, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "county",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "county",
+    "locality_names": [
+      "Henrico County"
+    ],
+    "county_names": [
+      "Henrico County"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/henrico_county/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/henrico_county/codes/code_of_ordinances"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "lynchburg-va",
+    "name": "Lynchburg, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Lynchburg"
+    ],
+    "county_names": [
+      "Lynchburg City",
+      "City of Lynchburg"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/lynchburg/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/lynchburg/codes/code_of_ordinances"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "manassas-va",
+    "name": "Manassas, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Manassas"
+    ],
+    "county_names": [
+      "Manassas City",
+      "City of Manassas"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/manassas/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/manassas/codes/code_of_ordinances"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "newport-news-va",
+    "name": "Newport News, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Newport News"
+    ],
+    "county_names": [
+      "Newport News City",
+      "City of Newport News"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/newport_news/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/newport_news/codes/code_of_ordinances"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "portsmouth-va",
+    "name": "Portsmouth, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Portsmouth"
+    ],
+    "county_names": [
+      "Portsmouth City",
+      "City of Portsmouth"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/portsmouth/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/portsmouth/codes/code_of_ordinances"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "prince-william-county-va",
+    "name": "Prince William County, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "county",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "county",
+    "locality_names": [
+      "Prince William County"
+    ],
+    "county_names": [
+      "Prince William County"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/prince_william_county/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/prince_william_county/codes/code_of_ordinances"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "richmond-va",
+    "name": "Richmond, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Richmond"
+    ],
+    "county_names": [
+      "Richmond City",
+      "City of Richmond"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/richmond/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/richmond/codes/code_of_ordinances"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "salem-va",
+    "name": "Salem, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Salem"
+    ],
+    "county_names": [
+      "Salem City",
+      "City of Salem"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/salem/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/salem/codes/code_of_ordinances"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "staunton-va",
+    "name": "Staunton, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Staunton"
+    ],
+    "county_names": [
+      "Staunton City",
+      "City of Staunton"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://ecode360.com/ST4660"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://ecode360.com/ST4660"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "suffolk-va",
+    "name": "Suffolk, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Suffolk"
+    ],
+    "county_names": [
+      "Suffolk City",
+      "City of Suffolk"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/suffolk/codes/unified_development_ordinance"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/suffolk/codes/unified_development_ordinance"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "virginia-beach-va",
+    "name": "Virginia Beach, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Virginia Beach"
+    ],
+    "county_names": [
+      "Virginia Beach City",
+      "City of Virginia Beach"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/virginia_beach/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/virginia_beach/codes/code_of_ordinances"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "winchester-va",
+    "name": "Winchester, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Winchester"
+    ],
+    "county_names": [
+      "Winchester City",
+      "City of Winchester"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/winchester/codes/zoning_and_subdivision_ordinance"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/winchester/codes/zoning_and_subdivision_ordinance"
+    },
+    "last_verified_at": "2026-06-27",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
   }
 ]

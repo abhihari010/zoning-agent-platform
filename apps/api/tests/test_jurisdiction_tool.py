@@ -72,20 +72,20 @@ def test_explicit_jurisdiction_takes_priority() -> None:
 
 def test_resolve_unknown_us_jurisdiction_returns_discovery_id() -> None:
     result = JurisdictionTool().resolve(
-        "1 Main St, Richmond, VA 23219",
-        37.5,
-        -77.4,
+        "1 Main St, Lincoln, NE 68508",
+        40.81,
+        -96.7,
         None,
         [
-            {"long_name": "Richmond", "types": ["locality"]},
-            {"long_name": "Richmond City", "types": ["administrative_area_level_2"]},
-            {"long_name": "Virginia", "short_name": "VA", "types": ["administrative_area_level_1"]},
+            {"long_name": "Lincoln", "types": ["locality"]},
+            {"long_name": "Lancaster County", "types": ["administrative_area_level_2"]},
+            {"long_name": "Nebraska", "short_name": "NE", "types": ["administrative_area_level_1"]},
             {"long_name": "United States", "short_name": "US", "types": ["country"]},
         ],
     )
 
-    assert result.jurisdiction_id == "us-va-richmond-city-richmond"
-    assert result.jurisdiction_name == "Richmond, VA"
+    assert result.jurisdiction_id == "us-ne-lancaster-lincoln"
+    assert result.jurisdiction_name == "Lincoln, NE"
     assert result.supported is False
     assert result.coverage_status == "unsupported"
     assert result.method == "geocode"

@@ -253,25 +253,25 @@ def test_normalize_address_valid_unrecognized_jurisdiction_is_not_invalid(
     _mock_google_address(
         monkeypatch,
         {
-            "formatted_address": "1 Main St, Richmond, VA 23219, USA",
+            "formatted_address": "1 Main St, Lincoln, NE 68508, USA",
             "place_id": "place-unrecognized",
             "address_components": [
-                {"long_name": "Richmond", "types": ["locality"]},
-                {"long_name": "Richmond City", "types": ["administrative_area_level_2"]},
-                {"long_name": "VA", "types": ["administrative_area_level_1"]},
+                {"long_name": "Lincoln", "types": ["locality"]},
+                {"long_name": "Lancaster County", "types": ["administrative_area_level_2"]},
+                {"long_name": "NE", "types": ["administrative_area_level_1"]},
             ],
-            "geometry": {"location": {"lat": 37.5, "lng": -77.4}},
+            "geometry": {"location": {"lat": 40.81, "lng": -96.7}},
         },
     )
 
-    result = services.normalize_address("1 Main St Richmond VA")
+    result = services.normalize_address("1 Main St Lincoln NE")
 
     assert result.is_valid is False
     assert result.support_status == "unsupported"
-    assert result.jurisdiction_id == "us-va-richmond-city-richmond"
-    assert result.jurisdiction_name == "Richmond, VA"
+    assert result.jurisdiction_id == "us-ne-lancaster-lincoln"
+    assert result.jurisdiction_name == "Lincoln, NE"
     assert result.coverage_status == "unsupported"
-    assert "Richmond, VA" in result.warnings[0]
+    assert "Lincoln, NE" in result.warnings[0]
 
 
 def test_keyword_district_rules_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
