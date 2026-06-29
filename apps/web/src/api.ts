@@ -894,10 +894,31 @@ function mapSourceEntry(payload: {
   };
 }
 
-export async function listSources(): Promise<SourceRegistryEntry[]> {
-  const response = await fetch(`${API_BASE}/ingestion/sources`, {
-    headers: requestHeaders(),
-  });
+export interface SourceListPage {
+  sources: SourceRegistryEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+// The catalog is paginated: each call fetches one page (default 100). Returning
+// the whole 6.8k-source corpus at once built large concurrent responses that
+// OOM'd the API instance under the admin page's refetch.
+export async function listSources(
+  params: { limit?: number; offset?: number } = {},
+): Promise<SourceListPage> {
+  const search = new URLSearchParams();
+  if (params.limit != null) {
+    search.set("limit", String(params.limit));
+  }
+  if (params.offset != null) {
+    search.set("offset", String(params.offset));
+  }
+  const query = search.toString();
+  const response = await fetch(
+    `${API_BASE}/ingestion/sources${query ? `?${query}` : ""}`,
+    { headers: requestHeaders() },
+  );
   if (!response.ok) {
     throw new Error(await parseError(response, "Failed to load sources"));
   }
@@ -914,8 +935,17 @@ export async function listSources(): Promise<SourceRegistryEntry[]> {
       districts: string[];
       uses: string[];
     }>;
+    total?: number;
+    limit?: number;
+    offset?: number;
   };
-  return payload.sources.map(mapSourceEntry);
+  const mapped = payload.sources.map(mapSourceEntry);
+  return {
+    sources: mapped,
+    total: payload.total ?? mapped.length,
+    limit: payload.limit ?? params.limit ?? mapped.length,
+    offset: payload.offset ?? params.offset ?? 0,
+  };
 }
 
 // The catalog list omits full_text to keep the response small; fetch the full

@@ -6,13 +6,20 @@ export function SourceCatalog({
   sourceHealthById,
   sourceIndexIssuesById,
   onEditSource,
+  total,
+  onLoadMore,
+  loadingMore,
 }: {
   sources: SourceRegistryEntry[];
   sourcesLoading: boolean;
   sourceHealthById: Map<string, string[]>;
   sourceIndexIssuesById: Map<string, string[]>;
   onEditSource: (source: SourceRegistryEntry) => void;
+  total: number;
+  onLoadMore: () => void;
+  loadingMore: boolean;
 }) {
+  const hasMore = sources.length < total;
   return (
     <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
       <div className="flex items-center justify-between gap-3">
@@ -23,7 +30,9 @@ export function SourceCatalog({
           <h2 className="mt-2 font-heading text-2xl text-pine">Catalog</h2>
         </div>
         <span className="rounded-full bg-mist px-3 py-1 text-xs font-semibold text-pine">
-          {sources.length} sources
+          {total > sources.length
+            ? `${sources.length} of ${total} sources`
+            : `${total} sources`}
         </span>
       </div>
 
@@ -63,6 +72,19 @@ export function SourceCatalog({
           ))
         )}
       </div>
+
+      {!sourcesLoading && hasMore && (
+        <div className="mt-5 flex justify-center">
+          <button
+            type="button"
+            onClick={onLoadMore}
+            disabled={loadingMore}
+            className="rounded-2xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 disabled:opacity-60"
+          >
+            {loadingMore ? "Loading..." : `Load more (${total - sources.length} remaining)`}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -43,6 +43,22 @@ def test_list_source_summaries_omits_full_text(tmp_path) -> None:
     assert store.get_source("missing") is None
 
 
+def test_list_source_summaries_paginates(tmp_path) -> None:
+    store = SQLiteStore(tmp_path / "local.sqlite3")
+    for index in range(5):
+        store.upsert_source(_sample_source(f"rule-{index}"))
+
+    # Ordered by source_id ascending; a page caps how many rows are built.
+    first_page = store.list_source_summaries(limit=2, offset=0)
+    assert [s.source_id for s in first_page] == ["rule-0", "rule-1"]
+
+    second_page = store.list_source_summaries(limit=2, offset=2)
+    assert [s.source_id for s in second_page] == ["rule-2", "rule-3"]
+
+    # No limit returns every summary (used by the status metadata scan).
+    assert len(store.list_source_summaries()) == 5
+
+
 def test_source_and_chunk_counts(tmp_path) -> None:
     from app.ingestion import build_source_chunks
 
