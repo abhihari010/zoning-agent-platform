@@ -5,6 +5,7 @@ import {
   fetchJurisdictionRequestSummaries,
   fetchSourceIndexStatus,
   getAdminAccessKey,
+  getSource,
   importLocalDocuments,
   importSourcePacks,
   listSources,
@@ -253,10 +254,23 @@ export function useSourcesAdmin({
     }
   }
 
-  function loadSourceIntoForm(source: SourceRegistryEntry) {
+  async function loadSourceIntoForm(source: SourceRegistryEntry) {
     onWorkspaceChange("admin");
+    // The catalog list omits full_text; fetch the complete source so editing
+    // and saving don't drop the body text.
     setSourceForm(source);
-    setSourceMessage(`Loaded ${source.sourceId} into the editor.`);
+    setSourceMessage(`Loading ${source.sourceId} into the editor...`);
+    try {
+      const full = await getSource(source.sourceId);
+      setSourceForm(full);
+      setSourceMessage(`Loaded ${source.sourceId} into the editor.`);
+    } catch (loadError) {
+      setSourceMessage(
+        loadError instanceof Error
+          ? `Loaded metadata only — ${loadError.message}`
+          : `Failed to load full text for ${source.sourceId}.`,
+      );
+    }
   }
 
   function resetSourceState() {

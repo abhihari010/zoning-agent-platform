@@ -918,6 +918,19 @@ export async function listSources(): Promise<SourceRegistryEntry[]> {
   return payload.sources.map(mapSourceEntry);
 }
 
+// The catalog list omits full_text to keep the response small; fetch the full
+// source (incl. full_text) on demand when opening it in the editor.
+export async function getSource(sourceId: string): Promise<SourceRegistryEntry> {
+  const response = await fetch(
+    `${API_BASE}/ingestion/sources/${encodeURIComponent(sourceId)}`,
+    { headers: requestHeaders() },
+  );
+  if (!response.ok) {
+    throw new Error(await parseError(response, "Failed to load source"));
+  }
+  return mapSourceEntry(await response.json());
+}
+
 export async function fetchSourceIndexStatus(): Promise<SourceIndexStatus> {
   const response = await fetch(`${API_BASE}/ingestion/status`, {
     headers: requestHeaders(),
