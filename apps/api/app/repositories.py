@@ -111,7 +111,9 @@ class StoreRepository(Protocol):
 
     def list_sources(self) -> list[SourceRegistryEntry]: ...
 
-    def list_source_summaries(self) -> list[SourceRegistryEntry]: ...
+    def list_source_summaries(
+        self, *, limit: int | None = None, offset: int = 0
+    ) -> list[SourceRegistryEntry]: ...
 
     def get_source(self, source_id: str) -> SourceRegistryEntry | None: ...
 
@@ -844,7 +846,9 @@ class SQLAlchemyStore:
 
         return [SourceRegistryEntry.model_validate(_coerce_payload(row.payload_json)) for row in rows]
 
-    def list_source_summaries(self) -> list[SourceRegistryEntry]:
+    def list_source_summaries(
+        self, *, limit: int | None = None, offset: int = 0
+    ) -> list[SourceRegistryEntry]:
         """List sources WITHOUT their full_text, streaming rows so the entire
         corpus text is never held in memory at once.
 
@@ -854,13 +858,20 @@ class SQLAlchemyStore:
         corpus per request and OOM'd the instance at breadth scale (6.8k
         full-text sources). full_text is dropped before validation, so the model
         validator backfills it from the (small) excerpt.
+
+        ``limit``/``offset`` page the result in SQL so the catalog can fetch one
+        page (~100 rows) at a time; ``limit=None`` returns every summary (used by
+        the status metadata-health scan, where full_text is still excluded).
         """
         try:
             entries: list[SourceRegistryEntry] = []
             with self.engine.connect() as connection:
-                result = connection.execution_options(yield_per=200).execute(
-                    select(sources.c.payload_json).order_by(sources.c.source_id.asc())
-                )
+                query = select(sources.c.payload_json).order_by(sources.c.source_id.asc())
+                if offset:
+                    query = query.offset(offset)
+                if limit is not None:
+                    query = query.limit(limit)
+                result = connection.execution_options(yield_per=200).execute(query)
                 for row in result:
                     payload = _coerce_payload(row.payload_json)
                     if isinstance(payload, dict) and "full_text" in payload:

@@ -150,6 +150,9 @@ export function App() {
     authMode === "supabase" ? currentUser?.role === "admin" : true;
   const {
     sources,
+    sourcesTotal,
+    sourcesLoadingMore,
+    loadMoreSources,
     indexStatus,
     sourcesLoading,
     sourceForm,
@@ -744,6 +747,11 @@ export function App() {
               sourceHealthById={sourceHealthById}
               sourceIndexIssuesById={sourceIndexIssuesById}
               onEditSource={loadSourceIntoForm}
+              total={sourcesTotal}
+              onLoadMore={() => {
+                void loadMoreSources();
+              }}
+              loadingMore={sourcesLoadingMore}
             />
           </section>
         )}

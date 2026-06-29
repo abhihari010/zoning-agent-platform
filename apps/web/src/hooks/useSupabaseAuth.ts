@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient, type Session } from "@supabase/supabase-js";
 import {
   authMode,
@@ -25,6 +25,13 @@ export function useSupabaseAuth({
   const [authMessage, setAuthMessage] = useState("");
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const canLoadPrivateData = authMode === "supabase" ? Boolean(authSession) : true;
+  // Tracks the last access token we actually applied. Supabase re-emits auth
+  // events (tab focus, periodic token checks) with a brand-new session object
+  // even when the token is unchanged; applying each one churned authSession's
+  // identity, and every data effect keys on authSession -> the admin page
+  // refetched /sources, /status, /me, /projects in a loop (80+ requests/page)
+  // and OOM'd the API. We only react to real token changes.
+  const lastAccessTokenRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!supabase) {
@@ -38,14 +45,23 @@ export function useSupabaseAuth({
         return;
       }
       const session = data.session;
-      setAuthSession(session);
-      setAuthToken(session?.access_token ?? "");
+      const nextToken = session?.access_token ?? null;
+      if (nextToken !== lastAccessTokenRef.current) {
+        lastAccessTokenRef.current = nextToken;
+        setAuthSession(session);
+        setAuthToken(nextToken ?? "");
+      }
       setAuthLoading(false);
     });
 
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      const nextToken = session?.access_token ?? null;
+      if (nextToken === lastAccessTokenRef.current) {
+        return;
+      }
+      lastAccessTokenRef.current = nextToken;
       setAuthSession(session);
-      setAuthToken(session?.access_token ?? "");
+      setAuthToken(nextToken ?? "");
       setCurrentUser(null);
       onAuthStateReset();
     });

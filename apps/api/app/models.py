@@ -187,6 +187,9 @@ class SourceRegistryUpsertRequest(BaseModel):
 
 class SourceRegistryListResponse(BaseModel):
     sources: list[SourceRegistryEntry]
+    total: int = 0
+    limit: int | None = None
+    offset: int = 0
 
 
 class SourceMetadataHealth(BaseModel):

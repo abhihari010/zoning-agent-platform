@@ -358,12 +358,22 @@ def get_trace(project_id: UUID, request: Request):
 
 
 @router.get("/ingestion/sources", response_model=SourceRegistryListResponse)
-def list_sources() -> SourceRegistryListResponse:
+def list_sources(
+    limit: int = Query(default=100, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
+) -> SourceRegistryListResponse:
     ensure_seed_sources()
-    # Lightweight list (no full_text) -- the catalog only renders metadata +
-    # excerpt. Loading every source's full_text here OOM'd the instance at
-    # breadth scale; full_text is fetched per-source via the by-id endpoint.
-    return SourceRegistryListResponse(sources=store.list_source_summaries())
+    # Lightweight, paginated list (no full_text) -- the catalog renders metadata
+    # + excerpt and pages through the corpus. Returning all sources at breadth
+    # scale (6.8k) built a multi-MB list per call and, under the admin page's
+    # refetch, stacked concurrent copies past the 512MB limit (OOM). full_text
+    # is fetched per-source via the by-id endpoint when editing.
+    return SourceRegistryListResponse(
+        sources=store.list_source_summaries(limit=limit, offset=offset),
+        total=store.get_source_count(),
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.get("/ingestion/sources/{source_id}", response_model=SourceRegistryEntry)
@@ -382,17 +392,28 @@ def get_source(source_id: str) -> SourceRegistryEntry:
 def upsert_source(payload: SourceRegistryUpsertRequest) -> SourceRegistryListResponse:
     store.upsert_source(payload.source)
     invalidate_all_caches()
-    return SourceRegistryListResponse(sources=store.list_source_summaries())
+    limit = 100
+    return SourceRegistryListResponse(
+        sources=store.list_source_summaries(limit=limit, offset=0),
+        total=store.get_source_count(),
+        limit=limit,
+        offset=0,
+    )
 
 
 @router.get("/ingestion/status", response_model=SourceIndexStatusResponse)
 def ingestion_status() -> SourceIndexStatusResponse:
     readiness = ensure_source_index_ready()
     settings = get_settings()
-    sources = store.list_sources()
+    # Metadata-health scan only needs each source's metadata fields, never its
+    # full_text -- use the lightweight summaries (no full_text) and a COUNT for
+    # the total so the status endpoint never loads the whole corpus body into
+    # memory (it's hit alongside /ingestion/sources on the admin page).
+    source_summaries = store.list_source_summaries()
+    source_count = store.get_source_count()
     vector_status = get_vector_index_status(settings)
     return SourceIndexStatusResponse(
-        source_count=len(sources),
+        source_count=source_count,
         chunk_count=readiness.chunk_count,
         has_index=readiness.chunk_count > 0,
         last_import_at=store.get_latest_audit_timestamp("source.import.completed"),
@@ -402,7 +423,7 @@ def ingestion_status() -> SourceIndexStatusResponse:
                 source_id=source.source_id,
                 missing_fields=_missing_source_metadata(source),
             )
-            for source in sources
+            for source in source_summaries
             if _missing_source_metadata(source)
         ],
         index_ready=readiness.index_ready,

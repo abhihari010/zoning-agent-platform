@@ -19,6 +19,8 @@ import {
 import type { Workspace } from "../types/app";
 import { emptySourceForm } from "../utils/sourceForms";
 
+const SOURCES_PAGE_SIZE = 100;
+
 export function useSourcesAdmin({
   canLoadPrivateData,
   canUseAdminTools,
@@ -31,6 +33,8 @@ export function useSourcesAdmin({
   onWorkspaceChange: (workspace: Workspace) => void;
 }) {
   const [sources, setSources] = useState<SourceRegistryEntry[]>([]);
+  const [sourcesTotal, setSourcesTotal] = useState(0);
+  const [sourcesLoadingMore, setSourcesLoadingMore] = useState(false);
   const [indexStatus, setIndexStatus] = useState<SourceIndexStatus | null>(null);
   const [sourcesLoading, setSourcesLoading] = useState(false);
   const [sourceForm, setSourceForm] = useState<SourceRegistryEntry>(emptySourceForm);
@@ -98,11 +102,12 @@ export function useSourcesAdmin({
       try {
         setSourcesLoading(true);
         const [nextSources, nextIndexStatus] = await Promise.all([
-          listSources(),
+          listSources({ limit: SOURCES_PAGE_SIZE, offset: 0 }),
           fetchSourceIndexStatus(),
         ]);
         if (!cancelled) {
-          setSources(nextSources);
+          setSources(nextSources.sources);
+          setSourcesTotal(nextSources.total);
           setIndexStatus(nextIndexStatus);
         }
       } catch (loadError) {
@@ -126,13 +131,40 @@ export function useSourcesAdmin({
 
   async function refreshSources(message?: string) {
     const [nextSources, nextIndexStatus] = await Promise.all([
-      listSources(),
+      listSources({ limit: SOURCES_PAGE_SIZE, offset: 0 }),
       fetchSourceIndexStatus(),
     ]);
-    setSources(nextSources);
+    setSources(nextSources.sources);
+    setSourcesTotal(nextSources.total);
     setIndexStatus(nextIndexStatus);
     if (message) {
       setSourceMessage(message);
+    }
+  }
+
+  async function loadMoreSources() {
+    if (sourcesLoadingMore) {
+      return;
+    }
+    try {
+      setSourcesLoadingMore(true);
+      const page = await listSources({
+        limit: SOURCES_PAGE_SIZE,
+        offset: sources.length,
+      });
+      setSources((prev) => {
+        const seen = new Set(prev.map((item) => item.sourceId));
+        return [...prev, ...page.sources.filter((item) => !seen.has(item.sourceId))];
+      });
+      setSourcesTotal(page.total);
+    } catch (loadError) {
+      setSourceMessage(
+        loadError instanceof Error
+          ? loadError.message
+          : "Failed to load more sources.",
+      );
+    } finally {
+      setSourcesLoadingMore(false);
     }
   }
 
@@ -169,15 +201,16 @@ export function useSourcesAdmin({
     try {
       setSourceSaving(true);
       setSourceMessage("");
-      const saved = await saveSource({
+      await saveSource({
         ...sourceForm,
         sourceId: sourceForm.sourceId.trim(),
         title: sourceForm.title.trim(),
         excerpt: sourceForm.excerpt.trim(),
         sectionRef: sourceForm.sectionRef.trim(),
       });
-      setSources(saved);
-      setIndexStatus(await fetchSourceIndexStatus());
+      // Re-fetch the first page + total + status rather than replacing the
+      // catalog with the save response, so pagination state stays consistent.
+      await refreshSources();
       setSourceForm(emptySourceForm());
       setSourceMessage("Source saved.");
     } catch (saveError) {
@@ -281,6 +314,9 @@ export function useSourcesAdmin({
 
   return {
     sources,
+    sourcesTotal,
+    sourcesLoadingMore,
+    loadMoreSources,
     indexStatus,
     sourcesLoading,
     sourceForm,
