@@ -86,6 +86,32 @@ def reset_source_index_readiness_memo() -> None:
 def ensure_source_index_ready(source_store: SQLiteStore = store) -> SourceIndexReadiness:
     ensure_seed_sources(source_store)
 
+    settings = get_settings()
+    # When startup reindex is disabled the corpus is managed out-of-band: the
+    # offline reindex_prod.py script is the source of truth for sources, chunks,
+    # and the vector index. In that mode we MUST NOT load + rebuild the entire
+    # corpus on every readiness check (/ready, /ingestion/status) and every
+    # analyze -- at breadth scale (20k+ chunks / 6k+ full-text sources) that
+    # materializes the whole corpus per request and OOMs the instance. Report
+    # readiness from cheap COUNT queries instead, and skip the request-time
+    # auto-reindex entirely (it would otherwise rewrite the chunk table from
+    # inside an HTTP request). The full reconciliation path below still runs in
+    # dev / tests, where STARTUP_REINDEX_ENABLED defaults to true.
+    if not settings.startup_reindex_enabled:
+        source_count = source_store.get_source_count()
+        chunk_count = source_store.get_source_chunk_count()
+        warnings: list[str] = []
+        if not source_count:
+            warnings.append("No source registry entries are available.")
+        if source_count and not chunk_count:
+            warnings.append("No indexed source chunks are available.")
+        return SourceIndexReadiness(
+            source_count=source_count,
+            chunk_count=chunk_count,
+            index_ready=bool(source_count) and bool(chunk_count),
+            warnings=warnings,
+        )
+
     # Hot-path memoization (production global store only). The corpus only
     # changes via (re)indexing, which moves the source/chunk counts, so we cache
     # the readiness result and recompute the expensive load+rebuild only when
@@ -102,7 +128,6 @@ def ensure_source_index_ready(source_store: SQLiteStore = store) -> SourceIndexR
     expected_chunks = build_source_chunks(sources)
     stale_source_ids = _stale_source_ids(expected_chunks, chunks)
     missing_chunk_source_ids = _missing_chunk_source_ids(sources, chunks)
-    settings = get_settings()
     should_reindex = bool(sources) and (
         stale_source_ids
         or (bool(missing_chunk_source_ids) and (bool(chunks) or settings.auto_reindex_on_empty))

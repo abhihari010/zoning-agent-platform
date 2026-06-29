@@ -619,11 +619,42 @@ def test_source_index_version_memoized_for_global_store(monkeypatch) -> None:
     hlr.reset_source_index_version_memo()
 
 
-def test_ensure_source_index_ready_memoized_for_global_store(monkeypatch) -> None:
+def test_ensure_source_index_ready_cheap_when_startup_reindex_disabled(monkeypatch) -> None:
+    from types import SimpleNamespace
+
     from app.ai import source_registry_retriever as srr
 
     srr.reset_source_index_readiness_memo()
     monkeypatch.setattr(srr, "ensure_seed_sources", lambda *a, **k: None)
+    monkeypatch.setattr(srr, "get_settings", lambda: SimpleNamespace(startup_reindex_enabled=False))
+    monkeypatch.setattr(srr.store, "get_source_count", lambda: 5)
+    monkeypatch.setattr(srr.store, "get_source_chunk_count", lambda: 42)
+
+    def _boom(*a, **k):
+        raise AssertionError("must not load the corpus when startup reindex is disabled")
+
+    monkeypatch.setattr(srr.store, "list_sources", _boom)
+    monkeypatch.setattr(srr.store, "list_source_chunks", _boom)
+
+    readiness = srr.ensure_source_index_ready(srr.store)
+    assert readiness.index_ready is True
+    assert readiness.source_count == 5
+    assert readiness.chunk_count == 42
+
+
+def test_ensure_source_index_ready_memoized_for_global_store(monkeypatch) -> None:
+    from types import SimpleNamespace
+
+    from app.ai import source_registry_retriever as srr
+
+    srr.reset_source_index_readiness_memo()
+    monkeypatch.setattr(srr, "ensure_seed_sources", lambda *a, **k: None)
+    # Force the full reconciliation path (not the externally-managed cheap path).
+    monkeypatch.setattr(
+        srr,
+        "get_settings",
+        lambda: SimpleNamespace(startup_reindex_enabled=True, auto_reindex_on_empty=False),
+    )
 
     entry = SourceRegistryEntry(
         source_id="memo-rule",
