@@ -69,8 +69,34 @@ def ensure_seed_sources(source_store: SQLiteStore = store) -> None:
             source_store.audit(version_stage, "source-registry")
 
 
+# Memoized readiness for the production global store, keyed on a cheap
+# (source_count, chunk_count) signature. Computing readiness loads AND rebuilds
+# the entire corpus (build_source_chunks over every source), materializing 20k+
+# chunks twice per call; doing that on every /ready check and every analyze blew
+# the instance memory limit at breadth scale. See ensure_source_index_ready.
+_READINESS_MEMO: tuple[tuple[int, int], "SourceIndexReadiness"] | None = None
+
+
+def reset_source_index_readiness_memo() -> None:
+    """Clear the memoized readiness result (e.g. after an in-process reindex)."""
+    global _READINESS_MEMO
+    _READINESS_MEMO = None
+
+
 def ensure_source_index_ready(source_store: SQLiteStore = store) -> SourceIndexReadiness:
     ensure_seed_sources(source_store)
+
+    # Hot-path memoization (production global store only). The corpus only
+    # changes via (re)indexing, which moves the source/chunk counts, so we cache
+    # the readiness result and recompute the expensive load+rebuild only when
+    # those counts change. A throwaway store (tests) is never memoized.
+    global _READINESS_MEMO
+    use_memo = source_store is store
+    if use_memo:
+        signature = (source_store.get_source_count(), source_store.get_source_chunk_count())
+        if _READINESS_MEMO is not None and _READINESS_MEMO[0] == signature:
+            return _READINESS_MEMO[1]
+
     sources = source_store.list_sources()
     chunks = source_store.list_source_chunks()
     expected_chunks = build_source_chunks(sources)
@@ -103,7 +129,7 @@ def ensure_source_index_ready(source_store: SQLiteStore = store) -> SourceIndexR
     if missing_chunk_source_ids:
         warnings.append("Some source registry entries do not have indexed chunks.")
 
-    return SourceIndexReadiness(
+    readiness = SourceIndexReadiness(
         source_count=len(sources),
         chunk_count=len(chunks),
         index_ready=bool(sources) and bool(chunks) and not stale_source_ids and not missing_chunk_source_ids,
@@ -111,6 +137,12 @@ def ensure_source_index_ready(source_store: SQLiteStore = store) -> SourceIndexR
         missing_chunk_source_ids=missing_chunk_source_ids,
         warnings=warnings,
     )
+
+    if use_memo:
+        # Re-read counts: an auto-reindex above may have changed them.
+        signature = (source_store.get_source_count(), source_store.get_source_chunk_count())
+        _READINESS_MEMO = (signature, readiness)
+    return readiness
 
 
 def _expected_hash_by_source(chunks: list[SourceChunk]) -> dict[str, str]:

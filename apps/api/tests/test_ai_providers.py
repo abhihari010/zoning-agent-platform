@@ -578,3 +578,79 @@ def test_source_index_version_changes_when_only_tags_change(tmp_path: Path) -> N
     assert first != second
 
 
+def _one_chunk() -> list:
+    entry = SourceRegistryEntry(
+        source_id="memo-rule",
+        title="Memo Rule",
+        excerpt="Coffee shops require zoning review with sufficient text for chunking.",
+        full_text="Coffee shops require zoning review with sufficient text for chunking.",
+        section_ref="Sec. 1",
+        jurisdiction_id="blacksburg-va",
+        districts=["unknown"],
+        uses=["general"],
+    )
+    return build_source_chunks([entry])
+
+
+def test_source_index_version_memoized_for_global_store(monkeypatch) -> None:
+    from app.ai import hybrid_local_retriever as hlr
+
+    hlr.reset_source_index_version_memo()
+    chunks = _one_chunk()
+    scans = {"n": 0}
+
+    def _counting_list() -> list:
+        scans["n"] += 1
+        return chunks
+
+    monkeypatch.setattr(hlr.store, "get_source_count", lambda: 1)
+    monkeypatch.setattr(hlr.store, "get_source_chunk_count", lambda: len(chunks))
+    monkeypatch.setattr(hlr.store, "list_source_chunks", _counting_list)
+
+    first = hlr._source_index_version(hlr.store, "")
+    second = hlr._source_index_version(hlr.store, "")
+    assert first == second
+    assert scans["n"] == 1  # second call served from the memo, no corpus scan
+
+    # Changing the cheap count signature busts the memo and forces a re-scan.
+    monkeypatch.setattr(hlr.store, "get_source_chunk_count", lambda: len(chunks) + 1)
+    hlr._source_index_version(hlr.store, "")
+    assert scans["n"] == 2
+    hlr.reset_source_index_version_memo()
+
+
+def test_ensure_source_index_ready_memoized_for_global_store(monkeypatch) -> None:
+    from app.ai import source_registry_retriever as srr
+
+    srr.reset_source_index_readiness_memo()
+    monkeypatch.setattr(srr, "ensure_seed_sources", lambda *a, **k: None)
+
+    entry = SourceRegistryEntry(
+        source_id="memo-rule",
+        title="Memo Rule",
+        excerpt="Coffee shops require zoning review with sufficient text for chunking.",
+        full_text="Coffee shops require zoning review with sufficient text for chunking.",
+        section_ref="Sec. 1",
+        jurisdiction_id="blacksburg-va",
+        districts=["unknown"],
+        uses=["general"],
+    )
+    chunks = build_source_chunks([entry])
+    scans = {"n": 0}
+
+    def _counting_chunks() -> list:
+        scans["n"] += 1
+        return chunks
+
+    monkeypatch.setattr(srr.store, "get_source_count", lambda: 1)
+    monkeypatch.setattr(srr.store, "get_source_chunk_count", lambda: len(chunks))
+    monkeypatch.setattr(srr.store, "list_sources", lambda: [entry])
+    monkeypatch.setattr(srr.store, "list_source_chunks", _counting_chunks)
+
+    first = srr.ensure_source_index_ready(srr.store)
+    second = srr.ensure_source_index_ready(srr.store)
+    assert first is second  # memo returns the same readiness object
+    assert scans["n"] == 1  # second call did not reload/rebuild the corpus
+    srr.reset_source_index_readiness_memo()
+
+

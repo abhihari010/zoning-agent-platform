@@ -687,22 +687,62 @@ def _build_retrieval_cache_key(request: RetrievalProviderRequest, source_index_v
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
+# Memoized source-index version for the production global store, keyed on a
+# cheap (source_count, chunk_count) signature. Computing the full version loads
+# every source chunk into memory; doing that on every retrieval blew the
+# instance memory limit at breadth scale (20k+ chunks). See _source_index_version.
+_VERSION_MEMO: tuple[tuple[int, int], str] | None = None
+
+
+def reset_source_index_version_memo() -> None:
+    """Clear the memoized source-index version (e.g. after an in-process reindex)."""
+    global _VERSION_MEMO
+    _VERSION_MEMO = None
+
+
 def _source_index_version(source_store: SQLiteStore, configured_version: str) -> str:
-    """Return a content-derived source index version for cache keys."""
+    """Return a content-derived source index version for cache keys.
+
+    The full version is a hash over every chunk's id / text hash / source
+    version / district + use tags, so any content *or* tag change busts the
+    retrieval cache. Computing it loads the entire corpus into memory; doing
+    that on every retrieval materialized 20k+ chunks per request and blew the
+    instance memory limit at breadth scale.
+
+    For the production global ``store`` we memoize the hash and recompute only
+    when the (source, chunk) counts change. Callers that pass a non-default
+    store (tests) always recompute, preserving full tag-sensitivity. Note: an
+    in-process reindex that changes tags without changing counts will reuse the
+    memoized version until the counts move or the process restarts; the
+    retrieval cache is TTL-bounded, so the staleness window is small.
+    """
+    global _VERSION_MEMO
+    use_memo = source_store is store
+    signature: tuple[int, int] | None = None
+    if use_memo:
+        signature = (source_store.get_source_count(), source_store.get_source_chunk_count())
+        if _VERSION_MEMO is not None and _VERSION_MEMO[0] == signature:
+            return _VERSION_MEMO[1]
+
     chunks = source_store.list_source_chunks()
     if not chunks:
-        return configured_version
-    raw = json.dumps(
-        [
-            {
-                "chunk_id": chunk.chunk_id,
-                "source_text_hash": chunk.source_text_hash,
-                "source_version": chunk.source_version,
-                "districts": sorted(chunk.districts),
-                "uses": sorted(chunk.uses),
-            }
-            for chunk in sorted(chunks, key=lambda item: item.chunk_id)
-        ],
-        sort_keys=True,
-    )
-    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+        version = configured_version
+    else:
+        raw = json.dumps(
+            [
+                {
+                    "chunk_id": chunk.chunk_id,
+                    "source_text_hash": chunk.source_text_hash,
+                    "source_version": chunk.source_version,
+                    "districts": sorted(chunk.districts),
+                    "uses": sorted(chunk.uses),
+                }
+                for chunk in sorted(chunks, key=lambda item: item.chunk_id)
+            ],
+            sort_keys=True,
+        )
+        version = hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+    if use_memo and signature is not None:
+        _VERSION_MEMO = (signature, version)
+    return version
