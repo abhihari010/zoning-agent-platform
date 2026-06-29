@@ -111,6 +111,10 @@ class StoreRepository(Protocol):
 
     def list_sources(self) -> list[SourceRegistryEntry]: ...
 
+    def list_source_summaries(self) -> list[SourceRegistryEntry]: ...
+
+    def get_source(self, source_id: str) -> SourceRegistryEntry | None: ...
+
     def get_source_count(self) -> int: ...
 
     def replace_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]: ...
@@ -840,13 +844,53 @@ class SQLAlchemyStore:
 
         return [SourceRegistryEntry.model_validate(_coerce_payload(row.payload_json)) for row in rows]
 
+    def list_source_summaries(self) -> list[SourceRegistryEntry]:
+        """List sources WITHOUT their full_text, streaming rows so the entire
+        corpus text is never held in memory at once.
+
+        The admin catalog only renders metadata + excerpt; a source's full_text
+        (up to 250k chars each) is fetched on demand via get_source() when
+        editing. Loading every source's full_text here materialized the whole
+        corpus per request and OOM'd the instance at breadth scale (6.8k
+        full-text sources). full_text is dropped before validation, so the model
+        validator backfills it from the (small) excerpt.
+        """
+        try:
+            entries: list[SourceRegistryEntry] = []
+            with self.engine.connect() as connection:
+                result = connection.execution_options(yield_per=200).execute(
+                    select(sources.c.payload_json).order_by(sources.c.source_id.asc())
+                )
+                for row in result:
+                    payload = _coerce_payload(row.payload_json)
+                    if isinstance(payload, dict) and "full_text" in payload:
+                        payload = {key: value for key, value in payload.items() if key != "full_text"}
+                    entries.append(SourceRegistryEntry.model_validate(payload))
+            return entries
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not list source summaries: {exc}") from exc
+
+    def get_source(self, source_id: str) -> SourceRegistryEntry | None:
+        try:
+            with self.engine.connect() as connection:
+                row = connection.execute(
+                    select(sources.c.payload_json).where(sources.c.source_id == source_id)
+                ).first()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not load source {source_id}: {exc}") from exc
+        if row is None:
+            return None
+        return SourceRegistryEntry.model_validate(_coerce_payload(row.payload_json))
+
     def get_source_count(self) -> int:
         try:
             with self.engine.connect() as connection:
-                row = connection.execute(select(sources.c.source_id)).all()
+                count = connection.execute(
+                    select(func.count()).select_from(sources)
+                ).scalar_one()
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not count sources: {exc}") from exc
-        return len(row)
+        return int(count)
 
     def replace_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]:
         now = datetime.now(timezone.utc)
@@ -987,10 +1031,12 @@ class SQLAlchemyStore:
     def get_source_chunk_count(self) -> int:
         try:
             with self.engine.connect() as connection:
-                row = connection.execute(select(source_chunks.c.chunk_id)).all()
+                count = connection.execute(
+                    select(func.count()).select_from(source_chunks)
+                ).scalar_one()
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not count source chunks: {exc}") from exc
-        return len(row)
+        return int(count)
 
     def get_latest_audit_timestamp(self, stage: str) -> datetime | None:
         try:

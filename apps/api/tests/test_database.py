@@ -5,8 +5,56 @@ from uuid import uuid4
 from sqlalchemy import inspect
 
 from app.database import database_url_from_settings, normalize_database_url
-from app.models import ProjectRecord
+from app.models import ProjectRecord, SourceRegistryEntry
 from app.storage import SQLiteStore
+
+
+def _sample_source(source_id: str = "rule-1") -> SourceRegistryEntry:
+    return SourceRegistryEntry(
+        source_id=source_id,
+        title="Zoning Rule",
+        excerpt="Coffee shops require a zoning review with enough text to chunk.",
+        full_text="FULL TEXT BODY " * 200,  # large body that must not load in the list
+        section_ref="Sec. 1",
+        jurisdiction_id="blacksburg-va",
+        districts=["unknown"],
+        uses=["general"],
+    )
+
+
+def test_list_source_summaries_omits_full_text(tmp_path) -> None:
+    store = SQLiteStore(tmp_path / "local.sqlite3")
+    store.upsert_source(_sample_source("rule-1"))
+    store.upsert_source(_sample_source("rule-2"))
+
+    summaries = store.list_source_summaries()
+
+    assert {s.source_id for s in summaries} == {"rule-1", "rule-2"}
+    # full_text is stripped before validation; the validator backfills the small
+    # excerpt, so it never carries the large body in the catalog list.
+    for summary in summaries:
+        assert "FULL TEXT BODY" not in (summary.full_text or "")
+        assert summary.excerpt.startswith("Coffee shops")
+
+    # The by-id fetch returns the complete source, including full_text.
+    full = store.get_source("rule-1")
+    assert full is not None
+    assert "FULL TEXT BODY" in (full.full_text or "")
+    assert store.get_source("missing") is None
+
+
+def test_source_and_chunk_counts(tmp_path) -> None:
+    from app.ingestion import build_source_chunks
+
+    store = SQLiteStore(tmp_path / "local.sqlite3")
+    assert store.get_source_count() == 0
+    assert store.get_source_chunk_count() == 0
+
+    store.upsert_source(_sample_source("rule-1"))
+    store.replace_source_chunks(build_source_chunks([_sample_source("rule-1")]))
+
+    assert store.get_source_count() == 1
+    assert store.get_source_chunk_count() >= 1
 
 
 def test_normalize_database_url_selects_psycopg_for_render_postgres_urls() -> None:

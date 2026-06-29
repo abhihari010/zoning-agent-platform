@@ -33,6 +33,7 @@ from app.models import (
     ReindexResponse,
     SourceIndexStatusResponse,
     SourceMetadataHealth,
+    SourceRegistryEntry,
     SourceRegistryListResponse,
     SourceRegistryUpsertRequest,
     SessionCreateResponse,
@@ -359,7 +360,18 @@ def get_trace(project_id: UUID, request: Request):
 @router.get("/ingestion/sources", response_model=SourceRegistryListResponse)
 def list_sources() -> SourceRegistryListResponse:
     ensure_seed_sources()
-    return SourceRegistryListResponse(sources=store.list_sources())
+    # Lightweight list (no full_text) -- the catalog only renders metadata +
+    # excerpt. Loading every source's full_text here OOM'd the instance at
+    # breadth scale; full_text is fetched per-source via the by-id endpoint.
+    return SourceRegistryListResponse(sources=store.list_source_summaries())
+
+
+@router.get("/ingestion/sources/{source_id}", response_model=SourceRegistryEntry)
+def get_source(source_id: str) -> SourceRegistryEntry:
+    source = store.get_source(source_id)
+    if source is None:
+        raise HTTPException(status_code=404, detail=f"Source '{source_id}' not found.")
+    return source
 
 
 @router.post(
@@ -370,7 +382,7 @@ def list_sources() -> SourceRegistryListResponse:
 def upsert_source(payload: SourceRegistryUpsertRequest) -> SourceRegistryListResponse:
     store.upsert_source(payload.source)
     invalidate_all_caches()
-    return SourceRegistryListResponse(sources=store.list_sources())
+    return SourceRegistryListResponse(sources=store.list_source_summaries())
 
 
 @router.get("/ingestion/status", response_model=SourceIndexStatusResponse)
