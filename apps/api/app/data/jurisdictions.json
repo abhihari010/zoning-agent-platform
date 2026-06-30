@@ -728,5 +728,36 @@
     },
     "last_verified_at": "2026-06-27",
     "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "franklin-tn",
+    "name": "Franklin, TN",
+    "state": "TN",
+    "state_fips": "47",
+    "county_fips": "187",
+    "place_fips": "27740",
+    "jurisdiction_type": "municipality",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality",
+    "locality_names": [
+      "Franklin"
+    ],
+    "county_names": [
+      "Williamson County"
+    ],
+    "state_names": [
+      "TN",
+      "Tennessee"
+    ],
+    "official_source_urls": [
+      "https://web.franklintn.gov/flippingbook/FranklinZoningOrdinance"
+    ],
+    "zoning_map_url": null,
+    "planning_contact": {
+      "url": "https://web.franklintn.gov/flippingbook/FranklinZoningOrdinance"
+    },
+    "last_verified_at": "2026-06-29",
+    "district_mapping_strategy": "source_indexed_until_ch5_use_table_image_extraction_and_district_qa_pass"
   }
 ]
