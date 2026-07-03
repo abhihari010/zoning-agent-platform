@@ -1,0 +1,117 @@
+name: Production Reindex
+
+# Automates the previously manual, laptop-run corpus sync:
+#   1. scripts/reindex_prod.py               — import source packs into prod
+#      Postgres, sync jurisdiction records, embed NEW chunks into Qdrant
+#      (incremental: existing chunk_ids are skipped, so re-runs are cheap).
+#   2. scripts/update_source_classification.py — payload-only district/use
+#      retag of already-indexed chunks (no re-embedding, no Gemini cost).
+#
+# Running both in sequence is correct for every change shape:
+#   - new/edited source-pack TEXT  -> reindex imports + embeds it (with district
+#     payloads applied at write time from committed classification_rules.json)
+#   - classification_rules.json-only change -> reindex is a near-no-op
+#     (0 pending chunks) and the retag applies the new tags.
+#
+# SAFETY:
+#   - No-ops cleanly when the prod secrets are not configured (see guard step).
+#   - Serialized: one run at a time, queued not cancelled (an interrupted
+#     embed run is resumable, but overlapping runs would race on Qdrant).
+#   - Everything it does is idempotent/resumable; re-running is always safe.
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_import:
+        description: "Skip the source-pack import phase (only embed/retag what is already in Postgres). Leave off for new cities."
+        type: boolean
+        default: false
+      retag_only:
+        description: "Only run the payload retag (classification_rules.json-only change; skips reindex entirely)."
+        type: boolean
+        default: false
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/api/app/data/source_packs/**"
+      - "apps/api/app/data/jurisdictions.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prod-reindex
+  cancel-in-progress: false
+
+jobs:
+  reindex:
+    name: Reindex prod corpus
+    runs-on: ubuntu-latest
+    # Import phase alone is ~45 min at ~0.4 s/source upsert over the full
+    # corpus; embedding adds more for large packs. Generous ceiling.
+    timeout-minutes: 180
+    env:
+      DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+      QDRANT_URL: ${{ secrets.QDRANT_URL }}
+      QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      EMBEDDING_PROVIDER: gemini
+      VECTOR_PROVIDER: qdrant
+      RAG_PROVIDER: hybrid_local
+    steps:
+      - name: Check required secrets
+        id: guard
+        run: |
+          missing=""
+          [ -z "$DATABASE_URL" ]   && missing="$missing PROD_DATABASE_URL"
+          [ -z "$QDRANT_URL" ]     && missing="$missing QDRANT_URL"
+          [ -z "$QDRANT_API_KEY" ] && missing="$missing QDRANT_API_KEY"
+          [ -z "$GEMINI_API_KEY" ] && missing="$missing GEMINI_API_KEY"
+          if [ -n "$missing" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Prod reindex skipped — missing GitHub Actions secret(s):$missing. See docs/production-readiness/prod-reindex-workflow.md."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.guard.outputs.configured == 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: steps.guard.outputs.configured == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install API
+        if: steps.guard.outputs.configured == 'true'
+        run: python -m pip install --upgrade pip && python -m pip install "apps/api"
+
+      - name: Reindex (import packs + sync jurisdictions + embed new chunks)
+        if: steps.guard.outputs.configured == 'true' && inputs.retag_only != true
+        working-directory: apps/api
+        run: |
+          args=""
+          if [ "${{ inputs.skip_import }}" = "true" ]; then
+            args="--skip-import"
+          fi
+          python ../../scripts/reindex_prod.py $args
+
+      - name: Retag district/use payloads (dry run)
+        if: steps.guard.outputs.configured == 'true'
+        working-directory: apps/api
+        run: python ../../scripts/update_source_classification.py --dry-run
+
+      - name: Retag district/use payloads (apply)
+        if: steps.guard.outputs.configured == 'true'
+        working-directory: apps/api
+        run: python ../../scripts/update_source_classification.py
+
+      - name: Verify public coverage endpoint
+        if: steps.guard.outputs.configured == 'true'
+        continue-on-error: true
+        run: |
+          curl -sf "https://zoning-agent-api.onrender.com/api/v1/jurisdictions/coverage" \
+            | python -c "import json,sys; d=json.load(sys.stdin); js=d.get('jurisdictions', d); print(f'coverage count: {len(js)}'); [print('-', j.get('jurisdiction_id', j)) for j in js]"
