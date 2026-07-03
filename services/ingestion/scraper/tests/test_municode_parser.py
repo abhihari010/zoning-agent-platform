@@ -134,3 +134,64 @@ def test_deep_linker_home_url():
     assert deep_link.home_url == (
         "https://library.municode.com/va/blacksburg/codes/code_of_ordinances"
     )
+
+
+def test_parse_content_sections_letter_outline_qualified_by_article():
+    # Danville, VA (Ch. 41) organizes Article -> lettered sections ("A. -
+    # Purpose and Intent.") with no "Sec. N" numbering.  The letters must be
+    # emitted as sections with refs qualified by the article number.
+    deep_link = DeepLinker(state="VA", city_slug="danville", code_slug="zoning")
+    records = parse_content_sections(
+        load_fixture("municode_content_danville_art7.json"),
+        deep_link=deep_link,
+        breadcrumb=["Chapter 41 - ZONING ORDINANCE"],
+        effective_date="2025-06-03",
+    )
+    by_ref = {r.section_ref: r for r in records}
+    assert "7.A" in by_ref
+    purpose = by_ref["7.A"]
+    assert purpose.heading == "A. - Purpose and Intent."
+    assert "nodeId=CH41ZOOR_ART7NOUS_APUIN" in purpose.url
+    assert purpose.text.strip()
+    # The structural article doc itself must not become a record.
+    assert not any(r.heading.startswith("ARTICLE") for r in records)
+
+
+def test_parse_content_sections_letter_outline_article_from_breadcrumb():
+    # A chunk that starts mid-article carries no article doc; the enclosing
+    # article number is seeded from the breadcrumb.  Letter-suffixed article
+    # numbers ("ARTICLE 3.N:") qualify as "3.N.C".
+    deep_link = DeepLinker(state="VA", city_slug="danville", code_slug="zoning")
+    payload = {
+        "Docs": [
+            {
+                "Id": "CH41ZOOR_ART3.NPLSHCECOPLSHCEDI._C",
+                "Title": "C. - Uses Permitted by Special Use Permit.",
+                "Content": "<p>Uses permitted by special use permit.</p>",
+            }
+        ]
+    }
+    records = parse_content_sections(
+        payload,
+        deep_link=deep_link,
+        breadcrumb=[
+            "Chapter 41 - ZONING ORDINANCE",
+            "ARTICLE 3.N: - PS-C, PLANNED SHOPPING CENTER COMMERCIAL",
+        ],
+    )
+    assert [r.section_ref for r in records] == ["3.N.C"]
+
+
+def test_parse_content_sections_letter_outline_without_article_is_skipped():
+    # A bare letter heading with no article context anywhere is not citable.
+    deep_link = DeepLinker(state="VA", city_slug="danville", code_slug="zoning")
+    payload = {
+        "Docs": [
+            {
+                "Id": "SOME_NODE",
+                "Title": "A. - Orphan.",
+                "Content": "<p>text</p>",
+            }
+        ]
+    }
+    assert parse_content_sections(payload, deep_link=deep_link) == []
