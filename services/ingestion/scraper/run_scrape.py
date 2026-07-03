@@ -36,6 +36,7 @@ if __package__ in (None, ""):
         EncodePlusFetcher,
         FlippingBookFetcher,
         GenericHtmlFetcher,
+        MadCapFlareFetcher,
         MunicipalCodeOnlineFetcher,
         MunicodeFetcher,
     )
@@ -49,6 +50,7 @@ else:  # pragma: no cover - exercised via module execution
         EncodePlusFetcher,
         FlippingBookFetcher,
         GenericHtmlFetcher,
+        MadCapFlareFetcher,
         MunicipalCodeOnlineFetcher,
         MunicodeFetcher,
     )
@@ -137,6 +139,25 @@ def _build_fetcher(args: argparse.Namespace, *, raw_dir: Path) -> Fetcher:
             regs_slug=args.regs_slug,
             impersonate=impersonate,
         )
+    if args.fetcher == "madcapflare":
+        if not args.url or len(args.url) != 1:
+            raise SystemExit(
+                "--fetcher madcapflare requires exactly one --url "
+                "(the TriPane export root, e.g. "
+                "https://www.norfolkva.gov/norfolkzoningordinance/)."
+            )
+        impersonate = (
+            None
+            if str(args.impersonate).strip().lower() in {"none", "off", ""}
+            else args.impersonate
+        )
+        return MadCapFlareFetcher(
+            cache_dir=raw_dir,
+            request_delay=args.delay,
+            max_sections=args.max_sections,
+            site_url=args.url[0],
+            impersonate=impersonate,
+        )
     raise SystemExit(f"Unknown fetcher: {args.fetcher}")
 
 
@@ -211,6 +232,7 @@ def build_parser() -> argparse.ArgumentParser:
             "ecode360",
             "amlegal",
             "encodeplus",
+            "madcapflare",
         ],
         default="municode",
         help="Which fetcher to use (default: municode).",

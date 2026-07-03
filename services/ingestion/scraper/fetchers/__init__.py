@@ -8,6 +8,7 @@ from .ecode360 import ECode360Fetcher
 from .encodeplus import EncodePlusFetcher
 from .flippingbook import FlippingBookFetcher
 from .generic_html import GenericHtmlFetcher
+from .madcapflare import MadCapFlareFetcher
 from .municipalcodeonline import MunicipalCodeOnlineFetcher
 from .municode import MunicodeFetcher
 
@@ -20,6 +21,7 @@ __all__ = [
     "FlippingBookFetcher",
     "SectionRecord",
     "GenericHtmlFetcher",
+    "MadCapFlareFetcher",
     "MunicipalCodeOnlineFetcher",
     "MunicodeFetcher",
 ]

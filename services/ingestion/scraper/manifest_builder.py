@@ -175,7 +175,7 @@ def build_manifest(
     resolved_jurisdiction_id = str(jurisdiction["jurisdiction_id"])
     retrieved_at = datetime.now(timezone.utc).date().isoformat()
     fallback_effective = effective_date or retrieved_at
-    fallback_source = "parsed_from_document" if effective_date else "unknown"
+    fallback_source = "parsed_from_document" if effective_date else "retrieval_date"
 
     used_ids: set[str] = set()
     sources = [
