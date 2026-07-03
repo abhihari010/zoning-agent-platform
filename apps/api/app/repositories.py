@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import threading
 from datetime import date, datetime, timezone
@@ -136,6 +137,8 @@ class StoreRepository(Protocol):
     def get_source_chunks_by_ids(self, chunk_ids: list[str]) -> list[SourceChunk]: ...
 
     def get_source_chunk_count(self) -> int: ...
+
+    def source_chunk_fingerprint(self) -> str: ...
 
     def get_latest_audit_timestamp(self, stage: str) -> datetime | None: ...
 
@@ -1048,6 +1051,54 @@ class SQLAlchemyStore:
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not count source chunks: {exc}") from exc
         return int(count)
+
+    def source_chunk_fingerprint(self) -> str:
+        """Return a content hash of the chunk corpus for cache-versioning.
+
+        Streams four small columns -- chunk_id (which embeds the source text
+        hash), source_version, and the district/use CSV tags -- and folds them
+        into a SHA-256 incrementally. This deliberately never reads
+        ``payload_json`` (which holds the full chunk text), so the hash is cheap
+        and the whole corpus is never materialized in process memory. The old
+        approach loaded every chunk row (full text) into a list and json-dumped
+        it, which spiked memory at breadth scale and OOM'd the 512MB instance.
+
+        The hash busts the retrieval cache on any text change (chunk_id moves)
+        or any district/use retag (the CSV columns move), including a payload-only
+        reclassification that leaves the row counts unchanged.
+        """
+        digest = hashlib.sha256()
+        try:
+            with self.engine.connect() as connection:
+                result = connection.execution_options(stream_results=True).execute(
+                    select(
+                        source_chunks.c.chunk_id,
+                        source_chunks.c.source_version,
+                        source_chunks.c.districts_csv,
+                        source_chunks.c.uses_csv,
+                    ).order_by(source_chunks.c.chunk_id.asc())
+                )
+                empty = True
+                for row in result:
+                    empty = False
+                    digest.update(
+                        "\x1f".join(
+                            (
+                                row.chunk_id,
+                                row.source_version or "",
+                                row.districts_csv or "",
+                                row.uses_csv or "",
+                            )
+                        ).encode("utf-8")
+                    )
+                    digest.update(b"\x1e")
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(
+                f"Could not fingerprint source chunks: {exc}"
+            ) from exc
+        if empty:
+            return ""
+        return digest.hexdigest()
 
     def get_latest_audit_timestamp(self, stage: str) -> datetime | None:
         try:
