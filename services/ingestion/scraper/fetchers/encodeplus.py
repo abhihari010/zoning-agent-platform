@@ -195,10 +195,14 @@ def parse_section_page(
     breadcrumb: list[str],
     chapter_title: str = "",
     fallback_effective_date: str | None = None,
+    fallback_title: str = "",
 ) -> SectionRecord | None:
     """Build one SectionRecord from a ``doc-view.aspx`` section page.
 
-    Returns ``None`` for empty/scaffolding sections.
+    Returns ``None`` for empty/scaffolding sections.  Glossary/definition
+    leaves (e.g. Loudoun's ~680 defined terms) carry no heading tag at all —
+    just a ``<p><strong class="def">Term:</strong> ...`` body — so the TOC
+    leaf title is accepted as ``fallback_title`` for those.
     """
     section_match = _SECTION_RE.search(html)
     if not section_match:
@@ -207,9 +211,10 @@ def parse_section_page(
     inner = section_match.group(2)
 
     heading_match = _HEADING_RE.search(inner)
-    if not heading_match:
-        return None
-    heading = _clean_text(_CATICON_RE.sub("", heading_match.group(2)))
+    if heading_match:
+        heading = _clean_text(_CATICON_RE.sub("", heading_match.group(2)))
+    else:
+        heading = (fallback_title or "").strip()
     if not heading:
         return None
     if heading.strip().lower() in _SKIP_TITLES:
@@ -220,7 +225,7 @@ def parse_section_page(
         return None
 
     # Body = the section minus its heading and the archive-notice footer.
-    body_html = _HEADING_RE.sub("", inner, count=1)
+    body_html = _HEADING_RE.sub("", inner, count=1) if heading_match else inner
     body_html = _ARCHIVE_NOTICE_RE.sub("", body_html)
     text = clean_html(body_html)
     if not text.strip():
@@ -340,6 +345,7 @@ class EncodePlusFetcher:
                     deep_link=deep_link,
                     breadcrumb=breadcrumb,
                     chapter_title=chapter,
+                    fallback_title=title,
                 )
                 if record is not None:
                     sections.append(record)

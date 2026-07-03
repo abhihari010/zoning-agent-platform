@@ -168,6 +168,32 @@ def test_parse_section_page_returns_none_without_section_markup():
     )
 
 
+def test_parse_section_page_definition_leaf_uses_fallback_title():
+    # Glossary/definition leaves (e.g. Loudoun's defined terms) have no heading
+    # tag — just a def paragraph; the TOC leaf title supplies the heading.
+    html = (
+        "<section class='doc-section' data-secid='565'>"
+        "<p><strong class=\"def\">Sign:</strong> Any visual display that "
+        "comprises letters, words, or symbols.</p></section>"
+    )
+    record = parse_section_page(
+        html,
+        deep_link=_DEEP_LINK,
+        breadcrumb=["Chapter 9: Definitions"],
+        fallback_title="Sign",
+    )
+    assert record is not None
+    assert record.section_ref == "Sign"
+    assert record.heading == "Sign"
+    assert record.node_id == "565"
+    assert "visual display" in record.text
+
+
+def test_parse_section_page_without_heading_or_fallback_returns_none():
+    html = "<section data-secid='1'><p>orphan text</p></section>"
+    assert parse_section_page(html, deep_link=_DEEP_LINK, breadcrumb=[]) is None
+
+
 def test_parse_section_page_skips_table_of_contents_leaf():
     html = (
         "<section data-secid='1770'><h3>Table of Contents</h3>"
