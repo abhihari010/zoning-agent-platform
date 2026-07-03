@@ -151,14 +151,31 @@ class QdrantVectorStore:
             )
         return len(stale_chunk_ids)
 
-    def update_chunk_payloads(self, payloads_by_chunk_id: dict[str, dict[str, Any]]) -> int:
+    def update_chunk_payloads(
+        self, payloads_by_chunk_id: dict[str, dict[str, Any]]
+    ) -> tuple[int, int]:
+        """Set payloads on existing points; skip (never fail on) missing ids.
+
+        Returns ``(updated, skipped)``. A chunk_id can be absent from Qdrant when
+        its source text is newer than the last reindex -- new/changed chunks are
+        embedded by reindex_prod.py, not by this payload-only retag. We pre-filter
+        to the ids actually present so one missing point can't raise 404 and abort
+        the whole retag mid-way (which previously left Qdrant half-retagged). If
+        the collection is missing/unreadable, ``existing`` is empty and every id is
+        skipped rather than 404-stormed.
+        """
         if not payloads_by_chunk_id:
-            return 0
+            return 0, 0
 
         client = self._get_client()
+        existing = self.existing_chunk_ids()
         updated = 0
+        skipped = 0
         for chunk_id, payload in payloads_by_chunk_id.items():
             if not payload:
+                continue
+            if chunk_id not in existing:
+                skipped += 1
                 continue
             client.set_payload(
                 collection_name=self.collection_name,
@@ -167,7 +184,7 @@ class QdrantVectorStore:
                 wait=True,
             )
             updated += 1
-        return updated
+        return updated, skipped
 
     def existing_chunk_ids(self) -> set[str]:
         """Chunk ids already stored in Qdrant.

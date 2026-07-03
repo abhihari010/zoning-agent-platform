@@ -106,18 +106,27 @@ def main() -> int:
         for chunk in chunks
     }
     vector_store = QdrantVectorStore(settings=settings)
-    updated = vector_store.update_chunk_payloads(payloads)
+    updated, skipped = vector_store.update_chunk_payloads(payloads)
     _log(f"updated {updated} Qdrant point payloads (no re-embedding).")
+    if skipped:
+        _log(
+            f"NOTE: skipped {skipped} chunk(s) whose points are not in Qdrant yet -- "
+            "their source text is newer than the last reindex. Run reindex_prod.py to "
+            "embed them (new points are written with correct district/use payloads), "
+            "then re-run this script to retag the rest."
+        )
 
-    # Sanity guard: confirm we made zero embedding calls.
-    assert updated == len(payloads), (
-        f"payload update count mismatch: {updated} != {len(payloads)}"
+    # Accounting guard: every non-empty payload was either applied or explicitly skipped.
+    non_empty = sum(1 for payload in payloads.values() if payload)
+    assert updated + skipped == non_empty, (
+        f"payload accounting mismatch: {updated} + {skipped} != {non_empty}"
     )
 
     _log(
-        f"\nDONE. {updated} Qdrant points retagged. "
-        "The A5 cache-version hash now includes districts/uses so stale cached "
-        "retrieval results are invalidated automatically on the next query."
+        f"\nDONE. {updated} Qdrant points retagged"
+        + (f" ({skipped} skipped, pending reindex)." if skipped else ".")
+        + " Retrieval-cache versioning is a live districts/uses fingerprint, so stale "
+        "cached results are invalidated automatically on the next query."
     )
     return 0
 
