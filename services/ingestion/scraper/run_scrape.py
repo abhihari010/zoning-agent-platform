@@ -33,6 +33,7 @@ if __package__ in (None, ""):
     from services.ingestion.scraper.fetchers import (
         AmericanLegalFetcher,
         ECode360Fetcher,
+        EncodePlusFetcher,
         FlippingBookFetcher,
         GenericHtmlFetcher,
         MunicipalCodeOnlineFetcher,
@@ -45,6 +46,7 @@ else:  # pragma: no cover - exercised via module execution
     from .fetchers import (
         AmericanLegalFetcher,
         ECode360Fetcher,
+        EncodePlusFetcher,
         FlippingBookFetcher,
         GenericHtmlFetcher,
         MunicipalCodeOnlineFetcher,
@@ -122,6 +124,19 @@ def _build_fetcher(args: argparse.Namespace, *, raw_dir: Path) -> Fetcher:
             code_slug=args.code_slug,
             impersonate=impersonate,
         )
+    if args.fetcher == "encodeplus":
+        impersonate = (
+            None
+            if str(args.impersonate).strip().lower() in {"none", "off", ""}
+            else args.impersonate
+        )
+        return EncodePlusFetcher(
+            cache_dir=raw_dir,
+            request_delay=args.delay,
+            max_sections=args.max_sections,
+            regs_slug=args.regs_slug,
+            impersonate=impersonate,
+        )
     raise SystemExit(f"Unknown fetcher: {args.fetcher}")
 
 
@@ -195,6 +210,7 @@ def build_parser() -> argparse.ArgumentParser:
             "municipalcodeonline",
             "ecode360",
             "amlegal",
+            "encodeplus",
         ],
         default="municode",
         help="Which fetcher to use (default: municode).",
@@ -221,6 +237,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="amlegal code slug, e.g. plaincity_oh; "
         "default resolves from the client landing page.",
+    )
+    parser.add_argument(
+        "--regs-slug",
+        default=None,
+        help="enCodePlus regulation slug, e.g. loudouncounty-va-zo "
+        "(the /regs/{slug}/ path segment). Required for --fetcher encodeplus.",
     )
     parser.add_argument(
         "--impersonate",

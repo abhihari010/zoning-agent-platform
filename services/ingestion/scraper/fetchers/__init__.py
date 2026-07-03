@@ -5,6 +5,7 @@ from __future__ import annotations
 from .amlegal import AmericanLegalFetcher
 from .base import FetchResult, Fetcher, SectionRecord
 from .ecode360 import ECode360Fetcher
+from .encodeplus import EncodePlusFetcher
 from .flippingbook import FlippingBookFetcher
 from .generic_html import GenericHtmlFetcher
 from .municipalcodeonline import MunicipalCodeOnlineFetcher
@@ -15,6 +16,7 @@ __all__ = [
     "Fetcher",
     "AmericanLegalFetcher",
     "ECode360Fetcher",
+    "EncodePlusFetcher",
     "FlippingBookFetcher",
     "SectionRecord",
     "GenericHtmlFetcher",
