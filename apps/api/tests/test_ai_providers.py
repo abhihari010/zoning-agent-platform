@@ -578,10 +578,47 @@ def test_source_index_version_changes_when_only_tags_change(tmp_path: Path) -> N
     assert first != second
 
 
-def _one_chunk() -> list:
-    entry = SourceRegistryEntry(
-        source_id="memo-rule",
-        title="Memo Rule",
+def test_source_index_version_uses_cheap_fingerprint_not_corpus_scan(monkeypatch) -> None:
+    """The version comes from the DB-side fingerprint, never a full corpus scan.
+
+    Loading every chunk row (with full text) here is what OOM'd the 512MB
+    instance at breadth scale, so guard that ``list_source_chunks`` is never
+    touched on the retrieval hot path.
+    """
+    from app.ai import hybrid_local_retriever as hlr
+
+    def _boom() -> list:
+        raise AssertionError("list_source_chunks must not be called to compute the version")
+
+    monkeypatch.setattr(hlr.store, "list_source_chunks", _boom)
+
+    fingerprints = iter(["fp-1", "fp-1", "fp-2"])
+    monkeypatch.setattr(hlr.store, "source_chunk_fingerprint", lambda: next(fingerprints))
+
+    first = hlr._source_index_version(hlr.store, "configured")
+    second = hlr._source_index_version(hlr.store, "configured")
+    third = hlr._source_index_version(hlr.store, "configured")
+
+    assert first == second == "fp-1"
+    # A tag-only retag moves the fingerprint even though row counts are unchanged,
+    # so cached retrieval is invalidated live (no restart / count change needed).
+    assert third == "fp-2"
+
+
+def test_source_index_version_falls_back_when_corpus_empty(monkeypatch) -> None:
+    from app.ai import hybrid_local_retriever as hlr
+
+    monkeypatch.setattr(hlr.store, "source_chunk_fingerprint", lambda: "")
+    assert hlr._source_index_version(hlr.store, "configured-fallback") == "configured-fallback"
+
+
+def test_source_chunk_fingerprint_stable_and_tag_sensitive(tmp_path: Path) -> None:
+    source_store = SQLiteStore(tmp_path / "fp.sqlite3")
+    assert source_store.source_chunk_fingerprint() == ""  # empty corpus
+
+    base = SourceRegistryEntry(
+        source_id="fp-rule",
+        title="FP Rule",
         excerpt="Coffee shops require zoning review with sufficient text for chunking.",
         full_text="Coffee shops require zoning review with sufficient text for chunking.",
         section_ref="Sec. 1",
@@ -589,34 +626,14 @@ def _one_chunk() -> list:
         districts=["unknown"],
         uses=["general"],
     )
-    return build_source_chunks([entry])
+    source_store.replace_source_chunks(build_source_chunks([base]))
+    first = source_store.source_chunk_fingerprint()
+    assert first  # non-empty once chunks exist
+    assert source_store.source_chunk_fingerprint() == first  # stable across calls
 
-
-def test_source_index_version_memoized_for_global_store(monkeypatch) -> None:
-    from app.ai import hybrid_local_retriever as hlr
-
-    hlr.reset_source_index_version_memo()
-    chunks = _one_chunk()
-    scans = {"n": 0}
-
-    def _counting_list() -> list:
-        scans["n"] += 1
-        return chunks
-
-    monkeypatch.setattr(hlr.store, "get_source_count", lambda: 1)
-    monkeypatch.setattr(hlr.store, "get_source_chunk_count", lambda: len(chunks))
-    monkeypatch.setattr(hlr.store, "list_source_chunks", _counting_list)
-
-    first = hlr._source_index_version(hlr.store, "")
-    second = hlr._source_index_version(hlr.store, "")
-    assert first == second
-    assert scans["n"] == 1  # second call served from the memo, no corpus scan
-
-    # Changing the cheap count signature busts the memo and forces a re-scan.
-    monkeypatch.setattr(hlr.store, "get_source_chunk_count", lambda: len(chunks) + 1)
-    hlr._source_index_version(hlr.store, "")
-    assert scans["n"] == 2
-    hlr.reset_source_index_version_memo()
+    tagged = base.model_copy(update={"districts": ["unknown", "commercial-employment"]})
+    source_store.replace_source_chunks(build_source_chunks([tagged]))
+    assert source_store.source_chunk_fingerprint() != first  # tag change moves it
 
 
 def test_ensure_source_index_ready_cheap_when_startup_reindex_disabled(monkeypatch) -> None:
