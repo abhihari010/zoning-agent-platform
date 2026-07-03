@@ -1,0 +1,251 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+    
+    <title>1.01 Title, Purpose, and Intent</title>
+    <link type="text/css" rel="Stylesheet" href="jqueryui/css/jqueryui.css" media="all" />
+    <link type="text/css" rel="Stylesheet" href="css/ui.css" media="all" />
+    <link type="text/css" rel="Stylesheet" href="css/customui.css" media="all" />
+    <link type="text/css" rel="Stylesheet" href="css/document.css" media="all" />
+    <link type="text/css" rel="Stylesheet" href="css/customdoc.css" media="all" />
+    <link type="text/css" rel="Stylesheet" href="tablestyles.aspx" media="all" />
+ <link rel="StyleSheet" type="text/css" href="/common/font-awesome/css/font-awesome.min.css">
+    <link type="text/css" rel="Stylesheet" href="css/docprint.css" media="print" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script type="text/javascript" src="jqueryui/js/jquery-ui-1.8.21.custom.min.js"></script>
+    <script type="text/javascript" src="js/doc-view.js?_t=183"></script>
+    <script type="text/javascript" src="js/tabletools.js"></script>
+       <script type="text/javascript" src="js/tabs.js"></script>
+	<script type="text/javascript">
+			var iframeReady = false;
+	</script>	
+    
+</head>
+<body class='doc-view' >
+<script type="text/javascript">
+    $(document).ready(function () {
+        ZP.DocView.InitDef();
+        ZP.DocView.OpenDefinitionPage = null;
+        ZP.DocView.OpenDefinitionMode = '_self';
+        ZP.DocView.OpenXRefPage = 'doc-viewer.aspx#$2-';
+        ZP.DocView.OpenXRefMode = '_blank';
+        $(window).bind('hashchange', ZP.DocView.HashChanged);
+        
+        if (typeof  ZP.DocView.ZoomClasses == 'undefined') {
+            ZP.DocView.ZoomClasses = ["Unzoom1", "", "Zoom1", "Zoom2", "Zoom3", "Zoom4"];
+        }
+        ZP.DocView.InitializeZoom();
+        EC.SortedTable.Init(".ord-tbl, .stat-tbl");
+        EC.Tabs.PositionLeftTabs();
+    });
+
+    
+</script>  
+
+
+    <div id="doc-viewer">
+        
+<div id="doc-view">
+<div id="doc-view-content">
+    
+<div id="pageControls">
+<script type="text/javascript" >
+    function clearEffDate() {
+        jQuery.get("doc-view-helper.aspx?task=currentversion", function () {
+            window.location.reload();
+        });
+        return false;
+    }
+</script>
+     <div class="pageControls psuedoTable white" role="navigation" aria-label="Document Navigation">  
+        <div class="psuedoTableBody" >     
+            <div class="psuedoTableRow">         
+                <div class="pageControls_outer" ></div>
+                <div class="pageControls_inner left">
+                    <a id='button1' onclick='ZP.DocView.PrintDoc("001.002.001",false);return false;' href="#" title="Print" role="button"> 
+                            <i class="fa fa-print" aria-hidden="true"></i></a>
+                    <a id='Button2' onclick='ZP.DocView.OpenPDF("001.002.001",false);return false;' href="#" title="Export PDF" role="button">
+						<img alt="Generate PDF" src="resources/btn-makepdf-white.png" /></a>
+                    <a class="email-popup" href="mailto:?subject=1.01%20Title,%20Purpose,%20and%20Intent&amp;body=Loudoun%20County,%20VA%20Zoning%20Ordinance https://online.encodeplus.com/regs/loudouncounty-va-zo/doc-viewer.aspx?secid=4"><img src="resources/email-white.png" alt="Click to Share By Email" /></a>     
+                </div>
+                <div  class="pageControls_inner breadCrumbs" title="Navigation 'breadcrumbs'">
+                     <div class='breadCrumbs'><a href='/regs/loudouncounty-va-zo/doc-viewer.aspx?tocid=001' >Loudoun County Zoning Ordinance</a> &gt; <a href='/regs/loudouncounty-va-zo/doc-viewer.aspx?tocid=001.002' >Chapter 1: Introduction</a> &gt; <a href='/regs/loudouncounty-va-zo/doc-viewer.aspx?tocid=001.002.001' >1.01 Title, Purpose, and Intent</a></div>
+                </div>
+                 <div  class="pageControls_inner right">       
+                     <ul >  
+                         <li>
+                            <a id='button3' class="nav fa" onclick="ZP.DocView.LoadPrevDoc('001.002.001');return false;" href="#"  title="Previous Section" accesskey="," role="button">
+                                <i class="fa fa-chevron-left" aria-hidden="true"></i></a>
+                         </li>  
+                         <li>
+                             <a id='Button4'  class="nav fa" onclick="ZP.DocView.LoadNextDoc('001.002.001');return false;" href="#"  title="Next Section" accesskey="." role="button"> 
+                                  <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+                         </li>   
+                         <li>
+                             <a id="pageControls-overflow" onclick="ZP.DocView.PgCntrlOverflowClick(event);return false;" href="#" title="Click for more options" role="button" >
+                             
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 23 23" style="enable-background:new 0 0 23 23;" xml:space="preserve">
+<g>
+	<path d="M2,21.2c-0.4-2.9-0.8-5.5-1.2-8.1C-0.1,6.9,4.6,1.2,10.9,0.8C16.7,0.3,22.1,5.2,22.3,11c0.3,6.4-4.5,11.5-10.9,11.3
+		C8.2,22.2,5.1,21.6,2,21.2z M20.4,11.6c0-5-3.9-9-8.8-9s-9.1,4.2-9.1,9.1s4.1,8.9,9,8.9C16.5,20.5,20.4,16.6,20.4,11.6z"/>
+	<path d="M7.7,10.8c0-0.9,0-1.7,0-2.6c0.9,0,1.7,0,2.6,0c0,0.8,0,1.7,0,2.6C9.5,10.8,8.7,10.8,7.7,10.8z"/>
+	<path d="M7.7,15.8c0-0.9,0-1.7,0-2.6c0.9,0,1.7,0,2.6,0c0,0.8,0,1.7,0,2.6C9.5,15.8,8.7,15.8,7.7,15.8z"/>
+	<path d="M12.8,15.8c0-0.9,0-1.7,0-2.6c0.9,0,1.7,0,2.6,0c0,0.8,0,1.7,0,2.6C14.6,15.8,13.8,15.8,12.8,15.8z"/>
+	<path d="M12.8,10.8c0-0.9,0-1.7,0-2.6c0.9,0,1.7,0,2.6,0c0,0.8,0,1.7,0,2.6C14.6,10.8,13.8,10.8,12.8,10.8z"/>
+</g>
+</svg>
+</a>
+                               
+  <ul class="submenu" role="dialog">
+            <li><a href="/regs/loudouncounty-va-zo/doc-viewer.aspx?secid=4" onclick="javascript:alert('Right click this icon and select \'add to favorites\' or \'Bookmark this Link\' to bookmark this page');return false;" title="Bookmark this page" >Bookmark</a></li>
+            <li>
+                                        
+                <a id="zoomMinus" onclick="ZP.DocView.DecreaseZoom();return false;" href="#" title="Decrease Zoom" class="zoomLink glyphicon" >&#x2212;</a>
+                <a onclick="ZP.DocView.DefaultZoom();return false;"  href="#" title="Default Zoom"  class="zoomLink" >100%</a>
+                <a id="zoomPlus" onclick="ZP.DocView.IncreaseZoom();return false;" href="#" title="Increase Zoom"  class="zoomLink glyphicon" > &#x2b; </a>
+            </li>
+           
+                           
+                
+</ul>
+                         </li>        
+                        
+                        </ul>   
+                </div>
+                <div class="pageControls_outer"></div>
+            </div>
+        </div>
+    </div> 
+    <div id="subscribe-dialog" title="" aria-live="polite" >
+        <div id="sub-message"></div>
+        <div id="sub-form-cntr"></div>
+    </div>
+</div>
+
+
+    <div id="thePage-outer" >
+        <div id="thePage-wrap" class="thePage-wrap ">
+           <div id="outer-doc-banner"></div>
+           <div id="thePage-border">
+            <div id="thePage" class="textPage " tocid="001.002.001" secid="4" role="main" aria-label="Document">
+                <img id="sectionBanner" title="Document text banner" src="resources/docbanner.png" width="720" valign="Top"  alt="Document text banner">
+                
+                <!--div id="MicrosoftTranslatorWidget" style="width: 200px; min-height: 83px; border-color: #3A5770; background-color: #78ADD0;"><noscript><a href="http://www.microsofttranslator.com/bv.aspx?a=http%3a%2f%2fwww.fast-forward-it.com%2f">Translate this page</a><br />Powered by <a href="http://www.bing.com/translator">Microsoft® Translator</a></noscript></div> <script type="text/javascript"> /* <![CDATA[ */ setTimeout(function() { var s = document.createElement("script"); s.type = "text/javascript"; s.charset = "UTF-8"; s.src = ((location && location.href && location.href.indexOf('https') == 0) ? "https://ssl.microsofttranslator.com" : "http://www.microsofttranslator.com" ) + "/ajax/v2/widget.aspx?mode=manual&from=en&layout=ts"; var p = document.getElementsByTagName('head')[0] || document.documentElement; p.insertBefore(s, p.firstChild); }, 0); /* ]]> */ </script>--> 
+                
+                <section id='secid-4' class='secLvl3 _001 _001-002 _001-002-001' tabindex='-1' data-secid='4'> 
+<h3>1.01&nbsp;Title, Purpose,&nbsp;and Intent</h3>
+
+<ol class="list-v2">
+	<li>
+	<div class="li-num">A.</div>
+
+	<div class="li-cont"><strong>Title.</strong>&nbsp;This Zoning Ordinance and the <a class="iLink" target="_blank" href="doc-view.aspx?pn=0&ajax=0&secid=1308">official zoning map</a>&nbsp;are known and may be cited and referred to together as the Loudoun County Zoning Ordinance. A<span style="font-size:inherit; text-indent:0in">ll references within this text to &ldquo;Zoning Ordinance&rdquo; refer to the Loudoun County Zoning Ordinance as&nbsp;amended from time to time, unless the reference specifies </span>a&nbsp;<span style="font-size:inherit; text-indent:0in">prior version of the Zoning Ordinance.</span></div>
+	</li>
+	<li>
+	<div class="li-num">B.</div>
+
+	<div class="li-cont"><strong>Purpose and Intent.</strong> The Zoning Ordinance is enacted to promote the health, safety, and welfare of the residents of Loudoun County. To these ends, the Zoning Ordinance is designed to:
+
+	<ol class="list-v2" data-unlistid="52888256">
+		<li>
+		<div class="li-num">1.</div>
+
+		<div class="li-cont">Guide and regulate the orderly growth, development, and redevelopment of Loudoun County in accordance with the Loudoun County <a class="iLink" target="_blank" href="doc-view.aspx?pn=0&ajax=0&secid=199">Comprehensive Plan</a>, in particular its components, the General Plan and the Countywide Transportation Plan;</div>
+		</li>
+		<li>
+		<div class="li-num">2.</div>
+
+		<div class="li-cont">Protect the established character and the social and economic wellbeing of both private and public property;</div>
+		</li>
+		<li>
+		<div class="li-num">3.</div>
+
+		<div class="li-cont">Provide for adequate light, air, convenient access, and safety from fire, flood, and other dangers;</div>
+		</li>
+		<li>
+		<div class="li-num">4.</div>
+
+		<div class="li-cont">Reduce or prevent congestion on public streets;</div>
+		</li>
+		<li>
+		<div class="li-num">5.</div>
+
+		<div class="li-cont">Facilitate the creation of a convenient, attractive, and harmonious community;</div>
+		</li>
+		<li>
+		<div class="li-num">6.</div>
+
+		<div class="li-cont">Expedite the provision of adequate police and fire protection, safety from crime, disaster evacuation, civil defense, transportation, water, sewerage, flood protection, schools, parks, forests, playgrounds, recreational facilities, airports, and other public services;</div>
+		</li>
+		<li>
+		<div class="li-num">7.</div>
+
+		<div class="li-cont">Protect against destruction of or encroachment upon&nbsp;historic areas;</div>
+		</li>
+		<li>
+		<div class="li-num">8.</div>
+
+		<div class="li-cont">Protect against the following: overcrowding of land, undue population density in relation to existing or available community facilities, obstruction of light and air, danger and congestion in travel and transportation, or loss of life, health, or property from fire, flood, panic, or other dangers;</div>
+		</li>
+		<li>
+		<div class="li-num">9.</div>
+
+		<div class="li-cont">Encourage economic development activities that provide desirable employment and enlarge the tax base;</div>
+		</li>
+		<li>
+		<div class="li-num">10.</div>
+
+		<div class="li-cont">Promote the public necessity, health, safety, convenience, and general welfare by equitably apportioning the cost of providing the additional public facilities necessitated or required by development;</div>
+		</li>
+		<li>
+		<div class="li-num">11.</div>
+
+		<div class="li-cont">Provide for the preservation of agricultural and forestal land and other land&nbsp;throughout the county<span>&nbsp;for the protection of the natural environment</span>, such as&nbsp;<span>habitats, ecological systems, and natural resources;</span></div>
+		</li>
+		<li>
+		<div class="li-num">12.</div>
+
+		<div class="li-cont">Protect approach slopes and other safety areas of licensed airports; and</div>
+		</li>
+		<li>
+		<div class="li-num">13.</div>
+
+		<div class="li-cont">Provide for and promote attainable&nbsp;housing for Loudoun County residents.&nbsp;&nbsp;</div>
+		</li>
+	</ol>
+	</div>
+	</li>
+</ol>
+
+<p class='archiveNotice nullValue '>Effective on:&nbsp;1/1/1901</p>
+</section> 
+
+                
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- hidden div below is for definition popup -->
+<div id="defFrame"><img alt='loading progress' src="resources/progress.gif"/></div>
+<!-- hidden div below is for ajax loading progress-->
+<div id='progress-template' style='display:none;'>
+<div class="progress" style='padding:100px;'>
+    <div style='margin:auto;display:block;width:200px;border:1px solid #ccc; background-color:#eee;padding:10px;'>
+        <img alt='loading progress' src='resources/progress.gif' style='margin:auto;display:block;'/>
+        <br />
+        <span style='margin:auto;display:block;width:75px;padding-left:10px;'>Loading...</span>
+    </div>
+</div>
+</div>
+<iframe style="width:1px;height:1px" src=""  id="printiframe" name="printiframe" onload="ZP.DocView.IFrameReady();" title="Print frame" aria-hidden="true" role="presentation"></iframe>
+    </div>
+
+
+</body>
+</html>

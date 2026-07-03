@@ -83,7 +83,9 @@ _SECTION_RE = re.compile(
     r"<section\b[^>]*\bdata-secid='(\d+)'[^>]*>(.*?)</section>",
     re.DOTALL | re.IGNORECASE,
 )
-_H4_RE = re.compile(r"<h4[^>]*>(.*?)</h4>", re.DOTALL | re.IGNORECASE)
+# Section heading: the first heading tag in the section body.  The viewer JS
+# renders <h4>, but the server-rendered ajax=0 pages emit <h3>.
+_HEADING_RE = re.compile(r"<h([1-6])[^>]*>(.*?)</h\1>", re.DOTALL | re.IGNORECASE)
 # Category-icon container inside the heading — strip it before reading text.
 _CATICON_RE = re.compile(
     r"<span\s+class='caticon-ctnr'.*?</span>\s*</span>",
@@ -204,10 +206,10 @@ def parse_section_page(
     secid = section_match.group(1)
     inner = section_match.group(2)
 
-    h4_match = _H4_RE.search(inner)
-    if not h4_match:
+    heading_match = _HEADING_RE.search(inner)
+    if not heading_match:
         return None
-    heading = _clean_text(_CATICON_RE.sub("", h4_match.group(1)))
+    heading = _clean_text(_CATICON_RE.sub("", heading_match.group(2)))
     if not heading:
         return None
     if heading.strip().lower() in _SKIP_TITLES:
@@ -217,8 +219,8 @@ def parse_section_page(
     if not section_ref:
         return None
 
-    # Body = the section minus its <h4> heading and the archive-notice footer.
-    body_html = _H4_RE.sub("", inner, count=1)
+    # Body = the section minus its heading and the archive-notice footer.
+    body_html = _HEADING_RE.sub("", inner, count=1)
     body_html = _ARCHIVE_NOTICE_RE.sub("", body_html)
     text = clean_html(body_html)
     if not text.strip():
