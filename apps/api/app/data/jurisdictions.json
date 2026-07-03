@@ -759,5 +759,69 @@
     },
     "last_verified_at": "2026-06-29",
     "district_mapping_strategy": "source_indexed_until_ch5_use_table_image_extraction_and_district_qa_pass"
+  },
+  {
+    "jurisdiction_id": "danville-va",
+    "name": "Danville, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Danville"
+    ],
+    "county_names": [
+      "Danville City",
+      "City of Danville"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/va/danville/codes/zoning"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://library.municode.com/va/danville/codes/zoning"
+    },
+    "last_verified_at": "2026-07-03",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "norfolk-va",
+    "name": "Norfolk, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": null,
+    "place_fips": null,
+    "jurisdiction_type": "independent_city",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "locality_and_county",
+    "locality_names": [
+      "Norfolk"
+    ],
+    "county_names": [
+      "Norfolk City",
+      "City of Norfolk"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://www.norfolkva.gov/norfolkzoningordinance/"
+    ],
+    "zoning_map_url": "",
+    "planning_contact": {
+      "url": "https://www.norfolkva.gov/norfolkzoningordinance/"
+    },
+    "last_verified_at": "2026-07-03",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
   }
 ]

@@ -79,6 +79,17 @@ _SECTION_REF_RE = re.compile(
 # "Secs. 4202—4210 - [Reserved]." style ranges are skipped as non-substantive.
 _RESERVED_RE = re.compile(r"\[?\s*reserved\s*\]?", re.IGNORECASE)
 
+# Letter-outline section headings — "A. - Purpose and Intent.", "AA. -
+# Campgrounds." — used by codes (e.g. Danville, VA Ch. 41) that organize
+# Chapter -> Article -> lettered sections instead of "Sec. N" numbering.  The
+# letter alone is not citable, so the ref is qualified by the enclosing
+# article's number: article "7" + letter "B" -> "7.B"; article "3.B" + "C" ->
+# "3.B.C".
+_LETTER_OUTLINE_RE = re.compile(r"^\s*([A-Z]{1,2})\.\s*-\s*\S")
+_ARTICLE_NUM_RE = re.compile(
+    r"^\s*ARTICLE\s+([0-9]+(?:\.[A-Z]+)?)\s*[.:]", re.IGNORECASE
+)
+
 
 # ---------------------------------------------------------------------------
 # Pure parsing helpers (unit-tested against saved fixtures, no network)
@@ -232,6 +243,15 @@ def parse_content_sections(
     if not isinstance(docs, list):
         raise ValueError("Municode CodesContent response missing Docs array.")
 
+    # Article context for letter-outline sections.  The chunk group's own
+    # article doc normally precedes its lettered children; the breadcrumb seeds
+    # the context for chunks that start mid-article.
+    article_num: str | None = None
+    for crumb in breadcrumb or []:
+        crumb_match = _ARTICLE_NUM_RE.match(crumb)
+        if crumb_match:
+            article_num = crumb_match.group(1)
+
     records: list[SectionRecord] = []
     for doc in docs:
         if not isinstance(doc, dict):
@@ -240,13 +260,20 @@ def parse_content_sections(
         node_id = str(doc.get("Id") or "").strip()
         if not title or not node_id:
             continue
+        article_match = _ARTICLE_NUM_RE.match(title)
+        if article_match:
+            article_num = article_match.group(1)
         if _RESERVED_RE.search(title):
             continue
         section_ref = _section_ref_from_title(title)
         if not section_ref:
-            # Structural node (Article/Division) — skip; its sections come through
-            # as their own docs.
-            continue
+            letter_match = _LETTER_OUTLINE_RE.match(title)
+            if letter_match and article_num:
+                section_ref = f"{article_num}.{letter_match.group(1)}"
+            else:
+                # Structural node (Article/Division) — skip; its sections come
+                # through as their own docs.
+                continue
         text = clean_html(str(doc.get("Content") or ""))
         if not text.strip():
             continue

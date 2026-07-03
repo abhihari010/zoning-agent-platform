@@ -275,6 +275,19 @@ def _entry_to_namespace(entry: dict, *, output_root: Path, global_delay: float |
     ns.county_name = entry.get("county_name", None)
     ns.max_sections = entry.get("max_sections", None)
 
+    # Platform-specific identifiers (thread through when present so batch mode
+    # can drive eCode360 / American Legal / enCodePlus without name resolution).
+    if "code_id" in entry:
+        ns.code_id = entry["code_id"]
+    if "client_slug" in entry:
+        ns.client_slug = entry["client_slug"]
+    if "code_slug" in entry:
+        ns.code_slug = entry["code_slug"]
+    if "regs_slug" in entry:
+        ns.regs_slug = entry["regs_slug"]
+    if "impersonate" in entry:
+        ns.impersonate = entry["impersonate"]
+
     # delay: city-entry takes precedence, then global CLI override, then default 1.0
     ns.delay = float(entry.get("delay", global_delay if global_delay is not None else 1.0))
 
