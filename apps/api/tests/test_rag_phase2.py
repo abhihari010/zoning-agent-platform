@@ -275,7 +275,7 @@ def test_qdrant_store_updates_payload_without_reembedding() -> None:
     chunks = build_source_chunks([source])
     store.upsert_chunks(chunks, [[0.1, 0.2, 0.3] for _ in chunks])
 
-    updated = store.update_chunk_payloads(
+    updated, skipped = store.update_chunk_payloads(
         {
             chunks[0].chunk_id: {
                 "districts": ["unknown", "commercial-employment"],
@@ -288,9 +288,43 @@ def test_qdrant_store_updates_payload_without_reembedding() -> None:
         filters={"district": "commercial-employment", "use": "food-service"},
     )
 
-    assert updated == 1
+    assert (updated, skipped) == (1, 0)
     assert hits[0].metadata["districts"] == ["unknown", "commercial-employment"]
     assert hits[0].metadata["uses"] == ["food-service", "general"]
+
+
+def test_qdrant_store_skips_payload_for_missing_points() -> None:
+    """A chunk_id not yet embedded in Qdrant is skipped, not fatal.
+
+    Guards the regression where a single missing point raised 404 and aborted the
+    whole payload retag mid-way (leaving Qdrant half-retagged) when the SQL corpus
+    was ahead of the vector index.
+    """
+    fake_client = FakeQdrantClient()
+    store = _make_store(fake_client)
+    source = SourceRegistryEntry(
+        source_id="present-rule",
+        title="Present Rule",
+        excerpt="Present chunk carries enough text to be chunked into the index.",
+        section_ref="Sec 4",
+        jurisdiction_id="blacksburg-va",
+        districts=["unknown"],
+        uses=["general"],
+        source_type="zoning_ordinance",
+    )
+    chunks = build_source_chunks([source])
+    store.upsert_chunks(chunks, [[0.1, 0.2, 0.3] for _ in chunks])
+
+    updated, skipped = store.update_chunk_payloads(
+        {
+            chunks[0].chunk_id: {"districts": ["unknown", "commercial-employment"]},
+            "never-embedded-chunk-id": {"districts": ["residential"]},
+        }
+    )
+
+    assert (updated, skipped) == (1, 1)
+    hits = store.query([0.1, 0.2, 0.3], filters={"district": "commercial-employment"})
+    assert hits[0].metadata["districts"] == ["unknown", "commercial-employment"]
 
 
 def test_qdrant_store_surfaces_query_errors() -> None:
