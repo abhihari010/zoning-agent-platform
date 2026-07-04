@@ -1,6 +1,6 @@
 # Project Status — Zoning Feasibility Platform
 
-_Last updated: 2026-06-01_
+_Last updated: 2026-07-04_
 
 A single source of truth for "where are we and what's next." Update this doc at the end of
 a working session instead of leaving point-in-time handoff files scattered in `docs/`.
@@ -9,101 +9,98 @@ a working session instead of leaving point-in-time handoff files scattered in `d
 
 ## TL;DR
 
-The product is a **deployed, working zoning-feasibility RAG platform** for the Blacksburg, VA
-region. The retrieval pipeline now has two-layer district/use precision (Layer 1 recall fix +
-Layer 2 source classification), both shipped and **verified live in production**. The next
-gate is **production hardening for real users** (smoke tests, paid Postgres, pre-launch checks),
-then **jurisdiction expansion** beyond the current VA corpus.
+The product is **live in production** and serving real jurisdiction coverage: **26 jurisdictions**
+in total — **3 `public_supported`** (blacksburg-va, christiansburg-va, montgomery-county-va) and
+**23 `source_indexed`** (served with a preliminary-coverage abstention caveat), the newest being
+loudoun-county-va (977 sources, 2,463 chunks, merged 2026-07-03). CI now includes an automated
+offline retrieval-regression gate, and prod reindexing is automated via a GitHub Actions workflow
+(not yet run for a real source change). Current focus is a validation pass (real-provider eval run,
+live prod smoke, first real execution of the prod-reindex workflow), then depth: promoting 1–2
+flagship jurisdictions (richmond-va first candidate) from `source_indexed` to `public_supported`.
 
 **Live URLs**
 - Frontend: https://zoning-agent-platform.vercel.app
 - API: https://zoning-agent-api.onrender.com
 
-**Production stack** (authoritative — `docs/production-readiness/runbook.md` now matches this)
-- `AI_PROVIDER=groq` · `RAG_PROVIDER=hybrid_local` · `EMBEDDING_PROVIDER=gemini` · `VECTOR_PROVIDER=qdrant`
-- Postgres on Supabase (free tier) · Render API (blueprint-synced via `render.yaml`) · Vercel frontend
-- `STARTUP_REINDEX_ENABLED=false` — retag offline via `scripts/update_source_classification.py`
+**Production stack**
+- `AI_PROVIDER=groq` (llama-3.3-70b-versatile) · `RAG_PROVIDER=hybrid_local` · `EMBEDDING_PROVIDER=gemini` · `VECTOR_PROVIDER=qdrant`
+- Postgres via Supabase (session pooler, `DATABASE_URL`) · Qdrant Cloud (27,952 points total) · Render API (free plan, 512MB — spins down when idle; blueprint-synced via `render.yaml`) · Vercel frontend
+- Auth: Supabase JWT for the public beta, plus a legacy beta-key gate; `ADMIN_ACCESS_KEY` gates source-admin writes
+- `STARTUP_REINDEX_ENABLED=false` — reindexing happens offline / via the `prod-reindex` workflow, never at boot
 
 ---
 
-## Current Stage: Layer 2 shipped + verified in prod
+## Architecture (one-paragraph version)
 
-### What just landed
-- **Layer 1** (PR #43) — made `"unknown"` a district wildcard so the scraped Blacksburg corpus
-  (406/412 sources tagged `districts:["unknown"]`) stops being filtered out. Restored recall.
-- **Layer 2** (PR #44) — additive district/use classification. The classifier
-  (`apps/api/app/source_classifier.py`) adds canonical tags (`commercial-employment`,
-  `mixed-use-core`, `residential-low-density`, `industrial-zone`; uses like `food-service`)
-  on top of the `unknown`/`general` wildcards, so the re-ranker can score exact-district matches
-  above wildcards (precision) without ever hard-excluding (recall stays safe).
-- **Production migration run** — `scripts/update_source_classification.py` retagged **1719 Qdrant
-  point payloads** (payload-only, no re-embedding — Gemini embeddings are billed). The A5
-  cache-version hash now includes districts/uses, so stale cached results self-invalidate.
+The backend is a provider-agnostic, five-stage pipeline coordinated by
+`apps/api/app/orchestrator/zoning_orchestrator.py` (`ZoningOrchestrator`), with each stage
+implemented as a tool under `apps/api/app/tools/` (intake, address, parcel, jurisdiction,
+compliance, citation, report). AI/retrieval/embedding providers are resolved through
+`apps/api/app/ai/registry.py` against `AI_PROVIDER` / `RAG_PROVIDER` / `EMBEDDING_PROVIDER` /
+`VECTOR_PROVIDER` settings, so the same orchestrator runs against deterministic logic, Groq,
+OpenAI-compatible, local, or legacy watsonx backends. Jurisdiction support is entirely data-driven
+via `apps/api/app/data/jurisdictions.json` and `apps/api/app/data/source_registry.json` (per-
+jurisdiction packs live under `apps/api/app/data/source_packs/`) — no hard-coded city checks.
+The key invariant: if retrieval returns no citations, the orchestrator returns `unknown` /
+low-confidence rather than synthesizing a zoning conclusion. See `docs/single-orchestrator-architecture.md`
+for the full design.
 
-### Verification (2026-06-01) — Layer 2 confirmed working in prod
+---
 
-**Check 1 — Golden bakery query** (`400 Clay St SW, Blacksburg, VA`)
+## What Shipped Recently
 
-| Criterion | Result |
-|---|---|
-| Pipeline ran end-to-end | ✓ All 5 stages completed, 200 OK |
-| Citations returned with source IDs | ✓ 5 excerpts, chunk IDs present (e.g. `blacksburg-va-sec-3405:chunk:7:…`) |
-| District correctly classified | ✓ `district-downtown` — Layer 2 working |
-| Provider stack | ✓ `groq` / `hybrid_local` (matches prod blueprint) |
-| Sec. 4555 surfacing | Conditional pass (see note) |
+- **PR #75** — memoized corpus-loading hot paths, stopping an OOM crash loop on the 512MB Render instance.
+- **PR #82** — fixed the retrieval-cache fingerprint to compute the source-index version from a DB
+  fingerprint instead of a full corpus load, removing that load from the serving hot path (fixed
+  both the OOM loop and a Supabase egress overage).
+- **PR #84** — promoted loudoun-county-va to `source_indexed` (977 sources, 2,463 chunks), verified
+  live in prod.
+- **PR #85** — added `.github/workflows/prod-reindex.yml`, automating prod corpus reindexing on
+  source-pack merges plus manual dispatch (runbook: `docs/production-readiness/prod-reindex-workflow.md`).
+- **PR #86** — added an offline retrieval-regression eval gate to CI
+  (`apps/api/tests/eval/ci_gate.py` + the `eval-gate` job in `.github/workflows/ci.yml`).
+- **PR #87** — documented the Postgres durability & cutover runbook
+  (`docs/production-readiness/postgres-cutover-runbook.md`) ahead of the eventual paid-plan cutover.
 
-> **Sec. 4555 note (correct behavior, not a bug).** With use type **"Home-based food business"**,
-> home-occupation sections (Sec. 3405, Sec. 4211) win — semantically correct for that framing.
-> With use type **"Restaurant or cafe"**, Sec. 4555 surfaces at score **4.08** as the second
-> citation (`blacksburg-va-sec-4555:chunk:4:acdc20192f6e`). The Layer 2 `food-service` /
-> `food-business` tags on Sec. 4555 are confirmed live in Qdrant and produced correctly by the
-> classifier. The section surfaces when the use type matches; it does not beat home-occupation
-> sections on a home-based query, which is the intended ranking.
+---
 
-**Check 2 — Residential query ranking** ("Add a second-story bedroom addition to single-family
-home" + Residential addition use type, same address)
+## CI / Automation Posture
 
-| Rank | Section | Score |
-|---|---|---|
-| 1 | Sec. 4220 — Single-family, attached | 4.07 |
-| 2 | Sec. 4201 — Accessory apartment | 4.05 |
-| 3 | Sec. 3113 — Site Development Regulations | 4.02 |
-| 4 | Sec. 3289 — Vehicular parking (historic overlay) | 4.02 |
-| 5 | Sec. 1271 — General provisions | 4.02 |
+`.github/workflows/ci.yml` runs 6 jobs on every change: Backend pytest, Source quality (source-pack
+validation + public-support-candidate + freshness checks), Web build (typecheck + build), Browser
+fixture smoke, Eval retrieval gate (offline regression gate against golden scenarios), and Hygiene.
 
-Zero commercial sections in the top 5 — **residential ranks above commercial. ✓**
-
-**Verdict:** Layer 2 source classification is live and behaving correctly. Retrieval precision
-improved without sacrificing recall.
+Two additional workflows run independently of the main CI pipeline:
+- `.github/workflows/production-smoke.yml` — `workflow_dispatch` smoke test against the deployed
+  Render/Vercel pair.
+- `.github/workflows/source-freshness.yml` — scheduled source-freshness checks.
+- `.github/workflows/prod-reindex.yml` — reindexes the production corpus on source-pack merges or
+  manual dispatch; see `docs/production-readiness/prod-reindex-workflow.md`. This has not yet been
+  exercised for a real source-pack change — that's part of the current validation pass.
 
 ---
 
 ## Next Steps
 
-### Now — production hardening (blocks real users)
-1. **Run beta smoke Tests 3 & 4** against prod — supported full pipeline + unsupported
-   jurisdiction (distinct "unsupported jurisdiction" message, not a generic crash). Check
-   `/health` and `/ready` for warnings (re-confirm `vector_count` is non-zero now that Qdrant is
-   populated, and that the old OpenAI 429 warning is gone under Groq).
-2. **Move Supabase free Postgres → paid plan with backups** before real users land. Triggers:
-   >25 testers, or any paid/contractual/municipal/SLA-bound user, or >1 GB / quota warning.
-3. **Run pre-launch checklist scripts:** `validate_source_packs.py`,
-   `check_public_support_candidates.py`, `check_source_freshness.py`,
-   `check_production_config.py`, `smoke_public_api.py`. Enforce rate limits; remove beta keys
-   before broad public launch.
+### Now — validation pass
+1. Run a real-provider (non-deterministic) five-gate eval run against the golden scenarios.
+2. Run a live prod smoke test (`scripts/smoke_public_api.py`) to confirm current coverage end to end.
+3. Execute the `prod-reindex` workflow for real against a live source-pack change, to confirm the
+   automation added in PR #85 works outside of CI.
 
-### Next — jurisdiction expansion
-- Living roadmap: `docs/handoff-nationwide-expansion.md` (WS0–WS9).
-- Add jurisdictions via source packs (`docs/public-launch/source-pack-spec.md` +
-  `document-acquisition-workflow.md`); promote only after a golden scenario passes
+### Next — flagship depth
+- Promote 1–2 `source_indexed` jurisdictions to `public_supported`, using the pilot playbook in
+  `docs/handoff-pilot-city-eval-gate.md`. **richmond-va** is the first candidate.
+- Continue to add jurisdictions via source packs
+  (`docs/public-launch/source-pack-spec.md`); promote only after a golden scenario passes
   (`docs/public-launch/golden-scenario-spec.md`). Do **not** hard-code city checks — extend
   `data/source_registry.json` and the district mappings.
 
-### Done this session ✓
-- ~~Reconcile stale `docs/production-readiness/runbook.md`~~ — fixed: env matrix now reflects
-  Groq/Gemini/Qdrant + `STARTUP_REINDEX_ENABLED=false` + blueprint-sync/secrets warnings.
-- ~~Docs cleanup~~ — removed 17 superseded/scratch markdown files; remaining docs are current,
-  CLAUDE.md-referenced, or living specs.
+### Deliberately deferred (pre-revenue decision, 2026-07-03)
+- **Supabase Pro upgrade** (paid plan, backups/durability) — cutover runbook is ready
+  (`docs/production-readiness/postgres-cutover-runbook.md`); a manual baseline `pg_dump` of the 10
+  user-data tables was taken 2026-07-04 as an interim safety net. Trigger: revenue / real users.
+- **Render RAM bump** (one-line `plan:` change in `render.yaml`) — deferred until the same trigger.
 
 ---
 
@@ -112,13 +109,18 @@ improved without sacrificing recall.
 - `AGENT.md` — commit exclusions, branch/PR conventions.
 - `docs/single-orchestrator-architecture.md` — orchestrator/tool design.
 - `docs/production-readiness/runbook.md` — deploy checklist, env matrix, rollback, incidents.
-- `docs/handoff-nationwide-expansion.md` — expansion roadmap (WS0–WS9).
-- `docs/handoff-layer2-prod-verification.md` — the verification runbook used above.
+- `docs/production-readiness/prod-reindex-workflow.md` — prod reindex automation runbook.
+- `docs/production-readiness/postgres-cutover-runbook.md` — paid-plan Postgres cutover runbook.
+- `docs/handoff-pilot-city-eval-gate.md` — pilot-city promotion playbook (public_supported gate).
 
 ## Operational gotchas (from project memory)
 - Render is **blueprint-synced** — change env in `render.yaml`, not the dashboard (drift is reset).
 - Startup reindex must stay **OFF** (boot-time reindex blocks Render's port scan → failed deploy).
-- `progress.md` / `testing-progress.md` are local-only — never commit (now gitignored).
+- `progress.md` / `testing-progress.md` are local-only — never commit (gitignored).
 - Never put "Co-Authored-By: Claude" in commits/PRs.
+- Running `pytest -q` from the main tree loads the repo-root `.env`, which points at production —
+  run backend tests in a `.env`-free worktree for a clean baseline.
+- Missing `QDRANT_URL`/`QDRANT_API_KEY` during a reindex silently falls back to `localhost`,
+  producing a connection-refused error that looks like "0 chunks in Qdrant."
 - `gh` auth can flip accounts: on `403 denied to abhihari10`, run
   `gh auth switch --user abhihari010 && gh auth setup-git`.
