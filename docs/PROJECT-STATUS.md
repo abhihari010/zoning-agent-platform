@@ -24,7 +24,7 @@ flagship jurisdictions (richmond-va first candidate) from `source_indexed` to `p
 
 **Production stack**
 - `AI_PROVIDER=groq` (llama-3.3-70b-versatile) · `RAG_PROVIDER=hybrid_local` · `EMBEDDING_PROVIDER=gemini` · `VECTOR_PROVIDER=qdrant`
-- Postgres via Supabase (session pooler, `DATABASE_URL`) · Qdrant Cloud (27,952 points total) · Render API (starter, blueprint-synced via `render.yaml`) · Vercel frontend
+- Postgres via Supabase (session pooler, `DATABASE_URL`) · Qdrant Cloud (27,952 points total) · Render API (free plan, 512MB — spins down when idle; blueprint-synced via `render.yaml`) · Vercel frontend
 - Auth: Supabase JWT for the public beta, plus a legacy beta-key gate; `ADMIN_ACCESS_KEY` gates source-admin writes
 - `STARTUP_REINDEX_ENABLED=false` — reindexing happens offline / via the `prod-reindex` workflow, never at boot
 
