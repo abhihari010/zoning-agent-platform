@@ -86,6 +86,29 @@ jobs:
           E2E_MODE: fixture
         run: npm run test:e2e
 
+  eval-gate:
+    name: Eval retrieval gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    env:
+      APP_ENV: local
+      DATABASE_URL: ""
+      AI_PROVIDER: deterministic
+      RAG_PROVIDER: hybrid_local
+      EMBEDDING_PROVIDER: none
+      VECTOR_PROVIDER: none
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install API
+        run: python -m pip install --upgrade pip && python -m pip install ".[dev]"
+      - name: Run offline retrieval gate
+        run: ZONING_DB_PATH="$RUNNER_TEMP/eval-gate.sqlite3" python -m tests.eval.ci_gate
+
   hygiene:
     name: Hygiene
     runs-on: ubuntu-latest
