@@ -87,7 +87,11 @@ jobs:
 
       - name: Install API
         if: steps.guard.outputs.configured == 'true'
-        run: python -m pip install --upgrade pip && python -m pip install "apps/api"
+        # Editable install is required: the reindex/retag scripts import `app`
+        # for its JSON data files (jurisdictions.json, source_packs/**), which a
+        # regular install does not package — a plain install turns every
+        # data-driven step into a silent no-op ("synced 0 jurisdiction records").
+        run: python -m pip install --upgrade pip && python -m pip install -e "apps/api"
 
       - name: Reindex (import packs + sync jurisdictions + embed new chunks)
         if: steps.guard.outputs.configured == 'true' && inputs.retag_only != true
@@ -112,6 +116,29 @@ jobs:
       - name: Verify public coverage endpoint
         if: steps.guard.outputs.configured == 'true'
         continue-on-error: true
+        # Fails (visibly, non-blocking) when any jurisdiction's live
+        # coverage_status disagrees with the committed data file — the exact
+        # symptom of a jurisdiction sync that silently did not run.
         run: |
           curl -sf "https://zoning-agent-api.onrender.com/api/v1/jurisdictions/coverage" \
-            | python -c "import json,sys; d=json.load(sys.stdin); js=d.get('jurisdictions', d); print(f'coverage count: {len(js)}'); [print('-', j.get('jurisdiction_id', j)) for j in js]"
+            | python -c "
+          import json, sys
+          live = json.load(sys.stdin)
+          live = live.get('jurisdictions', live)
+          expected = {
+              j['jurisdiction_id']: j.get('coverage_status', 'unsupported')
+              for j in json.load(open('apps/api/app/data/jurisdictions.json', encoding='utf-8'))
+          }
+          print(f'coverage count: {len(live)}')
+          mismatched = []
+          for j in live:
+              jid = j.get('jurisdiction_id')
+              status = j.get('coverage_status')
+              want = expected.get(jid)
+              tag = '' if want in (None, status) else f'  << data file says {want}'
+              if tag:
+                  mismatched.append(jid)
+              print(f'- {jid}: {status}{tag}')
+          if mismatched:
+              sys.exit(f'coverage_status mismatch vs data file: {mismatched}')
+          "

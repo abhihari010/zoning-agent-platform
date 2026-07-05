@@ -96,12 +96,24 @@ def main() -> int:
     # address resolution still treats them as unsupported. upsert is idempotent
     # and only adds/updates by id -- it never deletes prod-only records.
     juris_payloads = jurisdiction_payloads()
+    if not juris_payloads:
+        # The data file always has entries; an empty load means `app` resolved to
+        # an installed copy without its data files (e.g. a non-editable pip
+        # install), and silently continuing would skip the jurisdiction sync.
+        _log("ERROR: jurisdiction_payloads() returned 0 records — app/data/jurisdictions.json "
+             "was not found. Install the API editable (pip install -e apps/api) so the "
+             "repo data files are importable. Aborting.")
+        raise SystemExit(3)
     for payload in juris_payloads:
         store.upsert_jurisdiction(JurisdictionRecord.model_validate(payload))
     _log(f"synced {len(juris_payloads)} jurisdiction records from the data file into the DB.")
 
     if not args.skip_import:
         entries = import_source_packs()
+        if not entries:
+            _log("ERROR: import_source_packs() returned 0 sources — the source-pack data "
+                 "files were not found (same non-editable-install failure mode). Aborting.")
+            raise SystemExit(3)
         _log(f"importing {len(entries)} source-pack sources into the DB (one upsert each)...")
         import_started = time.monotonic()
         for index, entry in enumerate(entries, start=1):
