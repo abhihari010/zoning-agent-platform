@@ -19,6 +19,14 @@ from app.tools import CitationTool, ComplianceTool, IntakeTool, ReportTool
 
 PROMPT_VERSION = "2026_05_single_orchestrator"
 
+# District-resolution methods that are system guesses (address keywords or
+# address-component heuristics). A guessed district must never be asserted to
+# the analysis provider as fact — analysis receives "unknown" instead, and may
+# only re-derive a district from the project description itself. Districts
+# supplied by the caller (persisted_unverified) or an authoritative lookup
+# (fixture, gis_verified) are passed through regardless of confidence.
+GUESSED_DISTRICT_METHODS = frozenset({"keyword_fallback", "component_rule"})
+
 
 class ZoningOrchestrator:
     """Single coordinator for the zoning analysis pipeline.
@@ -213,12 +221,19 @@ class ZoningOrchestrator:
         if not source_readiness.index_ready:
             confidence = max(0.1, min(confidence, 0.55))
 
+        analysis_district = (
+            "unknown"
+            if intake.district_method in GUESSED_DISTRICT_METHODS
+            and intake.district_confidence < 0.7
+            else district
+        )
         recorder.record("compliance", "started")
         compliance = self.compliance_tool.analyze(
             context,
             analysis_provider,
             citations,
             context.evidence_chunks,
+            district_override=analysis_district,
         )
         decision = compliance.decision
         summary = compliance.summary

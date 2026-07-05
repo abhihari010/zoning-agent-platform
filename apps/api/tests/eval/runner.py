@@ -244,12 +244,22 @@ def run_eval(
     corpus_refs = _corpus_section_refs(source_store, jurisdiction_id)
     outcomes: list[ScenarioOutcome] = []
 
+    # Resolve districts the way the production intake path does (ParcelTool:
+    # curated fixtures first, keyword fallback, else unknown) so the eval
+    # measures the same retrieval the deployed pipeline performs. Hardcoding
+    # "unknown" here would silently disable the Layer-2 district boost for
+    # cities that have gis_verified parcel fixtures.
+    from app.tools.parcel_tool import ParcelTool
+
+    parcel_tool = ParcelTool()
+
     for scenario in scenarios:
+        parcel = parcel_tool.lookup(scenario.address, None, None, scenario.jurisdiction_id)
         result: AnalyzeResult = orch.analyze_project(
             project_description=scenario.project_description,
-            district="unknown",
-            district_confidence=0.0,
-            district_method="eval",
+            district=parcel.zoning_district or "unknown",
+            district_confidence=parcel.confidence,
+            district_method=parcel.method,
             jurisdiction_id=scenario.jurisdiction_id,
             normalized_address=scenario.address,
             bypass_support_gate=True,   # eval gate measures pre-promotion cities

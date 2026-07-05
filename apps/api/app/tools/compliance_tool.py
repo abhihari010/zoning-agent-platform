@@ -27,7 +27,10 @@ class ComplianceTool:
         analysis_provider: AnalysisProvider,
         citations: list[SourceCitation],
         evidence_chunks: list[SourceChunk] | None = None,
+        *,
+        district_override: str | None = None,
     ) -> ComplianceToolResult:
+        district = district_override if district_override is not None else context.district
         if not citations:
             compliance = ComplianceResult(
                 feasibility="unknown",
@@ -53,7 +56,7 @@ class ComplianceTool:
             provider_output = analysis_provider.generate_analysis(
                 AnalysisProviderRequest(
                     project_description=context.combined_description,
-                    district=context.district,
+                    district=district,
                     citation_excerpts=[citation.excerpt for citation in citations],
                     missing_fields=missing_details,
                     chunks=evidence_chunks,
@@ -63,7 +66,7 @@ class ComplianceTool:
         except Exception as exc:
             fallback_decision, fallback_summary = deterministic_feasibility(
                 context.combined_description,
-                context.district,
+                district,
             )
             compliance = _legacy_compliance_result(
                 decision=fallback_decision,
