@@ -2,7 +2,13 @@ from __future__ import annotations
 
 import app.services as _svc
 
-from app.ai.interfaces import RetrievalProviderResult, RetrievalProviderRequest
+from app.ai.interfaces import (
+    AnalysisProviderRequest,
+    AnalysisProviderResult,
+    RetrievalProviderResult,
+    RetrievalProviderRequest,
+)
+from app.models import SourceCitation
 from app.orchestrator.pipeline_events import PipelineTraceRecorder
 from app.orchestrator.zoning_orchestrator import ZoningOrchestrator
 
@@ -156,3 +162,91 @@ def test_orchestrator_high_confidence_district_passes_through_to_retrieval(monke
 
     assert len(retriever.requests) == 1
     assert retriever.requests[0].district == "commercial-employment"
+
+
+class _CitingRetriever:
+    """Retrieval stub that always returns one citation so compliance runs the provider."""
+
+    name = "citing"
+    source_store = None
+
+    def retrieve(self, request: RetrievalProviderRequest) -> RetrievalProviderResult:
+        return RetrievalProviderResult(
+            citations=[
+                SourceCitation(
+                    source_id="src-1",
+                    title="Permitted uses",
+                    excerpt="Bakeries are permitted by right in the mixed-use core district.",
+                    section_ref="Sec. 1.1",
+                    chunk_id="chunk-1",
+                    jurisdiction_id="blacksburg-va",
+                )
+            ]
+        )
+
+
+class _CapturingAnalysisProvider:
+    """Analysis provider stub that records every AnalysisProviderRequest."""
+
+    name = "capturing-analysis"
+
+    def __init__(self) -> None:
+        self.requests: list[AnalysisProviderRequest] = []
+
+    def generate_analysis(self, request: AnalysisProviderRequest) -> AnalysisProviderResult:
+        self.requests.append(request)
+        return AnalysisProviderResult(decision="likely_allowed", summary="stub analysis")
+
+
+def _run_with_capturing_analysis(monkeypatch, **kwargs) -> _CapturingAnalysisProvider:
+    analyzer = _CapturingAnalysisProvider()
+    monkeypatch.setattr(_svc, "get_retrieval_provider", lambda: _CitingRetriever())
+    monkeypatch.setattr(_svc, "get_analysis_provider", lambda: analyzer)
+    ZoningOrchestrator().analyze_project(
+        project_description="Open a small bakery with employees and renovation plans.",
+        jurisdiction_id="blacksburg-va",
+        jurisdiction_name="Blacksburg, VA",
+        normalized_address="250 S Main St, Blacksburg, VA 24060",
+        **kwargs,
+    )
+    assert len(analyzer.requests) == 1
+    return analyzer
+
+
+def test_orchestrator_keyword_guessed_district_not_asserted_to_analysis(monkeypatch) -> None:
+    # A district guessed from address keywords (e.g. "main st" → mixed-use-core at
+    # confidence 0.3) must not be presented to the analysis provider as fact: the
+    # model trusts any non-"unknown" district field, so a wrong guess yields a
+    # confidently wrong decision. Analysis must receive "unknown" instead.
+    analyzer = _run_with_capturing_analysis(
+        monkeypatch,
+        district="mixed-use-core",
+        district_confidence=0.3,
+        district_method="keyword_fallback",
+        project_id="test-keyword-guess",
+    )
+    assert analyzer.requests[0].district == "unknown"
+
+
+def test_orchestrator_authoritative_district_asserted_to_analysis(monkeypatch) -> None:
+    analyzer = _run_with_capturing_analysis(
+        monkeypatch,
+        district="commercial-employment",
+        district_confidence=0.9,
+        district_method="gis_verified",
+        project_id="test-gis-district",
+    )
+    assert analyzer.requests[0].district == "commercial-employment"
+
+
+def test_orchestrator_caller_supplied_district_still_reaches_analysis(monkeypatch) -> None:
+    # A district asserted by the caller without a resolution method arrives as
+    # persisted_unverified at confidence 0.0. It is excluded from retrieval
+    # boosting, but analysis must still see it — golden scenarios and users who
+    # state their own district rely on this.
+    analyzer = _run_with_capturing_analysis(
+        monkeypatch,
+        district="mixed-use-core",
+        project_id="test-caller-district",
+    )
+    assert analyzer.requests[0].district == "mixed-use-core"

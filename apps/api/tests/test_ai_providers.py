@@ -780,3 +780,19 @@ def test_ensure_source_index_ready_memoized_for_global_store(monkeypatch) -> Non
     srr.reset_source_index_readiness_memo()
 
 
+
+
+def test_analysis_system_prompt_forbids_restriction_from_silence() -> None:
+    """Pins the prompt text that stops fabricated 'restricted' decisions.
+
+    When a use appears nowhere in the retrieved excerpts (e.g. mobile food
+    vending in a corpus that regulates only fixed premises), the model must
+    abstain with 'unknown' — never infer 'restricted' from the mere absence
+    of the use. Measured live (richmond-va abstain scenarios, 2026-07-04):
+    without this guidance Groq returned 'restricted' on 2 of 3 runs.
+    """
+    from app.ai.openai_compatible import ANALYSIS_SYSTEM_PROMPT
+
+    assert "NEVER evidence" in ANALYSIS_SYSTEM_PROMPT
+    assert "never 'restricted'" in ANALYSIS_SYSTEM_PROMPT
+    assert "mobile or itinerant" in ANALYSIS_SYSTEM_PROMPT
