@@ -147,5 +147,72 @@
       "jurisdiction_supported": true,
       "required_warning_substrings": ["No relevant ordinances"]
     }
+  },
+  {
+    "id": "richmond-b3-restaurant-public-supported",
+    "project_description": "Open a sit-down restaurant with an outdoor patio dining area in an existing commercial building in the B-3 General Business district, with posted operating hours, about twelve employees, and interior renovation only.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "richmond-va",
+    "jurisdiction_name": "Richmond, VA",
+    "normalized_address": "1600 W Broad St, Richmond, VA 23220",
+    "sources": [
+      {
+        "source_id": "richmond-va-sec-30-438-1",
+        "title": "Sec. 30-438.1. - Permitted principal and accessory uses.",
+        "excerpt": "The following uses of buildings and premises shall be permitted in the B-3 district ... (45) Restaurants, tearooms, cafes, delicatessens, ice cream parlors and similar food and beverage service establishments, including entertainment in conjunction therewith. Such establishments may include areas outside completely enclosed buildings.",
+        "section_ref": "Sec. 30-438.1.",
+        "jurisdiction_id": "richmond-va",
+        "url": "https://library.municode.com/va/richmond/codes/code_of_ordinances?nodeId=CH30ZO_ARTIVDIRE_DIV21GEBUDI_S30-438.1PEPRACUS",
+        "effective_date": "2025-09-22",
+        "districts": ["mixed-use-core"],
+        "uses": ["food-service", "general"]
+      }
+    ],
+    "expect": {
+      "decisions": ["likely_allowed", "conditional"],
+      "statuses": ["success"],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true
+    }
+  },
+  {
+    "id": "richmond-r1-home-occupation-solo",
+    "project_description": "Run a home-based tailoring business inside a single-family house in the R-1 district, worked solely by household residents with no outside employees, posted daytime operating hours, and no renovation or new construction.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "richmond-va",
+    "jurisdiction_name": "Richmond, VA",
+    "normalized_address": "4712 Sulgrave Rd, Richmond, VA 23221",
+    "sources": [
+      {
+        "source_id": "richmond-va-sec-30-402-2",
+        "title": "Sec. 30-402.2. - Permitted accessory uses and structures.",
+        "excerpt": "Accessory uses and structures, including the following, which are customarily incidental and clearly subordinate to permitted principal uses, shall be permitted in the R-1 district ... (2) Home occupations;",
+        "section_ref": "Sec. 30-402.2.",
+        "jurisdiction_id": "richmond-va",
+        "url": "https://library.municode.com/va/richmond/codes/code_of_ordinances?nodeId=CH30ZO_ARTIVDIRE_DIV2SIMIREDI_S30-402.2PEACUSST",
+        "effective_date": "2025-09-22",
+        "districts": ["residential-low-density"],
+        "uses": ["general"]
+      },
+      {
+        "source_id": "richmond-va-sec-30-694-1",
+        "title": "Sec. 30-694.1. - Home occupation regulations.",
+        "excerpt": "The following provisions shall apply to home occupations in all districts in which they are permitted: (1) Employment. Only persons living together as a family on the premises shall be employed on the premises in the conduct of the home occupation. (2) Location. The home occupation shall be conducted within the dwelling unit or within a completely enclosed accessory building on the same property.",
+        "section_ref": "Sec. 30-694.1.",
+        "jurisdiction_id": "richmond-va",
+        "url": "https://library.municode.com/va/richmond/codes/code_of_ordinances?nodeId=CH30ZO_ARTVISURE_DIV12HOOC_S30-694.1HOOCRE",
+        "effective_date": "2025-09-22",
+        "districts": ["residential-low-density"],
+        "uses": ["general"]
+      }
+    ],
+    "expect": {
+      "decisions": ["likely_allowed", "conditional"],
+      "statuses": ["success"],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true
+    }
   }
 ]

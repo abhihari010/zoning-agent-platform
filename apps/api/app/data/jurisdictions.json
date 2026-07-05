@@ -545,8 +545,8 @@
     "county_fips": null,
     "place_fips": null,
     "jurisdiction_type": "independent_city",
-    "coverage_status": "source_indexed",
-    "supported": false,
+    "coverage_status": "public_supported",
+    "supported": true,
     "match_strategy": "locality_and_county",
     "locality_names": [
       "Richmond"
@@ -562,12 +562,15 @@
     "official_source_urls": [
       "https://library.municode.com/va/richmond/codes/code_of_ordinances"
     ],
-    "zoning_map_url": "",
+    "zoning_map_url": "https://www.rva.gov/planning-development-review/interactive-mapping-tools",
     "planning_contact": {
-      "url": "https://library.municode.com/va/richmond/codes/code_of_ordinances"
+      "department": "Planning & Development Review",
+      "url": "https://www.rva.gov/planning-development-review",
+      "email": "PDRLandUseAdmin@rva.gov",
+      "phone": "804-646-6304"
     },
-    "last_verified_at": "2026-06-27",
-    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+    "last_verified_at": "2026-07-04",
+    "district_mapping_strategy": "supported_source_backed_city_lookup_with_official_gis_verification_required"
   },
   {
     "jurisdiction_id": "salem-va",
