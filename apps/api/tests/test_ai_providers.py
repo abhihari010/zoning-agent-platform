@@ -447,6 +447,84 @@ def test_openai_compatible_provider_posts_and_coerces_unlisted_use(
     assert any("similar-use determination" in w for w in result.warnings)
 
 
+def test_openai_compatible_provider_dimensional_question_not_coerced_to_unknown(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A dimensional-standards question the model correctly decided must pass through.
+
+    Regression test for the over-abstention bug: a bare "what is the minimum lot
+    area / setback" question has no specific proposed use, so
+    unlisted_use_determination is correctly False. The provider must not force
+    'unknown' in that case — only the unlisted-use coercion may do that, and it
+    must not fire here.
+    """
+    from app.ai.openai_compatible import OpenAICompatibleAnalysisProvider
+
+    class FakeResponse:
+        status_code = 200
+
+        def raise_for_status(self) -> None:
+            return None
+
+        def json(self) -> dict:
+            # Model resolves the dimensional standard from the excerpts and is
+            # explicit that this is not a use-permission question.
+            return {
+                "choices": [
+                    {
+                        "message": {
+                            "content": (
+                                '{"decision":"likely_allowed",'
+                                '"summary":"Sec. 10-25 sets a minimum lot area of '
+                                '15,000 sq ft for the R-2 district.",'
+                                '"required_permits":[],"follow_up_questions":[],'
+                                '"warnings":[],"unlisted_use_determination":false}'
+                            )
+                        }
+                    }
+                ]
+            }
+
+    def fake_post(url: str, headers: dict, json: dict, timeout: float):
+        return FakeResponse()
+
+    monkeypatch.setattr("app.ai.openai_provider.httpx.post", fake_post)
+
+    provider = OpenAICompatibleAnalysisProvider(
+        name="groq",
+        base_url="https://api.groq.com/openai/v1",
+        api_key="test-key",
+        model="llama-3.3-70b-versatile",
+        timeout=20.0,
+    )
+    result = provider.generate_analysis(
+        AnalysisProviderRequest(
+            project_description="What is the minimum lot area for a dwelling in the R-2 Residential district?",
+            district="unknown",
+            citation_excerpts=["[Sec 10-25 R-2 Residential District] Lot requirements. Minimum lot area. Fifteen thousand (15,000) square feet."],
+            missing_fields=[],
+        )
+    )
+
+    assert result.decision == "likely_allowed"
+    assert not any("similar-use determination" in w for w in result.warnings)
+
+
+def test_analysis_system_prompt_documents_dimensional_question_handling() -> None:
+    """Pins the prompt text that fixes the dimensional over-abstention bug.
+
+    A bare dimensional-standard question (minimum lot area, setback, height,
+    etc. for a district) must not be routed through the use-permission STEP 0
+    unlisted-use gate, which has no path for "no proposed use" questions and
+    previously caused the model to answer 'unknown' even with the standard in
+    hand. This test guards against that guidance being silently dropped.
+    """
+    from app.ai.openai_compatible import ANALYSIS_SYSTEM_PROMPT
+
+    assert "DIMENSIONAL question" in ANALYSIS_SYSTEM_PROMPT
+    assert "skip STEP 0" in ANALYSIS_SYSTEM_PROMPT
+
+
 def test_openai_compatible_provider_requires_api_key() -> None:
     from app.ai.openai_compatible import OpenAICompatibleAnalysisProvider
 
