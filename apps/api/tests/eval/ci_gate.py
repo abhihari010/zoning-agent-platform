@@ -45,10 +45,13 @@ GATE_HALLUCINATED_SECTION: float = 0.0
 GATE_ABSTENTION_CORRECTNESS: float = 1.0
 
 # Per-city required-citation-recall floors under OFFLINE keyword retrieval.
-# Baselines measured 2026-07-03: montgomery-county-va 1.000, franklin-tn 0.692.
+# Baselines measured 2026-07-03: montgomery-county-va 1.000, franklin-tn 0.692;
+# 2026-07-04: richmond-va 0.500 (fine-grained Sec. 30-xxx.y subsection refs are
+# hard for keyword retrieval; live vector recall is the quality signal).
 CI_RECALL_FLOORS: dict[str, float] = {
     "montgomery-county-va": 0.80,
     "franklin-tn": 0.65,
+    "richmond-va": 0.45,
 }
 
 

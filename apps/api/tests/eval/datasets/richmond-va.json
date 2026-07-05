@@ -1,0 +1,211 @@
+[
+  {
+    "id": "richmond-va-r1-min-lot-area",
+    "address": "3419 Hawthorne Ave, Richmond, VA 23222",
+    "project_description": "What is the minimum lot area for a single-family dwelling in the R-1 Single-Family Residential district?",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 30-402.4."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "richmond-va-r1-max-height",
+    "address": "3419 Hawthorne Ave, Richmond, VA 23222",
+    "project_description": "What is the maximum building height allowed in the R-1 Single-Family Residential district?",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 30-402.7."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "richmond-va-r1-single-family-house",
+    "address": "3419 Hawthorne Ave, Richmond, VA 23222",
+    "project_description": "Build a new single-family detached house on a vacant lot in the R-1 Single-Family Residential district.",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 30-402.1."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "richmond-va-r1-home-occupation-solo",
+    "address": "3419 Hawthorne Ave, Richmond, VA 23222",
+    "project_description": "Run a home-based tailoring business inside my house in the R-1 district, working alone with no employees from outside my household and no customer traffic beyond occasional fittings.",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 30-402.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "richmond-va-r1-short-term-rental",
+    "address": "3419 Hawthorne Ave, Richmond, VA 23222",
+    "project_description": "Rent out a bedroom in my single-family house in the R-1 district as a short-term rental on a nightly basis.",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 30-402.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "richmond-va-b1-art-gallery",
+    "address": "1403 Chestnut St, Richmond, VA 23222",
+    "project_description": "Open a small art gallery in an existing storefront in the B-1 Neighborhood Business district.",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 30-434.1."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "richmond-va-b3-restaurant",
+    "address": "1311 Richmond Hwy, Richmond, VA 23224",
+    "project_description": "Open a sit-down restaurant with an outdoor patio dining area in the B-3 General Business district.",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 30-438.1."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "richmond-va-b3-nightclub-cup",
+    "address": "1311 Richmond Hwy, Richmond, VA 23224",
+    "project_description": "Open a nightclub with live music and late-night hours in the B-3 General Business district.",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 30-438.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "richmond-va-tod1-craft-brewery",
+    "address": "1600 W Broad St, Richmond, VA 23220",
+    "project_description": "Open a craft brewery producing about 5,000 barrels of beer per year with a taproom in the TOD-1 Transit-Oriented Nodal district.",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 30-457.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "richmond-va-m1-wholesale-bakery",
+    "address": "2701 Commerce Rd, Richmond, VA 23234",
+    "project_description": "Open a wholesale commercial bakery that produces and distributes baked goods in the M-1 Light Industrial district.",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 30-452.1."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "richmond-va-abstain-food-truck",
+    "address": "900 E Broad St, Richmond, VA 23219",
+    "project_description": "Operate a mobile food truck vending meals at different street locations around the city throughout the week.",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "unknown"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "richmond-va-abstain-data-center",
+    "address": "900 E Broad St, Richmond, VA 23219",
+    "project_description": "Build a large hyperscale data center campus with backup diesel generators and on-site electrical substations.",
+    "jurisdiction_id": "richmond-va",
+    "expect": {
+      "decision_in": [
+        "unknown"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
