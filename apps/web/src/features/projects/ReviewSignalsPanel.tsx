@@ -1,22 +1,36 @@
+import { motion } from "motion/react";
+
 export function ReviewSignalsPanel({ prompts }: { prompts: string[] }) {
   return (
-    <section className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-        Review Signals
-      </p>
-      <div className="mt-4 space-y-3">
+    <section className="sheet p-5">
+      <h2 className="text-sm font-bold text-ink">Review signals</h2>
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
+        className="mt-3 space-y-2.5"
+      >
         {prompts.length > 0 ? (
           prompts.map((prompt) => (
-            <div key={prompt} className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-              <p className="text-sm text-amber-900">{prompt}</p>
-            </div>
+            <motion.div
+              key={prompt}
+              variants={{
+                hidden: { opacity: 0, x: -6 },
+                visible: { opacity: 1, x: 0 },
+              }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="border-l-2 border-verdict-hold bg-verdict-holdwash/60 py-2 pl-3 pr-2"
+            >
+              <p className="text-[13px] leading-5 text-ink-soft">{prompt}</p>
+            </motion.div>
           ))
         ) : (
-          <p className="text-sm leading-6 text-slate-600">
-            Follow-up questions and confidence warnings will appear here when the review needs more detail.
+          <p className="text-sm leading-6 text-ink-soft">
+            Follow-up questions and confidence warnings will appear here when the review
+            needs more detail.
           </p>
         )}
-      </div>
+      </motion.div>
     </section>
   );
 }

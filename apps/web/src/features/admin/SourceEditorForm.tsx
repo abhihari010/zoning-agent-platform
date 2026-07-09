@@ -16,55 +16,53 @@ export function SourceEditorForm({
   onSaveSource: () => void;
 }) {
   return (
-    <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-        Source Editor
-      </p>
+    <div className="sheet p-6">
+      <h2 className="sheet-title">Source editor</h2>
       <div className="mt-4 space-y-4">
-        <label className="block text-sm font-semibold text-slate-700">
+        <label className="field-label">
           Source ID
           <input
-            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+            className="field font-mono"
             value={sourceForm.sourceId}
             onChange={(event) =>
               setSourceForm((current) => ({ ...current, sourceId: event.target.value }))
             }
           />
         </label>
-        <label className="block text-sm font-semibold text-slate-700">
+        <label className="field-label">
           Title
           <input
-            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+            className="field"
             value={sourceForm.title}
             onChange={(event) =>
               setSourceForm((current) => ({ ...current, title: event.target.value }))
             }
           />
         </label>
-        <label className="block text-sm font-semibold text-slate-700">
+        <label className="field-label">
           Excerpt
           <textarea
-            className="mt-2 min-h-[140px] w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+            className="field min-h-[130px]"
             value={sourceForm.excerpt}
             onChange={(event) =>
               setSourceForm((current) => ({ ...current, excerpt: event.target.value }))
             }
           />
         </label>
-        <label className="block text-sm font-semibold text-slate-700">
+        <label className="field-label">
           Section reference
           <input
-            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+            className="field font-mono"
             value={sourceForm.sectionRef}
             onChange={(event) =>
               setSourceForm((current) => ({ ...current, sectionRef: event.target.value }))
             }
           />
         </label>
-        <label className="block text-sm font-semibold text-slate-700">
+        <label className="field-label">
           Jurisdiction ID
           <input
-            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+            className="field font-mono"
             value={sourceForm.jurisdictionId ?? ""}
             onChange={(event) =>
               setSourceForm((current) => ({
@@ -75,20 +73,20 @@ export function SourceEditorForm({
             placeholder="blacksburg-va"
           />
         </label>
-        <label className="block text-sm font-semibold text-slate-700">
+        <label className="field-label">
           URL
           <input
-            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+            className="field font-mono"
             value={sourceForm.url ?? ""}
             onChange={(event) =>
               setSourceForm((current) => ({ ...current, url: event.target.value }))
             }
           />
         </label>
-        <label className="block text-sm font-semibold text-slate-700">
+        <label className="field-label">
           Effective date
           <input
-            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+            className="field font-mono"
             value={sourceForm.effectiveDate ?? ""}
             onChange={(event) =>
               setSourceForm((current) => ({
@@ -98,10 +96,10 @@ export function SourceEditorForm({
             }
           />
         </label>
-        <label className="block text-sm font-semibold text-slate-700">
+        <label className="field-label">
           Districts
           <input
-            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+            className="field font-mono"
             value={sourceForm.districts.join(", ")}
             onChange={(event) =>
               setSourceForm((current) => ({
@@ -111,10 +109,10 @@ export function SourceEditorForm({
             }
           />
         </label>
-        <label className="block text-sm font-semibold text-slate-700">
+        <label className="field-label">
           Uses
           <input
-            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+            className="field"
             value={sourceForm.uses.join(", ")}
             onChange={(event) =>
               setSourceForm((current) => ({
@@ -130,11 +128,11 @@ export function SourceEditorForm({
         type="button"
         onClick={onSaveSource}
         disabled={sourceSaving}
-        className="mt-5 w-full rounded-2xl bg-clay px-4 py-3 font-semibold text-white disabled:opacity-60"
+        className="btn-primary mt-5 w-full"
       >
-        {sourceSaving ? "Saving..." : "Save source"}
+        {sourceSaving ? "Saving…" : "Save source"}
       </button>
-      {sourceMessage && <p className="mt-4 text-sm text-slate-700">{sourceMessage}</p>}
+      {sourceMessage && <p className="mt-3 text-sm text-ink-soft">{sourceMessage}</p>}
     </div>
   );
 }

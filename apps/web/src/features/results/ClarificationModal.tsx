@@ -16,45 +16,45 @@ export function ClarificationModal({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-          Clarification Needed
-        </p>
-        <h2 className="mt-2 font-heading text-2xl text-pine">
-          We need a bit more detail before finishing the zoning call.
-        </h2>
-        <div className="mt-5 space-y-4">
-          {questions.map((question) => (
-            <label key={question.id} className="block text-sm font-semibold text-slate-700">
-              {question.question}
-              <textarea
-                className="mt-2 min-h-[96px] w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-clay focus:ring-2 focus:ring-clay"
-                value={answers[question.question] ?? ""}
-                onChange={(event) => onAnswerChange(question.question, event.target.value)}
-              />
-              <span className="mt-2 block text-xs font-normal leading-5 text-slate-500">
-                {question.reason}
-              </span>
-            </label>
-          ))}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm">
+      <div className="sheet rise max-h-[90dvh] w-full max-w-2xl overflow-auto shadow-raised">
+        <div className="border-b border-rule bg-well/70 px-6 py-2.5 md:px-8">
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">
+            Clarification needed
+          </p>
         </div>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={onSubmit}
-            disabled={submitting}
-            className="flex-1 rounded-2xl bg-pine px-4 py-3 font-semibold text-white disabled:opacity-60"
-          >
-            {submitting ? "Submitting..." : "Continue review"}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-2xl border border-slate-300 px-4 py-3 font-semibold text-slate-700"
-          >
-            Close
-          </button>
+        <div className="p-6 md:p-8">
+          <h2 className="text-xl font-bold tracking-tight text-ink">
+            A few details before the determination can be finished
+          </h2>
+          <div className="mt-5 space-y-4">
+            {questions.map((question) => (
+              <label key={question.id} className="field-label">
+                {question.question}
+                <textarea
+                  className="field min-h-[90px]"
+                  value={answers[question.question] ?? ""}
+                  onChange={(event) => onAnswerChange(question.question, event.target.value)}
+                />
+                <span className="mt-1.5 block text-xs font-normal leading-5 text-ink-faint">
+                  {question.reason}
+                </span>
+              </label>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+            <button
+              type="button"
+              onClick={onSubmit}
+              disabled={submitting}
+              className="btn-primary flex-1"
+            >
+              {submitting ? "Submitting…" : "Continue review"}
+            </button>
+            <button type="button" onClick={onClose} className="btn-outline">
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -13,7 +13,7 @@ export interface IntakeFacts {
   operatingHours: string;
   employeeCount: string;
   parkingLoading: string;
-  foodFireHealth: boolean;
+  foodService: string;
 }
 
 export type Decision = AnalyzeResponse["feasibility"]["decision"];

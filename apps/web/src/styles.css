@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Poppins:wght@500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -7,6 +7,11 @@
 @layer base {
   :root {
     color-scheme: light;
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-fast: 150ms;
+    --dur-med: 250ms;
+    --dur-slow: 450ms;
   }
 
   html {
@@ -14,14 +19,412 @@
   }
 
   body {
-    @apply m-0 bg-mist font-body text-slate-900;
+    @apply m-0 bg-paper font-sans text-[15px] leading-[1.55] text-ink antialiased;
+    /* Warm survey grid on the page background only — never inside cards.
+       Bumped from the pale v2 value so it actually reads (brief §0). */
+    background-image:
+      linear-gradient(to right, rgba(36, 28, 21, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(36, 28, 21, 0.06) 1px, transparent 1px);
+    background-size: 34px 34px;
+    background-attachment: fixed;
   }
 
   * {
     @apply box-border;
   }
 
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
+
   ::selection {
-    background: rgba(217, 120, 85, 0.22);
+    background: rgba(15, 94, 78, 0.18);
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-spruce ring-offset-2 ring-offset-paper;
+  }
+
+  .dusk-bg :focus-visible {
+    @apply ring-amber ring-offset-dusk;
+  }
+}
+
+@layer components {
+  /* Cards read as documents on a desk: white, 1px warm border, drafted 2px
+     corners, hard shadow. Hover lifts 1px with the border darkening. */
+  .sheet {
+    @apply rounded-sm border border-rule bg-sheet shadow-sheet transition-[border-color,transform,box-shadow] duration-200 ease-out;
+  }
+
+  .sheet:hover {
+    @apply -translate-y-px border-rule-strong shadow-raised;
+  }
+
+  .sheet-title {
+    @apply font-display text-lg font-bold leading-snug tracking-[-0.01em] text-ink;
+  }
+
+  .eyebrow {
+    @apply font-sans text-[11px] font-semibold uppercase tracking-[0.12em] text-spruce;
+  }
+
+  /* Record voice: mono reserved for record data only. */
+  .tag {
+    @apply inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide;
+  }
+
+  .tag-neutral {
+    @apply border-rule bg-well text-ink-soft;
+  }
+
+  .tag-ok {
+    @apply border-verdict-ok/25 bg-verdict-okwash text-verdict-ok;
+  }
+
+  .tag-hold {
+    @apply border-verdict-hold/25 bg-verdict-holdwash text-verdict-hold;
+  }
+
+  .tag-stop {
+    @apply border-verdict-stop/25 bg-verdict-stopwash text-verdict-stop;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm border px-4 py-2.5 text-sm font-semibold transition-[transform,background-color,border-color,color,filter,opacity,box-shadow] duration-fast ease-out active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  /* One primary style: solid, saturated accent — the clear thing to click
+     (brief §0). */
+  .btn-primary {
+    @apply btn border-spruce bg-spruce text-white shadow-[0_1px_0_rgba(11,74,62,0.6)] hover:-translate-y-px hover:bg-spruce-deep hover:border-spruce-deep;
+  }
+
+  .btn-outline {
+    @apply btn border-rule-strong bg-sheet text-ink hover:border-ink-faint hover:bg-well;
+  }
+
+  .btn-quiet {
+    @apply btn border-transparent bg-transparent text-ink-soft hover:bg-well hover:text-ink;
+  }
+
+  .btn-danger {
+    @apply btn border-verdict-stop/30 bg-sheet text-verdict-stop hover:bg-verdict-stopwash;
+  }
+
+  .field-label {
+    @apply block text-sm font-medium text-ink;
+  }
+
+  .field {
+    @apply mt-1.5 w-full rounded-sm border border-rule-strong bg-sheet px-3.5 py-2.5 text-[15px] text-ink shadow-[0_0_0_0_rgba(15,94,78,0)] placeholder:text-ink-faint transition-[border-color,box-shadow] duration-fast ease-out focus:border-spruce focus:outline-none focus:shadow-[0_0_0_2px_rgba(15,94,78,0.25)];
+  }
+
+  /* Dusk auth fields — same shape, warm-dark surface, amber focus glow. */
+  .field-label-dusk {
+    @apply block text-sm font-medium text-dusk-soft;
+  }
+
+  .field-dusk {
+    @apply mt-1.5 w-full rounded-sm border border-dusk-line bg-dusk-panel px-3.5 py-2.5 text-[15px] text-paper placeholder:text-dusk-faint transition-[border-color,box-shadow] duration-fast ease-out focus:border-amber focus:outline-none focus:shadow-[0_0_0_2px_rgba(231,162,78,0.28)];
+  }
+
+  /* Selectable chip (employees, construction scope, food question). */
+  .chip {
+    @apply inline-flex cursor-pointer items-center rounded-sm border border-rule-strong bg-sheet px-3 py-1.5 text-[13px] font-medium text-ink-soft transition-[background-color,border-color,color,transform] duration-fast ease-out hover:border-ink-faint hover:text-ink active:scale-[0.97];
+  }
+
+  .chip[aria-pressed="true"] {
+    @apply border-spruce bg-spruce-wash text-spruce;
+  }
+
+  /* The signature: a rubber determination stamp. Rotated −2°, letterspaced,
+     1.5px border with an inner ring, slight ink-press texture (brief §0). */
+  .stamp {
+    @apply relative inline-flex -rotate-2 flex-col items-center border-[1.5px] px-6 py-3 font-mono font-semibold uppercase tracking-[0.14em];
+    text-shadow: 0 0 1px currentColor;
+  }
+
+  .stamp::before {
+    content: "";
+    @apply pointer-events-none absolute inset-[3px] rounded-sm border border-current opacity-40;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Marketing surface helpers */
+  .marketing-link {
+    @apply relative text-sm font-medium text-ink-soft transition-colors duration-fast ease-out hover:text-ink;
+  }
+
+  .marketing-link-dusk {
+    @apply relative text-sm font-medium text-dusk-soft transition-colors duration-fast ease-out hover:text-paper;
+  }
+}
+
+/* ---- Dusk (dark surface: marketing landing + auth) ---- */
+
+/* Warm charcoal with depth from light, not pattern (de-card brief §1): a warm
+   ember pool seated top-right behind the hero record, a faint second warmth
+   low-left so the base never reads flat, and a soft top/bottom vignette. No
+   grid, no repeating texture. */
+.dusk-bg {
+  background-color: #1a1613;
+  background-image:
+    radial-gradient(
+      58% 48% at 84% 2%,
+      rgba(231, 162, 78, 0.2),
+      rgba(231, 162, 78, 0) 62%
+    ),
+    radial-gradient(
+      52% 44% at 6% 106%,
+      rgba(199, 127, 46, 0.1),
+      rgba(199, 127, 46, 0) 60%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.34) 0%,
+      rgba(0, 0, 0, 0) 18%,
+      rgba(0, 0, 0, 0) 74%,
+      rgba(0, 0, 0, 0.26) 100%
+    );
+  background-attachment: fixed, fixed, scroll;
+}
+
+/* Warm ambient halo + a 1px lighter-warm top-edge highlight so the hero record
+   catches light like a real card (de-card brief §3). */
+.dusk-halo {
+  box-shadow:
+    0 34px 90px -38px rgba(231, 162, 78, 0.24),
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 242, 224, 0.07);
+}
+
+/* The determination stamp: a subtle dark-mode glow only — the land animation
+   sells the "thunk", not the glow (de-card brief §5). */
+.stamp-glow {
+  box-shadow:
+    0 0 14px -6px rgba(46, 139, 118, 0.45),
+    inset 0 0 10px -8px rgba(46, 139, 118, 0.5);
+}
+
+/* Pipeline connector line that draws left→right (desktop) / top→down (mobile)
+   as the "how it works" sequence scrolls in — one pass through the pipeline. */
+.pipe-line {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 900ms var(--ease-out-expo);
+}
+
+.pipe-line.is-visible {
+  transform: scaleX(1);
+}
+
+/* ---- Motion layer (brief §5). Everything below is decoration for sighted,
+   motion-tolerant users; the reduced-motion block disables it wholesale. ---- */
+
+/* A. Page-load entrance: fade + 12px rise, header → main → rail. */
+.enter {
+  animation: enter 450ms var(--ease-out-expo) both;
+}
+
+.enter-1 {
+  animation-delay: 70ms;
+}
+
+.enter-2 {
+  animation-delay: 140ms;
+}
+
+.enter-3 {
+  animation-delay: 210ms;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Small entrance for overlays (modals, dropdowns). */
+.rise {
+  animation: enter 250ms var(--ease-out-expo) both;
+}
+
+/* Scroll-reveal for marketing sections: fade + 12px rise, fired once by an
+   IntersectionObserver that toggles .is-visible (brief §2). */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 550ms var(--ease-out-expo),
+    transform 550ms var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Active pipeline-stage marker while the review runs. */
+.survey-pulse {
+  animation: survey-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes survey-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* B. In-review progress line: the one permitted gradient. */
+.review-line {
+  @apply pointer-events-none absolute inset-x-0 top-0 h-0.5 overflow-hidden;
+}
+
+.review-line::after {
+  content: "";
+  @apply absolute inset-y-0 w-1/3;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #0f5e4e 45%,
+    #2e8b76 55%,
+    transparent
+  );
+  animation: review-sweep 1.8s var(--ease-in-out) infinite;
+}
+
+@keyframes review-sweep {
+  from {
+    left: -33%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+/* C. Stamp impact: one-frame 1px shake of the card when the stamp lands. */
+.stamp-impact {
+  animation: stamp-impact 120ms steps(2, end) 1;
+}
+
+@keyframes stamp-impact {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(1px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Auth failure: the whole form shakes 1px once (brief §3, Linear-style). */
+.shake {
+  animation: shake 320ms var(--ease-in-out) 1;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-3px);
+  }
+  40% {
+    transform: translateX(3px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+/* Acknowledgment checkmark draws in via stroke-dashoffset. */
+.check-draw {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  transition: stroke-dashoffset 200ms var(--ease-out-expo);
+}
+
+.check-draw[data-checked="true"] {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .enter,
+  .rise {
+    animation: none;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .pipe-line {
+    transform: scaleX(1);
+    transition: none;
+  }
+
+  .btn:hover {
+    transform: none;
+  }
+
+  .survey-pulse {
+    animation: none;
+  }
+
+  .review-line::after {
+    animation: none;
+    left: 0;
+    width: 100%;
+    background: #0f5e4e;
+  }
+
+  .stamp-impact,
+  .shake {
+    animation: none;
+  }
+
+  .check-draw {
+    transition: none;
+  }
+
+  .sheet,
+  .sheet:hover {
+    transform: none;
+  }
+
+  .btn {
+    @apply active:scale-100;
+  }
+
+  .chip {
+    @apply active:scale-100;
   }
 }

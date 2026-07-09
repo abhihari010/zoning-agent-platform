@@ -8,7 +8,7 @@ export function emptyIntakeFacts(): IntakeFacts {
     operatingHours: "",
     employeeCount: "",
     parkingLoading: "",
-    foodFireHealth: false,
+    foodService: "",
   };
 }
 
@@ -19,7 +19,7 @@ export function buildProjectContext(projectDescription: string, facts: IntakeFac
     ["Operating hours", facts.operatingHours],
     ["Number of employees", facts.employeeCount],
     ["Parking/loading", facts.parkingLoading],
-    ["Food/fire/health triggers", facts.foodFireHealth ? "Yes" : ""],
+    ["Food preparation or service", facts.foodService],
   ]
     .filter(([, value]) => value.trim())
     .map(([label, value]) => `- ${label}: ${value.trim()}`);

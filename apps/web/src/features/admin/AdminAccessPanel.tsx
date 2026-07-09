@@ -14,24 +14,21 @@ export function AdminAccessPanel({
   onClearAdminKey: () => void;
 }) {
   return (
-    <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-        Admin Access
-      </p>
-      <p className="mt-3 text-sm leading-6 text-slate-600">
+    <div className="sheet p-6">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="sheet-title">Admin access</h2>
+        <span className={`tag ${adminAccessKey ? "tag-ok" : "tag-neutral"}`}>
+          {adminAccessKey ? "Key saved" : "No key"}
+        </span>
+      </div>
+      <p className="mt-2 text-sm leading-6 text-ink-soft">
         Source status and catalog load with beta access. Save the separate admin key here
         before editing sources, importing documents, or reindexing.
       </p>
-      <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Write access</p>
-        <p className="mt-2 text-sm font-semibold text-slate-900">
-          {adminAccessKey ? "Admin key saved for this session" : "No admin key saved"}
-        </p>
-      </div>
-      <label className="mt-4 block text-sm font-semibold text-slate-700">
+      <label className="field-label mt-4">
         Source admin key
         <input
-          className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm"
+          className="field font-mono"
           type="password"
           value={adminAccessInput}
           onChange={(event) => onAdminAccessInputChange(event.target.value)}
@@ -42,24 +39,16 @@ export function AdminAccessPanel({
           }}
         />
       </label>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <button
-          type="button"
-          onClick={onSaveAdminKey}
-          className="rounded-2xl bg-clay px-4 py-3 font-semibold text-white"
-        >
+      <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+        <button type="button" onClick={onSaveAdminKey} className="btn-primary">
           Save admin key
         </button>
-        <button
-          type="button"
-          onClick={onClearAdminKey}
-          className="rounded-2xl border border-slate-300 px-4 py-3 font-semibold text-slate-700"
-        >
+        <button type="button" onClick={onClearAdminKey} className="btn-outline">
           Clear key
         </button>
       </div>
       {adminAccessMessage && (
-        <p className="mt-4 text-sm text-slate-700">{adminAccessMessage}</p>
+        <p className="mt-3 text-sm text-ink-soft">{adminAccessMessage}</p>
       )}
     </div>
   );

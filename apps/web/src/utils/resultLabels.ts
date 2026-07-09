@@ -17,30 +17,30 @@ export function decisionLabel(decision: Decision): string {
 export function decisionTone(decision: Decision): string {
   switch (decision) {
     case "likely_allowed":
-      return "border-emerald-200 bg-emerald-50 text-emerald-800";
+      return "border-verdict-ok/30 bg-verdict-okwash text-verdict-ok";
     case "conditional":
-      return "border-amber-200 bg-amber-50 text-amber-800";
+      return "border-verdict-hold/30 bg-verdict-holdwash text-verdict-hold";
     case "restricted":
-      return "border-red-200 bg-red-50 text-red-800";
+      return "border-verdict-stop/30 bg-verdict-stopwash text-verdict-stop";
     default:
-      return "border-slate-200 bg-slate-50 text-slate-800";
+      return "border-rule-strong bg-well text-ink-soft";
   }
 }
 
 export function statusTone(status: StageStatus, isActive: boolean): string {
   if (isActive) {
-    return "border-clay bg-clay/10";
+    return "border-spruce/40 bg-spruce-wash";
   }
   if (status === "completed") {
-    return "border-emerald-200 bg-emerald-50";
+    return "border-verdict-ok/25 bg-verdict-okwash/60";
   }
   if (status === "warning") {
-    return "border-amber-200 bg-amber-50";
+    return "border-verdict-hold/25 bg-verdict-holdwash/60";
   }
   if (status === "needs_clarification") {
-    return "border-clay/40 bg-clay/10";
+    return "border-verdict-hold/25 bg-verdict-holdwash/60";
   }
-  return "border-slate-200 bg-white";
+  return "border-rule bg-sheet";
 }
 
 export function confidenceLabel(confidence: number): string {
@@ -55,22 +55,22 @@ export function confidenceLabel(confidence: number): string {
 
 export function confidenceTone(confidence: number, citationCount: number): string {
   if (citationCount === 0 || confidence < 0.6) {
-    return "border-red-200 bg-red-50 text-red-900";
+    return "border-verdict-stop/25 bg-verdict-stopwash text-verdict-stop";
   }
   if (confidence < 0.75) {
-    return "border-amber-200 bg-amber-50 text-amber-900";
+    return "border-verdict-hold/25 bg-verdict-holdwash text-verdict-hold";
   }
-  return "border-emerald-200 bg-emerald-50 text-emerald-900";
+  return "border-verdict-ok/25 bg-verdict-okwash text-verdict-ok";
 }
 
 export function evidenceTone(citationCount: number): string {
   if (citationCount === 0) {
-    return "border-red-200 bg-red-50 text-red-900";
+    return "border-verdict-stop/25 bg-verdict-stopwash text-verdict-stop";
   }
   if (citationCount < 2) {
-    return "border-amber-200 bg-amber-50 text-amber-900";
+    return "border-verdict-hold/25 bg-verdict-holdwash text-verdict-hold";
   }
-  return "border-emerald-200 bg-emerald-50 text-emerald-900";
+  return "border-verdict-ok/25 bg-verdict-okwash text-verdict-ok";
 }
 
 export function evidenceLabel(citationCount: number): string {
@@ -95,12 +95,12 @@ export function supportStatusLabel(status?: IntakeResponse["supportStatus"]): st
 
 export function supportStatusTone(status?: IntakeResponse["supportStatus"]): string {
   if (status === "unsupported") {
-    return "border-amber-200 bg-amber-50 text-amber-900";
+    return "border-verdict-hold/25 bg-verdict-holdwash text-verdict-hold";
   }
   if (status === "invalid") {
-    return "border-red-200 bg-red-50 text-red-900";
+    return "border-verdict-stop/25 bg-verdict-stopwash text-verdict-stop";
   }
-  return "border-emerald-200 bg-emerald-50 text-emerald-900";
+  return "border-verdict-ok/25 bg-verdict-okwash text-verdict-ok";
 }
 
 export function coverageLabel(status?: CoverageStatus | null): string {
@@ -120,25 +120,25 @@ export function coverageLabel(status?: CoverageStatus | null): string {
 
 export function coverageTone(status?: CoverageStatus | null): string {
   if (status === "public_supported") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+    return "tag-ok";
   }
   if (status === "qa_ready" || status === "source_indexed") {
-    return "border-amber-200 bg-amber-50 text-amber-900";
+    return "tag-hold";
   }
-  return "border-slate-200 bg-slate-50 text-slate-700";
+  return "tag-neutral";
 }
 
 export function readinessTone(indexStatus: SourceIndexStatus | null): string {
   if (!indexStatus) {
-    return "border-slate-200 bg-slate-50 text-slate-900";
+    return "border-rule bg-well text-ink-soft";
   }
   if (indexStatus.indexReady) {
-    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+    return "border-verdict-ok/25 bg-verdict-okwash text-verdict-ok";
   }
   if (indexStatus.hasIndex) {
-    return "border-amber-200 bg-amber-50 text-amber-900";
+    return "border-verdict-hold/25 bg-verdict-holdwash text-verdict-hold";
   }
-  return "border-red-200 bg-red-50 text-red-900";
+  return "border-verdict-stop/25 bg-verdict-stopwash text-verdict-stop";
 }
 
 export function readinessLabel(indexStatus: SourceIndexStatus | null): string {
