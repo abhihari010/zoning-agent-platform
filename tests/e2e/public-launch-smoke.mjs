@@ -430,8 +430,13 @@ async function runWorkspaceFlow() {
   const sourceAdmin = page.getByRole("button", { name: "Source admin" });
   if (await sourceAdmin.isVisible().catch(() => false)) {
     await sourceAdmin.click();
-    await expectBodyIncludes("Source health", "Jurisdiction requests");
-    await expectBodyIncludes("Christiansburg, VA", "Sources indexed");
+    // Admin panels fetch + render async; wait for them rather than snapshotting.
+    await page.getByRole("heading", { name: "Source health" }).waitFor({ timeout: 10_000 });
+    await page
+      .getByRole("heading", { name: "Jurisdiction requests" })
+      .waitFor({ timeout: 10_000 });
+    await page.getByText("Christiansburg, VA").first().waitFor({ timeout: 10_000 });
+    await expectBodyIncludes("Sources indexed");
     await page.getByRole("button", { name: "Review", exact: true }).click();
   }
 
