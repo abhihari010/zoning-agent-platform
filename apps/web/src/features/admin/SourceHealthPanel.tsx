@@ -1,6 +1,49 @@
 import type { SourceIndexStatus } from "../../api";
 import { formatDateTime } from "../../utils/formatters";
-import { readinessLabel, readinessTone } from "../../utils/resultLabels";
+import { readinessLabel } from "../../utils/resultLabels";
+
+function HealthCell({
+  label,
+  value,
+  note,
+  tone = "neutral",
+}: {
+  label: string;
+  value: string;
+  note?: string;
+  tone?: "neutral" | "ok" | "hold" | "stop";
+}) {
+  const valueColor =
+    tone === "ok"
+      ? "text-verdict-ok"
+      : tone === "hold"
+        ? "text-verdict-hold"
+        : tone === "stop"
+          ? "text-verdict-stop"
+          : "text-ink";
+  return (
+    <div className="px-4 py-3.5">
+      <p className="text-xs font-medium text-ink-faint">{label}</p>
+      <p className={`tabular mt-1 truncate font-mono text-lg font-semibold ${valueColor}`}>
+        {value}
+      </p>
+      {note && <p className="mt-0.5 truncate text-xs leading-5 text-ink-soft">{note}</p>}
+    </div>
+  );
+}
+
+function readinessToneKey(indexStatus: SourceIndexStatus | null): "neutral" | "ok" | "hold" | "stop" {
+  if (!indexStatus) {
+    return "neutral";
+  }
+  if (indexStatus.indexReady) {
+    return "ok";
+  }
+  if (indexStatus.hasIndex) {
+    return "hold";
+  }
+  return "stop";
+}
 
 export function SourceHealthPanel({
   indexStatus,
@@ -9,95 +52,86 @@ export function SourceHealthPanel({
   indexStatus: SourceIndexStatus | null;
   sourceCount: number;
 }) {
+  const readiness = readinessToneKey(indexStatus);
+
   return (
-    <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-        Source Health
-      </p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div className={`rounded-2xl border p-4 ${readinessTone(indexStatus)}`}>
-          <p className="text-xs uppercase tracking-[0.18em] opacity-75">Readiness</p>
-          <p className="mt-2 text-2xl font-semibold">{readinessLabel(indexStatus)}</p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-80">
-            {indexStatus?.sourceRegistryVersion
+    <div className="sheet p-6">
+      <h2 className="sheet-title">Source health</h2>
+      <div className="mt-4 grid grid-cols-2 divide-x divide-y divide-rule overflow-hidden rounded-sm border border-rule [&>*:nth-child(odd)]:!border-l-0 [&>*:nth-child(-n+2)]:!border-t-0">
+        <HealthCell
+          label="Readiness"
+          value={readinessLabel(indexStatus)}
+          note={
+            indexStatus?.sourceRegistryVersion
               ? `Registry ${indexStatus.sourceRegistryVersion}`
-              : "Registry version unset"}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Sources</p>
-          <p className="mt-2 text-2xl font-semibold text-pine">
-            {indexStatus?.sourceCount ?? sourceCount}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Source Packs</p>
-          <p className="mt-2 text-2xl font-semibold text-pine">
-            {indexStatus?.sourcePackCount ?? 0}
-          </p>
-          <p className="mt-1 text-xs leading-5 text-slate-600">
-            {(indexStatus?.sourcePackJurisdictionIds ?? []).join(", ") || "No packs found"}
-          </p>
-        </div>
-        <div className={`rounded-2xl border p-4 ${readinessTone(indexStatus)}`}>
-          <p className="text-xs uppercase tracking-[0.18em] opacity-75">Index</p>
-          <p className="mt-2 text-2xl font-semibold">{indexStatus?.chunkCount ?? 0} chunks</p>
-        </div>
-        <div
-          className={`rounded-2xl border p-4 ${
-            indexStatus?.vectorIndexReady
-              ? "border-emerald-200 bg-emerald-50 text-emerald-950"
-              : "border-amber-200 bg-amber-50 text-amber-950"
-          }`}
-        >
-          <p className="text-xs uppercase tracking-[0.18em] opacity-75">Vectors</p>
-          <p className="mt-2 text-2xl font-semibold">{indexStatus?.vectorCount ?? 0} vectors</p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-80">
-            {indexStatus?.vectorProvider ?? "none"}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Last import</p>
-          <p className="mt-2 text-sm font-semibold text-slate-900">
-            {formatDateTime(indexStatus?.lastImportAt)}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Last reindex</p>
-          <p className="mt-2 text-sm font-semibold text-slate-900">
-            {formatDateTime(indexStatus?.lastReindexAt)}
-          </p>
-        </div>
+              : "Registry version unset"
+          }
+          tone={readiness}
+        />
+        <HealthCell
+          label="Sources"
+          value={String(indexStatus?.sourceCount ?? sourceCount)}
+        />
+        <HealthCell
+          label="Source packs"
+          value={String(indexStatus?.sourcePackCount ?? 0)}
+          note={(indexStatus?.sourcePackJurisdictionIds ?? []).join(", ") || "No packs found"}
+        />
+        <HealthCell
+          label="Index chunks"
+          value={String(indexStatus?.chunkCount ?? 0)}
+          tone={readiness}
+        />
+        <HealthCell
+          label="Vectors"
+          value={String(indexStatus?.vectorCount ?? 0)}
+          note={indexStatus?.vectorProvider ?? "none"}
+          tone={indexStatus?.vectorIndexReady ? "ok" : "hold"}
+        />
+        <HealthCell label="Last import" value={formatDateTime(indexStatus?.lastImportAt)} />
+        <HealthCell
+          label="Last reindex"
+          value={formatDateTime(indexStatus?.lastReindexAt)}
+        />
+        <HealthCell
+          label="Automation"
+          value={indexStatus ? (indexStatus.autoSeedSources ? "seed on" : "seed off") : "—"}
+          note={
+            indexStatus
+              ? `Auto reindex empty: ${indexStatus.autoReindexOnEmpty ? "on" : "off"}`
+              : undefined
+          }
+        />
       </div>
       {indexStatus && indexStatus.sourcesMissingMetadata.length > 0 && (
-        <p className="mt-4 text-sm leading-6 text-amber-900">
+        <p className="mt-4 text-sm leading-6 text-verdict-hold">
           {indexStatus.sourcesMissingMetadata.length} source
-          {indexStatus.sourcesMissingMetadata.length === 1 ? "" : "s"} need metadata before the
-          index is fully auditable.
+          {indexStatus.sourcesMissingMetadata.length === 1 ? "" : "s"} need metadata before
+          the index is fully auditable.
         </p>
       )}
       {indexStatus && (
-        <div className="mt-4 grid gap-3">
+        <div className="mt-4 space-y-3">
           {(indexStatus.staleSourceIds.length > 0 ||
             indexStatus.missingChunkSourceIds.length > 0) && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
-              <p className="font-semibold">Index refresh needed</p>
+            <div className="rounded-sm border border-verdict-hold/25 bg-verdict-holdwash p-4 text-sm">
+              <p className="font-bold text-verdict-hold">Index refresh needed</p>
               {indexStatus.staleSourceIds.length > 0 && (
-                <p className="mt-2 leading-6">
-                  Stale sources: {indexStatus.staleSourceIds.join(", ")}
+                <p className="mt-1.5 font-mono text-xs leading-5 text-ink-soft">
+                  Stale: {indexStatus.staleSourceIds.join(", ")}
                 </p>
               )}
               {indexStatus.missingChunkSourceIds.length > 0 && (
-                <p className="mt-2 leading-6">
+                <p className="mt-1.5 font-mono text-xs leading-5 text-ink-soft">
                   Missing chunks: {indexStatus.missingChunkSourceIds.join(", ")}
                 </p>
               )}
             </div>
           )}
           {indexStatus.readinessWarnings.length > 0 && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
-              <p className="font-semibold">Readiness warnings</p>
-              <ul className="mt-2 space-y-1 leading-6">
+            <div className="rounded-sm border border-verdict-hold/25 bg-verdict-holdwash p-4 text-sm">
+              <p className="font-bold text-verdict-hold">Readiness warnings</p>
+              <ul className="mt-1.5 space-y-1 leading-6 text-ink-soft">
                 {indexStatus.readinessWarnings.map((warning) => (
                   <li key={warning}>{warning}</li>
                 ))}
@@ -105,19 +139,15 @@ export function SourceHealthPanel({
             </div>
           )}
           {indexStatus.vectorReadinessWarnings.length > 0 && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
-              <p className="font-semibold">Vector warnings</p>
-              <ul className="mt-2 space-y-1 leading-6">
+            <div className="rounded-sm border border-verdict-hold/25 bg-verdict-holdwash p-4 text-sm">
+              <p className="font-bold text-verdict-hold">Vector warnings</p>
+              <ul className="mt-1.5 space-y-1 leading-6 text-ink-soft">
                 {indexStatus.vectorReadinessWarnings.map((warning) => (
                   <li key={warning}>{warning}</li>
                 ))}
               </ul>
             </div>
           )}
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs leading-5 text-slate-600">
-            Auto seed: {indexStatus.autoSeedSources ? "on" : "off"} Â· Auto reindex empty:{" "}
-            {indexStatus.autoReindexOnEmpty ? "on" : "off"}
-          </div>
         </div>
       )}
     </div>

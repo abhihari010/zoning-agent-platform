@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { AnalyzeResponse } from "@zoning-agent/shared-schema";
 import { authMode, type IntakeResponse, type JurisdictionCoverage } from "../../api";
 import {
@@ -6,6 +7,15 @@ import {
   supportStatusLabel,
   supportStatusTone,
 } from "../../utils/resultLabels";
+
+function CaseRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="py-3 first:pt-0 last:pb-0">
+      <p className="text-xs font-medium text-ink-faint">{label}</p>
+      {children}
+    </div>
+  );
+}
 
 export function CaseSnapshot({
   intake,
@@ -23,19 +33,72 @@ export function CaseSnapshot({
   onDeleteCurrentProject: () => void;
 }) {
   return (
-    <section className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-        Case Snapshot
-      </p>
+    <section className="sheet p-5">
+      <h2 className="text-sm font-bold text-ink">Case snapshot</h2>
       {intake ? (
-        <div className="mt-4 space-y-3 text-sm text-slate-700">
-          {result && (
-            <div className="grid gap-2">
-              <button
-                type="button"
-                onClick={onDownloadChecklist}
-                className="w-full rounded-2xl bg-pine px-4 py-3 text-sm font-semibold text-white"
+        <div className="mt-3">
+          <div className="divide-y divide-rule">
+            <CaseRow label="Address">
+              <p className="mt-1 font-mono text-[13px] font-medium leading-5 text-ink">
+                {intake.normalizedAddress}
+              </p>
+            </CaseRow>
+            <CaseRow label="Jurisdiction">
+              <p className="mt-1 text-sm font-medium text-ink">
+                {intake.jurisdictionName ?? intake.jurisdictionId ?? "Unknown jurisdiction"}
+              </p>
+              <span
+                className={`mt-1.5 inline-flex rounded-sm border px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide ${supportStatusTone(intake.supportStatus)}`}
               >
+                {coverageLabel(intake.coverageStatus ?? currentCoverage?.coverageStatus)}
+              </span>
+            </CaseRow>
+            <CaseRow label="Coverage trust">
+              <p className="mt-1 text-sm font-medium text-ink">
+                {supportStatusLabel(intake.supportStatus)}
+              </p>
+              <p className="mt-1 text-xs leading-5 text-ink-soft">
+                Last verified: {currentCoverage?.lastVerifiedAt ?? "not recorded"}
+              </p>
+              {(intake.planningContact?.url || currentCoverage?.planningContact.url) && (
+                <a
+                  className="mt-1.5 inline-flex text-[13px] font-medium text-spruce underline-offset-2 hover:underline"
+                  href={intake.planningContact?.url ?? currentCoverage?.planningContact.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Planning office
+                </a>
+              )}
+            </CaseRow>
+            <CaseRow label="District">
+              <p className="mt-1 font-mono text-[13px] font-medium uppercase text-ink">
+                {intake.district.replace(/-/g, " ")}
+              </p>
+            </CaseRow>
+            <CaseRow label="Coordinates">
+              <p className="tabular mt-1 font-mono text-[13px] text-ink-soft">
+                {intake.latitude != null && intake.longitude != null
+                  ? `${intake.latitude.toFixed(4)}, ${intake.longitude.toFixed(4)}`
+                  : "Unavailable"}
+              </p>
+            </CaseRow>
+            {result && (
+              <CaseRow label="Determination">
+                <div className="mt-1 flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium text-ink">
+                    {decisionLabel(result.feasibility.decision)}
+                  </p>
+                  <span className="tabular font-mono text-xs text-ink-faint">
+                    {(result.feasibility.confidence * 100).toFixed(0)}%
+                  </span>
+                </div>
+              </CaseRow>
+            )}
+          </div>
+          {result && (
+            <div className="mt-4 grid gap-2 border-t border-rule pt-4">
+              <button type="button" onClick={onDownloadChecklist} className="btn-primary w-full">
                 Download checklist
               </button>
               {authMode === "supabase" && (
@@ -43,81 +106,18 @@ export function CaseSnapshot({
                   type="button"
                   onClick={onDeleteCurrentProject}
                   disabled={deletingProjectId === intake.projectId}
-                  className="w-full rounded-2xl border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 disabled:opacity-60"
+                  className="btn-danger w-full"
                 >
-                  {deletingProjectId === intake.projectId ? "Deleting project" : "Delete saved project"}
+                  {deletingProjectId === intake.projectId
+                    ? "Deleting project…"
+                    : "Delete saved project"}
                 </button>
               )}
             </div>
           )}
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-              Normalized address
-            </p>
-            <p className="mt-2 font-semibold text-slate-900">{intake.normalizedAddress}</p>
-          </div>
-          <div className={`rounded-2xl border p-4 ${supportStatusTone(intake.supportStatus)}`}>
-            <p className="text-xs uppercase tracking-[0.18em] opacity-75">Jurisdiction</p>
-            <p className="mt-2 font-semibold">
-              {intake.jurisdictionName ?? intake.jurisdictionId ?? "Unknown jurisdiction"}
-            </p>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] opacity-80">
-              {coverageLabel(intake.coverageStatus ?? currentCoverage?.coverageStatus)}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-              Coverage Trust
-            </p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">
-              {supportStatusLabel(intake.supportStatus)}
-            </p>
-            <p className="mt-2 text-xs leading-5 text-slate-600">
-              Last verified: {currentCoverage?.lastVerifiedAt ?? "Not recorded"}
-            </p>
-            {(intake.planningContact?.url || currentCoverage?.planningContact.url) && (
-              <a
-                className="mt-3 inline-flex text-sm font-semibold text-clay underline-offset-2 hover:underline"
-                href={intake.planningContact?.url ?? currentCoverage?.planningContact.url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Planning office
-              </a>
-            )}
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">District</p>
-              <p className="mt-2 font-semibold text-slate-900">
-                {intake.district.replace(/-/g, " ")}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Coordinates</p>
-              <p className="mt-2 font-semibold text-slate-900">
-                {intake.latitude != null && intake.longitude != null
-                  ? `${intake.latitude.toFixed(4)}, ${intake.longitude.toFixed(4)}`
-                  : "Unavailable"}
-              </p>
-            </div>
-          </div>
-          {result && (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Decision</p>
-              <div className="mt-2 flex items-center justify-between gap-3">
-                <p className="font-semibold text-slate-900">
-                  {decisionLabel(result.feasibility.decision)}
-                </p>
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600">
-                  {(result.feasibility.confidence * 100).toFixed(0)}%
-                </span>
-              </div>
-            </div>
-          )}
         </div>
       ) : (
-        <p className="mt-4 text-sm leading-6 text-slate-600">
+        <p className="mt-3 text-sm leading-6 text-ink-soft">
           Normalized parcel context appears here after intake succeeds.
         </p>
       )}

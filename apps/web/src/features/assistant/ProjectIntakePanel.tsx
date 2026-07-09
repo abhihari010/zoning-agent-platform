@@ -1,11 +1,23 @@
-import type { Dispatch, RefObject, SetStateAction, KeyboardEvent } from "react";
+import { useRef, useState } from "react";
+import type { Dispatch, ReactNode, RefObject, SetStateAction, KeyboardEvent } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { authMode, type IntakeResponse, type JurisdictionCoverage } from "../../api";
 import type { IntakeFacts, Phase } from "../../types/app";
 import { coverageLabel } from "../../utils/resultLabels";
 
+const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+
+const EMPLOYEE_OPTIONS = ["Owner only", "2–5", "6+", "Not sure"];
+const SCOPE_OPTIONS = [
+  "No construction",
+  "Interior renovation",
+  "Addition",
+  "New structure",
+];
+const FOOD_OPTIONS = ["Yes", "No", "Not sure"];
+
 export function ProjectIntakePanel({
   phase,
-  sourcesCount,
   acceptedDisclaimer,
   projectDescription,
   intakeFacts,
@@ -32,7 +44,6 @@ export function ProjectIntakePanel({
   onRequestJurisdictionSupport,
 }: {
   phase: Phase;
-  sourcesCount: number;
   acceptedDisclaimer: boolean;
   projectDescription: string;
   intakeFacts: IntakeFacts;
@@ -58,292 +69,476 @@ export function ProjectIntakePanel({
   onReset: () => void;
   onRequestJurisdictionSupport: () => void;
 }) {
+  const busy = phase === "intake" || phase === "analyzing";
+  const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
+
+  function autosizeDescription() {
+    const el = descriptionRef.current;
+    if (!el) {
+      return;
+    }
+    el.style.height = "auto";
+    el.style.height = `${Math.max(el.scrollHeight, 120)}px`;
+  }
+
   return (
-    <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
-      <div className="mb-5 grid gap-4 rounded-3xl border border-slate-200 bg-slate-50/70 p-4 md:grid-cols-[minmax(0,1fr)_220px]">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-            Project Intake
-          </p>
-          <h2 className="mt-2 font-heading text-2xl text-pine">Tell us what you want to build</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            Start with the project and the parcel address. The system will validate the
-            property, infer the likely zoning context, and run the staged review.
+    <div className="sheet relative p-6 md:p-8">
+      {busy && <span className="review-line" aria-hidden="true" />}
+
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-[1.75rem] font-bold leading-[1.1] tracking-[-0.02em] text-ink md:text-[2rem]">
+            Check what you can build on a property
+          </h1>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-ink-soft">
+            Describe the project and give the parcel address; the review checks the
+            local ordinance and returns a determination with citations.
           </p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-3 md:grid-cols-1">
-          <div className="rounded-2xl border border-slate-200 bg-white p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Stage
-            </p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">
-              {phase === "analyzing"
-                ? "Analyzing"
-                : phase === "intake"
-                  ? "Validating"
-                  : phase === "done"
-                    ? "Ready"
-                    : phase === "error"
-                      ? "Error"
-                      : "Waiting"}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Workflow
-            </p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">5 stages</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-              Registry
-            </p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">{sourcesCount} sources</p>
-          </div>
-        </div>
+        <span
+          className={`stamp mt-1 shrink-0 px-3 py-1.5 text-[10px] tracking-[0.22em] ${
+            busy
+              ? "border-verdict-hold/60 text-verdict-hold"
+              : "border-spruce/50 text-spruce"
+          }`}
+        >
+          {busy ? "In review" : "Ready"}
+        </span>
       </div>
 
-      <div className="mb-5 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/80 p-4 text-sm text-slate-700">
-        <input
-          className="mt-1 h-4 w-4 accent-clay"
-          type="checkbox"
-          checked={acceptedDisclaimer}
-          onChange={(event) => onAcceptedDisclaimerChange(event.target.checked)}
-        />
-        <span>I understand this is an educational tool and not official legal approval.</span>
-      </div>
-
-      <label className="mb-4 block text-sm font-semibold text-slate-700">
-        Describe the project
-        <textarea
-          className="mt-2 min-h-[160px] w-full rounded-2xl border border-slate-300 bg-slate-50/50 px-4 py-3 text-sm outline-none transition focus:border-clay focus:ring-2 focus:ring-clay"
-          value={projectDescription}
-          onChange={(event) => onProjectDescriptionChange(event.target.value)}
-          placeholder="Example: Can I open a bakery out of my attached garage with two employees, weekday pickup hours, and limited interior renovation?"
-        />
-      </label>
-
-      <IntakeFactsFields facts={intakeFacts} onFactsChange={onIntakeFactsChange} />
-
-      <div ref={addressSectionRef}>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <label className="block text-sm font-semibold text-slate-700" htmlFor="address">
+      <fieldset
+        disabled={busy}
+        className={`mt-7 min-w-0 space-y-6 border-0 p-0 transition-opacity duration-med ease-out ${
+          busy ? "opacity-60" : "opacity-100"
+        }`}
+      >
+        <div ref={addressSectionRef} className="relative">
+          <label className="field-label" htmlFor="address">
             Property address
           </label>
-          <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
-            US addresses accepted; answers only where coverage is public-supported
-          </span>
-        </div>
-        <input
-          id="address"
-          className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50/50 px-4 py-3 text-sm outline-none transition focus:border-clay focus:ring-2 focus:ring-clay"
-          value={address}
-          onChange={(event) => onAddressChange(event.target.value)}
-          onKeyDown={onAddressKeyDown}
-          placeholder="123 Main St, Blacksburg, VA"
-          autoComplete="off"
-        />
-        <div className="mt-3 flex flex-wrap gap-2">
-          {publicSupportedCoverage.slice(0, 4).map((item) => (
-            <span
-              key={item.jurisdictionId}
-              className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-900"
-            >
-              {item.name}
-            </span>
-          ))}
-          {indexedCoverage.slice(0, 3).map((item) => (
-            <span
-              key={item.jurisdictionId}
-              className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900"
-            >
-              {item.name} source-indexed
-            </span>
-          ))}
-        </div>
-
-        {suggestionLoading && (
-          <p className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Looking up addresses
-          </p>
-        )}
-
-        {suggestions.length > 0 && (
-          <ul className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-            {suggestions.map((option, index) => (
-              <li key={`${option}-${index}`} className="border-b border-slate-200 last:border-b-0">
-                <button
-                  type="button"
-                  onMouseDown={(event) => {
-                    event.preventDefault();
-                    onSelectSuggestion(option);
-                  }}
-                  onClick={() => onSelectSuggestion(option)}
-                  className={`w-full px-4 py-3 text-left text-sm ${
-                    index === activeSuggestionIndex ? "bg-amber-100" : "bg-transparent"
-                  }`}
-                >
-                  {option}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-        <button
-          type="button"
-          onClick={onSubmit}
-          disabled={!canSubmit || phase === "intake" || phase === "analyzing"}
-          className="flex-1 rounded-2xl bg-gradient-to-r from-clay to-pine px-5 py-3 font-semibold text-white disabled:opacity-60"
-        >
-          {phase === "intake" || phase === "analyzing"
-            ? "Running zoning review..."
-            : "Run zoning review"}
-        </button>
-        <button
-          type="button"
-          onClick={onReset}
-          className="rounded-2xl border border-slate-300 px-5 py-3 font-semibold text-slate-700"
-        >
-          Reset
-        </button>
-      </div>
-
-      {error && (
-        <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          <p>{error}</p>
-          {intake?.supportStatus === "unsupported" && (
-            <div className="mt-4 rounded-2xl border border-amber-200 bg-white/80 p-4 text-amber-950">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em]">
-                Request Coverage
-              </p>
-              <p className="mt-2 leading-6">
-                We recognize {intake.jurisdictionName ?? "this jurisdiction"}, but it
-                is {coverageLabel(intake.coverageStatus)} rather than public-supported.
-              </p>
-              <button
-                type="button"
-                onClick={onRequestJurisdictionSupport}
-                disabled={jurisdictionRequestSubmitting || authMode !== "supabase"}
-                className="mt-3 rounded-2xl bg-pine px-4 py-3 font-semibold text-white disabled:opacity-60"
+          <input
+            id="address"
+            className="field"
+            value={address}
+            onChange={(event) => onAddressChange(event.target.value)}
+            onKeyDown={onAddressKeyDown}
+            placeholder="123 Main St, Blacksburg, VA"
+            autoComplete="off"
+          />
+          <AnimatePresence>
+            {suggestions.length > 0 && (
+              <motion.ul
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15, ease: EASE_OUT_EXPO }}
+                className="absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-sm border border-rule-strong bg-sheet shadow-raised"
               >
-                {jurisdictionRequestSubmitting ? "Requesting..." : "Request support"}
-              </button>
-              {authMode !== "supabase" && (
-                <p className="mt-2 text-xs leading-5">
-                  Sign-in mode records demand by user; beta/local mode does not submit
-                  coverage requests.
-                </p>
-              )}
-              {jurisdictionRequestMessage && (
-                <p className="mt-2 text-sm leading-6">{jurisdictionRequestMessage}</p>
+                {suggestions.map((option, index) => (
+                  <li key={`${option}-${index}`} className="border-b border-rule last:border-b-0">
+                    <button
+                      type="button"
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                        onSelectSuggestion(option);
+                      }}
+                      onClick={() => onSelectSuggestion(option)}
+                      className={`w-full px-3.5 py-2.5 text-left font-mono text-[13px] transition-colors duration-fast ease-out ${
+                        index === activeSuggestionIndex
+                          ? "bg-spruce-wash text-ink"
+                          : "bg-transparent text-ink-soft hover:bg-well hover:text-ink"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  </li>
+                ))}
+              </motion.ul>
+            )}
+          </AnimatePresence>
+          <p className="mt-2 text-xs leading-5 text-ink-faint">
+            {suggestionLoading
+              ? "Looking up addresses…"
+              : "US addresses only. Determinations require public ordinance coverage."}
+          </p>
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            {publicSupportedCoverage.slice(0, 4).map((item) => (
+              <span key={item.jurisdictionId} className="tag tag-ok">
+                {item.name}
+              </span>
+            ))}
+            {indexedCoverage.slice(0, 3).map((item) => (
+              <span key={item.jurisdictionId} className="tag tag-neutral">
+                {item.name} · indexing
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="field-label" htmlFor="project-description">
+            Describe the project
+          </label>
+          <p className="mt-1 text-xs leading-5 text-ink-faint">
+            Example: “Can I open a bakery out of my attached garage with two employees
+            and weekday pickup hours?”
+          </p>
+          <textarea
+            id="project-description"
+            ref={descriptionRef}
+            className="field min-h-[120px] resize-none overflow-hidden transition-[height,border-color,box-shadow] duration-med ease-inout"
+            value={projectDescription}
+            onChange={(event) => {
+              onProjectDescriptionChange(event.target.value);
+              autosizeDescription();
+            }}
+            placeholder="What do you want to build or run, and how will it operate?"
+          />
+        </div>
+
+        <ProjectDetailsDisclosure facts={intakeFacts} onFactsChange={onIntakeFactsChange} />
+
+        <div className="space-y-4 border-t border-rule pt-5">
+          <AcknowledgmentCheckbox
+            checked={acceptedDisclaimer}
+            onChange={onAcceptedDisclaimerChange}
+          />
+          <div className="flex flex-col gap-2.5 sm:flex-row">
+            <button
+              type="button"
+              onClick={onSubmit}
+              disabled={!canSubmit || busy}
+              className="btn-primary flex-1 py-3 text-[15px] transition-[transform,background-color,border-color,color,filter,opacity] duration-med"
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={busy ? "busy" : "idle"}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  {busy ? "Reviewing…" : "Run feasibility review"}
+                </motion.span>
+              </AnimatePresence>
+            </button>
+            <button type="button" onClick={onReset} className="btn-quiet py-3">
+              Reset
+            </button>
+          </div>
+        </div>
+      </fieldset>
+
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: EASE_OUT_EXPO }}
+            className="overflow-hidden"
+          >
+            <div className="mt-6 rounded-sm border border-verdict-stop/25 bg-verdict-stopwash p-4 text-sm text-verdict-stop">
+              <p className="leading-6">{error}</p>
+              {intake?.supportStatus === "unsupported" && (
+                <div className="mt-4 rounded-sm border border-rule bg-sheet p-4 text-ink">
+                  <p className="font-medium">
+                    {intake.jurisdictionName ?? "This jurisdiction"} is recognized, but its
+                    coverage is {coverageLabel(intake.coverageStatus).toLowerCase()} rather
+                    than public-supported.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={onRequestJurisdictionSupport}
+                    disabled={jurisdictionRequestSubmitting || authMode !== "supabase"}
+                    className="btn-primary mt-3"
+                  >
+                    {jurisdictionRequestSubmitting ? "Requesting…" : "Request coverage"}
+                  </button>
+                  {authMode !== "supabase" && (
+                    <p className="mt-2 text-xs leading-5 text-ink-faint">
+                      Sign-in mode records demand by user; beta/local mode does not submit
+                      coverage requests.
+                    </p>
+                  )}
+                  {jurisdictionRequestMessage && (
+                    <p className="mt-2 text-sm leading-6 text-ink-soft">
+                      {jurisdictionRequestMessage}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
-          )}
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-function IntakeFactsFields({
+function AcknowledgmentCheckbox({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex cursor-pointer items-start gap-2.5 text-sm leading-6 text-ink-soft">
+      <input
+        type="checkbox"
+        className="sr-only"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <span
+        aria-hidden="true"
+        className={`mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors duration-fast ease-out ${
+          checked ? "border-spruce bg-spruce" : "border-rule-strong bg-sheet"
+        }`}
+      >
+        <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none">
+          <path
+            d="M2.5 6.5L5 9l4.5-6"
+            stroke="#FFFFFF"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="check-draw"
+            data-checked={checked}
+          />
+        </svg>
+      </span>
+      <span>I understand this is an educational tool, not legal approval or a permit.</span>
+    </label>
+  );
+}
+
+function ChipGroup({
+  label,
+  options,
+  value,
+  onSelect,
+  children,
+}: {
+  label: string;
+  options: string[];
+  value: string;
+  onSelect: (option: string) => void;
+  children?: ReactNode;
+}) {
+  return (
+    <div>
+      <p className="field-label">{label}</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {options.map((option) => {
+          const isSelected = value === option;
+          return (
+            <button
+              key={option}
+              type="button"
+              className="chip"
+              aria-pressed={isSelected}
+              onClick={() => onSelect(isSelected ? "" : option)}
+            >
+              {option}
+            </button>
+          );
+        })}
+        {children}
+      </div>
+    </div>
+  );
+}
+
+const fieldVariants = {
+  hidden: { opacity: 0, y: 4 },
+  visible: { opacity: 1, y: 0 },
+};
+
+function ProjectDetailsDisclosure({
   facts,
   onFactsChange,
 }: {
   facts: IntakeFacts;
   onFactsChange: Dispatch<SetStateAction<IntakeFacts>>;
 }) {
+  const [open, setOpen] = useState(false);
+  const scopeIsCustom =
+    facts.constructionScope.length > 0 && !SCOPE_OPTIONS.includes(facts.constructionScope);
+  const [otherScope, setOtherScope] = useState(scopeIsCustom);
+
+  const providedCount = [
+    facts.useType,
+    facts.constructionScope,
+    facts.operatingHours,
+    facts.employeeCount,
+    facts.parkingLoading,
+    facts.foodService,
+  ].filter((value) => value.trim()).length;
+
   return (
-    <div className="mb-4 grid gap-4 rounded-3xl border border-slate-200 bg-slate-50/70 p-4 md:grid-cols-2">
-      <label className="block text-sm font-semibold text-slate-700">
-        Use type
-        <select
-          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
-          value={facts.useType}
-          onChange={(event) =>
-            onFactsChange((current) => ({ ...current, useType: event.target.value }))
-          }
+    <div className="rounded-sm border border-rule">
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        aria-expanded={open}
+        className="flex w-full items-center gap-2.5 px-4 py-3.5 text-left transition-colors duration-fast ease-out hover:bg-well"
+      >
+        <motion.svg
+          viewBox="0 0 12 12"
+          className="h-3 w-3 shrink-0 text-ink-faint"
+          animate={{ rotate: open ? 90 : 0 }}
+          transition={{ duration: 0.25, ease: EASE_OUT_EXPO }}
+          aria-hidden="true"
         >
-          <option value="">Select if known</option>
-          <option value="Home-based food business">Home-based food business</option>
-          <option value="Retail or service business">Retail or service business</option>
-          <option value="Restaurant or cafe">Restaurant or cafe</option>
-          <option value="Residential addition">Residential addition</option>
-          <option value="General construction">General construction</option>
-        </select>
-      </label>
-      <label className="block text-sm font-semibold text-slate-700">
-        Construction scope
-        <input
-          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
-          value={facts.constructionScope}
-          onChange={(event) =>
-            onFactsChange((current) => ({
-              ...current,
-              constructionScope: event.target.value,
-            }))
-          }
-          placeholder="Interior renovation, addition, no construction"
-        />
-      </label>
-      <label className="block text-sm font-semibold text-slate-700">
-        Operating hours
-        <input
-          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
-          value={facts.operatingHours}
-          onChange={(event) =>
-            onFactsChange((current) => ({
-              ...current,
-              operatingHours: event.target.value,
-            }))
-          }
-          placeholder="Weekdays 8 AM to 5 PM"
-        />
-      </label>
-      <label className="block text-sm font-semibold text-slate-700">
-        Employees
-        <input
-          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
-          value={facts.employeeCount}
-          onChange={(event) =>
-            onFactsChange((current) => ({
-              ...current,
-              employeeCount: event.target.value,
-            }))
-          }
-          placeholder="Owner only, 2 employees, unknown"
-        />
-      </label>
-      <label className="block text-sm font-semibold text-slate-700 md:col-span-2">
-        Parking/loading
-        <input
-          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm"
-          value={facts.parkingLoading}
-          onChange={(event) =>
-            onFactsChange((current) => ({
-              ...current,
-              parkingLoading: event.target.value,
-            }))
-          }
-          placeholder="Existing driveway, deliveries twice weekly, customer pickup"
-        />
-      </label>
-      <label className="flex items-start gap-3 text-sm font-semibold text-slate-700 md:col-span-2">
-        <input
-          className="mt-1 h-4 w-4 accent-clay"
-          type="checkbox"
-          checked={facts.foodFireHealth}
-          onChange={(event) =>
-            onFactsChange((current) => ({
-              ...current,
-              foodFireHealth: event.target.checked,
-            }))
-          }
-        />
-        Food, fire, or health department review may be triggered.
-      </label>
+          <path d="M4 2l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </motion.svg>
+        <span className="shrink-0 whitespace-nowrap text-sm font-medium text-ink">
+          Add project details
+        </span>
+        <span className="text-sm text-ink-faint">
+          {!open && providedCount > 0
+            ? `${providedCount} of 6 provided`
+            : "optional — improves confidence of the determination"}
+        </span>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.65, 0, 0.35, 1] }}
+            className="overflow-hidden"
+          >
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
+              className="space-y-5 border-t border-rule px-4 py-5"
+            >
+              <motion.label variants={fieldVariants} className="field-label block">
+                Use type
+                <select
+                  className="field"
+                  value={facts.useType}
+                  onChange={(event) =>
+                    onFactsChange((current) => ({ ...current, useType: event.target.value }))
+                  }
+                >
+                  <option value="">Not sure yet</option>
+                  <option value="Home-based food business">Home-based food business</option>
+                  <option value="Retail or service business">Retail or service business</option>
+                  <option value="Restaurant or cafe">Restaurant or cafe</option>
+                  <option value="Residential addition">Residential addition</option>
+                  <option value="General construction">General construction</option>
+                </select>
+              </motion.label>
+
+              <motion.div variants={fieldVariants}>
+                <ChipGroup
+                  label="Employees"
+                  options={EMPLOYEE_OPTIONS}
+                  value={facts.employeeCount}
+                  onSelect={(option) =>
+                    onFactsChange((current) => ({ ...current, employeeCount: option }))
+                  }
+                />
+              </motion.div>
+
+              <motion.div variants={fieldVariants}>
+                <ChipGroup
+                  label="Construction scope"
+                  options={SCOPE_OPTIONS}
+                  value={otherScope ? "" : facts.constructionScope}
+                  onSelect={(option) => {
+                    setOtherScope(false);
+                    onFactsChange((current) => ({ ...current, constructionScope: option }));
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="chip"
+                    aria-pressed={otherScope}
+                    onClick={() => {
+                      setOtherScope((current) => !current);
+                      onFactsChange((current) => ({ ...current, constructionScope: "" }));
+                    }}
+                  >
+                    Other
+                  </button>
+                </ChipGroup>
+                <AnimatePresence initial={false}>
+                  {otherScope && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.65, 0, 0.35, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <input
+                        className="field"
+                        value={facts.constructionScope}
+                        onChange={(event) =>
+                          onFactsChange((current) => ({
+                            ...current,
+                            constructionScope: event.target.value,
+                          }))
+                        }
+                        placeholder="Describe the construction scope"
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              <motion.label variants={fieldVariants} className="field-label block">
+                Operating hours
+                <input
+                  className="field"
+                  value={facts.operatingHours}
+                  onChange={(event) =>
+                    onFactsChange((current) => ({
+                      ...current,
+                      operatingHours: event.target.value,
+                    }))
+                  }
+                  placeholder="e.g. Weekdays 8–5"
+                />
+              </motion.label>
+
+              <motion.label variants={fieldVariants} className="field-label block">
+                Parking and loading
+                <input
+                  className="field"
+                  value={facts.parkingLoading}
+                  onChange={(event) =>
+                    onFactsChange((current) => ({
+                      ...current,
+                      parkingLoading: event.target.value,
+                    }))
+                  }
+                  placeholder="e.g. existing driveway, weekly deliveries"
+                />
+              </motion.label>
+
+              <motion.div variants={fieldVariants}>
+                <ChipGroup
+                  label="Does the project involve food preparation or service?"
+                  options={FOOD_OPTIONS}
+                  value={facts.foodService}
+                  onSelect={(option) =>
+                    onFactsChange((current) => ({ ...current, foodService: option }))
+                  }
+                />
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

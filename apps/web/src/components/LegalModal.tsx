@@ -14,47 +14,43 @@ export function LegalModal({
   const isMandatory = !!onAcknowledge;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4">
-      <section className="w-full max-w-2xl rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-          {isMandatory ? "Required Acknowledgment" : "Public Disclosure"}
-        </p>
-        <h2 className="mt-2 font-heading text-3xl text-pine">{legal.title}</h2>
-        <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
-          {legal.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm">
+      <section className="sheet rise max-h-[90dvh] w-full max-w-2xl overflow-auto shadow-raised">
+        <div className="border-b border-rule bg-well/70 px-6 py-2.5 md:px-8">
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink-faint">
+            {isMandatory ? "Required acknowledgment" : "Public disclosure"}
+          </p>
         </div>
-        <div className="mt-6 flex gap-3">
-          {isMandatory ? (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  onAcknowledge();
-                  onClose();
-                }}
-                className="rounded-2xl bg-pine px-4 py-3 font-semibold text-white"
-              >
-                I understand — continue
+        <div className="p-6 md:p-8">
+          <h2 className="text-2xl font-bold tracking-tight text-ink">{legal.title}</h2>
+          <div className="mt-4 space-y-4 text-sm leading-7 text-ink-soft">
+            {legal.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap gap-2.5">
+            {isMandatory ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onAcknowledge();
+                    onClose();
+                  }}
+                  className="btn-primary"
+                >
+                  I understand, continue
+                </button>
+                <button type="button" onClick={onClose} className="btn-outline">
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button type="button" onClick={onClose} className="btn-primary">
+                Close
               </button>
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-2xl border border-slate-300 px-4 py-3 font-semibold text-slate-600"
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-2xl bg-pine px-4 py-3 font-semibold text-white"
-            >
-              Close
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </section>
     </div>

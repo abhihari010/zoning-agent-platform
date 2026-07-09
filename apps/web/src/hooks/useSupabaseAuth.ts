@@ -13,6 +13,8 @@ const supabase =
     ? createClient(supabaseConfig.url, supabaseConfig.anonKey)
     : null;
 
+export type AuthResult = { ok: boolean; message?: string };
+
 export function useSupabaseAuth({
   onAuthStateReset,
 }: {
@@ -20,9 +22,6 @@ export function useSupabaseAuth({
 }) {
   const [authSession, setAuthSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(authMode === "supabase");
-  const [authEmail, setAuthEmail] = useState("");
-  const [authPassword, setAuthPassword] = useState("");
-  const [authMessage, setAuthMessage] = useState("");
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const canLoadPrivateData = authMode === "supabase" ? Boolean(authSession) : true;
   // Tracks the last access token we actually applied. Supabase re-emits auth
@@ -98,50 +97,55 @@ export function useSupabaseAuth({
     };
   }, [canLoadPrivateData, authSession]);
 
-  async function signIn() {
+  async function signIn({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }): Promise<AuthResult> {
     if (!supabase) {
-      setAuthMessage("Supabase is not configured for this deployment.");
-      return;
+      return { ok: false, message: "Sign-in is not configured for this deployment." };
     }
-    if (!authEmail.trim() || !authPassword) {
-      setAuthMessage("Enter your email and password.");
-      return;
-    }
-
-    setAuthLoading(true);
-    setAuthMessage("");
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: authEmail.trim(),
-      password: authPassword,
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
     });
-    if (signInError) {
-      setAuthMessage(signInError.message);
+    if (error) {
+      return { ok: false, message: error.message };
     }
-    setAuthLoading(false);
+    return { ok: true };
   }
 
-  async function signUp() {
+  async function signUp({
+    name,
+    email,
+    password,
+  }: {
+    name?: string;
+    email: string;
+    password: string;
+  }): Promise<AuthResult> {
     if (!supabase) {
-      setAuthMessage("Supabase is not configured for this deployment.");
-      return;
+      return { ok: false, message: "Sign-up is not configured for this deployment." };
     }
-    if (!authEmail.trim() || authPassword.length < 8) {
-      setAuthMessage("Enter an email and a password with at least 8 characters.");
-      return;
-    }
-
-    setAuthLoading(true);
-    setAuthMessage("");
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: authEmail.trim(),
-      password: authPassword,
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: name?.trim() ? { data: { full_name: name.trim() } } : undefined,
     });
-    setAuthMessage(
-      signUpError
-        ? signUpError.message
-        : "Account created. Check your email if confirmation is required, then sign in.",
-    );
-    setAuthLoading(false);
+    if (error) {
+      return { ok: false, message: error.message };
+    }
+    // When email confirmation is required Supabase returns a user but no
+    // session; surface that so the UI can tell the user to check their inbox.
+    if (!data.session) {
+      return {
+        ok: true,
+        message: "Account created. Check your email to confirm, then log in.",
+      };
+    }
+    return { ok: true };
   }
 
   async function signOut() {
@@ -156,12 +160,7 @@ export function useSupabaseAuth({
   return {
     authSession,
     authLoading,
-    authEmail,
-    authPassword,
-    authMessage,
     currentUser,
-    setAuthEmail,
-    setAuthPassword,
     signIn,
     signUp,
     signOut,

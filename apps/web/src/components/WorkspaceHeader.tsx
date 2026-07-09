@@ -1,7 +1,127 @@
+import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { Link } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { authMode, type CurrentUser } from "../api";
-import { DISCLAIMER } from "../constants/legal";
 import type { Workspace } from "../types/app";
+
+export function BenchmarkMark({ className = "h-8 w-8" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
+      <rect width="32" height="32" rx="2" className="fill-spruce" />
+      <circle cx="16" cy="16" r="7" fill="none" stroke="#FAF7F0" strokeWidth="2" />
+      <path
+        d="M16 3v6M16 23v6M3 16h6M23 16h6"
+        stroke="#FAF7F0"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+const WORKSPACE_TABS: Array<{ key: Workspace; label: string }> = [
+  { key: "assistant", label: "Review" },
+  { key: "admin", label: "Source admin" },
+];
+
+function initialsFor(email?: string | null): string {
+  if (!email) {
+    return "ZR";
+  }
+  const handle = email.split("@")[0] ?? email;
+  const parts = handle.split(/[.\-_]/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return handle.slice(0, 2).toUpperCase();
+}
+
+function AccountMenu({
+  currentUser,
+  authSession,
+  onSignOut,
+}: {
+  currentUser: CurrentUser | null;
+  authSession: Session | null;
+  onSignOut: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const email = currentUser?.email ?? authSession?.user.email ?? "Signed in";
+  const role = currentUser?.role ?? "user";
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="flex items-center gap-2 rounded-sm border border-rule-strong bg-sheet px-1.5 py-1.5 transition-colors duration-fast ease-out hover:border-ink-faint"
+      >
+        <span className="flex h-6 w-6 items-center justify-center rounded-sm bg-spruce font-display text-[11px] font-bold text-white">
+          {initialsFor(email)}
+        </span>
+        <span className="hidden max-w-[160px] truncate text-sm text-ink sm:block">
+          {email}
+        </span>
+        <svg viewBox="0 0 12 12" className="mr-0.5 h-3 w-3 text-ink-faint" aria-hidden="true">
+          <path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <>
+            <button
+              type="button"
+              aria-hidden="true"
+              tabIndex={-1}
+              onClick={() => setOpen(false)}
+              className="fixed inset-0 z-30 cursor-default"
+            />
+            <motion.div
+              role="menu"
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute right-0 z-40 mt-2 w-60 overflow-hidden rounded-sm border border-rule-strong bg-sheet shadow-raised"
+            >
+              <div className="border-b border-rule bg-well/60 px-4 py-3">
+                <p className="truncate text-sm font-medium text-ink">{email}</p>
+                <p className="font-mono text-[11px] uppercase tracking-wide text-ink-faint">
+                  {role}
+                </p>
+              </div>
+              <div className="p-1.5">
+                <Link
+                  to="/"
+                  role="menuitem"
+                  onClick={() => setOpen(false)}
+                  className="block rounded-sm px-3 py-2 text-sm text-ink-soft transition-colors duration-fast hover:bg-well hover:text-ink"
+                >
+                  Home
+                </Link>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setOpen(false);
+                    onSignOut();
+                  }}
+                  className="block w-full rounded-sm px-3 py-2 text-left text-sm text-ink-soft transition-colors duration-fast hover:bg-well hover:text-ink"
+                >
+                  Sign out
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export function WorkspaceHeader({
   workspace,
@@ -19,71 +139,53 @@ export function WorkspaceHeader({
   onSignOut: () => void;
 }) {
   return (
-    <section className="mb-5 grid gap-5 rounded-[28px] border border-pine/10 bg-white/90 p-6 shadow-card backdrop-blur lg:grid-cols-[minmax(0,1.5fr)_320px]">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">
-          Zoning Review Platform
-        </p>
-        <h1 className="mt-3 max-w-4xl font-heading text-3xl leading-tight text-pine md:text-[2.75rem]">
-          Check whether a project is allowed on a property and get the next permit steps.
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700 md:text-base">
-          This workspace runs one orchestrated zoning pipeline: it understands the request,
-          checks property context, retrieves municipal code evidence, and turns that into a
-          feasibility summary plus a permit checklist.
-        </p>
-      </div>
+    <header className="border-b border-rule bg-sheet">
+      <div className="mx-auto flex max-w-[1040px] flex-wrap items-stretch gap-x-8 gap-y-0 px-4 md:px-6">
+        <Link to="/" className="flex items-center gap-3 py-3.5" aria-label="Zoning Review home">
+          <BenchmarkMark className="h-7 w-7" />
+          <p className="font-display text-[15px] font-bold tracking-[-0.01em] text-ink">
+            Zoning Review
+          </p>
+        </Link>
 
-      <div className="flex flex-col justify-between gap-4">
-        <div className="rounded-3xl border border-amber-200 bg-amber-50/90 p-4 text-sm leading-6 text-amber-950">
-          {DISCLAIMER}
-        </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => onWorkspaceChange("assistant")}
-            className={`flex-1 rounded-2xl px-4 py-3 text-sm font-semibold ${
-              workspace === "assistant"
-                ? "bg-pine text-white"
-                : "border border-slate-300 bg-white text-slate-700"
-            }`}
-          >
-            Assistant
-          </button>
-          {canUseAdminTools && (
-            <button
-              type="button"
-              onClick={() => onWorkspaceChange("admin")}
-              className={`flex-1 rounded-2xl px-4 py-3 text-sm font-semibold ${
-                workspace === "admin"
-                  ? "bg-clay text-white"
-                  : "border border-slate-300 bg-white text-slate-700"
-              }`}
-            >
-              Source Admin
-            </button>
-          )}
-        </div>
+        {canUseAdminTools && (
+          <nav className="flex items-stretch" aria-label="Workspace">
+            {WORKSPACE_TABS.map((tab) => {
+              const isActive = workspace === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => onWorkspaceChange(tab.key)}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`relative px-3.5 text-sm font-medium transition-colors duration-fast ease-out ${
+                    isActive ? "text-ink" : "text-ink-soft hover:text-ink"
+                  }`}
+                >
+                  {tab.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="workspace-tab-underline"
+                      className="absolute inset-x-3.5 -bottom-px h-0.5 bg-ink"
+                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        )}
+
         {authMode === "supabase" && (
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
-            <p className="font-semibold text-slate-900">
-              {currentUser?.email ?? authSession?.user.email ?? "Signed in"}
-            </p>
-            <div className="mt-2 flex items-center justify-between gap-3">
-              <span className="text-xs uppercase tracking-[0.16em] text-slate-500">
-                {currentUser?.role ?? "user"}
-              </span>
-              <button
-                type="button"
-                onClick={onSignOut}
-                className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500"
-              >
-                Sign out
-              </button>
-            </div>
+          <div className="ml-auto flex items-center py-2.5">
+            <AccountMenu
+              currentUser={currentUser}
+              authSession={authSession}
+              onSignOut={onSignOut}
+            />
           </div>
         )}
       </div>
-    </section>
+    </header>
   );
 }

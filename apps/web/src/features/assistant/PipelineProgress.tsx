@@ -1,6 +1,52 @@
 import type { PipelineStageReport } from "@zoning-agent/shared-schema";
 import type { Phase } from "../../types/app";
-import { statusTone } from "../../utils/resultLabels";
+
+type StageDisplay = "pending" | "working" | "completed" | "warning" | "failed";
+
+function displayStatus(
+  phase: Phase,
+  reported: string,
+  index: number,
+  activeStageIndex: number,
+): StageDisplay {
+  if (phase === "analyzing") {
+    if (index < activeStageIndex) {
+      return "completed";
+    }
+    if (index === activeStageIndex) {
+      return "working";
+    }
+    return "pending";
+  }
+  if (phase === "done") {
+    if (reported === "completed") {
+      return "completed";
+    }
+    if (reported === "warning" || reported === "needs_clarification") {
+      return "warning";
+    }
+    if (reported === "failed") {
+      return "failed";
+    }
+    return "pending";
+  }
+  return "pending";
+}
+
+function stageTag(status: StageDisplay): string {
+  switch (status) {
+    case "working":
+      return "tag-neutral border-spruce/40 text-spruce";
+    case "completed":
+      return "tag-ok";
+    case "warning":
+      return "tag-hold";
+    case "failed":
+      return "tag-stop";
+    default:
+      return "tag-neutral";
+  }
+}
 
 export function PipelineProgress({
   phase,
@@ -12,51 +58,62 @@ export function PipelineProgress({
   stages: PipelineStageReport[];
 }) {
   return (
-    <div className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card md:p-8">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-            Pipeline Progress
-          </p>
-          <h2 className="mt-2 font-heading text-2xl text-pine">Orchestrated workflow</h2>
-        </div>
-        <p className="text-sm text-slate-600">
+    <div className="sheet p-6 md:p-8">
+      <div className="flex items-baseline justify-between gap-4">
+        <h2 className="sheet-title">Review pipeline</h2>
+        <p className="font-mono text-[11px] uppercase tracking-wide text-ink-faint">
           {phase === "analyzing"
-            ? "Running now"
-            : phase === "done"
-              ? "Latest result"
-              : "Waiting for input"}
+            ? "Running"
+            : phase === "intake"
+              ? "Validating address"
+              : "Latest result"}
         </p>
       </div>
 
-      <div className="mt-5 grid gap-3">
+      <ol className="mt-5">
         {stages.map((stage, index) => {
-          const isActive = phase === "analyzing" && index === activeStageIndex;
+          const status = displayStatus(phase, stage.status, index, activeStageIndex);
+          const isActive = status === "working";
+          const isLast = index === stages.length - 1;
           return (
-            <article
-              key={stage.key}
-              className={`rounded-2xl border p-4 ${statusTone(stage.status, isActive)}`}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-semibold text-slate-900">{stage.label}</p>
-                  <p className="mt-1 text-sm text-slate-700">{stage.headline}</p>
-                </div>
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">
-                  {isActive ? "Working" : stage.status.replace("_", " ")}
-                </span>
-              </div>
-              {stage.details.length > 0 && (
-                <ul className="mt-3 space-y-1 text-sm text-slate-600">
-                  {stage.details.map((detail) => (
-                    <li key={detail}>{detail}</li>
-                  ))}
-                </ul>
+            <li key={stage.key} className="relative flex gap-4 pb-5 last:pb-0">
+              {!isLast && (
+                <span
+                  aria-hidden="true"
+                  className="absolute left-[13px] top-7 h-[calc(100%-1.75rem)] w-px bg-rule"
+                />
               )}
-            </article>
+              <span
+                className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border font-mono text-[11px] font-semibold transition-colors duration-med ease-out ${
+                  isActive
+                    ? "survey-pulse border-spruce bg-spruce text-white"
+                    : status === "completed"
+                      ? "border-spruce/40 bg-spruce-wash text-spruce"
+                      : "border-rule bg-well text-ink-faint"
+                }`}
+              >
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div className="min-w-0 flex-1 pt-0.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-medium text-ink">{stage.label}</p>
+                  <span className={`tag ${stageTag(status)}`}>
+                    {status === "working" ? "Working" : status.replace("_", " ")}
+                  </span>
+                </div>
+                <p className="mt-0.5 text-sm leading-6 text-ink-soft">{stage.headline}</p>
+                {stage.details.length > 0 && (
+                  <ul className="mt-1.5 space-y-1 text-[13px] leading-5 text-ink-faint">
+                    {stage.details.map((detail) => (
+                      <li key={detail}>{detail}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </li>
           );
         })}
-      </div>
+      </ol>
     </div>
   );
 }

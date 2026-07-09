@@ -20,46 +20,44 @@ export function SavedProjectsPanel({
   }
 
   return (
-    <section className="rounded-[28px] border border-pine/10 bg-white p-6 shadow-card">
+    <section className="sheet p-5">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-          Saved Projects
-        </p>
-        <button
-          type="button"
-          onClick={onRefresh}
-          className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500"
-        >
+        <h2 className="text-sm font-bold text-ink">Saved reviews</h2>
+        <button type="button" onClick={onRefresh} className="btn-quiet px-2 py-1 text-xs">
           Refresh
         </button>
       </div>
-      <div className="mt-4 space-y-3">
+      <div className="mt-3">
         {projectsLoading ? (
-          <p className="text-sm text-slate-600">Loading projects...</p>
+          <p className="text-sm text-ink-soft">Loading projects…</p>
         ) : projects.length > 0 ? (
-          projects.slice(0, 6).map((project) => (
-            <button
-              key={project.projectId}
-              type="button"
-              onClick={() => onOpenProject(project)}
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-clay"
-            >
-              <p className="text-sm font-semibold text-slate-900">
-                {project.normalizedAddress}
-              </p>
-              <p className="mt-1 text-xs uppercase tracking-[0.14em] text-slate-500">
-                {project.jurisdictionName ?? project.jurisdictionId ?? "Unknown"} &middot;{" "}
-                {project.decision ? decisionLabel(project.decision) : project.status}
-              </p>
-            </button>
-          ))
+          <ul className="divide-y divide-rule">
+            {projects.slice(0, 6).map((project) => (
+              <li key={project.projectId}>
+                <button
+                  type="button"
+                  onClick={() => onOpenProject(project)}
+                  className="group w-full py-3 text-left transition-colors duration-150 ease-out first:pt-0"
+                >
+                  <p className="truncate font-mono text-[13px] font-medium text-ink group-hover:text-spruce">
+                    {project.normalizedAddress}
+                  </p>
+                  <p className="mt-1 text-xs text-ink-faint">
+                    {project.jurisdictionName ?? project.jurisdictionId ?? "Unknown"}
+                    {" · "}
+                    {project.decision ? decisionLabel(project.decision) : project.status}
+                  </p>
+                </button>
+              </li>
+            ))}
+          </ul>
         ) : (
-          <p className="text-sm leading-6 text-slate-600">
+          <p className="text-sm leading-6 text-ink-soft">
             Saved zoning reviews will appear here after your first run.
           </p>
         )}
         {projectsMessage && (
-          <p className="text-sm leading-6 text-slate-600">{projectsMessage}</p>
+          <p className="mt-2 text-sm leading-6 text-ink-soft">{projectsMessage}</p>
         )}
       </div>
     </section>

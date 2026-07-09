@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import type {
   AnalyzeResponse,
   FollowUpQuestion,
@@ -34,6 +36,7 @@ import {
   emptyIntakeFacts,
   intakeErrorMessage,
 } from "./utils/intake";
+import { useAuth } from "./auth/AuthContext";
 import { LegalFooter } from "./components/LegalFooter";
 import { LegalModal } from "./components/LegalModal";
 import { WorkspaceHeader } from "./components/WorkspaceHeader";
@@ -45,7 +48,6 @@ import { SourceEditorForm } from "./features/admin/SourceEditorForm";
 import { SourceHealthPanel } from "./features/admin/SourceHealthPanel";
 import { PipelineProgress } from "./features/assistant/PipelineProgress";
 import { ProjectIntakePanel } from "./features/assistant/ProjectIntakePanel";
-import { PublicAuthScreen } from "./features/landing/PublicAuthScreen";
 import { CaseSnapshot } from "./features/projects/CaseSnapshot";
 import { ReviewSignalsPanel } from "./features/projects/ReviewSignalsPanel";
 import { SavedProjectsPanel } from "./features/projects/SavedProjectsPanel";
@@ -56,7 +58,6 @@ import { useCoverage } from "./hooks/useCoverage";
 import { useFeedback } from "./hooks/useFeedback";
 import { useLegalAck } from "./hooks/useLegalAck";
 import { useSourcesAdmin } from "./hooks/useSourcesAdmin";
-import { useSupabaseAuth } from "./hooks/useSupabaseAuth";
 import { useTrace } from "./hooks/useTrace";
 
 export function App() {
@@ -66,24 +67,10 @@ export function App() {
   const [deletingProjectId, setDeletingProjectId] = useState<string | null>(
     null,
   );
-  const resetAuthState = useCallback(() => {
-    setProjects([]);
-  }, []);
-  const {
-    authSession,
-    authLoading,
-    authEmail,
-    authPassword,
-    authMessage,
-    currentUser,
-    setAuthEmail,
-    setAuthPassword,
-    signIn,
-    signUp,
-    signOut,
-  } = useSupabaseAuth({
-    onAuthStateReset: resetAuthState,
-  });
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { authSession, currentUser, signOut } = useAuth();
   const {
     coverage,
     coverageMessage,
@@ -99,7 +86,12 @@ export function App() {
     useState("");
   const [jurisdictionRequestSubmitting, setJurisdictionRequestSubmitting] =
     useState(false);
-  const [workspace, setWorkspace] = useState<Workspace>("assistant");
+  // Workspace is driven by the route (/review vs /admin) so navigation and the
+  // header tabs stay in sync and deep links work.
+  const workspace: Workspace =
+    location.pathname === "/admin" ? "admin" : "assistant";
+  const setWorkspace = (next: Workspace) =>
+    navigate(next === "admin" ? "/admin" : "/review");
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
   const [projectDescription, setProjectDescription] = useState("");
   const [intakeFacts, setIntakeFacts] = useState<IntakeFacts>(emptyIntakeFacts);
@@ -142,8 +134,6 @@ export function App() {
     Record<string, string>
   >({});
   const [clarificationSubmitting, setClarificationSubmitting] = useState(false);
-  const isSupabaseAuthenticated =
-    authMode !== "supabase" || Boolean(authSession);
   const canLoadPrivateData =
     authMode === "supabase" ? Boolean(authSession) : true;
   const canUseAdminTools =
@@ -197,7 +187,9 @@ export function App() {
     }
 
     const interval = window.setInterval(() => {
-      setActiveStageIndex((current) => (current + 1) % PIPELINE_STAGE_COUNT);
+      setActiveStageIndex((current) =>
+        Math.min(current + 1, PIPELINE_STAGE_COUNT - 1),
+      );
     }, 1200);
 
     return () => window.clearInterval(interval);
@@ -212,11 +204,29 @@ export function App() {
     void refreshProjects();
   }, [authSession]);
 
+  // Bounce non-admins off /admin, but only once we actually know their role —
+  // otherwise an admin deep-linking /admin gets kicked before currentUser loads.
   useEffect(() => {
-    if (workspace === "admin" && !canUseAdminTools) {
-      setWorkspace("assistant");
+    if (workspace !== "admin") {
+      return;
     }
-  }, [workspace, canUseAdminTools]);
+    if (authMode === "supabase" && currentUser && currentUser.role !== "admin") {
+      navigate("/review", { replace: true });
+    }
+  }, [workspace, currentUser, navigate]);
+
+  // Seed the address from the hero CTA (?address=…), then drop the param so it
+  // doesn't re-apply on later renders.
+  useEffect(() => {
+    const seeded = searchParams.get("address");
+    if (seeded) {
+      setAddress(seeded);
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.delete("address");
+      setSearchParams(nextParams, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const canSubmit = useMemo(
     () =>
@@ -308,6 +318,7 @@ export function App() {
   async function onSignOut() {
     await signOut();
     resetWorkspace();
+    navigate("/");
   }
 
   async function runAnalysis(
@@ -560,35 +571,12 @@ export function App() {
     result?.status === "low_confidence" ||
     result?.feasibility.decision === "unknown";
 
-  if (authMode === "supabase" && (authLoading || !isSupabaseAuthenticated)) {
-    return (
-      <PublicAuthScreen
-        coverage={coverage}
-        publicSupportedCoverage={publicSupportedCoverage}
-        indexedCoverage={indexedCoverage}
-        coverageMessage={coverageMessage}
-        authEmail={authEmail}
-        authPassword={authPassword}
-        authMessage={authMessage}
-        authLoading={authLoading}
-        legalPage={legalPage}
-        onAuthEmailChange={setAuthEmail}
-        onAuthPasswordChange={setAuthPassword}
-        onSignIn={() => {
-          void signIn();
-        }}
-        onSignUp={() => {
-          void signUp();
-        }}
-        onSelectLegalPage={setLegalPage}
-        onCloseLegalPage={() => setLegalPage(null)}
-      />
-    );
-  }
+  const railHasCase = Boolean(intake || result);
+  const railHasSignals = assistantPrompts.length > 0;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(217,120,85,0.10),transparent_24%),linear-gradient(180deg,#f8f3ea_0%,#efe5d5_100%)] text-slate-900">
-      <div className="mx-auto max-w-6xl px-4 py-5 md:px-8 md:py-8">
+    <main className="min-h-screen">
+      <div className="enter">
         <WorkspaceHeader
           workspace={workspace}
           canUseAdminTools={canUseAdminTools}
@@ -599,13 +587,14 @@ export function App() {
             void onSignOut();
           }}
         />
+      </div>
 
+      <div className="mx-auto max-w-[1040px] px-4 py-8 md:px-6 md:py-10">
         {workspace === "assistant" ? (
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
-            <section className="space-y-6">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <section className="enter enter-1 min-w-0 space-y-6">
               <ProjectIntakePanel
                 phase={phase}
-                sourcesCount={sources.length}
                 acceptedDisclaimer={acceptedDisclaimer}
                 projectDescription={projectDescription}
                 intakeFacts={intakeFacts}
@@ -636,11 +625,23 @@ export function App() {
                 }}
               />
 
-              <PipelineProgress
-                phase={phase}
-                activeStageIndex={activeStageIndex}
-                stages={displayedStages}
-              />
+              <AnimatePresence initial={false}>
+                {phase !== "idle" && phase !== "error" && (
+                  <motion.div
+                    key="pipeline"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <PipelineProgress
+                      phase={phase}
+                      activeStageIndex={activeStageIndex}
+                      stages={displayedStages}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {result && (
                 <ResultSection
@@ -662,7 +663,7 @@ export function App() {
               )}
             </section>
 
-            <aside className="space-y-5 xl:sticky xl:top-5 xl:self-start">
+            <aside className="enter enter-2 space-y-5 lg:sticky lg:top-6 lg:self-start">
               <SavedProjectsPanel
                 projects={projects}
                 projectsLoading={projectsLoading}
@@ -675,22 +676,60 @@ export function App() {
                 }}
               />
 
-              <CaseSnapshot
-                intake={intake}
-                result={result}
-                currentCoverage={currentCoverage}
-                deletingProjectId={deletingProjectId}
-                onDownloadChecklist={downloadChecklist}
-                onDeleteCurrentProject={() => {
-                  void onDeleteCurrentProject();
-                }}
-              />
+              <AnimatePresence initial={false}>
+                {!railHasCase && !railHasSignals && (
+                  <motion.section
+                    key="case-file-empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="sheet p-5"
+                  >
+                    <h2 className="text-sm font-bold text-ink">Case file</h2>
+                    <p className="mt-2 text-sm leading-6 text-ink-soft">
+                      Details appear here as the review runs.
+                    </p>
+                  </motion.section>
+                )}
 
-              <ReviewSignalsPanel prompts={assistantPrompts} />
+                {railHasCase && (
+                  <motion.div
+                    key="case-snapshot"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <CaseSnapshot
+                      intake={intake}
+                      result={result}
+                      currentCoverage={currentCoverage}
+                      deletingProjectId={deletingProjectId}
+                      onDownloadChecklist={downloadChecklist}
+                      onDeleteCurrentProject={() => {
+                        void onDeleteCurrentProject();
+                      }}
+                    />
+                  </motion.div>
+                )}
+
+                {railHasSignals && (
+                  <motion.div
+                    key="review-signals"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.45, delay: 0.07, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <ReviewSignalsPanel prompts={assistantPrompts} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </aside>
           </div>
         ) : (
-          <section className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
+          <section className="enter enter-1 grid gap-6 xl:grid-cols-[400px_minmax(0,1fr)]">
             <div className="space-y-6">
               <SourceHealthPanel
                 indexStatus={indexStatus}
