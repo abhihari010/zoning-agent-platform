@@ -9,10 +9,10 @@ export function BenchmarkMark({ className = "h-8 w-8" }: { className?: string })
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
       <rect width="32" height="32" rx="2" className="fill-spruce" />
-      <circle cx="16" cy="16" r="7" fill="none" stroke="#FAF7F0" strokeWidth="2" />
+      <circle cx="16" cy="16" r="7" fill="none" className="stroke-dusk" strokeWidth="2" />
       <path
         d="M16 3v6M16 23v6M3 16h6M23 16h6"
-        stroke="#FAF7F0"
+        className="stroke-dusk"
         strokeWidth="2"
         strokeLinecap="round"
       />

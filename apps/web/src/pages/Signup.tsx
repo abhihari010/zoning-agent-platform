@@ -1,7 +1,9 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { motion, useReducedMotion } from "motion/react";
 import { authMode } from "../api";
 import { useAuth } from "../auth/AuthContext";
+import { EASE } from "../lib/motion";
 
 function safeNext(next: string | null): string {
   if (next && next.startsWith("/") && !next.startsWith("//")) {
@@ -10,12 +12,14 @@ function safeNext(next: string | null): string {
   return "/review";
 }
 
+// Password strength maps to verdict semantics: weak = stop, fair = hold,
+// strong = ok — the same colour language the product uses for determinations.
 const STRENGTH = [
-  { label: "Too short", tone: "bg-[#C25A4A]", width: "20%" },
-  { label: "Weak", tone: "bg-[#C25A4A]", width: "40%" },
-  { label: "Fair", tone: "bg-amber", width: "62%" },
-  { label: "Good", tone: "bg-[#2E8B76]", width: "82%" },
-  { label: "Strong", tone: "bg-[#3FA98C]", width: "100%" },
+  { label: "Too short", tone: "bg-verdict-stop", width: "20%" },
+  { label: "Weak", tone: "bg-verdict-stop", width: "40%" },
+  { label: "Fair", tone: "bg-verdict-hold", width: "62%" },
+  { label: "Good", tone: "bg-verdict-ok", width: "82%" },
+  { label: "Strong", tone: "bg-verdict-ok", width: "100%" },
 ];
 
 function scorePassword(pw: string): number {
@@ -31,6 +35,7 @@ function scorePassword(pw: string): number {
 export function Signup() {
   const { signUp, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const reduce = useReducedMotion();
   const [params] = useSearchParams();
 
   const intendedAddress = params.get("address");
@@ -50,8 +55,7 @@ export function Signup() {
 
   const score = useMemo(() => scorePassword(password), [password]);
   const meter = STRENGTH[score];
-  const valid =
-    email.trim().length > 3 && password.length >= 8 && accepted;
+  const valid = email.trim().length > 3 && password.length >= 8 && accepted;
 
   if (isAuthenticated) {
     return <Navigate to={postTarget} replace />;
@@ -88,24 +92,32 @@ export function Signup() {
   return (
     <div key={shakeKey} className={error ? "shake" : undefined}>
       {hasReviewIntent && (
-        <div className="mb-4 flex items-center gap-2 rounded-sm border border-amber/30 bg-amber/10 px-3.5 py-2.5 text-[13px] leading-5 text-amber-soft">
-          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber" />
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-spruce/30 bg-spruce/10 px-3.5 py-2.5 text-[13px] leading-5 text-spruce-bright">
+          <span className="status-dot h-1.5 w-1.5 shrink-0 rounded-full bg-spruce-bright" />
           We’ll take you straight to your review after you sign up.
         </div>
       )}
 
-      <div className="rise rounded-sm border border-dusk-line bg-dusk-panel p-6 shadow-[0_24px_70px_-44px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,242,224,0.05)] md:p-8">
-        <h1 className="font-display text-2xl font-bold tracking-[-0.02em] text-paper">
+      <motion.div
+        initial={reduce ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EASE }}
+        className="rounded-xl border border-dusk-line bg-dusk-panel p-6 shadow-raised md:p-8"
+      >
+        <h1 className="font-display text-2xl font-bold tracking-display text-paper">
           Create your account
         </h1>
-        <p className="mt-1.5 text-sm leading-6 text-dusk-soft">
+        <p className="mt-2 text-sm font-light leading-6 text-dusk-soft">
           Free while in beta. Save reviews and request new jurisdictions.
         </p>
 
         {authMode !== "supabase" && (
-          <p className="mt-5 rounded-sm border border-dusk-line bg-dusk-raised/60 px-3 py-2.5 text-[13px] leading-5 text-dusk-soft">
+          <p className="mt-5 rounded-lg border border-dusk-line bg-dusk-raised/60 px-3 py-2.5 text-[13px] leading-5 text-dusk-soft">
             This deployment runs without sign-up. Head straight to{" "}
-            <Link to="/review" className="font-medium text-amber hover:underline">
+            <Link
+              to="/review"
+              className="font-medium text-spruce-bright hover:underline"
+            >
               the review tool
             </Link>
             .
@@ -163,22 +175,23 @@ export function Signup() {
           <label className="mt-5 flex cursor-pointer items-start gap-2.5 text-sm leading-6 text-dusk-soft">
             <input
               type="checkbox"
-              className="mt-1 h-4 w-4 shrink-0 accent-amber"
+              className="mt-1 h-4 w-4 shrink-0 accent-spruce"
               checked={accepted}
               onChange={(event) => setAccepted(event.target.checked)}
             />
             <span>
-              I understand this tool gives educational guidance, not legal approval.
+              I understand this tool gives educational guidance, not legal
+              approval.
             </span>
           </label>
 
           {error && (
-            <p className="mt-4 rounded-sm border border-verdict-stop/40 bg-verdict-stop/15 px-3 py-2.5 text-sm leading-5 text-[#F0A895]">
+            <p className="mt-4 rounded-lg border border-verdict-stop/40 bg-verdict-stop/12 px-3 py-2.5 text-sm leading-5 text-verdict-stop">
               {error}
             </p>
           )}
           {notice && (
-            <p className="mt-4 rounded-sm border border-amber/25 bg-amber/10 px-3 py-2.5 text-sm leading-5 text-dusk-soft">
+            <p className="mt-4 rounded-lg border border-spruce/25 bg-spruce/10 px-3 py-2.5 text-sm leading-5 text-dusk-soft">
               {notice}
             </p>
           )}
@@ -186,16 +199,19 @@ export function Signup() {
           <button
             type="submit"
             disabled={!valid || submitting}
-            className="btn-primary mt-6 w-full py-3 transition-[transform,background-color,border-color,color,filter,opacity,box-shadow] duration-med"
+            className="btn-primary mt-6 w-full py-3"
           >
             {submitting ? "Creating account…" : "Create account"}
           </button>
         </form>
-      </div>
+      </motion.div>
 
       <p className="mt-5 text-center text-sm text-dusk-soft">
         Already have an account?{" "}
-        <Link to="/login" className="font-semibold text-amber hover:underline">
+        <Link
+          to="/login"
+          className="font-semibold text-spruce-bright hover:underline"
+        >
           Log in
         </Link>
       </p>

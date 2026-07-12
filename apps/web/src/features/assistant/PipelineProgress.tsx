@@ -36,7 +36,7 @@ function displayStatus(
 function stageTag(status: StageDisplay): string {
   switch (status) {
     case "working":
-      return "tag-neutral border-spruce/40 text-spruce";
+      return "tag-neutral border-spruce/40 text-spruce-bright";
     case "completed":
       return "tag-ok";
     case "warning":
@@ -88,7 +88,7 @@ export function PipelineProgress({
                   isActive
                     ? "survey-pulse border-spruce bg-spruce text-white"
                     : status === "completed"
-                      ? "border-spruce/40 bg-spruce-wash text-spruce"
+                      ? "border-spruce/40 bg-spruce-wash text-spruce-bright"
                       : "border-rule bg-well text-ink-faint"
                 }`}
               >

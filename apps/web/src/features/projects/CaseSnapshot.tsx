@@ -62,7 +62,7 @@ export function CaseSnapshot({
               </p>
               {(intake.planningContact?.url || currentCoverage?.planningContact.url) && (
                 <a
-                  className="mt-1.5 inline-flex text-[13px] font-medium text-spruce underline-offset-2 hover:underline"
+                  className="mt-1.5 inline-flex text-[13px] font-medium text-spruce-bright underline-offset-2 hover:underline"
                   href={intake.planningContact?.url ?? currentCoverage?.planningContact.url}
                   target="_blank"
                   rel="noreferrer"

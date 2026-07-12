@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { motion, useReducedMotion } from "motion/react";
 import { authMode } from "../api";
 import { useAuth } from "../auth/AuthContext";
+import { EASE } from "../lib/motion";
 
 /** Only allow same-origin absolute paths as a redirect target (no open redirects). */
 function safeNext(next: string | null): string {
@@ -14,6 +16,7 @@ function safeNext(next: string | null): string {
 export function Login() {
   const { signIn, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const reduce = useReducedMotion();
   const [params] = useSearchParams();
   const next = safeNext(params.get("next"));
 
@@ -55,18 +58,26 @@ export function Login() {
 
   return (
     <div key={shakeKey} className={error ? "shake" : undefined}>
-      <div className="rise rounded-sm border border-dusk-line bg-dusk-panel p-6 shadow-[0_24px_70px_-44px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,242,224,0.05)] md:p-8">
-        <h1 className="font-display text-2xl font-bold tracking-[-0.02em] text-paper">
+      <motion.div
+        initial={reduce ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: EASE }}
+        className="rounded-xl border border-dusk-line bg-dusk-panel p-6 shadow-raised md:p-8"
+      >
+        <h1 className="font-display text-2xl font-bold tracking-display text-paper">
           Log in to Zoning Review
         </h1>
-        <p className="mt-1.5 text-sm leading-6 text-dusk-soft">
+        <p className="mt-2 text-sm font-light leading-6 text-dusk-soft">
           Reopen saved reviews and request coverage for new jurisdictions.
         </p>
 
         {authMode !== "supabase" && (
-          <p className="mt-5 rounded-sm border border-dusk-line bg-dusk-raised/60 px-3 py-2.5 text-[13px] leading-5 text-dusk-soft">
+          <p className="mt-5 rounded-lg border border-dusk-line bg-dusk-raised/60 px-3 py-2.5 text-[13px] leading-5 text-dusk-soft">
             This deployment runs without sign-in. Head straight to{" "}
-            <Link to="/review" className="font-medium text-amber hover:underline">
+            <Link
+              to="/review"
+              className="font-medium text-spruce-bright hover:underline"
+            >
               the review tool
             </Link>
             .
@@ -93,7 +104,11 @@ export function Login() {
               </label>
               <button
                 type="button"
-                onClick={() => setError("Password reset isn’t available yet — contact the operator.")}
+                onClick={() =>
+                  setError(
+                    "Password reset isn’t available yet — contact the operator.",
+                  )
+                }
                 className="text-[13px] font-medium text-dusk-faint transition-colors duration-fast hover:text-dusk-soft"
               >
                 Forgot password?
@@ -110,22 +125,26 @@ export function Login() {
           </div>
 
           {error && (
-            <p className="mt-4 rounded-sm border border-verdict-stop/40 bg-verdict-stop/15 px-3 py-2.5 text-sm leading-5 text-[#F0A895]">
+            <p className="mt-4 rounded-lg border border-verdict-stop/40 bg-verdict-stop/12 px-3 py-2.5 text-sm leading-5 text-verdict-stop">
               {error}
             </p>
           )}
 
-          <button type="submit" disabled={submitting} className="btn-primary mt-6 w-full py-3">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="btn-primary mt-6 w-full py-3"
+          >
             {submitting ? "Logging in…" : "Log in"}
           </button>
         </form>
-      </div>
+      </motion.div>
 
       <p className="mt-5 text-center text-sm text-dusk-soft">
         New here?{" "}
         <Link
           to={`/signup${params.get("next") ? `?next=${encodeURIComponent(params.get("next") ?? "")}` : ""}`}
-          className="font-semibold text-amber hover:underline"
+          className="font-semibold text-spruce-bright hover:underline"
         >
           Create an account
         </Link>
