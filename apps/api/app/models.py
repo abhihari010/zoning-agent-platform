@@ -473,7 +473,6 @@ class CurrentUserResponse(BaseModel):
     email: str | None = None
     role: Literal["anonymous", "user", "admin"] = "anonymous"
     auth_mode: Literal["disabled", "supabase"] = "disabled"
-    public_signups_enabled: bool = True
 
 
 class ProjectSummary(BaseModel):

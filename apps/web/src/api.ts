@@ -67,7 +67,6 @@ export interface CurrentUser {
   email?: string | null;
   role: "anonymous" | "user" | "admin";
   authMode: "disabled" | "supabase";
-  publicSignupsEnabled: boolean;
 }
 
 export interface ProjectSummary {
@@ -275,14 +274,12 @@ export async function fetchCurrentUser(): Promise<CurrentUser> {
     email?: string | null;
     role: CurrentUser["role"];
     auth_mode: CurrentUser["authMode"];
-    public_signups_enabled: boolean;
   };
   return {
     userId: payload.user_id,
     email: payload.email,
     role: payload.role,
     authMode: payload.auth_mode,
-    publicSignupsEnabled: payload.public_signups_enabled,
   };
 }
 
