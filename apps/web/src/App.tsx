@@ -50,7 +50,7 @@ import { PipelineProgress } from "./features/assistant/PipelineProgress";
 import { ProjectIntakePanel } from "./features/assistant/ProjectIntakePanel";
 import { CaseSnapshot } from "./features/projects/CaseSnapshot";
 import { ReviewSignalsPanel } from "./features/projects/ReviewSignalsPanel";
-import { SavedProjectsPanel } from "./features/projects/SavedProjectsPanel";
+import { SavedReviewsPage } from "./features/projects/SavedReviewsPage";
 import { ClarificationModal } from "./features/results/ClarificationModal";
 import { ResultSection } from "./features/results/ResultSection";
 import { useAddressAutocomplete } from "./hooks/useAddressAutocomplete";
@@ -89,9 +89,15 @@ export function App() {
   // Workspace is driven by the route (/review vs /admin) so navigation and the
   // header tabs stay in sync and deep links work.
   const workspace: Workspace =
-    location.pathname === "/admin" ? "admin" : "assistant";
+    location.pathname === "/admin"
+      ? "admin"
+      : location.pathname === "/reviews"
+        ? "saved"
+        : "assistant";
   const setWorkspace = (next: Workspace) =>
-    navigate(next === "admin" ? "/admin" : "/review");
+    navigate(
+      next === "admin" ? "/admin" : next === "saved" ? "/reviews" : "/review",
+    );
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
   const [projectDescription, setProjectDescription] = useState("");
   const [intakeFacts, setIntakeFacts] = useState<IntakeFacts>(emptyIntakeFacts);
@@ -664,18 +670,6 @@ export function App() {
             </section>
 
             <aside className="enter enter-2 space-y-5 lg:sticky lg:top-6 lg:self-start">
-              <SavedProjectsPanel
-                projects={projects}
-                projectsLoading={projectsLoading}
-                projectsMessage={projectsMessage}
-                onRefresh={() => {
-                  void refreshProjects();
-                }}
-                onOpenProject={(project) => {
-                  void openSavedProject(project);
-                }}
-              />
-
               <AnimatePresence initial={false}>
                 {!railHasCase && !railHasSignals && (
                   <motion.section
@@ -728,6 +722,18 @@ export function App() {
               </AnimatePresence>
             </aside>
           </div>
+        ) : workspace === "saved" ? (
+          <SavedReviewsPage
+            projects={projects}
+            projectsLoading={projectsLoading}
+            projectsMessage={projectsMessage}
+            onRefresh={() => {
+              void refreshProjects();
+            }}
+            onOpenProject={(project) => {
+              void openSavedProject(project);
+            }}
+          />
         ) : (
           <section className="enter enter-1 grid gap-6 xl:grid-cols-[400px_minmax(0,1fr)]">
             <div className="space-y-6">

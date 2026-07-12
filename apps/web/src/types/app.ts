@@ -1,7 +1,7 @@
 import type { AnalyzeResponse, PipelineStageReport } from "@zoning-agent/shared-schema";
 import type { IntakeResponse } from "../api";
 
-export type Workspace = "assistant" | "admin";
+export type Workspace = "assistant" | "saved" | "admin";
 export type Phase = "idle" | "intake" | "analyzing" | "done" | "error";
 export type FeedbackState = "idle" | "submitting" | "submitted";
 export type ResultView = "checklist" | "evidence" | "trace";

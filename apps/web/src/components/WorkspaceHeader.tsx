@@ -22,6 +22,7 @@ export function BenchmarkMark({ className = "h-8 w-8" }: { className?: string })
 
 const WORKSPACE_TABS: Array<{ key: Workspace; label: string }> = [
   { key: "assistant", label: "Review" },
+  { key: "saved", label: "Saved reviews" },
   { key: "admin", label: "Source admin" },
 ];
 
@@ -138,8 +139,16 @@ export function WorkspaceHeader({
   onWorkspaceChange: (workspace: Workspace) => void;
   onSignOut: () => void;
 }) {
+  // Review is always shown; Saved reviews needs Supabase-backed accounts, and
+  // Source admin is admin-only. Hide the whole nav when only Review qualifies.
+  const visibleTabs = WORKSPACE_TABS.filter((tab) => {
+    if (tab.key === "saved") return authMode === "supabase";
+    if (tab.key === "admin") return canUseAdminTools;
+    return true;
+  });
+
   return (
-    <header className="border-b border-rule bg-sheet">
+    <header className="relative z-40 border-b border-rule bg-sheet">
       <div className="mx-auto flex max-w-[1040px] flex-wrap items-stretch gap-x-8 gap-y-0 px-4 md:px-6">
         <Link to="/" className="flex items-center gap-3 py-3.5" aria-label="Zoning Review home">
           <BenchmarkMark className="h-7 w-7" />
@@ -148,9 +157,9 @@ export function WorkspaceHeader({
           </p>
         </Link>
 
-        {canUseAdminTools && (
+        {visibleTabs.length > 1 && (
           <nav className="flex items-stretch" aria-label="Workspace">
-            {WORKSPACE_TABS.map((tab) => {
+            {visibleTabs.map((tab) => {
               const isActive = workspace === tab.key;
               return (
                 <button
