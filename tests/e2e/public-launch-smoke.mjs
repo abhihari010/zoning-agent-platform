@@ -252,7 +252,6 @@ async function installApiMocks(targetPage) {
           email: supabaseUserEmail || "e2e@example.com",
           role: "user",
           auth_mode: "disabled",
-          public_signups_enabled: true,
         }),
       );
       return;

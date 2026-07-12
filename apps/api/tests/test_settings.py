@@ -33,7 +33,6 @@ def _clear_provider_env(monkeypatch: pytest.MonkeyPatch) -> None:
         "SUPABASE_JWT_SECRET",
         "CORS_ALLOW_ORIGINS",
         "ADMIN_USER_EMAILS",
-        "PUBLIC_SIGNUPS_ENABLED",
         "DAILY_ANALYSIS_LIMIT_FREE",
         "DAILY_PROJECT_LIMIT_FREE",
     ]:
@@ -140,7 +139,6 @@ def test_settings_reads_public_auth_configuration(monkeypatch: pytest.MonkeyPatc
     monkeypatch.setenv("SUPABASE_PROJECT_URL", "https://example.supabase.co/")
     monkeypatch.setenv("SUPABASE_JWT_SECRET", "jwt-secret")
     monkeypatch.setenv("ADMIN_USER_EMAILS", "Admin@Example.com, ops@example.com")
-    monkeypatch.setenv("PUBLIC_SIGNUPS_ENABLED", "false")
     monkeypatch.setenv("DAILY_ANALYSIS_LIMIT_FREE", "3")
     monkeypatch.setenv("DAILY_PROJECT_LIMIT_FREE", "4")
 
@@ -151,7 +149,6 @@ def test_settings_reads_public_auth_configuration(monkeypatch: pytest.MonkeyPatc
     assert settings.supabase_project_url == "https://example.supabase.co"
     assert settings.supabase_jwt_secret == "jwt-secret"
     assert settings.admin_user_emails == ("admin@example.com", "ops@example.com")
-    assert settings.public_signups_enabled is False
     assert settings.daily_analysis_limit_free == 3
     assert settings.daily_project_limit_free == 4
 

@@ -118,7 +118,6 @@ def get_me(request: Request) -> CurrentUserResponse:
         email=auth.email,
         role=auth.role,
         auth_mode=auth.auth_mode if auth.auth_mode != "disabled" else settings.auth_provider,
-        public_signups_enabled=settings.public_signups_enabled,
     )
 
 
