@@ -1,0 +1,21 @@
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    name: Ping production
+    runs-on: ubuntu-latest
+    steps:
+      # --max-time 90 + retries tolerate Render free-tier cold starts (~50s spin-up)
+      - name: API /health
+        run: >
+          curl -fsS --retry 3 --retry-delay 20 --retry-all-errors --max-time 90
+          https://zoning-agent-api.onrender.com/health
+      - name: Web
+        run: >
+          curl -fsS --retry 3 --retry-delay 10 --retry-all-errors --max-time 30
+          -o /dev/null https://zoning-agent-platform.vercel.app
