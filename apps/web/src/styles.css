@@ -245,7 +245,12 @@
    block at the bottom disables it wholesale. ----------------------------- */
 
 .enter {
-  animation: enter 520ms var(--ease-out-expo) both;
+  /* `backwards`, not `both`: the animation ends at the natural style, and a
+     forward fill keeps the transform "applied" (a permanent stacking context
+     that traps z-indexed children — the account-menu dropdown was painting
+     under the sticky case-file rail). Backwards fill still hides the element
+     during its stagger delay. */
+  animation: enter 520ms var(--ease-out-expo) backwards;
 }
 .enter-1 {
   animation-delay: 70ms;
@@ -264,12 +269,16 @@
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    /* `none`, not translateY(0): fill-mode `both` keeps the final keyframe
+       applied forever, and any non-none transform creates a permanent
+       stacking context that traps z-indexed children (the account-menu
+       dropdown was painting under the sticky case-file rail). */
+    transform: none;
   }
 }
 
 .rise {
-  animation: enter 260ms var(--ease-out-expo) both;
+  animation: enter 260ms var(--ease-out-expo) backwards;
 }
 
 /* Scroll-reveal (IntersectionObserver toggles .is-visible). Enhances an
