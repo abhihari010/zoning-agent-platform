@@ -388,7 +388,7 @@ function ChecklistView({ result }: { result: AnalyzeResponse }) {
                 className="absolute left-[13px] top-8 h-[calc(100%-2rem)] w-px bg-rule"
               />
             )}
-            <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-spruce/40 bg-spruce-wash font-mono text-[11px] font-semibold text-spruce">
+            <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-spruce/40 bg-spruce-wash font-mono text-[11px] font-semibold text-spruce-bright">
               {String(step.order).padStart(2, "0")}
             </span>
             <div className="min-w-0 flex-1 pt-0.5">

@@ -152,7 +152,7 @@ export function EvidencePanel({ citations }: { citations: SourceCitation[] }) {
             <span>Type: {citation.sourceType ?? "registry"}</span>
             {citation.url && (
               <a
-                className="font-medium text-spruce underline-offset-2 hover:underline"
+                className="font-medium text-spruce-bright underline-offset-2 hover:underline"
                 href={citation.url}
                 target="_blank"
                 rel="noreferrer"

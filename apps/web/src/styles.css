@@ -1,32 +1,45 @@
-@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    color-scheme: light;
+    color-scheme: dark;
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
     --dur-fast: 150ms;
-    --dur-med: 250ms;
-    --dur-slow: 450ms;
+    --dur-med: 260ms;
+    --dur-slow: 520ms;
+    /* Semantic z-scale — never arbitrary 999s. */
+    --z-dropdown: 30;
+    --z-sticky: 40;
+    --z-backdrop: 50;
+    --z-modal: 60;
+    --z-toast: 70;
   }
 
   html {
     @apply scroll-smooth;
   }
 
+  /* Lenis smooth-scroll: hand scroll control to Lenis while it is mounted. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
   body {
-    @apply m-0 bg-paper font-sans text-[15px] leading-[1.55] text-ink antialiased;
-    /* Warm survey grid on the page background only — never inside cards.
-       Bumped from the pale v2 value so it actually reads (brief §0). */
-    background-image:
-      linear-gradient(to right, rgba(36, 28, 21, 0.06) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(36, 28, 21, 0.06) 1px, transparent 1px);
-    background-size: 34px 34px;
-    background-attachment: fixed;
+    /* Inter body, comfortable measure. Light aesthetic; small UI text stays 400
+       for legibility, large landing prose opts into font-light where it reads. */
+    @apply m-0 bg-dusk font-sans text-[15px] font-normal leading-[1.65] text-ink antialiased;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   * {
@@ -35,28 +48,30 @@
 
   h1,
   h2,
-  h3 {
-    @apply font-display;
+  h3,
+  h4 {
+    @apply font-display font-bold tracking-display;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   ::selection {
-    background: rgba(15, 94, 78, 0.18);
+    background: rgba(91, 140, 255, 0.26);
+    color: #f4f6fb;
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-spruce ring-offset-2 ring-offset-paper;
-  }
-
-  .dusk-bg :focus-visible {
-    @apply ring-amber ring-offset-dusk;
+    @apply outline-none ring-2 ring-spruce/70 ring-offset-2 ring-offset-dusk;
   }
 }
 
 @layer components {
-  /* Cards read as documents on a desk: white, 1px warm border, drafted 2px
-     corners, hard shadow. Hover lifts 1px with the border darkening. */
+  /* Cards: cool panel, hairline border, soft ambient depth. Hover lifts 1px. */
   .sheet {
-    @apply rounded-sm border border-rule bg-sheet shadow-sheet transition-[border-color,transform,box-shadow] duration-200 ease-out;
+    @apply rounded-lg border border-rule bg-sheet shadow-sheet transition-[border-color,transform,box-shadow] duration-med ease-out;
   }
 
   .sheet:hover {
@@ -64,16 +79,17 @@
   }
 
   .sheet-title {
-    @apply font-display text-lg font-bold leading-snug tracking-[-0.01em] text-ink;
+    @apply font-display text-lg font-bold leading-snug tracking-display text-ink;
   }
 
+  /* Uppercase micro-label — wide tracking, used sparingly (not on every section). */
   .eyebrow {
-    @apply font-sans text-[11px] font-semibold uppercase tracking-[0.12em] text-spruce;
+    @apply font-sans text-[11px] font-semibold uppercase tracking-label text-spruce-bright;
   }
 
-  /* Record voice: mono reserved for record data only. */
+  /* Mono reserved for record data (§ refs, dates, IDs). */
   .tag {
-    @apply inline-flex items-center gap-1.5 rounded-sm border px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide;
+    @apply inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 font-mono text-[11px] font-medium uppercase tracking-wide;
   }
 
   .tag-neutral {
@@ -93,17 +109,16 @@
   }
 
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-sm border px-4 py-2.5 text-sm font-semibold transition-[transform,background-color,border-color,color,filter,opacity,box-shadow] duration-fast ease-out active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-md border px-4 py-2.5 text-sm font-semibold transition-[transform,background-color,border-color,color,box-shadow] duration-fast ease-out active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
   }
 
-  /* One primary style: solid, saturated accent — the clear thing to click
-     (brief §0). */
+  /* One primary style: solid azure, faint top highlight, glow on hover. */
   .btn-primary {
-    @apply btn border-spruce bg-spruce text-white shadow-[0_1px_0_rgba(11,74,62,0.6)] hover:-translate-y-px hover:bg-spruce-deep hover:border-spruce-deep;
+    @apply btn border-spruce bg-spruce text-dusk-deep shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] hover:-translate-y-px hover:bg-spruce-bright hover:shadow-[0_10px_30px_-12px_rgba(91,140,255,0.7)];
   }
 
   .btn-outline {
-    @apply btn border-rule-strong bg-sheet text-ink hover:border-ink-faint hover:bg-well;
+    @apply btn border-rule-strong bg-well/60 text-ink hover:border-ink-faint hover:bg-well;
   }
 
   .btn-quiet {
@@ -119,44 +134,41 @@
   }
 
   .field {
-    @apply mt-1.5 w-full rounded-sm border border-rule-strong bg-sheet px-3.5 py-2.5 text-[15px] text-ink shadow-[0_0_0_0_rgba(15,94,78,0)] placeholder:text-ink-faint transition-[border-color,box-shadow] duration-fast ease-out focus:border-spruce focus:outline-none focus:shadow-[0_0_0_2px_rgba(15,94,78,0.25)];
+    @apply mt-1.5 w-full rounded-md border border-rule-strong bg-well px-3.5 py-2.5 text-[15px] text-ink placeholder:text-ink-faint transition-[border-color,box-shadow] duration-fast ease-out focus:border-spruce focus:outline-none focus:shadow-[0_0_0_3px_rgba(91,140,255,0.22)];
   }
 
-  /* Dusk auth fields — same shape, warm-dark surface, amber focus glow. */
   .field-label-dusk {
     @apply block text-sm font-medium text-dusk-soft;
   }
 
   .field-dusk {
-    @apply mt-1.5 w-full rounded-sm border border-dusk-line bg-dusk-panel px-3.5 py-2.5 text-[15px] text-paper placeholder:text-dusk-faint transition-[border-color,box-shadow] duration-fast ease-out focus:border-amber focus:outline-none focus:shadow-[0_0_0_2px_rgba(231,162,78,0.28)];
+    @apply mt-1.5 w-full rounded-md border border-dusk-line bg-dusk-panel px-3.5 py-2.5 text-[15px] text-paper placeholder:text-dusk-faint transition-[border-color,box-shadow] duration-fast ease-out focus:border-spruce focus:outline-none focus:shadow-[0_0_0_3px_rgba(91,140,255,0.22)];
   }
 
-  /* Selectable chip (employees, construction scope, food question). */
+  /* Selectable chip. */
   .chip {
-    @apply inline-flex cursor-pointer items-center rounded-sm border border-rule-strong bg-sheet px-3 py-1.5 text-[13px] font-medium text-ink-soft transition-[background-color,border-color,color,transform] duration-fast ease-out hover:border-ink-faint hover:text-ink active:scale-[0.97];
+    @apply inline-flex cursor-pointer items-center rounded-md border border-rule-strong bg-well px-3 py-1.5 text-[13px] font-medium text-ink-soft transition-[background-color,border-color,color,transform] duration-fast ease-out hover:border-ink-faint hover:text-ink active:scale-[0.97];
   }
 
   .chip[aria-pressed="true"] {
-    @apply border-spruce bg-spruce-wash text-spruce;
+    @apply border-spruce bg-spruce/10 text-spruce-bright;
   }
 
-  /* The signature: a rubber determination stamp. Rotated −2°, letterspaced,
-     1.5px border with an inner ring, slight ink-press texture (brief §0). */
+  /* Determination stamp — technical, monospaced, slight rotate + inner ring. */
   .stamp {
-    @apply relative inline-flex -rotate-2 flex-col items-center border-[1.5px] px-6 py-3 font-mono font-semibold uppercase tracking-[0.14em];
-    text-shadow: 0 0 1px currentColor;
+    @apply relative inline-flex -rotate-2 flex-col items-center rounded-sm border-[1.5px] px-6 py-3 font-mono font-semibold uppercase tracking-[0.14em];
+    text-shadow: 0 0 12px currentColor;
   }
 
   .stamp::before {
     content: "";
-    @apply pointer-events-none absolute inset-[3px] rounded-sm border border-current opacity-40;
+    @apply pointer-events-none absolute inset-[3px] rounded-[3px] border border-current opacity-40;
   }
 
   .tabular {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Marketing surface helpers */
   .marketing-link {
     @apply relative text-sm font-medium text-ink-soft transition-colors duration-fast ease-out hover:text-ink;
   }
@@ -166,54 +178,59 @@
   }
 }
 
-/* ---- Dusk (dark surface: marketing landing + auth) ---- */
+/* ---- Dusk surface (marketing landing + auth) ---------------------------- */
 
-/* Warm charcoal with depth from light, not pattern (de-card brief §1): a warm
-   ember pool seated top-right behind the hero record, a faint second warmth
-   low-left so the base never reads flat, and a soft top/bottom vignette. No
-   grid, no repeating texture. */
+/* Cool near-black with depth from light: an azure pool top-right behind the
+   hero, a fainter cool wash low-left, and a soft top/bottom vignette. No grid,
+   no repeating texture. Fixed attachment so the glow anchors to the viewport. */
 .dusk-bg {
-  background-color: #1a1613;
+  background-color: #0a0b0f;
   background-image:
     radial-gradient(
-      58% 48% at 84% 2%,
-      rgba(231, 162, 78, 0.2),
-      rgba(231, 162, 78, 0) 62%
+      60% 50% at 82% -4%,
+      rgba(91, 140, 255, 0.16),
+      rgba(91, 140, 255, 0) 60%
     ),
     radial-gradient(
-      52% 44% at 6% 106%,
-      rgba(199, 127, 46, 0.1),
-      rgba(199, 127, 46, 0) 60%
+      50% 44% at 2% 104%,
+      rgba(91, 140, 255, 0.07),
+      rgba(91, 140, 255, 0) 58%
     ),
     linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.34) 0%,
-      rgba(0, 0, 0, 0) 18%,
-      rgba(0, 0, 0, 0) 74%,
-      rgba(0, 0, 0, 0.26) 100%
+      rgba(0, 0, 0, 0.4) 0%,
+      rgba(0, 0, 0, 0) 16%,
+      rgba(0, 0, 0, 0) 76%,
+      rgba(0, 0, 0, 0.3) 100%
     );
-  background-attachment: fixed, fixed, scroll;
+  background-attachment: scroll;
 }
 
-/* Warm ambient halo + a 1px lighter-warm top-edge highlight so the hero record
-   catches light like a real card (de-card brief §3). */
+/* Parallax-anchored glow only on desktop pointer devices — fixed attachment
+   repaints the full-viewport gradients on every scroll frame, which janks on
+   mobile. Mobile keeps the same look, just scroll-attached. */
+@media (min-width: 768px) and (hover: hover) {
+  .dusk-bg {
+    background-attachment: fixed, fixed, scroll;
+  }
+}
+
+/* Azure ambient halo + top-edge highlight so a hero surface catches light. */
 .dusk-halo {
   box-shadow:
-    0 34px 90px -38px rgba(231, 162, 78, 0.24),
-    0 2px 0 rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 242, 224, 0.07);
+    0 40px 100px -44px rgba(91, 140, 255, 0.28),
+    0 2px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-/* The determination stamp: a subtle dark-mode glow only — the land animation
-   sells the "thunk", not the glow (de-card brief §5). */
 .stamp-glow {
   box-shadow:
-    0 0 14px -6px rgba(46, 139, 118, 0.45),
-    inset 0 0 10px -8px rgba(46, 139, 118, 0.5);
+    0 0 24px -8px rgba(74, 222, 158, 0.5),
+    inset 0 0 14px -10px rgba(74, 222, 158, 0.6);
 }
 
-/* Pipeline connector line that draws left→right (desktop) / top→down (mobile)
-   as the "how it works" sequence scrolls in — one pass through the pipeline. */
+/* Pipeline connector that draws in as the sequence scrolls (fallback when GSAP
+   is not driving it). */
 .pipe-line {
   transform: scaleX(0);
   transform-origin: left center;
@@ -224,22 +241,18 @@
   transform: scaleX(1);
 }
 
-/* ---- Motion layer (brief §5). Everything below is decoration for sighted,
-   motion-tolerant users; the reduced-motion block disables it wholesale. ---- */
+/* ---- Motion layer. Decoration for motion-tolerant users; the reduced-motion
+   block at the bottom disables it wholesale. ----------------------------- */
 
-/* A. Page-load entrance: fade + 12px rise, header → main → rail. */
 .enter {
-  animation: enter 450ms var(--ease-out-expo) both;
+  animation: enter 520ms var(--ease-out-expo) both;
 }
-
 .enter-1 {
   animation-delay: 70ms;
 }
-
 .enter-2 {
   animation-delay: 140ms;
 }
-
 .enter-3 {
   animation-delay: 210ms;
 }
@@ -247,7 +260,7 @@
 @keyframes enter {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
@@ -255,19 +268,18 @@
   }
 }
 
-/* Small entrance for overlays (modals, dropdowns). */
 .rise {
-  animation: enter 250ms var(--ease-out-expo) both;
+  animation: enter 260ms var(--ease-out-expo) both;
 }
 
-/* Scroll-reveal for marketing sections: fade + 12px rise, fired once by an
-   IntersectionObserver that toggles .is-visible (brief §2). */
+/* Scroll-reveal (IntersectionObserver toggles .is-visible). Enhances an
+   already-laid-out element — never gates content visibility on JS. */
 .reveal {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(16px);
   transition:
-    opacity 550ms var(--ease-out-expo),
-    transform 550ms var(--ease-out-expo);
+    opacity 620ms var(--ease-out-expo),
+    transform 620ms var(--ease-out-expo);
   will-change: opacity, transform;
 }
 
@@ -276,7 +288,6 @@
   transform: none;
 }
 
-/* Active pipeline-stage marker while the review runs. */
 .survey-pulse {
   animation: survey-pulse 1.1s ease-in-out infinite;
 }
@@ -291,24 +302,46 @@
   }
 }
 
-/* B. In-review progress line: the one permitted gradient. */
+/* Pulsing status dot (marketing "Live" badge, active states). */
+.status-dot {
+  position: relative;
+}
+.status-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: status-ping 2s var(--ease-out-expo) infinite;
+}
+@keyframes status-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* In-review progress line: the one permitted sweep. */
 .review-line {
   @apply pointer-events-none absolute inset-x-0 top-0 h-0.5 overflow-hidden;
 }
-
 .review-line::after {
   content: "";
   @apply absolute inset-y-0 w-1/3;
   background: linear-gradient(
     90deg,
     transparent,
-    #0f5e4e 45%,
-    #2e8b76 55%,
+    #5b8cff 45%,
+    #93b2ff 55%,
     transparent
   );
   animation: review-sweep 1.8s var(--ease-in-out) infinite;
 }
-
 @keyframes review-sweep {
   from {
     left: -33%;
@@ -318,11 +351,9 @@
   }
 }
 
-/* C. Stamp impact: one-frame 1px shake of the card when the stamp lands. */
 .stamp-impact {
   animation: stamp-impact 120ms steps(2, end) 1;
 }
-
 @keyframes stamp-impact {
   0% {
     transform: translateY(0);
@@ -335,11 +366,9 @@
   }
 }
 
-/* Auth failure: the whole form shakes 1px once (brief §3, Linear-style). */
 .shake {
   animation: shake 320ms var(--ease-in-out) 1;
 }
-
 @keyframes shake {
   0%,
   100% {
@@ -359,13 +388,11 @@
   }
 }
 
-/* Acknowledgment checkmark draws in via stroke-dashoffset. */
 .check-draw {
   stroke-dasharray: 20;
   stroke-dashoffset: 20;
   transition: stroke-dashoffset 200ms var(--ease-out-expo);
 }
-
 .check-draw[data-checked="true"] {
   stroke-dashoffset: 0;
 }
@@ -374,56 +401,42 @@
   html {
     scroll-behavior: auto;
   }
-
   .enter,
   .rise {
     animation: none;
   }
-
   .reveal {
     opacity: 1;
     transform: none;
     transition: none;
   }
-
   .pipe-line {
     transform: scaleX(1);
     transition: none;
   }
-
-  .btn:hover {
-    transform: none;
-  }
-
-  .survey-pulse {
-    animation: none;
-  }
-
-  .review-line::after {
-    animation: none;
-    left: 0;
-    width: 100%;
-    background: #0f5e4e;
-  }
-
-  .stamp-impact,
-  .shake {
-    animation: none;
-  }
-
-  .check-draw {
-    transition: none;
-  }
-
+  .btn:hover,
   .sheet,
   .sheet:hover {
     transform: none;
   }
-
-  .btn {
-    @apply active:scale-100;
+  .survey-pulse,
+  .status-dot::after {
+    animation: none;
   }
-
+  .review-line::after {
+    animation: none;
+    left: 0;
+    width: 100%;
+    background: #5b8cff;
+  }
+  .stamp-impact,
+  .shake {
+    animation: none;
+  }
+  .check-draw {
+    transition: none;
+  }
+  .btn,
   .chip {
     @apply active:scale-100;
   }

@@ -99,7 +99,7 @@ export function ProjectIntakePanel({
           className={`stamp mt-1 shrink-0 px-3 py-1.5 text-[10px] tracking-[0.22em] ${
             busy
               ? "border-verdict-hold/60 text-verdict-hold"
-              : "border-spruce/50 text-spruce"
+              : "border-spruce/50 text-spruce-bright"
           }`}
         >
           {busy ? "In review" : "Ready"}
@@ -300,11 +300,10 @@ function AcknowledgmentCheckbox({
         <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none">
           <path
             d="M2.5 6.5L5 9l4.5-6"
-            stroke="#FFFFFF"
             strokeWidth="1.8"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="check-draw"
+            className="check-draw stroke-paper"
             data-checked={checked}
           />
         </svg>

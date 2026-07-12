@@ -39,7 +39,7 @@ export function SavedProjectsPanel({
                   onClick={() => onOpenProject(project)}
                   className="group w-full py-3 text-left transition-colors duration-150 ease-out first:pt-0"
                 >
-                  <p className="truncate font-mono text-[13px] font-medium text-ink group-hover:text-spruce">
+                  <p className="truncate font-mono text-[13px] font-medium text-ink group-hover:text-spruce-bright">
                     {project.normalizedAddress}
                   </p>
                   <p className="mt-1 text-xs text-ink-faint">

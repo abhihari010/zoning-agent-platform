@@ -34,6 +34,11 @@ export function DeterminationCard({ dusk = false }: { dusk?: boolean }) {
   const [impact, setImpact] = useState(false);
   const cardRef = useRef<HTMLDivElement | null>(null);
 
+  // Play the scripted demo exactly once on mount. Deliberately NOT keyed on
+  // `reduce`: re-running when useReducedMotion() settles would clear the timers
+  // and reschedule the whole sequence — the "loads again, plays again" bug.
+  // StrictMode's dev double-invoke is safe: cleanup clears the first pass, the
+  // second reschedules, so it still plays a single time.
   useEffect(() => {
     if (reduce) {
       setStep(5);
@@ -47,7 +52,8 @@ export function DeterminationCard({ dusk = false }: { dusk?: boolean }) {
     timers.push(window.setTimeout(() => setStep(4), 3850));
     timers.push(window.setTimeout(() => setStep(5), 4250));
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [reduce]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Typewriter for the address once step 1 begins.
   useEffect(() => {
@@ -79,7 +85,7 @@ export function DeterminationCard({ dusk = false }: { dusk?: boolean }) {
         project: "text-paper/90",
         rule: "border-dusk-line",
         chip: "border-dusk-line bg-dusk-raised/60 text-dusk-soft",
-        stamp: "stamp-glow border-[#2E8B76] text-[#5FC7A9] tracking-[0.22em]",
+        stamp: "stamp-glow border-verdict-ok/40 text-verdict-ok tracking-[0.22em]",
         row: "border-dusk-line bg-dusk-raised/40",
         rowRef: "text-amber",
         rowTitle: "text-paper",
@@ -106,7 +112,7 @@ export function DeterminationCard({ dusk = false }: { dusk?: boolean }) {
       ref={cardRef}
       animate={impact ? { y: [0, 1, 0] } : undefined}
       transition={{ duration: 0.12 }}
-      className={`relative w-full overflow-hidden rounded-sm border ${t.shell}`}
+      className={`relative min-h-[464px] w-full overflow-hidden rounded-sm border sm:min-h-[424px] ${t.shell}`}
     >
       {reviewing && <span className="review-line" aria-hidden="true" />}
 

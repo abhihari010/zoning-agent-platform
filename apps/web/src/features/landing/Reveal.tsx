@@ -17,7 +17,11 @@ export function Reveal({
   as?: "div" | "section" | "li";
 }) {
   const ref = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
+  // Fall back to visible where IntersectionObserver is unavailable (old
+  // browsers, some headless renderers) so content never ships gated-blank.
+  const [visible, setVisible] = useState(
+    () => typeof IntersectionObserver === "undefined",
+  );
 
   useEffect(() => {
     const node = ref.current;
