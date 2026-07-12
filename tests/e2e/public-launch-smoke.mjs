@@ -453,7 +453,7 @@ async function runWorkspaceFlow() {
   }
   // The determination verdict renders inside the .stamp artifact, not a heading.
   await page.locator(".stamp").getByText("Conditional").waitFor({ timeout: 10_000 });
-  await expectBodyIncludes("Blacksburg, VA", "Zoning permit", "Evidence snapshot");
+  await expectBodyIncludes("Blacksburg, VA", "Zoning permit", "Permit checklist");
 
   await page.getByRole("button", { name: "Reset" }).click();
   await page.locator('input[type="checkbox"]').first().check({ force: true });

@@ -479,6 +479,7 @@ class CurrentUserResponse(BaseModel):
 class ProjectSummary(BaseModel):
     project_id: UUID
     normalized_address: str
+    project_description: str = ""
     jurisdiction_id: str | None = None
     jurisdiction_name: str | None = None
     district: str

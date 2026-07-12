@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import type {
   AnalyzeResponse,
   FollowUpQuestion,
@@ -10,7 +15,6 @@ import {
   authMode,
   createSession,
   deleteProject,
-  fetchProjectResult,
   intakeProject,
   listProjects,
   requestJurisdictionSupport,
@@ -50,9 +54,10 @@ import { PipelineProgress } from "./features/assistant/PipelineProgress";
 import { ProjectIntakePanel } from "./features/assistant/ProjectIntakePanel";
 import { CaseSnapshot } from "./features/projects/CaseSnapshot";
 import { ReviewSignalsPanel } from "./features/projects/ReviewSignalsPanel";
-import { SavedProjectsPanel } from "./features/projects/SavedProjectsPanel";
+import { SavedReviewsPage } from "./features/projects/SavedReviewsPage";
 import { ClarificationModal } from "./features/results/ClarificationModal";
 import { ResultSection } from "./features/results/ResultSection";
+import { ReviewRecordPage } from "./features/results/ReviewRecordPage";
 import { useAddressAutocomplete } from "./hooks/useAddressAutocomplete";
 import { useCoverage } from "./hooks/useCoverage";
 import { useFeedback } from "./hooks/useFeedback";
@@ -87,11 +92,19 @@ export function App() {
   const [jurisdictionRequestSubmitting, setJurisdictionRequestSubmitting] =
     useState(false);
   // Workspace is driven by the route (/review vs /admin) so navigation and the
-  // header tabs stay in sync and deep links work.
+  // header tabs stay in sync and deep links work. /reviews/:projectId renders
+  // the saved-review record under the Saved reviews tab.
+  const { projectId: recordProjectId } = useParams<{ projectId: string }>();
   const workspace: Workspace =
-    location.pathname === "/admin" ? "admin" : "assistant";
+    location.pathname === "/admin"
+      ? "admin"
+      : location.pathname.startsWith("/reviews")
+        ? "saved"
+        : "assistant";
   const setWorkspace = (next: Workspace) =>
-    navigate(next === "admin" ? "/admin" : "/review");
+    navigate(
+      next === "admin" ? "/admin" : next === "saved" ? "/reviews" : "/review",
+    );
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
   const [projectDescription, setProjectDescription] = useState("");
   const [intakeFacts, setIntakeFacts] = useState<IntakeFacts>(emptyIntakeFacts);
@@ -215,8 +228,9 @@ export function App() {
     }
   }, [workspace, currentUser, navigate]);
 
-  // Seed the address from the hero CTA (?address=…), then drop the param so it
-  // doesn't re-apply on later renders.
+  // Seed the address from the hero CTA or a saved-review re-run (?address=…),
+  // then drop the param so it doesn't re-apply on later renders. Runs on every
+  // param change because App stays mounted across /review and /reviews routes.
   useEffect(() => {
     const seeded = searchParams.get("address");
     if (seeded) {
@@ -226,7 +240,7 @@ export function App() {
       setSearchParams(nextParams, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchParams]);
 
   const canSubmit = useMemo(
     () =>
@@ -328,13 +342,14 @@ export function App() {
     setPhase("analyzing");
     setActiveStageIndex(0);
     const analysis = await analyzeProject(projectId, answers);
-    setResult(analysis);
-    setPhase("done");
 
     if (
       analysis.status === "needs_clarification" &&
       analysis.followUpQuestions.length > 0
     ) {
+      setResult(analysis);
+      setPhase("done");
+      void refreshProjects();
       const nextAnswers = analysis.followUpQuestions.reduce<
         Record<string, string>
       >((accumulator, question) => {
@@ -345,7 +360,21 @@ export function App() {
       setClarificationQuestions(analysis.followUpQuestions);
       setClarificationAnswers(nextAnswers);
       setClarificationOpen(true);
+      return;
     }
+
+    // Final determination: hand off to the permanent record page and clear
+    // the runner so /review is a fresh form next time. Saved reviews only
+    // exist for Supabase accounts; other auth modes keep the in-place result.
+    if (authMode === "supabase") {
+      await refreshProjects();
+      navigate(`/reviews/${projectId}`, { state: { result: analysis } });
+      resetWorkspace();
+      return;
+    }
+
+    setResult(analysis);
+    setPhase("done");
   }
 
   async function runSubmitFlow() {
@@ -388,7 +417,6 @@ export function App() {
       }
 
       await runAnalysis(intakeResult.projectId);
-      await refreshProjects();
     } catch (submitError) {
       setPhase("error");
       setError(
@@ -442,36 +470,6 @@ export function App() {
       );
     } finally {
       setClarificationSubmitting(false);
-    }
-  }
-
-  async function openSavedProject(project: ProjectSummary) {
-    try {
-      setProjectsMessage("");
-      setWorkspace("assistant");
-      setPhase("done");
-      setError(null);
-      setProjectDescription("");
-      setAddress(project.normalizedAddress);
-      setIntake({
-        projectId: project.projectId,
-        normalizedAddress: project.normalizedAddress,
-        district: project.district,
-        status: "created",
-        supportStatus: "supported",
-        jurisdictionId: project.jurisdictionId,
-        jurisdictionName: project.jurisdictionName,
-        followUpQuestions: [],
-      });
-      const savedResult = await fetchProjectResult(project.projectId);
-      setResult(savedResult);
-      setResultView("checklist");
-    } catch (projectError) {
-      setProjectsMessage(
-        projectError instanceof Error
-          ? projectError.message
-          : "Failed to open saved project.",
-      );
     }
   }
 
@@ -664,18 +662,6 @@ export function App() {
             </section>
 
             <aside className="enter enter-2 space-y-5 lg:sticky lg:top-6 lg:self-start">
-              <SavedProjectsPanel
-                projects={projects}
-                projectsLoading={projectsLoading}
-                projectsMessage={projectsMessage}
-                onRefresh={() => {
-                  void refreshProjects();
-                }}
-                onOpenProject={(project) => {
-                  void openSavedProject(project);
-                }}
-              />
-
               <AnimatePresence initial={false}>
                 {!railHasCase && !railHasSignals && (
                   <motion.section
@@ -728,6 +714,37 @@ export function App() {
               </AnimatePresence>
             </aside>
           </div>
+        ) : workspace === "saved" ? (
+          recordProjectId ? (
+            <ReviewRecordPage
+              projectId={recordProjectId}
+              projects={projects}
+              projectsLoading={projectsLoading}
+              coverage={coverage}
+              isAdmin={canUseAdminTools}
+              onDeleted={() => {
+                setProjects((current) =>
+                  current.filter(
+                    (item) => item.projectId !== recordProjectId,
+                  ),
+                );
+                setProjectsMessage("Review deleted.");
+                navigate("/reviews");
+              }}
+            />
+          ) : (
+            <SavedReviewsPage
+              projects={projects}
+              projectsLoading={projectsLoading}
+              projectsMessage={projectsMessage}
+              onRefresh={() => {
+                void refreshProjects();
+              }}
+              onOpenProject={(project) => {
+                navigate(`/reviews/${project.projectId}`);
+              }}
+            />
+          )
         ) : (
           <section className="enter enter-1 grid gap-6 xl:grid-cols-[400px_minmax(0,1fr)]">
             <div className="space-y-6">

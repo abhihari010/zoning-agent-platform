@@ -73,6 +73,7 @@ export interface CurrentUser {
 export interface ProjectSummary {
   projectId: string;
   normalizedAddress: string;
+  projectDescription: string;
   jurisdictionId?: string | null;
   jurisdictionName?: string | null;
   district: string;
@@ -296,6 +297,7 @@ export async function listProjects(): Promise<ProjectSummary[]> {
     projects: Array<{
       project_id: string;
       normalized_address: string;
+      project_description?: string;
       jurisdiction_id?: string | null;
       jurisdiction_name?: string | null;
       district: string;
@@ -309,6 +311,7 @@ export async function listProjects(): Promise<ProjectSummary[]> {
   return payload.projects.map((project) => ({
     projectId: project.project_id,
     normalizedAddress: project.normalized_address,
+    projectDescription: project.project_description ?? "",
     jurisdictionId: project.jurisdiction_id,
     jurisdictionName: project.jurisdiction_name,
     district: project.district,

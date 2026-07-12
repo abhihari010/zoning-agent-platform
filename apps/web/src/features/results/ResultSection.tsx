@@ -1,5 +1,4 @@
 import { useState } from "react";
-import type { ReactNode } from "react";
 import { motion } from "motion/react";
 import type { AnalyzeResponse, AuditEvent } from "@zoning-agent/shared-schema";
 import {
@@ -64,23 +63,15 @@ export function ResultSection({
       variants={{ visible: { transition: { staggerChildren: 0.07 } } }}
       className="space-y-6"
     >
-      <motion.div
-        variants={arrivalVariants}
-        transition={arrivalTransition}
-        className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]"
-      >
+      <motion.div variants={arrivalVariants} transition={arrivalTransition}>
         <DecisionSummary result={result} showHumanFallback={showHumanFallback} />
-        <EvidenceSnapshot result={result} onDownloadChecklist={onDownloadChecklist} />
       </motion.div>
 
-      <motion.div
-        variants={arrivalVariants}
-        transition={arrivalTransition}
-        className="space-y-5"
-      >
-        <TrustIndicatorBar result={result} />
-        <UnsupportedJurisdiction result={result} />
-      </motion.div>
+      {result.trustIndicators?.jurisdictionSupported === false && (
+        <motion.div variants={arrivalVariants} transition={arrivalTransition}>
+          <UnsupportedJurisdiction result={result} />
+        </motion.div>
+      )}
 
       <motion.div variants={arrivalVariants} transition={arrivalTransition}>
         <SupportingDetailsTabs
@@ -89,6 +80,7 @@ export function ResultSection({
           trace={trace}
           traceLoading={traceLoading}
           onResultViewChange={onResultViewChange}
+          onDownloadChecklist={onDownloadChecklist}
         />
       </motion.div>
 
@@ -210,116 +202,20 @@ function DecisionSummary({
   );
 }
 
-function SnapshotRow({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="py-3.5 first:pt-0 last:pb-0">
-      <p className="text-xs font-medium text-ink-faint">{label}</p>
-      {children}
-    </div>
-  );
-}
-
-function EvidenceSnapshot({
-  result,
-  onDownloadChecklist,
-}: {
-  result: AnalyzeResponse;
-  onDownloadChecklist: () => void;
-}) {
-  return (
-    <section className="sheet self-start p-6">
-      <h2 className="sheet-title">Evidence snapshot</h2>
-      <div className="mt-4 divide-y divide-rule">
-        <SnapshotRow label="Source coverage">
-          <p className="mt-1 text-sm font-medium text-ink">
-            {evidenceLabel(result.citations.length)}
-          </p>
-          <p className="mt-1 text-xs leading-5 text-ink-soft">
-            {result.citations.length === 0
-              ? "No ordinance excerpts were retrieved; treat this result as a planning-office handoff."
-              : "Each cited source is available in the Evidence tab."}
-          </p>
-        </SnapshotRow>
-        {result.citationValidation && (
-          <SnapshotRow label="Citation validation">
-            <p className="tabular mt-1 font-mono text-sm font-medium text-ink">
-              {(result.citationValidation.citationCoverage * 100).toFixed(0)}% coverage
-            </p>
-            <p className="mt-1 text-xs leading-5 text-ink-soft">
-              {result.citationValidation.valid
-                ? "All returned citations passed validation checks."
-                : "Unsupported or invalid citation references were found."}
-            </p>
-            {result.citationValidation.unsupportedClaims.length > 0 && (
-              <ul className="mt-1.5 space-y-1 text-xs leading-5 text-verdict-hold">
-                {result.citationValidation.unsupportedClaims.map((claim) => (
-                  <li key={claim}>{claim}</li>
-                ))}
-              </ul>
-            )}
-          </SnapshotRow>
-        )}
-        {result.citations.length > 0 && (
-          <SnapshotRow label="Primary citation">
-            <p className="mt-1 text-sm font-medium leading-5 text-ink">
-              {result.citations[0].title}
-            </p>
-            <p className="mt-1 font-mono text-xs text-ink-faint">
-              {result.citations[0].sectionRef}
-            </p>
-          </SnapshotRow>
-        )}
-        <SnapshotRow label="Permit path">
-          <p className="mt-1 text-sm font-medium text-ink">
-            {result.checklist.steps.length} step
-            {result.checklist.steps.length === 1 ? "" : "s"}
-          </p>
-          <p className="mt-1 text-xs leading-5 text-ink-soft">
-            {result.checklist.permits.length > 0
-              ? result.checklist.permits.join(", ")
-              : "No explicit permit names were returned."}
-          </p>
-        </SnapshotRow>
-        {result.pipeline && (
-          <SnapshotRow label="Pipeline">
-            <p className="mt-1 font-mono text-xs leading-5 text-ink-soft">
-              {result.pipeline.provider} / {result.pipeline.ragProvider}
-            </p>
-            <p className="mt-0.5 truncate font-mono text-[11px] text-ink-faint">
-              {result.pipeline.version} · {result.pipeline.traceId}
-            </p>
-          </SnapshotRow>
-        )}
-      </div>
-      <button
-        type="button"
-        onClick={onDownloadChecklist}
-        className="btn-primary mt-5 w-full"
-      >
-        Download checklist
-      </button>
-    </section>
-  );
-}
-
 function SupportingDetailsTabs({
   result,
   resultView,
   trace,
   traceLoading,
   onResultViewChange,
+  onDownloadChecklist,
 }: {
   result: AnalyzeResponse;
   resultView: ResultView;
   trace: AuditEvent[];
   traceLoading: boolean;
   onResultViewChange: (view: ResultView) => void;
+  onDownloadChecklist: () => void;
 }) {
   return (
     <section className="sheet p-6 md:p-8">
@@ -331,53 +227,100 @@ function SupportingDetailsTabs({
               ? "Source references"
               : "Audit trace"}
         </h3>
-        <div
-          className="flex w-full max-w-full overflow-x-auto border-b border-rule md:w-auto md:border-b-0"
-          role="tablist"
-        >
-          {RESULT_VIEWS.map((view) => {
-            const isActive = resultView === view.key;
-            return (
-              <button
-                key={view.key}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                onClick={() => onResultViewChange(view.key)}
-                className={`relative px-4 py-2 text-sm font-medium transition-colors duration-fast ease-out ${
-                  isActive ? "text-ink" : "text-ink-soft hover:text-ink"
-                }`}
-              >
-                {view.label}
-                {isActive && (
-                  <motion.span
-                    layoutId="result-tab-underline"
-                    className="absolute inset-x-4 bottom-0 h-0.5 bg-ink"
-                    transition={{ duration: 0.25, ease: EASE_OUT_EXPO }}
-                  />
-                )}
-              </button>
-            );
-          })}
+        <div className="flex flex-wrap items-center gap-3">
+          <div
+            className="flex w-full max-w-full overflow-x-auto border-b border-rule md:w-auto md:border-b-0"
+            role="tablist"
+          >
+            {RESULT_VIEWS.map((view) => {
+              const isActive = resultView === view.key;
+              return (
+                <button
+                  key={view.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => onResultViewChange(view.key)}
+                  className={`relative px-4 py-2 text-sm font-medium transition-colors duration-fast ease-out ${
+                    isActive ? "text-ink" : "text-ink-soft hover:text-ink"
+                  }`}
+                >
+                  {view.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="result-tab-underline"
+                      className="absolute inset-x-4 bottom-0 h-0.5 bg-ink"
+                      transition={{ duration: 0.25, ease: EASE_OUT_EXPO }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            onClick={onDownloadChecklist}
+            className="btn-outline px-3 py-1.5 text-sm"
+          >
+            Download checklist
+          </button>
         </div>
       </div>
 
       {resultView === "checklist" ? (
         <ChecklistView result={result} />
       ) : resultView === "evidence" ? (
-        <div className="mt-6">
+        <div className="mt-6 space-y-5">
+          <TrustIndicatorBar result={result} />
+          {result.citationValidation && (
+            <CitationValidationNote validation={result.citationValidation} />
+          )}
           <EvidencePanel citations={result.citations} />
         </div>
       ) : (
-        <TraceView trace={trace} traceLoading={traceLoading} />
+        <TraceView result={result} trace={trace} traceLoading={traceLoading} />
       )}
     </section>
   );
 }
 
+function CitationValidationNote({
+  validation,
+}: {
+  validation: NonNullable<AnalyzeResponse["citationValidation"]>;
+}) {
+  return (
+    <div className="rounded-sm border border-rule bg-well/60 p-4">
+      <p className="text-xs font-medium text-ink-faint">Citation validation</p>
+      <p className="tabular mt-1 font-mono text-sm font-medium text-ink">
+        {(validation.citationCoverage * 100).toFixed(0)}% coverage
+      </p>
+      <p className="mt-1 text-xs leading-5 text-ink-soft">
+        {validation.valid
+          ? "All returned citations passed validation checks."
+          : "Unsupported or invalid citation references were found."}
+      </p>
+      {validation.unsupportedClaims.length > 0 && (
+        <ul className="mt-1.5 space-y-1 text-xs leading-5 text-verdict-hold">
+          {validation.unsupportedClaims.map((claim) => (
+            <li key={claim}>{claim}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function ChecklistView({ result }: { result: AnalyzeResponse }) {
   return (
-    <ol className="mt-6">
+    <>
+      {result.checklist.permits.length > 0 && (
+        <p className="mt-6 text-sm leading-6 text-ink-soft">
+          <span className="font-medium text-ink">Permits:</span>{" "}
+          {result.checklist.permits.join(", ")}
+        </p>
+      )}
+      <ol className="mt-6">
       {result.checklist.steps.map((step, index) => {
         const isLast = index === result.checklist.steps.length - 1;
         return (
@@ -406,19 +349,28 @@ function ChecklistView({ result }: { result: AnalyzeResponse }) {
           </li>
         );
       })}
-    </ol>
+      </ol>
+    </>
   );
 }
 
 function TraceView({
+  result,
   trace,
   traceLoading,
 }: {
+  result: AnalyzeResponse;
   trace: AuditEvent[];
   traceLoading: boolean;
 }) {
   return (
-    <div className="mt-6">
+    <div className="mt-6 space-y-4">
+      {result.pipeline && (
+        <p className="font-mono text-xs leading-5 text-ink-faint">
+          {result.pipeline.provider} / {result.pipeline.ragProvider} ·{" "}
+          {result.pipeline.version} · {result.pipeline.traceId}
+        </p>
+      )}
       {traceLoading ? (
         <p className="text-sm text-ink-soft">Loading trace…</p>
       ) : trace.length > 0 ? (

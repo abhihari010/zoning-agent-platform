@@ -345,6 +345,7 @@ class SQLAlchemyStore:
                 ProjectSummary(
                     project_id=project.project_id,
                     normalized_address=project.normalized_address,
+                    project_description=project.project_description,
                     jurisdiction_id=project.jurisdiction_id,
                     jurisdiction_name=project.jurisdiction_name,
                     district=project.district,
