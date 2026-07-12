@@ -57,6 +57,14 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               }
             />
             <Route
+              path="reviews/:projectId"
+              element={
+                <RequireAuth>
+                  <App />
+                </RequireAuth>
+              }
+            />
+            <Route
               path="admin"
               element={
                 <RequireAuth>
