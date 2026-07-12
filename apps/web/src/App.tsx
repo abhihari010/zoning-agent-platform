@@ -14,6 +14,7 @@ import {
   analyzeProject,
   authMode,
   createSession,
+  deleteMyData,
   deleteProject,
   intakeProject,
   listProjects,
@@ -315,9 +316,9 @@ export function App() {
       setProjectsLoading(true);
       const nextProjects = await listProjects();
       setProjects(nextProjects);
-      if (message) {
-        setProjectsMessage(message);
-      }
+      // Clear any stale transient error (e.g. clock-skew JWT failures) once a
+      // refresh succeeds.
+      setProjectsMessage(message ?? "");
     } catch (projectError) {
       setProjectsMessage(
         projectError instanceof Error
@@ -333,6 +334,26 @@ export function App() {
     await signOut();
     resetWorkspace();
     navigate("/");
+  }
+
+  async function onDeleteMyData() {
+    const confirmed = window.confirm(
+      "Delete all your saved reviews and account data? This cannot be undone.",
+    );
+    if (!confirmed) {
+      return;
+    }
+    try {
+      await deleteMyData();
+    } catch (deleteError) {
+      window.alert(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Failed to delete account data.",
+      );
+      return;
+    }
+    await onSignOut();
   }
 
   async function runAnalysis(
@@ -584,6 +605,9 @@ export function App() {
           onSignOut={() => {
             void onSignOut();
           }}
+          onDeleteMyData={() => {
+            void onDeleteMyData();
+          }}
         />
       </div>
 
@@ -651,6 +675,7 @@ export function App() {
                   feedbackState={feedbackState}
                   feedbackMessage={feedbackMessage}
                   showHumanFallback={showHumanFallback}
+                  showTrace={canUseAdminTools}
                   onResultViewChange={setResultView}
                   onFeedbackNoteChange={setFeedbackNote}
                   onSubmitFeedback={(helpful) => {

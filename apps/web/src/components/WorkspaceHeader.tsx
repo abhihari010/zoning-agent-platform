@@ -42,10 +42,12 @@ function AccountMenu({
   currentUser,
   authSession,
   onSignOut,
+  onDeleteMyData,
 }: {
   currentUser: CurrentUser | null;
   authSession: Session | null;
   onSignOut: () => void;
+  onDeleteMyData: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const email = currentUser?.email ?? authSession?.user.email ?? "Signed in";
@@ -115,6 +117,17 @@ function AccountMenu({
                 >
                   Sign out
                 </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setOpen(false);
+                    onDeleteMyData();
+                  }}
+                  className="block w-full rounded-sm px-3 py-2 text-left text-sm text-verdict-stop transition-colors duration-fast hover:bg-well"
+                >
+                  Delete my data
+                </button>
               </div>
             </motion.div>
           </>
@@ -131,6 +144,7 @@ export function WorkspaceHeader({
   authSession,
   onWorkspaceChange,
   onSignOut,
+  onDeleteMyData,
 }: {
   workspace: Workspace;
   canUseAdminTools: boolean;
@@ -138,6 +152,7 @@ export function WorkspaceHeader({
   authSession: Session | null;
   onWorkspaceChange: (workspace: Workspace) => void;
   onSignOut: () => void;
+  onDeleteMyData: () => void;
 }) {
   // Review is always shown; Saved reviews needs Supabase-backed accounts, and
   // Source admin is admin-only. Hide the whole nav when only Review qualifies.
@@ -191,6 +206,7 @@ export function WorkspaceHeader({
               currentUser={currentUser}
               authSession={authSession}
               onSignOut={onSignOut}
+              onDeleteMyData={onDeleteMyData}
             />
           </div>
         )}
