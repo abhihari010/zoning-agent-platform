@@ -10,6 +10,7 @@ import { AuthShell } from "./shells/AuthShell";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
+import { ResetPassword } from "./pages/ResetPassword";
 import { NotFound } from "./pages/NotFound";
 import "./styles.css";
 
@@ -38,6 +39,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route element={<AuthShell />}>
               <Route path="login" element={<Login />} />
               <Route path="signup" element={<Signup />} />
+              <Route path="reset-password" element={<ResetPassword />} />
             </Route>
 
             <Route

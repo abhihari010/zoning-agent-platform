@@ -148,6 +148,30 @@ export function useSupabaseAuth({
     return { ok: true };
   }
 
+  async function requestPasswordReset(email: string): Promise<AuthResult> {
+    if (!supabase) {
+      return { ok: false, message: "Password reset is not configured for this deployment." };
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      return { ok: false, message: error.message };
+    }
+    return { ok: true };
+  }
+
+  async function updatePassword(password: string): Promise<AuthResult> {
+    if (!supabase) {
+      return { ok: false, message: "Password reset is not configured for this deployment." };
+    }
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      return { ok: false, message: error.message };
+    }
+    return { ok: true };
+  }
+
   async function signOut() {
     if (supabase) {
       await supabase.auth.signOut();
@@ -164,5 +188,7 @@ export function useSupabaseAuth({
     signIn,
     signUp,
     signOut,
+    requestPasswordReset,
+    updatePassword,
   };
 }
