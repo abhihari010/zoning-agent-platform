@@ -55,9 +55,13 @@ export function DeterminationCard({ dusk = false }: { dusk?: boolean }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Typewriter for the address once step 1 begins.
+  // Typewriter for the address. Starts once the sequence reaches step 1 and runs
+  // to completion. Keyed on a boolean, NOT on `step`: depending on `step` re-ran
+  // this effect on every later step change (2..5), each time resetting i to 0 and
+  // retyping the address from scratch — the "types, restarts, types again" bug.
+  const typing = step >= 1;
   useEffect(() => {
-    if (reduce || step < 1) {
+    if (reduce || !typing) {
       return;
     }
     let i = 0;
@@ -69,7 +73,7 @@ export function DeterminationCard({ dusk = false }: { dusk?: boolean }) {
       }
     }, 34);
     return () => window.clearInterval(id);
-  }, [step, reduce]);
+  }, [typing, reduce]);
 
   const reviewing = step === 3;
   const stamped = step >= 4;
@@ -112,7 +116,7 @@ export function DeterminationCard({ dusk = false }: { dusk?: boolean }) {
       ref={cardRef}
       animate={impact ? { y: [0, 1, 0] } : undefined}
       transition={{ duration: 0.12 }}
-      className={`relative min-h-[464px] w-full overflow-hidden rounded-sm border sm:min-h-[424px] ${t.shell}`}
+      className={`relative min-h-[464px] w-full overflow-hidden rounded-sm border sm:min-h-[452px] ${t.shell}`}
     >
       {reviewing && <span className="review-line" aria-hidden="true" />}
 
