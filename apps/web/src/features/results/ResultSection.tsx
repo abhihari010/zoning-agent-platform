@@ -38,6 +38,8 @@ export function ResultSection({
   feedbackState,
   feedbackMessage,
   showHumanFallback,
+  showTrace,
+  showFeedback = true,
   onResultViewChange,
   onFeedbackNoteChange,
   onSubmitFeedback,
@@ -51,6 +53,10 @@ export function ResultSection({
   feedbackState: FeedbackState;
   feedbackMessage: string;
   showHumanFallback: boolean;
+  /** The trace endpoint is admin-gated; hide the tab for viewers who can't load it. */
+  showTrace: boolean;
+  /** Hide the feedback panel when reopening a saved record (feedback is per-run). */
+  showFeedback?: boolean;
   onResultViewChange: (view: ResultView) => void;
   onFeedbackNoteChange: (value: string) => void;
   onSubmitFeedback: (helpful: boolean) => void;
@@ -79,21 +85,24 @@ export function ResultSection({
           resultView={resultView}
           trace={trace}
           traceLoading={traceLoading}
+          showTrace={showTrace}
           onResultViewChange={onResultViewChange}
           onDownloadChecklist={onDownloadChecklist}
         />
       </motion.div>
 
-      <motion.div variants={arrivalVariants} transition={arrivalTransition}>
-        <WorkflowFeedbackPanel
-          result={result}
-          feedbackNote={feedbackNote}
-          feedbackState={feedbackState}
-          feedbackMessage={feedbackMessage}
-          onFeedbackNoteChange={onFeedbackNoteChange}
-          onSubmitFeedback={onSubmitFeedback}
-        />
-      </motion.div>
+      {showFeedback && (
+        <motion.div variants={arrivalVariants} transition={arrivalTransition}>
+          <WorkflowFeedbackPanel
+            result={result}
+            feedbackNote={feedbackNote}
+            feedbackState={feedbackState}
+            feedbackMessage={feedbackMessage}
+            onFeedbackNoteChange={onFeedbackNoteChange}
+            onSubmitFeedback={onSubmitFeedback}
+          />
+        </motion.div>
+      )}
     </motion.div>
   );
 }
@@ -207,6 +216,7 @@ function SupportingDetailsTabs({
   resultView,
   trace,
   traceLoading,
+  showTrace,
   onResultViewChange,
   onDownloadChecklist,
 }: {
@@ -214,9 +224,13 @@ function SupportingDetailsTabs({
   resultView: ResultView;
   trace: AuditEvent[];
   traceLoading: boolean;
+  showTrace: boolean;
   onResultViewChange: (view: ResultView) => void;
   onDownloadChecklist: () => void;
 }) {
+  const visibleViews = showTrace
+    ? RESULT_VIEWS
+    : RESULT_VIEWS.filter((view) => view.key !== "trace");
   return (
     <section className="sheet p-6 md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -232,7 +246,7 @@ function SupportingDetailsTabs({
             className="flex w-full max-w-full overflow-x-auto border-b border-rule md:w-auto md:border-b-0"
             role="tablist"
           >
-            {RESULT_VIEWS.map((view) => {
+            {visibleViews.map((view) => {
               const isActive = resultView === view.key;
               return (
                 <button

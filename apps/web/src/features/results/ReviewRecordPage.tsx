@@ -282,6 +282,8 @@ export function ReviewRecordPage({
         feedbackState={feedbackState}
         feedbackMessage={feedbackMessage}
         showHumanFallback={showHumanFallback}
+        showTrace={isAdmin}
+        showFeedback={Boolean(seededResult)}
         onResultViewChange={setResultView}
         onFeedbackNoteChange={setFeedbackNote}
         onSubmitFeedback={(helpful) => {
