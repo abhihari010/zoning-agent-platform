@@ -15,13 +15,22 @@
         "jurisdiction_id": "blacksburg-va",
         "url": "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
         "effective_date": "2026-01-15",
-        "districts": ["mixed-use-core"],
-        "uses": ["home-based-food-business", "food-business"]
+        "districts": [
+          "mixed-use-core"
+        ],
+        "uses": [
+          "home-based-food-business",
+          "food-business"
+        ]
       }
     ],
     "expect": {
-      "decisions": ["conditional"],
-      "statuses": ["success"],
+      "decisions": [
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true
@@ -43,17 +52,30 @@
         "jurisdiction_id": "montgomery-county-va",
         "url": "https://www.montgomerycountyva.gov/docs/default-source/planning-gis/applications-and-forms/zoning/home-occupation-form.pdf?sfvrsn=8068743c_4",
         "effective_date": "2021-10",
-        "districts": ["residential-low-density"],
-        "uses": ["home-based-food-business", "general"]
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "home-based-food-business",
+          "general"
+        ]
       }
     ],
     "expect": {
-      "decisions": ["likely_allowed", "conditional"],
-      "statuses": ["success"],
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "christiansburg-va"]
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "christiansburg-va"
+      ]
     }
   },
   {
@@ -72,17 +94,31 @@
         "jurisdiction_id": "christiansburg-va",
         "url": "https://library.municode.com/va/christiansburg/codes/code_of_ordinances?nodeId=SPBLADERE_CH42ZO_ARTIVSIMIREDIR-_S42-93PEUS",
         "effective_date": "2022-10-25",
-        "districts": ["residential-low-density"],
-        "uses": ["general"]
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
       }
     ],
     "expect": {
-      "decisions": ["likely_allowed", "conditional"],
-      "statuses": ["success"],
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "montgomery-county-va", "roanoke-va", "roanoke-county-va"]
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "roanoke-va",
+        "roanoke-county-va"
+      ]
     }
   },
   {
@@ -94,12 +130,21 @@
     "normalized_address": "215 Church Ave SW, Roanoke, VA 24011",
     "sources": [],
     "expect": {
-      "decisions": ["unknown"],
-      "statuses": ["low_confidence"],
+      "decisions": [
+        "unknown"
+      ],
+      "statuses": [
+        "low_confidence"
+      ],
       "min_citations": 1,
       "jurisdiction_supported": true,
-      "required_warning_substrings": ["Preliminary coverage"],
-      "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "montgomery-county-va"]
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va"
+      ]
     }
   },
   {
@@ -111,12 +156,21 @@
     "normalized_address": "5204 Bernard Dr, Roanoke, VA 24018",
     "sources": [],
     "expect": {
-      "decisions": ["unknown"],
-      "statuses": ["low_confidence"],
+      "decisions": [
+        "unknown"
+      ],
+      "statuses": [
+        "low_confidence"
+      ],
       "min_citations": 1,
       "jurisdiction_supported": true,
-      "required_warning_substrings": ["Preliminary coverage"],
-      "forbidden_citation_jurisdiction_ids": ["blacksburg-va", "montgomery-county-va"]
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va"
+      ]
     }
   },
   {
@@ -135,17 +189,27 @@
         "jurisdiction_id": "blacksburg-va",
         "url": "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
         "effective_date": "2026-01-15",
-        "districts": ["residential-low-density"],
-        "uses": ["home-based-food-business"]
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "home-based-food-business"
+        ]
       }
     ],
     "expect": {
-      "decisions": ["unknown"],
-      "statuses": ["low_confidence"],
+      "decisions": [
+        "unknown"
+      ],
+      "statuses": [
+        "low_confidence"
+      ],
       "min_citations": 0,
       "max_citations": 0,
       "jurisdiction_supported": true,
-      "required_warning_substrings": ["No relevant ordinances"]
+      "required_warning_substrings": [
+        "No relevant ordinances"
+      ]
     }
   },
   {
@@ -164,13 +228,23 @@
         "jurisdiction_id": "richmond-va",
         "url": "https://library.municode.com/va/richmond/codes/code_of_ordinances?nodeId=CH30ZO_ARTIVDIRE_DIV21GEBUDI_S30-438.1PEPRACUS",
         "effective_date": "2025-09-22",
-        "districts": ["mixed-use-core"],
-        "uses": ["food-service", "general"]
+        "districts": [
+          "mixed-use-core"
+        ],
+        "uses": [
+          "food-service",
+          "general"
+        ]
       }
     ],
     "expect": {
-      "decisions": ["likely_allowed", "conditional"],
-      "statuses": ["success"],
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true
@@ -192,8 +266,12 @@
         "jurisdiction_id": "richmond-va",
         "url": "https://library.municode.com/va/richmond/codes/code_of_ordinances?nodeId=CH30ZO_ARTIVDIRE_DIV2SIMIREDI_S30-402.2PEACUSST",
         "effective_date": "2025-09-22",
-        "districts": ["residential-low-density"],
-        "uses": ["general"]
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
       },
       {
         "source_id": "richmond-va-sec-30-694-1",
@@ -203,16 +281,116 @@
         "jurisdiction_id": "richmond-va",
         "url": "https://library.municode.com/va/richmond/codes/code_of_ordinances?nodeId=CH30ZO_ARTVISURE_DIV12HOOC_S30-694.1HOOCRE",
         "effective_date": "2025-09-22",
-        "districts": ["residential-low-density"],
-        "uses": ["general"]
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
       }
     ],
     "expect": {
-      "decisions": ["likely_allowed", "conditional"],
-      "statuses": ["success"],
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true
+    }
+  },
+  {
+    "id": "franklin-tn-source-indexed-cafe",
+    "project_description": "Open a small coffee shop with six employees, posted operating hours, and interior renovation only in an existing downtown storefront.",
+    "district": "DD",
+    "jurisdiction_id": "franklin-tn",
+    "jurisdiction_name": "Franklin, TN",
+    "normalized_address": "231 Public Sq, Franklin, TN 37064",
+    "sources": [
+      {
+        "source_id": "franklin-tn-chapter-5-use-table",
+        "title": "Chapter 5. USE REGULATIONS - 5.1.3 Permitted Principal Uses by Zoning District",
+        "excerpt": "Restaurants: Permitted by right in: PD, NC, CC, DD, 1ST, 5TH, RC4, RC6, RC12, LI. Permitted subject to additional use regulations under Subsection 5.1.4 (conditional) in: none. Not permitted in any district not listed for this use.",
+        "section_ref": "Chapter 5",
+        "jurisdiction_id": "franklin-tn",
+        "url": "https://web.franklintn.gov/flippingbook/FranklinZoningOrdinance",
+        "effective_date": "2026-01-13",
+        "districts": [
+          "DD",
+          "CC",
+          "NC",
+          "PD"
+        ],
+        "uses": [
+          "food-service",
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va"
+      ]
+    }
+  },
+  {
+    "id": "franklin-tn-source-indexed-home-occupation",
+    "project_description": "Run a home-based graphic design business inside a single-family house, worked solely by household residents with no outside employees, posted daytime operating hours, and no renovation or new construction.",
+    "district": "unknown",
+    "jurisdiction_id": "franklin-tn",
+    "jurisdiction_name": "Franklin, TN",
+    "normalized_address": "1112 Lewisburg Pike, Franklin, TN 37064",
+    "sources": [
+      {
+        "source_id": "franklin-tn-chapter-5",
+        "title": "Chapter 5. USE REGULATIONS",
+        "excerpt": "5.2 Accessory Uses and Structures. Accessory uses customarily incidental and clearly subordinate to permitted principal uses include Home Occupations, subject to the accessory use and structure standards of Chapter 5.",
+        "section_ref": "Chapter 5",
+        "jurisdiction_id": "franklin-tn",
+        "url": "https://web.franklintn.gov/flippingbook/FranklinZoningOrdinance",
+        "effective_date": "2026-01-13",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "unknown"
+      ],
+      "statuses": [
+        "low_confidence"
+      ],
+      "min_citations": 1,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va"
+      ]
     }
   }
 ]
