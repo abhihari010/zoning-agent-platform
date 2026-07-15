@@ -481,5 +481,95 @@
       ],
       "min_confidence": 0.7
     }
+  },
+  {
+    "id": "loudoun-county-va-source-indexed-farm-winery",
+    "project_description": "Establish a farm winery with a small tasting room using grapes grown on my property, with four employees, posted operating hours, and interior renovation only of the existing barn.",
+    "district": "agricultural",
+    "jurisdiction_id": "loudoun-county-va",
+    "jurisdiction_name": "Loudoun County, VA",
+    "normalized_address": "40661 Hurley Ln, Paeonian Springs, VA 20129",
+    "sources": [
+      {
+        "source_id": "loudoun-county-va-3-02-03",
+        "title": "3.02.03 Transition, Rural, and JLMA Zoning Districts Use Table",
+        "excerpt": "Table 3.02.03-1. Principal Use Table for Transition, Rural, and Joint Land Management Area (JLMA) Zoning Districts. Note: P = Permitted | S = Special Exception | M = Minor Special Exception | blank cell = Prohibited. Agriculture: 159 Winery, Farm (Use-Specific Standard 4.08.15): Permitted (P) in the AR-1 and AR-2 Agricultural Rural zoning districts. 145 Brewery, Limited (4.08.05): P/M in AR-1 and AR-2. 34 Farmers Market (4.08.14): Permitted (P) in the Transition, Rural, and JLMA zoning districts.",
+        "section_ref": "3.02.03",
+        "jurisdiction_id": "loudoun-county-va",
+        "url": "https://online.encodeplus.com/regs/loudouncounty-va-zo/doc-viewer.aspx?secid=932",
+        "effective_date": "2026-07-03",
+        "districts": [
+          "agricultural"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va"
+      ]
+    }
+  },
+  {
+    "id": "loudoun-county-va-source-indexed-manufacturing",
+    "project_description": "Open a general manufacturing facility assembling electronic components with twenty employees, posted operating hours, and interior renovation only of an existing industrial building.",
+    "district": "industrial-zone",
+    "jurisdiction_id": "loudoun-county-va",
+    "jurisdiction_name": "Loudoun County, VA",
+    "normalized_address": "45532 Dulles Plz, Sterling, VA 20166",
+    "sources": [
+      {
+        "source_id": "loudoun-county-va-3-02-05",
+        "title": "3.02.05 Office and Industrial Zoning Districts Use Table",
+        "excerpt": "Table 3.02.05-1. Principal Use Table for Office and Industrial Zoning Districts (OP, IP, GI, MR-HI). Note: P = Permitted | S = Special Exception | M = Minor Special Exception | blank cell = Prohibited. Industrial/Production, Manufacturing and Employment: 104 Manufacturing, General (Use-Specific Standard 4.06.05): Permitted (P) in the IP Industrial Park and GI General Industry zoning districts. 101 Data Center (4.06.02): Special Exception (S) in OP, IP, GI, and MR-HI.",
+        "section_ref": "3.02.05",
+        "jurisdiction_id": "loudoun-county-va",
+        "url": "https://online.encodeplus.com/regs/loudouncounty-va-zo/doc-viewer.aspx?secid=1625",
+        "effective_date": "2026-07-03",
+        "districts": [
+          "industrial-zone"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va"
+      ]
+    }
   }
 ]

@@ -1,0 +1,158 @@
+[
+  {
+    "id": "loudoun-county-va-r8-single-family",
+    "address": "42611 Harlow Meadows Ter, Sterling, VA 20166",
+    "project_description": "Build a new single-family detached dwelling on a vacant lot in the R-8 single-family residential district.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.02.02"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "loudoun-county-va-r8-child-day-home",
+    "address": "42611 Harlow Meadows Ter, Sterling, VA 20166",
+    "project_description": "Operate a child day home providing day care for a small number of children inside my house in the R-8 residential district.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.02.02"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "loudoun-county-va-gb-restaurant",
+    "address": "25284 Pleasant Valley Rd, Chantilly, VA 20152",
+    "project_description": "Open a sit-down restaurant in an existing commercial building in the GB general business district.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.02.02"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "loudoun-county-va-gb-retail",
+    "address": "25284 Pleasant Valley Rd, Chantilly, VA 20152",
+    "project_description": "Open a general retail store selling household goods in the GB general business district.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.02.02"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "loudoun-county-va-ar1-farm-winery",
+    "address": "40661 Hurley Ln, Paeonian Springs, VA 20129",
+    "project_description": "Establish a farm winery producing wine from grapes grown on my property in the AR-1 agricultural rural district.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.02.03"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "loudoun-county-va-ar1-bnb-homestay",
+    "address": "40661 Hurley Ln, Paeonian Springs, VA 20129",
+    "project_description": "Offer a bed and breakfast homestay renting two rooms of my farmhouse to overnight guests in the AR-1 agricultural rural district.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.02.03"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "loudoun-county-va-ar1-limited-brewery",
+    "address": "40661 Hurley Ln, Paeonian Springs, VA 20129",
+    "project_description": "Open a limited brewery producing craft beer with ingredients grown on the farm in the AR-1 agricultural rural district.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.02.03"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "loudoun-county-va-ar1-farmers-market",
+    "address": "40661 Hurley Ln, Paeonian Springs, VA 20129",
+    "project_description": "Operate a farmers market selling locally grown produce on my farm property in the AR-1 agricultural rural district.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.02.03"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "loudoun-county-va-ip-general-manufacturing",
+    "address": "45532 Dulles Plz, Sterling, VA 20166",
+    "project_description": "Open a general manufacturing facility assembling electronic components in the IP industrial park district.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.02.05"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "loudoun-county-va-ip-data-center-se",
+    "address": "45532 Dulles Plz, Sterling, VA 20166",
+    "project_description": "Build a data center in the IP industrial park district.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.02.05"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "loudoun-county-va-abstain-food-truck",
+    "address": "43777 Central Station Dr, Ashburn, VA 20147",
+    "project_description": "Operate a mobile food truck vending meals at different street locations around the county throughout the week.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "loudoun-county-va-abstain-casino",
+    "address": "43777 Central Station Dr, Ashburn, VA 20147",
+    "project_description": "Open a casino with slot machines and table games.",
+    "jurisdiction_id": "loudoun-county-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
