@@ -392,5 +392,94 @@
         "richmond-va"
       ]
     }
+  },
+  {
+    "id": "chesapeake-va-source-indexed-restaurant",
+    "project_description": "Open a sit-down restaurant with eight employees, posted operating hours, and interior renovation only in an existing storefront on Battlefield Boulevard.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "chesapeake-va",
+    "jurisdiction_name": "Chesapeake, VA",
+    "normalized_address": "621 Battlefield Blvd N, Chesapeake, VA 23320",
+    "sources": [
+      {
+        "source_id": "chesapeake-va-7-602",
+        "title": "§ 7-602. - Table of permitted and conditional uses in business districts.",
+        "excerpt": "SECTION 7-602. TABLE OF PERMITTED AND CONDITIONAL USES IN BUSINESS DISTRICTS. 58 Eating and Drinking Places with Seating: Permitted (P) in B-1, B-2, B-5 and MXD/U in the rural, suburban and urban overlay areas. 58 Eating and Drinking Places Without Seating: Permitted (P) in B-1, B-2, B-5 and MXD/U. Restaurants and similar eating and drinking establishments with seating are permitted by right in the B-2 general business district.",
+        "section_ref": "§ 7-602",
+        "jurisdiction_id": "chesapeake-va",
+        "url": "https://library.municode.com/va/chesapeake/codes/zoning?nodeId=ZO_ART7BUDI_S7-602TAPECOUSBUDI",
+        "effective_date": "2026-01-20",
+        "districts": [
+          "commercial-employment"
+        ],
+        "uses": [
+          "food-service",
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va"
+      ]
+    }
+  },
+  {
+    "id": "chesapeake-va-source-indexed-home-daycare",
+    "project_description": "Operate a home child day care service inside my single-family house with two employees, posted operating hours, and no exterior renovation.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "chesapeake-va",
+    "jurisdiction_name": "Chesapeake, VA",
+    "normalized_address": "1400 Bandock St, Chesapeake, VA 23323",
+    "sources": [
+      {
+        "source_id": "chesapeake-va-6-2102",
+        "title": "§ 6-2102. - Table of permitted and conditional uses in residential districts.",
+        "excerpt": "SECTION 6-2102. TABLE OF PERMITTED AND CONDITIONAL USES IN RESIDENTIAL DISTRICTS. 835 Home Child Day Care Services: Permitted (P) in all residential districts. 835 Child Day Care Services Requiring State Licensing: allowed only through the granting of a conditional use permit (C) by city council in all residential districts.",
+        "section_ref": "§ 6-2102",
+        "jurisdiction_id": "chesapeake-va",
+        "url": "https://library.municode.com/va/chesapeake/codes/zoning?nodeId=ZO_ART6REDI_S6-2102TAPECOUSREDI",
+        "effective_date": "2026-01-20",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va"
+      ],
+      "min_confidence": 0.7
+    }
   }
 ]

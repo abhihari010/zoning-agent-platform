@@ -1,0 +1,158 @@
+[
+  {
+    "id": "chesapeake-va-r10-single-family",
+    "address": "1400 Bandock St, Chesapeake, VA 23323",
+    "project_description": "Build a new single-family detached house on a vacant lot in the R-10 residential district.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 6-2102"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "chesapeake-va-r10-home-occupation",
+    "address": "1400 Bandock St, Chesapeake, VA 23323",
+    "project_description": "Operate a Level I home occupation running a small tailoring business inside my dwelling in the R-10 residential district, working alone with no outside employees.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 6-2102"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "chesapeake-va-r10-home-daycare",
+    "address": "1400 Bandock St, Chesapeake, VA 23323",
+    "project_description": "Operate a small home child day care service inside my single-family house in the R-10 residential district.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 6-2102"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "chesapeake-va-r10-church-cup",
+    "address": "1400 Bandock St, Chesapeake, VA 23323",
+    "project_description": "Establish a church with weekly worship services in the R-10 residential district.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 6-2102"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "chesapeake-va-b2-restaurant",
+    "address": "621 Battlefield Blvd N, Chesapeake, VA 23320",
+    "project_description": "Open a sit-down restaurant with indoor seating in an existing storefront in the B-2 general business district.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 7-602"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "chesapeake-va-b2-daycare-cup",
+    "address": "621 Battlefield Blvd N, Chesapeake, VA 23320",
+    "project_description": "Open a child day care center in a commercial building in the B-2 general business district.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 7-602"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "chesapeake-va-b2-fitness",
+    "address": "621 Battlefield Blvd N, Chesapeake, VA 23320",
+    "project_description": "Open a physical fitness gym with exercise equipment and group classes in the B-2 general business district.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 7-602"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "chesapeake-va-b2-retail-bakery",
+    "address": "621 Battlefield Blvd N, Chesapeake, VA 23320",
+    "project_description": "Open a retail bakery selling bread and pastries to walk-in customers in the B-2 general business district.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 7-602"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "chesapeake-va-a1-farmers-market",
+    "address": "3529 Kentucky Trl, Chesapeake, VA 23323",
+    "project_description": "Operate a farmers market selling locally grown produce on my agricultural property in the A-1 agricultural district.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 10-602"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "chesapeake-va-m1-wholesale-bakery",
+    "address": "1015 Seaboard Ave, Chesapeake, VA 23324",
+    "project_description": "Open a wholesale commercial bakery that produces and distributes baked goods in the M-1 light industrial district.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 8-602"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "chesapeake-va-abstain-food-truck",
+    "address": "306 Cedar Rd, Chesapeake, VA 23322",
+    "project_description": "Operate a mobile food truck vending meals at different street locations around the city throughout the week.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "chesapeake-va-abstain-data-center",
+    "address": "306 Cedar Rd, Chesapeake, VA 23322",
+    "project_description": "Build a large hyperscale data center campus with backup diesel generators and on-site electrical substations.",
+    "jurisdiction_id": "chesapeake-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
