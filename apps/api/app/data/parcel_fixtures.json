@@ -137,5 +137,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org) spatial intersect at lat:36.818648 lon:-76.271315 returning CLASS='M-1'; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "42611 harlow meadows ter",
+    "jurisdiction_id": "loudoun-county-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:38.936569 lon:-77.527987 returning ZO_ZONE='R8' (1993 legacy Single Family Residential, ord section 2.02.05.03); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R8 (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "25284 pleasant valley",
+    "jurisdiction_id": "loudoun-county-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:38.917576 lon:-77.470997 returning ZO_ZONE='GB' (1993 legacy General Business, ord section 2.02.05.12); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed GB (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "40661 hurley ln",
+    "jurisdiction_id": "loudoun-county-va",
+    "parcel_id": null,
+    "zoning_district": "agricultural",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:39.167394 lon:-77.593847 returning ZO_ZONE='AR1' (Agricultural Rural-1, ord section 2.04.01); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed AR1 (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "45532 dulles plz",
+    "jurisdiction_id": "loudoun-county-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:38.977767 lon:-77.425471 returning ZO_ZONE='IP' (Industrial Park, ord section 2.06); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed IP (verified 2026-07-14)"
   }
 ]

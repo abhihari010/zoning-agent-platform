@@ -56,6 +56,9 @@ CI_RECALL_FLOORS: dict[str, float] = {
     "franklin-tn": 0.65,
     "richmond-va": 0.45,
     "chesapeake-va": 0.15,
+    # 2026-07-14: loudoun-county-va 0.400 (Chapter 3 use-table refs; same
+    # keyword-vs-table caveat as chesapeake).
+    "loudoun-county-va": 0.35,
 }
 
 
