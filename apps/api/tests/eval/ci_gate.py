@@ -48,10 +48,14 @@ GATE_ABSTENTION_CORRECTNESS: float = 1.0
 # Baselines measured 2026-07-03: montgomery-county-va 1.000, franklin-tn 0.692;
 # 2026-07-04: richmond-va 0.500 (fine-grained Sec. 30-xxx.y subsection refs are
 # hard for keyword retrieval; live vector recall is the quality signal).
+# 2026-07-14: chesapeake-va 0.200 (ground-truth refs are the giant SIC use
+# tables § 6-2102/§ 7-602/§ 8-602/§ 10-602, which keyword scoring rarely
+# surfaces; live vector recall is the quality signal).
 CI_RECALL_FLOORS: dict[str, float] = {
     "montgomery-county-va": 0.80,
     "franklin-tn": 0.65,
     "richmond-va": 0.45,
+    "chesapeake-va": 0.15,
 }
 
 

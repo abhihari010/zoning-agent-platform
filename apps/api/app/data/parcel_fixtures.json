@@ -97,5 +97,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "City of Richmond 'Zoning Districts' feature layer (services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/ZoningDistricts/FeatureServer/0, owner richard.morton_cor) spatial intersect at lat:37.487116 lon:-77.432568 returning Name='M-1'; address geocoded via US Census onelineaddress; spatial intersect returned M-1 (verified 2026-07-04)"
+  },
+  {
+    "address_pattern": "1400 bandock st",
+    "jurisdiction_id": "chesapeake-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org) spatial intersect at lat:36.787818 lon:-76.336667 returning CLASS='R-10'; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-10 (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "621 battlefield blvd n",
+    "jurisdiction_id": "chesapeake-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org) spatial intersect at lat:36.739776 lon:-76.242242 returning CLASS='B-2'; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B-2 (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "3529 kentucky trl",
+    "jurisdiction_id": "chesapeake-va",
+    "parcel_id": null,
+    "zoning_district": "agricultural",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org): parcel with situs address contained in A-1 polygon (Parcels layer MapServer/15 esriSpatialRelContains); address geocoded via US Census onelineaddress at lat:36.747914 lon:-76.377120; re-intersect confirmed A-1 (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "1015 seaboard ave",
+    "jurisdiction_id": "chesapeake-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org) spatial intersect at lat:36.818648 lon:-76.271315 returning CLASS='M-1'; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-14)"
   }
 ]
