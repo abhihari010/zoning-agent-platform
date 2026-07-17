@@ -59,6 +59,9 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # 2026-07-14: loudoun-county-va 0.400 (Chapter 3 use-table refs; same
     # keyword-vs-table caveat as chesapeake).
     "loudoun-county-va": 0.35,
+    # 2026-07-14: prince-william-county-va 0.700 (prose per-district
+    # "Uses permitted by right" lists — keyword-friendly).
+    "prince-william-county-va": 0.60,
 }
 
 
