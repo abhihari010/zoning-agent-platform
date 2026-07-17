@@ -663,5 +663,99 @@
         "loudoun-county-va"
       ]
     }
+  },
+  {
+    "id": "albemarle-county-va-source-indexed-restaurant",
+    "project_description": "Open a sit-down restaurant with eight employees and posted operating hours in an existing commercial building, interior renovation only.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "albemarle-county-va",
+    "jurisdiction_name": "Albemarle County, VA",
+    "normalized_address": "1839 Broadway St, Charlottesville, VA 22902",
+    "sources": [
+      {
+        "source_id": "albemarle-county-va-sec-22-2-1",
+        "title": "Sec. 22.2.1 - By right.",
+        "excerpt": "The following uses shall be permitted in any C-1 district, subject to the applicable requirements of this chapter. a. The following retail sales and service establishments: 1. Antique, gift, jewelry, notion and craft shops. 4. Drug store, pharmacy. 6. Food and grocery stores including such specialty shops as bakery, candy, milk dispensary. c. ... 2. Convenience stores. 3. Restaurants. b. The following services and public establishments: 1. Offices. 13. Child day centers (reference 5.1.06).",
+        "section_ref": "Sec. 22.2.1",
+        "jurisdiction_id": "albemarle-county-va",
+        "url": "https://library.municode.com/va/albemarle_county/codes/code_of_ordinances?nodeId=CH18ZO_ARTIIIDIRE_S22CO-1_S22.2PEUS_S22.2.1BYRI",
+        "effective_date": "2026-01-14",
+        "districts": [
+          "commercial-employment"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va"
+      ]
+    }
+  },
+  {
+    "id": "albemarle-county-va-source-indexed-farm-winery",
+    "project_description": "Establish a farm winery with a tasting room on my rural property, with four employees, posted operating hours, and interior renovation only of the existing barn.",
+    "district": "agricultural",
+    "jurisdiction_id": "albemarle-county-va",
+    "jurisdiction_name": "Albemarle County, VA",
+    "normalized_address": "3215 Middle Mtn Rd, Crozet, VA 22932",
+    "sources": [
+      {
+        "source_id": "albemarle-county-va-sec-10-2-1",
+        "title": "Sec. 10.2.1 - By right.",
+        "excerpt": "The following uses shall be permitted by right in the RA district, subject to the applicable requirements of this chapter: 3. Agriculture, forestry, and fishery uses except as otherwise expressly provided. 17. Farm winery uses, events, and activities authorized by section 5.1.25(a),(b), and (c)(2).",
+        "section_ref": "Sec. 10.2.1",
+        "jurisdiction_id": "albemarle-county-va",
+        "url": "https://library.municode.com/va/albemarle_county/codes/code_of_ordinances?nodeId=CH18ZO_ARTIIIDIRE_S10RUARDIA_S10.2PEUS_S10.2.1BYRI",
+        "effective_date": "2026-01-14",
+        "districts": [
+          "agricultural"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va"
+      ]
+    }
   }
 ]

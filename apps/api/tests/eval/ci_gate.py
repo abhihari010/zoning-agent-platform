@@ -62,6 +62,9 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # 2026-07-14: prince-william-county-va 0.700 (prose per-district
     # "Uses permitted by right" lists — keyword-friendly).
     "prince-william-county-va": 0.60,
+    # 2026-07-17: albemarle-county-va 0.900 (prose per-district "By right"
+    # lists; only the R-1 home-occupation ref is keyword-hard).
+    "albemarle-county-va": 0.80,
 }
 
 

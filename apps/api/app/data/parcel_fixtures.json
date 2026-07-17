@@ -217,5 +217,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.770601 lon:-77.539792 returning ZoningDistrict='M-2' (Light Industrial, ord Part 403); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-2 (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "130 darden blvd",
+    "jurisdiction_id": "albemarle-county-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.051539 lon:-78.514398 returning Zoning='R1 Residential' (ord Sec. 13); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R1 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "1839 broadway st",
+    "jurisdiction_id": "albemarle-county-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.020206 lon:-78.457323 returning Zoning='C1 Commercial' (ord Sec. 22); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed C1 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "3215 middle mtn rd",
+    "jurisdiction_id": "albemarle-county-va",
+    "parcel_id": null,
+    "zoning_district": "agricultural",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.124349 lon:-78.732401 returning Zoning='Rural Areas' (ord Sec. 10); address sampled from county Addresses layer inside the RA polygon, geocoded via US Census onelineaddress; round-trip re-intersect confirmed Rural Areas (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "744 moores creek ln",
+    "jurisdiction_id": "albemarle-county-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.017112 lon:-78.462525 returning Zoning='Light Industry' (ord Sec. 27, uses per Sec. 26.2 table); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed Light Industry (verified 2026-07-17)"
   }
 ]

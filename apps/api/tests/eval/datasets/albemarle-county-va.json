@@ -1,0 +1,158 @@
+[
+  {
+    "id": "albemarle-county-va-r1-single-family",
+    "address": "130 Darden Blvd, Charlottesville, VA 22903",
+    "project_description": "Build a new detached single-family dwelling on a vacant lot in the R-1 residential district.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 13.2.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "albemarle-county-va-r1-home-occupation",
+    "address": "130 Darden Blvd, Charlottesville, VA 22903",
+    "project_description": "Run a Class A home occupation doing freelance graphic design inside my house in the R-1 residential district, with no outside employees.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 13.2.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "albemarle-county-va-c1-restaurant",
+    "address": "1839 Broadway St, Charlottesville, VA 22902",
+    "project_description": "Open a sit-down restaurant in an existing commercial building in the C-1 commercial district.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 22.2.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "albemarle-county-va-c1-child-day-center",
+    "address": "1839 Broadway St, Charlottesville, VA 22902",
+    "project_description": "Open a child day center for preschool children in the C-1 commercial district.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 22.2.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "albemarle-county-va-c1-pharmacy",
+    "address": "1839 Broadway St, Charlottesville, VA 22902",
+    "project_description": "Open a retail drug store and pharmacy in the C-1 commercial district.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 22.2.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "albemarle-county-va-c1-professional-office",
+    "address": "1839 Broadway St, Charlottesville, VA 22902",
+    "project_description": "Open a professional office for an accounting firm in the C-1 commercial district.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 22.2.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "albemarle-county-va-ra-farm-winery",
+    "address": "3215 Middle Mtn Rd, Crozet, VA 22932",
+    "project_description": "Establish a farm winery with events and activities on my rural property in the RA Rural Areas district.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 10.2.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "albemarle-county-va-ra-agriculture",
+    "address": "3215 Middle Mtn Rd, Crozet, VA 22932",
+    "project_description": "Use my rural land for agriculture and forestry, raising crops and managing timber in the RA Rural Areas district.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 10.2.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "albemarle-county-va-li-manufacturing",
+    "address": "744 Moores Creek Ln, Charlottesville, VA 22902",
+    "project_description": "Open a manufacturing and assembly facility producing electronic components in the LI light industry district.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 26.2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "albemarle-county-va-li-food-processing",
+    "address": "744 Moores Creek Ln, Charlottesville, VA 22902",
+    "project_description": "Open a food processing and fabrication plant producing packaged baked goods in the LI light industry district.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 26.2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "albemarle-county-va-abstain-food-truck",
+    "address": "401 McIntire Rd, Charlottesville, VA 22902",
+    "project_description": "Operate a mobile food truck vending meals at different roadside locations around the county throughout the week.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "albemarle-county-va-abstain-casino",
+    "address": "401 McIntire Rd, Charlottesville, VA 22902",
+    "project_description": "Open a casino with slot machines and table games.",
+    "jurisdiction_id": "albemarle-county-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
