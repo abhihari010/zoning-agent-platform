@@ -177,5 +177,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:38.977767 lon:-77.425471 returning ZO_ZONE='IP' (Industrial Park, ord section 2.06); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed IP (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "3020 jenny ln",
+    "jurisdiction_id": "prince-william-county-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.663547 lon:-77.306066 returning ZoningDistrict='R-4' (Suburban Residential, ord Part 303); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-4 (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "14141 daves store ln",
+    "jurisdiction_id": "prince-william-county-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.798204 lon:-77.612539 returning ZoningDistrict='B-1' (General Business, ord Part 401); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B-1 (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "14872 shelter ln",
+    "jurisdiction_id": "prince-william-county-va",
+    "parcel_id": null,
+    "zoning_district": "agricultural",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.870645 lon:-77.632784 returning ZoningDistrict='A-1' (Agricultural, ord Part 301); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed A-1 (verified 2026-07-14)"
+  },
+  {
+    "address_pattern": "11609 hayden rd",
+    "jurisdiction_id": "prince-william-county-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.770601 lon:-77.539792 returning ZoningDistrict='M-2' (Light Industrial, ord Part 403); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-2 (verified 2026-07-14)"
   }
 ]

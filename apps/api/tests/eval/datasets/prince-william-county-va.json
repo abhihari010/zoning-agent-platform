@@ -1,0 +1,158 @@
+[
+  {
+    "id": "prince-william-county-va-r4-single-family",
+    "address": "3020 Jenny Ln, Woodbridge, VA 22192",
+    "project_description": "Build a new one-family detached dwelling on a vacant lot in the R-4 suburban residential district.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 32-303.11."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "prince-william-county-va-r4-home-occupation",
+    "address": "3020 Jenny Ln, Woodbridge, VA 22192",
+    "project_description": "Run a home occupation doing freelance bookkeeping inside my house in the R-4 residential district, with no outside employees.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 32-303.11."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "prince-william-county-va-b1-restaurant",
+    "address": "14141 Daves Store Ln, Gainesville, VA 20155",
+    "project_description": "Open a sit-down restaurant in an existing commercial building in the B-1 general business district.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 32-401.11."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "prince-william-county-va-b1-childcare",
+    "address": "14141 Daves Store Ln, Gainesville, VA 20155",
+    "project_description": "Open a child-care facility for preschool children in the B-1 general business district.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 32-401.11."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "prince-william-county-va-b1-hotel",
+    "address": "14141 Daves Store Ln, Gainesville, VA 20155",
+    "project_description": "Build a hotel with about 90 guest rooms in the B-1 general business district.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 32-401.11."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "prince-william-county-va-b1-craft-brewery",
+    "address": "14141 Daves Store Ln, Gainesville, VA 20155",
+    "project_description": "Open a craft brewery producing under 10,000 barrels per year with an attached restaurant in the B-1 general business district.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 32-401.11."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "prince-william-county-va-a1-farm-winery",
+    "address": "14872 Shelter Ln, Haymarket, VA 20169",
+    "project_description": "Establish a farm winery on my five-acre agricultural property in the A-1 agricultural district.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 32-301.02."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "prince-william-county-va-a1-livestock",
+    "address": "14872 Shelter Ln, Haymarket, VA 20169",
+    "project_description": "Keep livestock including horses and goats on my five-acre property in the A-1 agricultural district.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 32-301.02."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "prince-william-county-va-m2-industrial-bakery",
+    "address": "11609 Hayden Rd, Manassas, VA 20109",
+    "project_description": "Open an industrial bakery producing and distributing baked goods in the M-2 light industrial district.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 32-403.21."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "prince-william-county-va-m2-brewery-bottling",
+    "address": "11609 Hayden Rd, Manassas, VA 20109",
+    "project_description": "Open a brewery and bottling facility in the M-2 light industrial district.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 32-403.21."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "prince-william-county-va-abstain-food-truck",
+    "address": "1 County Complex Ct, Woodbridge, VA 22192",
+    "project_description": "Operate a mobile food truck vending meals at different street locations around the county throughout the week.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "prince-william-county-va-abstain-casino",
+    "address": "1 County Complex Ct, Woodbridge, VA 22192",
+    "project_description": "Open a casino with slot machines and table games.",
+    "jurisdiction_id": "prince-william-county-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]

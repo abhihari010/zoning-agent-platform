@@ -571,5 +571,97 @@
         "chesapeake-va"
       ]
     }
+  },
+  {
+    "id": "prince-william-county-va-source-indexed-restaurant",
+    "project_description": "Open a sit-down restaurant with ten employees and posted operating hours in an existing commercial building, interior renovation only.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "prince-william-county-va",
+    "jurisdiction_name": "Prince William County, VA",
+    "normalized_address": "14141 Daves Store Ln, Gainesville, VA 20155",
+    "sources": [
+      {
+        "source_id": "prince-william-county-va-sec-32-401-11",
+        "title": "Sec. 32-401.11. - Uses permitted by right.",
+        "excerpt": "The following uses shall be permitted by right in the B-1 District: 10. Child-care facility. 16. Craft brewery (not to exceed production of 10,000 barrels per year. May or may not be associated with a restaurant). 25. Hotel or motel. 38. Office. 51. Restaurant.",
+        "section_ref": "Sec. 32-401.11.",
+        "jurisdiction_id": "prince-william-county-va",
+        "url": "https://library.municode.com/va/prince_william_county/codes/code_of_ordinances?nodeId=CH32ZO_ARTIVCOOFINDI_PT401CODI_S32-401.11USPERI",
+        "effective_date": "2026-01-20",
+        "districts": [
+          "commercial-employment"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va"
+      ]
+    }
+  },
+  {
+    "id": "prince-william-county-va-source-indexed-farm-winery",
+    "project_description": "Establish a farm winery with a tasting room on my five-acre agricultural property, with four employees, posted operating hours, and interior renovation only of the existing barn.",
+    "district": "agricultural",
+    "jurisdiction_id": "prince-william-county-va",
+    "jurisdiction_name": "Prince William County, VA",
+    "normalized_address": "14872 Shelter Ln, Haymarket, VA 20169",
+    "sources": [
+      {
+        "source_id": "prince-william-county-va-sec-32-301-02",
+        "title": "Sec. 32-301.02. - Uses permitted by right.",
+        "excerpt": "The following uses shall be permitted by right in the A-1 district: 1. Except for the keeping of domestic fowl as regulated in Part 508, agricultural uses, the keeping of livestock, and fishery uses, farm wineries and breweries with limited brewery licenses in accordance with section 32-300.07.10, on lots two acres or greater. Accessory structures such as, but not limited to, barns, sheds, and stables shall be permitted as required for bona fide agricultural uses.",
+        "section_ref": "Sec. 32-301.02.",
+        "jurisdiction_id": "prince-william-county-va",
+        "url": "https://library.municode.com/va/prince_william_county/codes/code_of_ordinances?nodeId=CH32ZO_ARTIIIAGREDI_PT301AGDI_S32-301.02USPERI",
+        "effective_date": "2026-01-20",
+        "districts": [
+          "agricultural"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va"
+      ]
+    }
   }
 ]
