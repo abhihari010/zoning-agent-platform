@@ -327,5 +327,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "Virginia Beach 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) spatial intersect at lat:36.919786 lon:-76.001841 returning DESCRIPTION='Industrial' (ord Article 10); address reverse-geocoded from an Industrial polygon interior point, then geocoded via US Census onelineaddress; round-trip re-intersect confirmed Industrial (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "100 hopkins st",
+    "jurisdiction_id": "newport-news-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Newport News 'Zoning' layer (maps.nnva.gov/gis/rest/services/Operational/Zoning/MapServer/0) spatial intersect at lat:37.030258 lon:-76.458778 returning ZONECLASS='R4' (Single-Family Dwelling District, ord Article IX); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R4 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "313 hiden blvd",
+    "jurisdiction_id": "newport-news-va",
+    "parcel_id": null,
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Newport News 'Zoning' layer (maps.nnva.gov/gis/rest/services/Operational/Zoning/MapServer/0) spatial intersect at lat:37.068997 lon:-76.494042 returning ZONECLASS='R9' (Mixed Use District, ord Article XIV); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R9 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "12465 warwick blvd",
+    "jurisdiction_id": "newport-news-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Newport News 'Zoning' layer (maps.nnva.gov/gis/rest/services/Operational/Zoning/MapServer/0) spatial intersect at lat:37.072939 lon:-76.493630 returning ZONECLASS='C1' (Retail Commercial District, ord Article XX); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed C1 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "180 hogan dr",
+    "jurisdiction_id": "newport-news-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Newport News 'Zoning' layer (maps.nnva.gov/gis/rest/services/Operational/Zoning/MapServer/0) spatial intersect at lat:37.099557 lon:-76.494464 returning ZONECLASS='M1' (Light Industrial District, ord Article XXV); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M1 (verified 2026-07-17)"
   }
 ]

@@ -951,5 +951,106 @@
         "winchester-va"
       ]
     }
+  },
+  {
+    "id": "newport-news-va-source-indexed-retail-store",
+    "project_description": "Open a small retail store selling home goods with four employees, posted operating hours, and interior renovation only of an existing commercial building in the C1 Retail Commercial District.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "newport-news-va",
+    "jurisdiction_name": "Newport News, VA",
+    "normalized_address": "12465 Warwick Blvd, Newport News, VA 23606",
+    "sources": [
+      {
+        "source_id": "newport-news-va-sec-45-2002",
+        "title": "Sec. 45-2002. - Permitted uses.",
+        "excerpt": "(a) Principal uses. Principal uses permitted in this district are set forth in Article IV, section 45-402 (b) Accessory uses. Generally, uses accessory to principal uses allowed in this district are permitted. However, certain accessory uses may have special requirements or require a special exception. See Article V and Article XXXII to determine what special requirements may apply.",
+        "section_ref": "Sec. 45-2002.",
+        "jurisdiction_id": "newport-news-va",
+        "url": "https://library.municode.com/va/newport_news/codes/code_of_ordinances?nodeId=CD_ORD_CH45ZOOR_ARTXXC1RECODIRE_S45-2002PEUS",
+        "effective_date": "0001-01-01",
+        "districts": [
+          "commercial-employment"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va"
+      ]
+    }
+  },
+  {
+    "id": "newport-news-va-source-indexed-home-occupation",
+    "project_description": "Run a home occupation providing freelance bookkeeping services inside my single-family home, with no employees, no posted public hours, and no exterior renovation, using less than 400 square feet of floor space, in the R4 Single-Family Dwelling District.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "newport-news-va",
+    "jurisdiction_name": "Newport News, VA",
+    "normalized_address": "100 Hopkins St, Newport News, VA 23601",
+    "sources": [
+      {
+        "source_id": "newport-news-va-sec-45-517",
+        "title": "Sec. 45-517. - Home occupation.",
+        "excerpt": "No home occupation shall be permitted that: (1) Makes use of more than four hundred (400) square feet of floor space. (2) Makes use of any accessory building. (3) Changes the outside appearance of the dwelling or is visible from the street or has any other exterior indication of the home occupation. (4) Displays or stores materials outside. (5) Creates a nuisance varying the residential character of the premises.",
+        "section_ref": "Sec. 45-517.",
+        "jurisdiction_id": "newport-news-va",
+        "url": "https://library.municode.com/va/newport_news/codes/code_of_ordinances?nodeId=CD_ORD_CH45ZOOR_ARTVGERE_S45-517HOOC",
+        "effective_date": "0001-01-01",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va"
+      ]
+    }
   }
 ]

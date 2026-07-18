@@ -1,0 +1,158 @@
+[
+  {
+    "id": "newport-news-va-r4-single-family",
+    "address": "100 Hopkins St, Newport News, VA 23601",
+    "project_description": "Build a new single-family dwelling on a vacant lot in the R4 Single-Family Dwelling District, sized to meet the minimum 6,600 square foot lot area with a 30-foot front yard setback and a 35-foot maximum building height.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 45-903."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "newport-news-va-r4-freight-container",
+    "address": "100 Hopkins St, Newport News, VA 23601",
+    "project_description": "Permanently store a freight shipping container on my residential lot in the R4 Single-Family Dwelling District for personal storage.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 45-528."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "newport-news-va-r4-commercial-kennel",
+    "address": "100 Hopkins St, Newport News, VA 23601",
+    "project_description": "Open a commercial dog boarding kennel as an accessory use behind my single-family home in the R4 Single-Family Dwelling District.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 45-518."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "newport-news-va-r9-mixed-use-development",
+    "address": "313 Hiden Blvd, Newport News, VA 23606",
+    "project_description": "Build a mixed-use development combining multiple-family residential units and office space on a 40,000 square foot site in the R9 Mixed Use District, with a 30-foot front yard setback and a building height under 110 feet.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 45-1403."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "newport-news-va-r9-local-utilities",
+    "address": "313 Hiden Blvd, Newport News, VA 23606",
+    "project_description": "Install the local utilities connections and distribution lines required to serve my mixed-use development in the R9 Mixed Use District.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 45-402."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "newport-news-va-c1-retail-building",
+    "address": "12465 Warwick Blvd, Newport News, VA 23606",
+    "project_description": "Construct a new retail commercial building in the C1 Retail Commercial District meeting the district's 25-foot front yard setback and 40-foot maximum height.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 45-2003."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "newport-news-va-c1-bus-stop",
+    "address": "12465 Warwick Blvd, Newport News, VA 23606",
+    "project_description": "Install a bus stop and shelter as part of the site plan for my retail development in the C1 Retail Commercial District.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 45-402."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "newport-news-va-m1-light-manufacturing",
+    "address": "180 Hogan Dr, Newport News, VA 23606",
+    "project_description": "Build a light manufacturing and assembly facility in the M1 Light Industrial District meeting the district's 30-foot front yard setback and 40-foot maximum height.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 45-2503."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "newport-news-va-m1-permitted-uses",
+    "address": "180 Hogan Dr, Newport News, VA 23606",
+    "project_description": "Operate a light manufacturing and assembly facility with no outdoor storage in the M1 Light Industrial District, as a principal permitted use of the property.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 45-2502.", "Sec. 45-402."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "newport-news-va-m1-local-utilities",
+    "address": "180 Hogan Dr, Newport News, VA 23606",
+    "project_description": "Install a local utility substation connection as part of the infrastructure for my industrial facility in the M1 Light Industrial District.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 45-402."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "newport-news-va-abstain-cannabis-dispensary",
+    "address": "9 Oyster Point Rd, Newport News, VA 23602",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "newport-news-va-abstain-data-center",
+    "address": "9 Oyster Point Rd, Newport News, VA 23602",
+    "project_description": "Construct a hyperscale data center campus with large-scale server farms and standby diesel generators.",
+    "jurisdiction_id": "newport-news-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
