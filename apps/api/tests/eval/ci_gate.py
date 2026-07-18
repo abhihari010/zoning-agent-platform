@@ -72,6 +72,12 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # 2026-07-17: virginia-beach-va 1.000 (each article has ONE use chart,
     # so the per-district use vocabulary concentrates in the target section).
     "virginia-beach-va": 0.85,
+    # 2026-07-17: newport-news-va 0.455 (the "Summary of uses by district" use
+    # table at Sec. 45-402 is shared across 20 districts with no per-district
+    # column delimiter in scraped text, so table-derived refs are keyword-hard;
+    # the per-district dimensional/general sections are keyword-friendly and
+    # carry most of the recall — live vector recall is the quality signal).
+    "newport-news-va": 0.35,
 }
 
 
