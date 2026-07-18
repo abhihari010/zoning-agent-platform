@@ -1,0 +1,158 @@
+[
+  {
+    "id": "fredericksburg-va-r2-single-family-detached",
+    "address": "5517 River Rd, Fredericksburg, VA 22407",
+    "project_description": "Build a new single-family detached dwelling on a vacant lot in the R-2 Residential District, meeting the district's 15,000 square foot minimum lot area and 2 dwelling units per acre maximum density standard.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["72-31.2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fredericksburg-va-r2-duplex-prohibited",
+    "address": "5517 River Rd, Fredericksburg, VA 22407",
+    "project_description": "Build a new duplex dwelling on the same vacant lot in the R-2 Residential District.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["72-31.2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fredericksburg-va-r2-garage-bakery-conditional",
+    "address": "5517 River Rd, Fredericksburg, VA 22407",
+    "project_description": "Convert a garage into a small commercial bakery with two employees and a walk-up window on the same residential lot in the R-2 Residential District, meeting the district's 15,000 square foot minimum lot area standard.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["conditional", "restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["72-31.2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fredericksburg-va-ch-retail-permitted",
+    "address": "3300 Plank Rd, Fredericksburg, VA 22407",
+    "project_description": "Open a new general retail store in the Commercial-Highway (C-H) District meeting the district's 20,000 square foot minimum lot area and 40-foot maximum height standard.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["72-32.4"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fredericksburg-va-ch-outdoor-storage-conditional",
+    "address": "3300 Plank Rd, Fredericksburg, VA 22407",
+    "project_description": "Add an outdoor storage and display area for merchandise that is not shown on an approved site plan, adjacent to the retail building in the Commercial-Highway (C-H) District.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["conditional", "restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["72-32.4"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fredericksburg-va-i2-manufacturing-permitted",
+    "address": "480 Central Rd, Fredericksburg, VA 22401",
+    "project_description": "Build a new medium industrial manufacturing facility in the General Industrial (I-2) District meeting the district's 20,000 square foot minimum lot area and 50-foot maximum height standard.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["72-32.6"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fredericksburg-va-i2-height-increase-conditional",
+    "address": "480 Central Rd, Fredericksburg, VA 22401",
+    "project_description": "Build a new industrial building up to 90 feet tall on the same site in the General Industrial (I-2) District, exceeding the district's standard 50-foot maximum height.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["72-32.6"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fredericksburg-va-i2-unscreened-outdoor-storage-restricted",
+    "address": "480 Central Rd, Fredericksburg, VA 22401",
+    "project_description": "Add an unscreened outdoor storage area visible from off-site properties next to the industrial building in the General Industrial (I-2) District.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["conditional", "restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["72-32.6"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fredericksburg-va-pdmu-mixed-use-permitted",
+    "address": "1220 Spur Ln, Fredericksburg, VA 22401",
+    "project_description": "Develop a mixed-use project in the Planned Development-Mixed-Use (PD-MU) District combining ground-floor retail and upper-story residential dwellings, including two or more different use groups, with building heights not exceeding 80 feet.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["72-33.3"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fredericksburg-va-pdmu-single-use-restricted",
+    "address": "1220 Spur Ln, Fredericksburg, VA 22401",
+    "project_description": "Develop an apartment complex consisting entirely of residential units, with no retail, office, or other use group included, on the same site in the Planned Development-Mixed-Use (PD-MU) District.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["72-33.3"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fredericksburg-va-abstain-cannabis-dispensary",
+    "address": "1000 Caroline St, Fredericksburg, VA 22401",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "fredericksburg-va-abstain-data-center",
+    "address": "2000 Fall Hill Ave, Fredericksburg, VA 22401",
+    "project_description": "Build a hyperscale data center campus with on-site backup power generation and cooling towers.",
+    "jurisdiction_id": "fredericksburg-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]

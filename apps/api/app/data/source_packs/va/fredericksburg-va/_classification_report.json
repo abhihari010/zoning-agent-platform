@@ -1,0 +1,125 @@
+{
+  "generated_at": "2026-07-02T15:46:33.975011+00:00",
+  "manifest_path": "C:\\Users\\abhih\\Zoning-Agent-App\\apps\\api\\app\\data\\source_packs\\va\\fredericksburg-va\\manifest.json",
+  "model": "llama-3.3-70b-versatile",
+  "min_confidence": 0.7,
+  "group_count": 8,
+  "coerced_count": 0,
+  "error_count": 0,
+  "low_confidence_count": 6,
+  "results": [
+    {
+      "article": "",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The sections provided appear to be general provisions and penalties related to zoning violations, which do not specifically pertain to any particular district or use.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "Administration",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The Administration article governs general administrative procedures and boards, not specific to any district or use.",
+      "confidence": 0.9,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "Definitions and Interpretations",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "This section provides general definitions and interpretations that apply across all districts and uses, without specific reference to any particular district or use.",
+      "confidence": 0.9,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "Development Standards",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section titles suggest a broad range of development standards that could apply across multiple districts, without specific references to a particular district or use.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "General Provisions",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The General Provisions article contains broad, cross-cutting sections that apply to multiple districts and uses, making 'unknown' and 'general' the most suitable classifications.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "Nonconformities",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section group 'Nonconformities' appears to be a broad, cross-cutting topic that applies across multiple districts and uses, without specific references to particular districts or uses.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "Use Standards",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section group appears to provide broad use standards that apply across districts, including residential, institutional, and commercial uses, without specific district-level standards.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "Zoning Districts",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section titles provided are general and do not specifically relate to any particular district or use, suggesting a broad or cross-cutting application.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    }
+  ],
+  "note": "REVIEW REQUIRED \u2014 do not promote to public_supported until all groups have been spot-checked. Coerced/low-confidence groups default to 'unknown'/'general'."
+}
