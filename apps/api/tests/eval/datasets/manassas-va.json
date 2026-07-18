@@ -1,0 +1,158 @@
+[
+  {
+    "id": "manassas-va-r1-single-family-detached",
+    "address": "8600 Fort Dr, Manassas, VA 20110",
+    "project_description": "Build a new single-family detached dwelling on a vacant lot in the R-1 Low Density, Single-Family Residential District, meeting the district's 15,000 square foot minimum lot area and 35-foot minimum front setback standards.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 130-262."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "manassas-va-r1-height-variance-conditional",
+    "address": "8600 Fort Dr, Manassas, VA 20110",
+    "project_description": "Build a new single-family home up to 45 feet tall on the same lot in the R-1 Low Density, Single-Family Residential District, exceeding the district's standard 35-foot maximum structure height.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 130-262."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "manassas-va-r1-side-setback-encroachment-restricted",
+    "address": "8600 Fort Dr, Manassas, VA 20110",
+    "project_description": "Build a home addition located five feet from the side lot line, well under the district's 15-foot minimum side setback, on the same lot in the R-1 Low Density, Single-Family Residential District, with no setback variance requested.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 130-262."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "manassas-va-b4-retail-office-permitted",
+    "address": "10023 Dumfries Rd, Manassas, VA 20110",
+    "project_description": "Open a new general retail and office business in the B-4 General Commercial District meeting the district's 15-foot minimum front setback and 55-foot maximum structure height standards.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 130-305."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "manassas-va-b4-vet-hospital-outdoor-runs-restricted",
+    "address": "10023 Dumfries Rd, Manassas, VA 20110",
+    "project_description": "Open a veterinary hospital with an outdoor exercise run area for boarded animals, adjacent to the retail building in the B-4 General Commercial District.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 130-305."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "manassas-va-i1-light-manufacturing-permitted",
+    "address": "10001 Dean Dr, Manassas, VA 20110",
+    "project_description": "Build a new light manufacturing and distribution facility with an on-site business office in the I-1 Light Industrial District, meeting the district's 15-foot minimum front setback standard.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 130-306."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "manassas-va-i1-height-increase-conditional",
+    "address": "10001 Dean Dr, Manassas, VA 20110",
+    "project_description": "Build a new industrial building up to 90 feet tall on the same site in the I-1 Light Industrial District, exceeding the district's standard 75-foot maximum structure height.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 130-306."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "manassas-va-i1-unscreened-storage-street-side-restricted",
+    "address": "10001 Dean Dr, Manassas, VA 20110",
+    "project_description": "Add an unscreened outdoor storage area located between the principal structure and the adjacent street, next to the manufacturing building in the I-1 Light Industrial District, with no opaque screening or landscape buffer provided.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["conditional", "restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 130-306."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "manassas-va-b3-mixed-use-existing-building-permitted",
+    "address": "8912 Quarry Rd, Manassas, VA 20110",
+    "project_description": "Convert the upper floor of an existing Old Town building (final certificate of occupancy issued before May 11, 2015) into residential dwelling units above ground-floor retail in the B-3 City Center Commercial (Old Town) District, meeting the district's 600 square foot minimum unit size and 80 percent ground-floor non-residential standards.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 130-303."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "manassas-va-b3-fast-food-drive-through-restricted",
+    "address": "8912 Quarry Rd, Manassas, VA 20110",
+    "project_description": "Add a drive-through service window at a new fast-food restaurant (not a financial institution) in the B-3 City Center Commercial (Old Town) District.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 130-303."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "manassas-va-abstain-cannabis-dispensary",
+    "address": "1000 Prince William St, Manassas, VA 20110",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "manassas-va-abstain-data-center",
+    "address": "9500 Godwin Dr, Manassas, VA 20109",
+    "project_description": "Build a hyperscale data center campus with on-site backup power generation and cooling towers.",
+    "jurisdiction_id": "manassas-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]

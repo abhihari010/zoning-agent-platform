@@ -527,5 +527,45 @@
     "confidence": 0.85,
     "method": "gis_verified",
     "source": "City of Lynchburg 'Zoning' layer (mapviewer.lynchburgva.gov/arcgis/rest/services/Apps/ParcelViewer/MapServer/42) point-in-polygon test at address-point lat:37.41740309 lon:-79.14844564 (from the city's own 'Addresses' layer, MapServer/1) returning Zone='B4' (Zone_ID=629, Description='B-6 to B-4', downtown Lynchburg); cross-checked against the independent Planning/ZoningAndLandUse/MapServer 'Business' sublayer (id 8), same point-in-polygon result Zone='B4'; address forward-geocoded via US Census onelineaddress to 400 CLAY ST, LYNCHBURG, VA, 24504; B4 is a human judgment-call mapping to mixed-use-core (see classification_rules.json _notes) rather than a vocabulary term the ordinance names directly, hence confidence 0.85 not 0.9 (ord Sec. 35.2-47, B-4 District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "8600 fort dr",
+    "jurisdiction_id": "manassas-va",
+    "parcel_id": "7796-54-0624",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.767492966033 lon:-77.474706838921 returning FULL_ADDRESS='8600 FORT DR', ZONING='R1', GPIN_NUM='7796-54-0624', USE_CODE='101' MODEL_DESC='ANTIETAM' (single-family detached, Signal Hill/Fort Dr subdivision); address forward-geocoded via US Census onelineaddress to '8600 FORT DR, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 56.6m); cross-checked against the 9 neighboring parcels within the same 60m buffer, all ZONING='R1' with single-family MODEL_DESC values (SHILOH, WILLIAMSBURG, ANTIETAM), confirming a coherent single-family neighborhood rather than a boundary parcel (ord Sec. 130-262, R-1 Low Density, Single-Family Residential District) (verified 2026-07-18); the older manassasgis.manassasva.gov/arcgis21 GIS host referenced in public search results is unreachable from this environment (connection refused), so gis.manassasva.gov/server2 -- the host actually backing the city's live parcel/zoning lookup tools -- was used"
+  },
+  {
+    "address_pattern": "10023 dumfries rd",
+    "jurisdiction_id": "manassas-va",
+    "parcel_id": "7795-63-3054",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.738332161665 lon:-77.472185738721 returning FULL_ADDRESS='10023 DUMFRIES RD', ZONING='B4', GPIN_NUM='7795-63-3054', USE_CODE='210' MODEL_DESC='DAYCARE'; address forward-geocoded via US Census onelineaddress to '10023 DUMFRIES RD, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 69.5m); cross-checked against the neighboring Dumfries Rd corridor parcels within the same 60m buffer -- 10024 DUMFRIES RD ZONING='B4' (WELLINGTON CENT retail center), 10233 DUMFRIES RD ZONING='B4', 10217 DUMFRIES RD ZONING='B2' (neighborhood commercial) -- confirming a general commercial corridor consistent with the B-4 purpose text's 'wide array of retail, office, service, and institutional uses' serving 'local and regional patrons' (ord Sec. 130-305, B-4 General Commercial District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "10001 dean dr",
+    "jurisdiction_id": "manassas-va",
+    "parcel_id": "7695-96-0319",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.746177 lon:-77.496692 returning FULL_ADDRESS='10001 DEAN DR', ZONING='I1', GPIN_NUM='7695-96-0319', USE_CODE='920'; address forward-geocoded via US Census onelineaddress to '10001 DEAN DR, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 48.5m); cross-checked against 7 neighboring Dean Dr parcels in the same buffer, all ZONING='I1', including '9478 TECHNOLOGY DR' MODEL_DESC='DATA CENTER' -- directly corroborating the I-1 ordinance text's own framing of this area as the 'Godwin Technology Character Area' (ord Sec. 130-306, I-1 Light Industrial District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "8912 quarry rd",
+    "jurisdiction_id": "manassas-va",
+    "parcel_id": "7795-78-4290",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.85,
+    "method": "gis_verified",
+    "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.752763 lon:-77.466891 returning FULL_ADDRESS='8912 QUARRY RD', ZONING='B3', GPIN_NUM='7795-78-4290', USE_CODE='915R' MODEL_DESC='2STY FRAME' (Old Town Manassas, one block off Main St); address forward-geocoded via US Census onelineaddress to '8912 QUARRY RD, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 36.4m); cross-checked against neighboring parcels in the same buffer -- adjacent B-3.5 (city center planned, also mapped mixed-use-core) parcels on Quarry Rd/Fairview Ave, plus R-2-S residential parcels one block over on Centreville Rd, consistent with B-3's purpose text describing 'an attractive and successful mixed-use historic downtown with pedestrian-oriented retail, commercial, and institutional uses along with residential uses'; B-3 is a human judgment-call mapping to mixed-use-core (see classification_rules.json _notes) rather than a vocabulary term the ordinance names directly, hence confidence 0.85 not 0.9 (ord Sec. 130-303, B-3 City Center Commercial (Old Town) District) (verified 2026-07-18)"
   }
 ]
