@@ -257,5 +257,35 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.017112 lon:-78.462525 returning Zoning='Light Industry' (ord Sec. 27, uses per Sec. 26.2 table); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed Light Industry (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "2307 stoneridge rd",
+    "jurisdiction_id": "winchester-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Winchester 'Zoning' layer (gis.winchesterva.gov/arcgis/rest/services/Winchester/Zoning/MapServer/0) spatial intersect at lat:39.162679 lon:-78.193121 returning MZONE='LR' (Low Density Residential, ord Article 3); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed LR (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "1104 conway st",
+    "jurisdiction_id": "winchester-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Winchester 'Zoning' layer (gis.winchesterva.gov/arcgis/rest/services/Winchester/Zoning/MapServer/0) spatial intersect at lat:39.186802 lon:-78.142569 returning MZONE='B2' (Highway Commercial, ord Article 8); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B2 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "144 bruce dr",
+    "jurisdiction_id": "winchester-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Winchester 'Zoning' layer (gis.winchesterva.gov/arcgis/rest/services/Winchester/Zoning/MapServer/0) spatial intersect at lat:39.150446 lon:-78.175928 returning MZONE='M1' (Limited Industrial, ord Article 11); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M1 (verified 2026-07-17)"
   }
 ]
