@@ -78,6 +78,13 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # the per-district dimensional/general sections are keyword-friendly and
     # carry most of the recall — live vector recall is the quality signal).
     "newport-news-va": 0.35,
+    # 2026-07-17: hampton-va 0.200 (most conditional/restricted refs point at
+    # Sec. 3-3 "Additional standards on uses", a single very long section
+    # covering dozens of unrelated use types — its keyword vocabulary is
+    # diluted the same way chesapeake's SIC use tables are; the per-district
+    # dimensional sections (Sec. 4-44, 5-16, 6-3, 7-4, ...) are keyword-
+    # friendly; live vector recall is the quality signal).
+    "hampton-va": 0.15,
 }
 
 

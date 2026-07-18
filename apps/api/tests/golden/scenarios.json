@@ -1052,5 +1052,109 @@
         "virginia-beach-va"
       ]
     }
+  },
+  {
+    "id": "hampton-va-source-indexed-single-family-lot-area",
+    "project_description": "Build a new one-family detached dwelling with four employees, posted operating hours, and interior renovation only, meeting the minimum 22,000 square foot lot area and 110-foot frontage in the R-22 One Family Residential District.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "hampton-va",
+    "jurisdiction_name": "Hampton, VA",
+    "normalized_address": "10 Oldenburg Ln, Hampton, VA 23664",
+    "sources": [
+      {
+        "source_id": "hampton-va-sec-4-44",
+        "title": "Sec. 4-44. - Lot area.",
+        "excerpt": "All lots shall be a minimum of twenty-two thousand (22,000) square feet with a minimum frontage of one hundred ten (110) feet.",
+        "section_ref": "Sec. 4-44",
+        "jurisdiction_id": "hampton-va",
+        "url": "https://library.municode.com/va/hampton/codes/zoning?nodeId=CH4OMIREDI_ARTVR-DINEFARE_S4-44LOAR",
+        "effective_date": "0001-01-01",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va"
+      ]
+    }
+  },
+  {
+    "id": "hampton-va-source-indexed-light-manufacturing-height",
+    "project_description": "Build a light manufacturing and assembly facility with four employees, posted operating hours, and interior renovation only of an existing building, meeting the 35-foot maximum building height in the M-1 Limited Manufacturing District.",
+    "district": "industrial-zone",
+    "jurisdiction_id": "hampton-va",
+    "jurisdiction_name": "Hampton, VA",
+    "normalized_address": "8 Shuttle Ct, Hampton, VA 23666",
+    "sources": [
+      {
+        "source_id": "hampton-va-sec-7-4",
+        "title": "Sec. 7-4. - Height.",
+        "excerpt": "Buildings shall be a maximum of thirty-five (35) feet in height, unless otherwise approved by use permit in accordance with chapter 14.",
+        "section_ref": "Sec. 7-4",
+        "jurisdiction_id": "hampton-va",
+        "url": "https://library.municode.com/va/hampton/codes/zoning?nodeId=CH7MADI_ARTIDIIMMA_S7-4HE",
+        "effective_date": "0001-01-01",
+        "districts": [
+          "industrial-zone"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va"
+      ]
+    }
   }
 ]
