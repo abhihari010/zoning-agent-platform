@@ -287,5 +287,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "City of Winchester 'Zoning' layer (gis.winchesterva.gov/arcgis/rest/services/Winchester/Zoning/MapServer/0) spatial intersect at lat:39.150446 lon:-78.175928 returning MZONE='M1' (Limited Industrial, ord Article 11); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M1 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "873 daimler dr",
+    "jurisdiction_id": "virginia-beach-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Virginia Beach 'Residential Address Points' ZONING='R7.5' cross-checked against the city 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) at lat:36.783296 lon:-75.981180 returning DESCRIPTION='Residential Single-Family' (ord Article 5); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "1152 virginia beach blvd",
+    "jurisdiction_id": "virginia-beach-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Virginia Beach 'Residential Address Points' ZONING='B2' cross-checked against the city 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) at lat:36.841985 lon:-75.997320 returning DESCRIPTION='Business' (ord Article 9); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "6540 blackwater rd",
+    "jurisdiction_id": "virginia-beach-va",
+    "parcel_id": null,
+    "zoning_district": "agricultural",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Virginia Beach 'Residential Address Points' ZONING='AG2' cross-checked against the city 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) at lat:36.558343 lon:-76.073795 returning DESCRIPTION='Agricultural' (ord Article 4); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "461 santiago rd",
+    "jurisdiction_id": "virginia-beach-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Virginia Beach 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) spatial intersect at lat:36.919786 lon:-76.001841 returning DESCRIPTION='Industrial' (ord Article 10); address reverse-geocoded from an Industrial polygon interior point, then geocoded via US Census onelineaddress; round-trip re-intersect confirmed Industrial (verified 2026-07-17)"
   }
 ]

@@ -69,6 +69,9 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # zoning/subdivision packs share bare N-N section numbering, which
     # dilutes keyword scoring for the shortest refs).
     "winchester-va": 0.60,
+    # 2026-07-17: virginia-beach-va 1.000 (each article has ONE use chart,
+    # so the per-district use vocabulary concentrates in the target section).
+    "virginia-beach-va": 0.85,
 }
 
 

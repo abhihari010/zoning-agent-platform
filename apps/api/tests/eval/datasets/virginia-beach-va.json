@@ -1,0 +1,158 @@
+[
+  {
+    "id": "virginia-beach-va-r75-single-family",
+    "address": "873 Daimler Dr, Virginia Beach, VA 23454",
+    "project_description": "Build a new single-family dwelling on a vacant lot in the R-7.5 residential district.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 501."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "virginia-beach-va-r75-home-occupation",
+    "address": "873 Daimler Dr, Virginia Beach, VA 23454",
+    "project_description": "Run a home occupation doing freelance bookkeeping inside my house in the R-7.5 residential district, with no outside employees.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 501."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "virginia-beach-va-b2-business-office",
+    "address": "1152 Virginia Beach Blvd, Virginia Beach, VA 23451",
+    "project_description": "Open a business studio and office for a marketing firm in the B-2 business district.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 901."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "virginia-beach-va-b2-day-care-center",
+    "address": "1152 Virginia Beach Blvd, Virginia Beach, VA 23451",
+    "project_description": "Open a day-care center and child care education center in the B-2 business district.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 901."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "virginia-beach-va-b2-drugstore",
+    "address": "1152 Virginia Beach Blvd, Virginia Beach, VA 23451",
+    "project_description": "Open a drugstore with a beauty shop and barbershop in the B-2 business district.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 901."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "virginia-beach-va-b2-eating-establishment",
+    "address": "1152 Virginia Beach Blvd, Virginia Beach, VA 23451",
+    "project_description": "Open an eating and drinking establishment without a drive-through window inside a mixed use building in the B-2 business district.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 901."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "virginia-beach-va-ag2-livestock",
+    "address": "6540 Blackwater Rd, Virginia Beach, VA 23457",
+    "project_description": "Run agricultural and horticultural operations raising and grazing livestock and poultry on my farm in the AG-2 agricultural district.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 401."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "virginia-beach-va-ag2-farm-winery",
+    "address": "6540 Blackwater Rd, Virginia Beach, VA 23457",
+    "project_description": "Establish a farm winery with a vineyard on my agricultural property in the AG-2 agricultural district.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 401."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "virginia-beach-va-i1-printing",
+    "address": "461 Santiago Rd, Virginia Beach, VA 23451",
+    "project_description": "Open a printing, lithographic and publishing establishment in the I-1 industrial district.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 1001."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "virginia-beach-va-i1-craft-brewery",
+    "address": "461 Santiago Rd, Virginia Beach, VA 23451",
+    "project_description": "Open a craft brewery with a tasting room in the I-1 industrial district.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 1001."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "virginia-beach-va-abstain-food-truck",
+    "address": "2401 Courthouse Dr, Virginia Beach, VA 23456",
+    "project_description": "Operate a mobile food truck vending meals at different street locations around the city throughout the week.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "virginia-beach-va-abstain-casino",
+    "address": "2401 Courthouse Dr, Virginia Beach, VA 23456",
+    "project_description": "Open a casino with slot machines and table games.",
+    "jurisdiction_id": "virginia-beach-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
