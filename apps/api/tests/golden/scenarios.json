@@ -853,5 +853,103 @@
         "albemarle-county-va"
       ]
     }
+  },
+  {
+    "id": "virginia-beach-va-source-indexed-business-office",
+    "project_description": "Open a business studio and office for a marketing firm with six employees, posted operating hours, and interior renovation only of an existing commercial building.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "virginia-beach-va",
+    "jurisdiction_name": "Virginia Beach, VA",
+    "normalized_address": "1152 Virginia Beach Blvd, Virginia Beach, VA 23451",
+    "sources": [
+      {
+        "source_id": "virginia-beach-va-sec-901",
+        "title": "Sec. 901. - Use regulations.",
+        "excerpt": "(a) Principal and conditional uses. The following chart lists those uses permitted within the B-1 through B-4K Business Districts, as either principal uses indicated by a 'P' or as conditional uses indicated by a 'C.' Business studios, offices and clinics P P P P P P P. Day-care centers and child care education centers C C P P P P C. Drugstores, beauty shops and barbershops P P P P P P P.",
+        "section_ref": "Sec. 901.",
+        "jurisdiction_id": "virginia-beach-va",
+        "url": "https://library.municode.com/va/virginia_beach/codes/code_of_ordinances?nodeId=CO_APXAZOOR_ART9BUDI_S901USRE",
+        "effective_date": "0001-01-01",
+        "districts": [
+          "commercial-employment"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "virginia-beach-va-source-indexed-farm-winery",
+    "project_description": "Establish a farm winery with a vineyard and tasting room on my agricultural property, with four employees, posted operating hours, and interior renovation only of the existing barn.",
+    "district": "agricultural",
+    "jurisdiction_id": "virginia-beach-va",
+    "jurisdiction_name": "Virginia Beach, VA",
+    "normalized_address": "6540 Blackwater Rd, Virginia Beach, VA 23457",
+    "sources": [
+      {
+        "source_id": "virginia-beach-va-sec-401",
+        "title": "Sec. 401. - Use regulations.",
+        "excerpt": "(a) Principal and conditional uses. The following chart lists those uses permitted within the AG-1 and AG-2 Agricultural Districts, as either principal uses indicated by a 'P' or as conditional uses indicated by a 'C.' Agricultural, aquacultural and horticultural operations, including orchards, vineyards, nurseries and the raising and grazing of livestock, poultry and swine and the keeping of bees P P. Farm wineries, farm breweries and farm distilleries, subject to the provisions of section 209.1 P P.",
+        "section_ref": "Sec. 401.",
+        "jurisdiction_id": "virginia-beach-va",
+        "url": "https://library.municode.com/va/virginia_beach/codes/code_of_ordinances?nodeId=CO_APXAZOOR_ART4AGDI_S401USRE",
+        "effective_date": "0001-01-01",
+        "districts": [
+          "agricultural"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va"
+      ]
+    }
   }
 ]
