@@ -65,6 +65,10 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # 2026-07-17: albemarle-county-va 0.900 (prose per-district "By right"
     # lists; only the R-1 home-occupation ref is keyword-hard).
     "albemarle-county-va": 0.80,
+    # 2026-07-17: winchester-va 0.700 (prose per-article use regulations;
+    # zoning/subdivision packs share bare N-N section numbering, which
+    # dilutes keyword scoring for the shortest refs).
+    "winchester-va": 0.60,
 }
 
 

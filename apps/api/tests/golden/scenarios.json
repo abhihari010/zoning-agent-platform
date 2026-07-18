@@ -757,5 +757,101 @@
         "prince-william-county-va"
       ]
     }
+  },
+  {
+    "id": "winchester-va-source-indexed-restaurant",
+    "project_description": "Open a sit-down restaurant with eight employees and posted operating hours in an existing commercial building, interior renovation only.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "winchester-va",
+    "jurisdiction_name": "Winchester, VA",
+    "normalized_address": "1104 Conway St, Winchester, VA 22601",
+    "sources": [
+      {
+        "source_id": "winchester-va-sec-8-1",
+        "title": "Sec. 8-1. - Use regulations.",
+        "excerpt": "Structures to be erected and land to be used shall be for the following uses: 8-1-9 Banks and financial institutions. 8-1-20 Bed and Breakfast Inns, Bed and Breakfast Homestays, Hotels and motels. 8-1-36 Restaurants. 8-1-37 Retail stores. 8-1-38 Schools.",
+        "section_ref": "Sec. 8-1",
+        "jurisdiction_id": "winchester-va",
+        "url": "https://library.municode.com/va/winchester/codes/zoning_and_subdivision_ordinance?nodeId=ZOOR_ART8HICODI-2_S8-1USRE",
+        "effective_date": "2025-10-28",
+        "districts": [
+          "commercial-employment"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va"
+      ]
+    }
+  },
+  {
+    "id": "winchester-va-source-indexed-industrial-bakery",
+    "project_description": "Open a plant manufacturing and processing bakery goods with twelve employees, posted operating hours, and interior renovation only of an existing industrial building.",
+    "district": "industrial-zone",
+    "jurisdiction_id": "winchester-va",
+    "jurisdiction_name": "Winchester, VA",
+    "normalized_address": "144 Bruce Dr, Winchester, VA 22601",
+    "sources": [
+      {
+        "source_id": "winchester-va-sec-11-1",
+        "title": "Sec. 11-1. - Use regulations.",
+        "excerpt": "Structures to be erected or land to be used shall be for the following uses: 11-1-1 The manufacture, compounding, processing, packing, or treatment of such products as bakery goods, candy, cosmetics, dairy products, drugs, perfumes, pharmaceuticals and high-purity chemicals, perfumed toilet soap, toiletries, and food products. 11-1-2 The manufacture, compounding, assembling, or treatment of articles or merchandise from prepared materials including wood, cloth, and plastics.",
+        "section_ref": "Sec. 11-1",
+        "jurisdiction_id": "winchester-va",
+        "url": "https://library.municode.com/va/winchester/codes/zoning_and_subdivision_ordinance?nodeId=ZOOR_ART11LIINDI-1_S11-1USRE",
+        "effective_date": "2025-10-28",
+        "districts": [
+          "industrial-zone"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.7,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va"
+      ]
+    }
   }
 ]

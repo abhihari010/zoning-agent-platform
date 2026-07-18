@@ -1,0 +1,158 @@
+[
+  {
+    "id": "winchester-va-lr-single-family",
+    "address": "2307 Stoneridge Rd, Winchester, VA 22601",
+    "project_description": "Build a new single-family detached dwelling on a vacant lot in the LR low density residential district.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 3-1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "winchester-va-lr-place-of-worship",
+    "address": "2307 Stoneridge Rd, Winchester, VA 22601",
+    "project_description": "Build a church and place of worship with a sanctuary in the LR low density residential district.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 3-1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "winchester-va-lr-public-school",
+    "address": "2307 Stoneridge Rd, Winchester, VA 22601",
+    "project_description": "Build a private elementary school with the same curricula as public schools in the LR low density residential district.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 3-1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "winchester-va-b2-restaurant",
+    "address": "1104 Conway St, Winchester, VA 22601",
+    "project_description": "Open a sit-down restaurant in an existing commercial building in the B-2 highway commercial district.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 8-1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "winchester-va-b2-retail-store",
+    "address": "1104 Conway St, Winchester, VA 22601",
+    "project_description": "Open a retail store selling home goods and apparel in the B-2 highway commercial district.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 8-1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "winchester-va-b2-hotel",
+    "address": "1104 Conway St, Winchester, VA 22601",
+    "project_description": "Build a hotel with about 80 guest rooms in the B-2 highway commercial district.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 8-1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "winchester-va-b2-bank",
+    "address": "1104 Conway St, Winchester, VA 22601",
+    "project_description": "Open a bank and financial institution branch in the B-2 highway commercial district.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 8-1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "winchester-va-m1-industrial-bakery",
+    "address": "144 Bruce Dr, Winchester, VA 22601",
+    "project_description": "Open a plant for the manufacture and processing of bakery goods and food products in the M-1 limited industrial district.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 11-1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "winchester-va-m1-wood-assembly",
+    "address": "144 Bruce Dr, Winchester, VA 22601",
+    "project_description": "Open a workshop for the manufacture and assembly of furniture articles from prepared wood in the M-1 limited industrial district.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 11-1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "winchester-va-m1-pharmaceuticals",
+    "address": "144 Bruce Dr, Winchester, VA 22601",
+    "project_description": "Open a facility for the manufacture and compounding of pharmaceuticals and high-purity chemicals in the M-1 limited industrial district.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 11-1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "winchester-va-abstain-food-truck",
+    "address": "15 N Cameron St, Winchester, VA 22601",
+    "project_description": "Operate a mobile food truck vending meals at different street locations around the city throughout the week.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "winchester-va-abstain-casino",
+    "address": "15 N Cameron St, Winchester, VA 22601",
+    "project_description": "Open a casino with slot machines and table games.",
+    "jurisdiction_id": "winchester-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
