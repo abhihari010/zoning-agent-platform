@@ -407,5 +407,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:37.101465 lon:-76.395449 returning ZONE_='M-1' (Limited Manufacturing District, ord Chapter 7); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "202 sleepy hollow rd",
+    "jurisdiction_id": "henrico-county-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) joined against 'Master_Address_Points' layer (portal.henrico.gov/mapping/rest/services/Layers/Master_Address_Points/MapServer/0) spatial intersect at lat:37.577496 lon:-77.581127 returning ZONE_LABEL='R-1' (R-1 One-Family Residence District, ord Sec. 24-3305); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-1 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "3715 mechanicsville",
+    "jurisdiction_id": "henrico-county-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) joined against 'Master_Address_Points' layer spatial intersect at lat:37.576285 lon:-77.396379 returning ZONE_LABEL='B-2' (B-2 Business District, ord Sec. 24-3409); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B-2 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "9851 brook rd",
+    "jurisdiction_id": "henrico-county-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) joined against 'Master_Address_Points' layer spatial intersect at lat:37.668059 lon:-77.460723 returning ZONE_LABEL='M-1' (M-1 Light Industrial District, ord Sec. 24-3411); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "1601 willow lawn dr",
+    "jurisdiction_id": "henrico-county-va",
+    "parcel_id": null,
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) spatial intersect returning ZONE_LABEL='UMU-PD' (UMU-PD Urban Mixed-Use Planned Development District, ord Sec. 24-3507); note: base CMU district (Sec. 24-3403) has only 2 unconditional/conditional parcels county-wide and neither round-tripped through the Census geocoder, so UMU-PD -- Henrico's actually-developed urban mixed-use district on the Willow Lawn corridor -- was used instead; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed UMU-PD (verified 2026-07-17)"
   }
 ]

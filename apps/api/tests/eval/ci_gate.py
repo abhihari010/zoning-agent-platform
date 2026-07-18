@@ -85,6 +85,13 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # dimensional sections (Sec. 4-44, 5-16, 6-3, 7-4, ...) are keyword-
     # friendly; live vector recall is the quality signal).
     "hampton-va": 0.15,
+    # 2026-07-17: henrico-county-va 0.400 (weak-label pack: only ~35 of 442
+    # sources classify to a real district after the rules fix, so most refs
+    # point at Article 4 accessory-use sections whose district is "unknown" —
+    # they resolve fine by keyword since each section covers one narrow use,
+    # but the district-scoped base-district refs are a minority of the
+    # dataset; live vector recall is the quality signal).
+    "henrico-county-va": 0.35,
 }
 
 
