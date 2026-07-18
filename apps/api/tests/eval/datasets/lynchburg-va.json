@@ -1,0 +1,158 @@
+[
+  {
+    "id": "lynchburg-va-r2-single-family-detached",
+    "address": "215 Coffee Rd, Lynchburg, VA 24503",
+    "project_description": "Build a new single-family detached dwelling on a vacant lot in the R-2 District, meeting the district's 40-foot maximum height, 30-foot minimum front setback, and 10,000 square foot minimum lot area standards.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 35.2-42.4."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "lynchburg-va-r2-duplex-restricted",
+    "address": "215 Coffee Rd, Lynchburg, VA 24503",
+    "project_description": "Build a new duplex (two-household) dwelling on the same vacant lot in the R-2 District.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 35.2-42.3."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "lynchburg-va-r2-rental-adu-restricted",
+    "address": "215 Coffee Rd, Lynchburg, VA 24503",
+    "project_description": "Convert a detached accessory building into a rentable accessory dwelling unit for a tenant, while the property owner does not reside in the principal dwelling, on the same lot in the R-2 District.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["conditional", "restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 35.2-42.3."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "lynchburg-va-b3-retail-office-permitted",
+    "address": "4925 Boonsboro Rd, Lynchburg, VA 24503",
+    "project_description": "Open a new general office and retail business in the B-3 District meeting the district's 1,000 square foot minimum lot area per dwelling unit and 20-foot parking setback standards.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 35.2-46.4."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "lynchburg-va-b3-vet-hospital-outdoor-kennel-restricted",
+    "address": "4925 Boonsboro Rd, Lynchburg, VA 24503",
+    "project_description": "Open a veterinarian hospital with an outdoor kennel area for overnight boarding, adjacent to the retail building in the B-3 District.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["conditional", "restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 35.2-46.3."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "lynchburg-va-i2-manufacturing-permitted",
+    "address": "3400 Forest Brook Rd, Lynchburg, VA 24501",
+    "project_description": "Build a new industrial manufacturing facility with an office directly related to the on-site industrial activity in the I-2 District.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 35.2-52.3."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "lynchburg-va-i2-junkyard-storage-restricted",
+    "address": "3400 Forest Brook Rd, Lynchburg, VA 24501",
+    "project_description": "Add an outdoor storage yard for combustible materials and an automobile wrecking operation next to the manufacturing building in the I-2 District.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 35.2-52.3."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "lynchburg-va-i2-height-increase-conditional",
+    "address": "3400 Forest Brook Rd, Lynchburg, VA 24501",
+    "project_description": "Build a new industrial building whose height exceeds two times the width of the abutting street, requiring the district's stepped setback-for-height standards in the I-2 District.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 35.2-52.4."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "lynchburg-va-b4-mixed-use-permitted",
+    "address": "400 Clay St, Lynchburg, VA 24504",
+    "project_description": "Develop a mixed-use building in the B-4 District combining ground-floor retail with upper-story multi-household residences in downtown Lynchburg, meeting the district's stepped height-for-setback standards.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 35.2-47.4."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "lynchburg-va-b4-drive-through-restricted",
+    "address": "400 Clay St, Lynchburg, VA 24504",
+    "project_description": "Add a drive-through service window where customers are served food and beverages in their cars, at a new restaurant in the B-4 District.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 35.2-47.3."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "lynchburg-va-abstain-cannabis-dispensary",
+    "address": "1000 Church St, Lynchburg, VA 24504",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "lynchburg-va-abstain-data-center",
+    "address": "2000 Lakeside Dr, Lynchburg, VA 24501",
+    "project_description": "Build a hyperscale data center campus with on-site backup power generation and cooling towers.",
+    "jurisdiction_id": "lynchburg-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]

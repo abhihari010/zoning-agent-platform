@@ -1,0 +1,167 @@
+{
+  "generated_at": "2026-07-02T15:47:22.819246+00:00",
+  "manifest_path": "C:\\Users\\abhih\\Zoning-Agent-App\\apps\\api\\app\\data\\source_packs\\va\\lynchburg-va\\manifest.json",
+  "model": "llama-3.3-70b-versatile",
+  "min_confidence": 0.7,
+  "group_count": 11,
+  "coerced_count": 0,
+  "error_count": 0,
+  "low_confidence_count": 9,
+  "results": [
+    {
+      "article": "ARTICLE I. - ZONING ORDINANCE OVERVIEW",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "This section provides an overview of the zoning ordinance and does not specifically relate to any particular district or use.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE II. - PROCEDURES",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The article and division titles do not provide specific information about a particular district or use, and the section titles suggest general procedural standards.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE III. - ZONING DISTRICTS, MAPS AND BOUNDARIES",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "This section group appears to provide an overview of zoning districts, maps, and boundaries, without focusing on a specific district or use.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE IV. - BASE ZONING DISTRICTS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The article governs base zoning districts with multiple district types mentioned, such as R-C and R-1, making it cross-cutting and broad in scope.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE IX. - NON-CONFORMING SITUATIONS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The article governs non-conforming situations across various districts and uses, without specific focus on any particular district or use.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE V. - SPECIAL ZONING DISTRICTS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section titles suggest a broad, cross-cutting set of standards for special zoning districts without specific reference to a particular district or use.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE VI. - SITE DEVELOPMENT STANDARDS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section titles suggest broad site development standards that could apply across multiple districts, without specific references to a particular district or use.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE VII. - SPECIFIC LAND USE STANDARDS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section titles suggest a broad range of standards that could apply across multiple districts and uses, without specific references to a particular district or use.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE VIII. - LAND USE DEVELOPMENT PATTERNS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section titles suggest a broad range of standards that could apply across multiple districts, without specific references to a particular district or use.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE X. - ADMINISTRATION",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "This section is classified as general use because it deals with administrative roles and does not specifically address any particular district or use.",
+      "confidence": 0.8,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE XI. - DEFINITIONS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "This section group contains definitions and interpretive rules that apply broadly across the zoning code, without specific reference to a particular district or use.",
+      "confidence": 0.8,
+      "coerced": false,
+      "error": ""
+    }
+  ],
+  "note": "REVIEW REQUIRED \u2014 do not promote to public_supported until all groups have been spot-checked. Coerced/low-confidence groups default to 'unknown'/'general'."
+}

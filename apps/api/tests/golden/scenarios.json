@@ -1370,5 +1370,115 @@
         "henrico-county-va"
       ]
     }
+  },
+  {
+    "id": "lynchburg-va-source-indexed-r2-single-family",
+    "project_description": "Build a new single-family detached dwelling with two employees, posted operating hours, and interior renovation only, meeting the district's 40-foot maximum height and 30-foot minimum front setback standards in the R-2 District.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "lynchburg-va",
+    "jurisdiction_name": "Lynchburg, VA",
+    "normalized_address": "215 Coffee Rd, Lynchburg, VA 24503",
+    "sources": [
+      {
+        "source_id": "lynchburg-va-sec-35-2-42-4",
+        "title": "Sec. 35.2-42.4. - R-2 District development standards.",
+        "excerpt": "Exhibit IV-6: Summary of R-2 Development Standards Design Element Standards Cross-Reference Maximum height 40' 35.2-61.2 Minimum front setback (dimension A) 30' 35.2-61.3 Minimum side setback, interior (dimension B) 8' 35.2-61.3 Minimum side setback, exterior (dimension C) 30' 35.2-61.3 Minimum rear setback (dimension D) 30' 35.2-61.3 Minimum lot area (square feet) 10,000, with 5,000 per boarding unit 35.2-61.4 Maximum net density (dwelling units per acre/dwelling units per acre including accessory and boarding units) 4.35/8.7 35.2-61.4 Maximum lot coverage 20% 35.2-61.4",
+        "section_ref": "Sec. 35.2-42.4.",
+        "jurisdiction_id": "lynchburg-va",
+        "url": "https://library.municode.com/va/lynchburg/codes/code_of_ordinances?nodeId=CH35.2ZOOR_ARTIVBAZODI_S35.2-42.4DIDEST",
+        "effective_date": "0001-01-01",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va"
+      ]
+    }
+  },
+  {
+    "id": "lynchburg-va-source-indexed-b4-mixed-use",
+    "project_description": "Develop a mixed-use building with six employees, posted operating hours, and interior renovation only, combining ground-floor retail with upper-story multi-household residences in downtown Lynchburg's Planned Development-adjacent B-4 District, with no drive-in or drive-through service.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "lynchburg-va",
+    "jurisdiction_name": "Lynchburg, VA",
+    "normalized_address": "400 Clay St, Lynchburg, VA 24504",
+    "sources": [
+      {
+        "source_id": "lynchburg-va-sec-35-2-47-1",
+        "title": "Sec. 35.2-47.1. - B-4 District purpose.",
+        "excerpt": "The B-4 district is intended to: (a) Provide for a wide range of residential, commercial and other sales and service operations, serving the entire metropolitan area in downtown Lynchburg and other mixed use centers throughout the City; (b) Encourage a compatible mix of multi-household residences, business and related activities of relatively high densities and with adequate services where appropriate; (c) Assure public access to the James River for recreational purposes and to protect the aesthetic qualities of the riverfront.",
+        "section_ref": "Sec. 35.2-47.1.",
+        "jurisdiction_id": "lynchburg-va",
+        "url": "https://library.municode.com/va/lynchburg/codes/code_of_ordinances?nodeId=CH35.2ZOOR_ARTIVBAZODI_S35.2-47.1DIPU",
+        "effective_date": "0001-01-01",
+        "districts": [
+          "mixed-use-core"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va"
+      ]
+    }
   }
 ]

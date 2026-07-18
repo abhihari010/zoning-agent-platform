@@ -487,5 +487,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at parcel-point lat:38.28805 lon:-77.47719 (from the city's 'Addresses' layer) returning ZONING='PD-MU'; cross-checked against the 'Addresses' layer's own Zoning attribute='PDMU - PLND DEV-MIXED USE' for the same parcel (ord Sec. 72-33.3, Planned Development-Mixed-Use District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "215 coffee rd",
+    "jurisdiction_id": "lynchburg-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Lynchburg 'Zoning' layer (mapviewer.lynchburgva.gov/arcgis/rest/services/Apps/ParcelViewer/MapServer/42) point-in-polygon test at address-point lat:37.44644758 lon:-79.26675644 (from the city's own 'Addresses' layer, mapviewer.lynchburgva.gov/arcgis/rest/services/Apps/ParcelViewer/MapServer/1) returning Zone='R2' (Zone_ID=55); cross-checked against the independent Planning/ZoningAndLandUse/MapServer 'Residential' sublayer (id 9), same point-in-polygon result Zone='R2'; address forward-geocoded via US Census onelineaddress to 215 COFFEE RD, LYNCHBURG, VA, 24503 (ord Sec. 35.2-42, R-2 District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "4925 boonsboro rd",
+    "jurisdiction_id": "lynchburg-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Lynchburg 'Zoning' layer (mapviewer.lynchburgva.gov/arcgis/rest/services/Apps/ParcelViewer/MapServer/42) point-in-polygon test at address-point lat:37.44740374 lon:-79.21972321 (from the city's own 'Addresses' layer, MapServer/1) returning Zone='B3' (Zone_ID=53, unconditional); cross-checked against the independent Planning/ZoningAndLandUse/MapServer 'Business' sublayer (id 8), same point-in-polygon result Zone='B3'; address forward-geocoded via US Census onelineaddress to 4925 BOONSBORO RD, LYNCHBURG, VA, 24503 (ord Sec. 35.2-46, B-3 District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "3400 forest brook rd",
+    "jurisdiction_id": "lynchburg-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Lynchburg 'Zoning' layer (mapviewer.lynchburgva.gov/arcgis/rest/services/Apps/ParcelViewer/MapServer/42) point-in-polygon test at address-point lat:37.40527059 lon:-79.21010256 (from the city's own 'Addresses' layer, MapServer/1) returning Zone='I2' (Zone_ID=1148, unconditional); cross-checked against the independent Planning/ZoningAndLandUse/MapServer 'Industrial' sublayer (id 10), same point-in-polygon result Zone='I2'; address forward-geocoded via US Census onelineaddress to 3400 FOREST BROOK RD, LYNCHBURG, VA, 24501 (coordinates -79.21052808809,37.405359280748, also confirmed inside the same I2 polygon) (ord Sec. 35.2-52, I-2 District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "400 clay st",
+    "jurisdiction_id": "lynchburg-va",
+    "parcel_id": null,
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.85,
+    "method": "gis_verified",
+    "source": "City of Lynchburg 'Zoning' layer (mapviewer.lynchburgva.gov/arcgis/rest/services/Apps/ParcelViewer/MapServer/42) point-in-polygon test at address-point lat:37.41740309 lon:-79.14844564 (from the city's own 'Addresses' layer, MapServer/1) returning Zone='B4' (Zone_ID=629, Description='B-6 to B-4', downtown Lynchburg); cross-checked against the independent Planning/ZoningAndLandUse/MapServer 'Business' sublayer (id 8), same point-in-polygon result Zone='B4'; address forward-geocoded via US Census onelineaddress to 400 CLAY ST, LYNCHBURG, VA, 24504; B4 is a human judgment-call mapping to mixed-use-core (see classification_rules.json _notes) rather than a vocabulary term the ordinance names directly, hence confidence 0.85 not 0.9 (ord Sec. 35.2-47, B-4 District) (verified 2026-07-18)"
   }
 ]
