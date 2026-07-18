@@ -1480,5 +1480,117 @@
         "fredericksburg-va"
       ]
     }
+  },
+  {
+    "id": "manassas-va-source-indexed-r1-single-family",
+    "project_description": "Build a new single-family detached dwelling with two employees, posted operating hours, and interior renovation only, meeting the district's 15,000 square foot minimum lot area and 35-foot minimum front setback standards in the R-1 Low Density, Single-Family Residential District.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "manassas-va",
+    "jurisdiction_name": "Manassas, VA",
+    "normalized_address": "8600 Fort Dr, Manassas, VA 20110",
+    "sources": [
+      {
+        "source_id": "manassas-va-sec-130-262",
+        "title": "Sec. 130-262. - R-1 low density, single-family residential.",
+        "excerpt": "(a) Purpose and intent. The R-1 low density, single-family residential district is intended to preserve and promote quality residential-scale architecture and neighborhood character. This district is designed to provide for and encourage development of high-quality detached single-family homes at a low suburban density of approximately 2.9 dwelling units per acre or less. (b) Uses permitted. See section 130-241. (c) Minimum lot dimensions: (1) Area: 15,000 square feet. (2) Width: a. Interior lots, 100 feet at the front setback line. b. Corner lots, 110 feet at the front setback line. (d) Minimum setback requirements: (1) Front, all structures shall be located a minimum of 35 feet from the front lot line.",
+        "section_ref": "Sec. 130-262.",
+        "jurisdiction_id": "manassas-va",
+        "url": "https://library.municode.com/va/manassas/codes/code_of_ordinances?nodeId=PTIICOOR_CH130ZO_ARTVIIIZODI_DIV2REDI_S130-262LODESIMIRE",
+        "effective_date": "2025-07-28",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va"
+      ]
+    }
+  },
+  {
+    "id": "manassas-va-source-indexed-b3-mixed-use",
+    "project_description": "Develop a mixed-use project with six employees, posted operating hours, and interior renovation only, combining ground-floor pedestrian-oriented retail with upper-story residential dwelling units in the B-3 City Center Commercial (Old Town) District.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "manassas-va",
+    "jurisdiction_name": "Manassas, VA",
+    "normalized_address": "8912 Quarry Rd, Manassas, VA 20110",
+    "sources": [
+      {
+        "source_id": "manassas-va-sec-130-303",
+        "title": "Sec. 130-303. - B-3 city center commercial (Old Town district).",
+        "excerpt": "(a) Purpose and intent. The B-3 city center commercial district is intended to implement the Comprehensive Plan's Downtown Character Area and to provide an attractive and successful mixed-use historic downtown with pedestrian-oriented retail, commercial, and institutional uses along with residential uses at urban densities that attract and serve both local and visitor populations. Recognizing the economic value of the existing historic downtown, it shall further be the intention of this district to encourage the retention and rehabilitation of structures and uses in the district that have historic and/or architectural significance.",
+        "section_ref": "Sec. 130-303.",
+        "jurisdiction_id": "manassas-va",
+        "url": "https://library.municode.com/va/manassas/codes/code_of_ordinances?nodeId=PTIICOOR_CH130ZO_ARTVIIIZODI_DIV3NSIMIUSDI_S130-303CECOOLTODI",
+        "effective_date": "2025-07-28",
+        "districts": [
+          "mixed-use-core"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va"
+      ]
+    }
   }
 ]

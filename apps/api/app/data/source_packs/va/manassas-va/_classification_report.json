@@ -1,0 +1,153 @@
+{
+  "generated_at": "2026-07-02T15:47:36.028523+00:00",
+  "manifest_path": "C:\\Users\\abhih\\Zoning-Agent-App\\apps\\api\\app\\data\\source_packs\\va\\manassas-va\\manifest.json",
+  "model": "llama-3.3-70b-versatile",
+  "min_confidence": 0.7,
+  "group_count": 10,
+  "coerced_count": 0,
+  "error_count": 0,
+  "low_confidence_count": 7,
+  "results": [
+    {
+      "article": "ARTICLE I. - ADMINISTRATION",
+      "division": "DIVISION 1. - IN GENERAL",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "This section is classified as general use because it deals with administrative and procedural matters that apply across all districts.",
+      "confidence": 0.8,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE II. - DEFINITIONS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "This section provides definitions for terms used in the zoning code, which applies broadly across all districts and uses.",
+      "confidence": 0.8,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE III. - GENERAL REGULATIONS",
+      "division": "DIVISION 1. - DEVELOPMENT STANDARDS",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section titles suggest general development standards that apply across various districts, without specific references to particular land uses or districts.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE IV. - SIGNS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section group governs sign regulations across different districts, including residential and non-residential areas, without specific use cases.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE IX. - LAND USE APPLICATIONS",
+      "division": "DIVISION 1. - SPECIAL USE PERMITS",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section governs special use permits, which is a broad and cross-cutting topic that applies across multiple districts and uses.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE V. - NONCONFORMING USES, LOTS, AND STRUCTURES",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section group governs nonconforming uses, lots, and structures, which is a broad and cross-cutting topic that applies across multiple districts and uses.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE VI. - OFF-STREET PARKING AND LOADING REQUIREMENTS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section group governs off-street parking and loading requirements, which applies across districts and does not specify a particular use or district.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE VII. - TREE CANOPY AND LANDSCAPING REQUIREMENTS",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The section group focuses on tree canopy and landscaping requirements, which is a cross-cutting standard that applies across various districts and uses.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE VIII. - ZONING DISTRICTS",
+      "division": "DIVISION 1. - PERMITTED USES",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "The division governs permitted uses across different zoning districts, without specifying a particular district or use.",
+      "confidence": 0.6,
+      "coerced": false,
+      "error": ""
+    },
+    {
+      "article": "ARTICLE X. - ENFORCEMENT",
+      "division": "",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "rationale": "This section group is classified as general use because it deals with enforcement, which applies across all districts and uses.",
+      "confidence": 0.8,
+      "coerced": false,
+      "error": ""
+    }
+  ],
+  "note": "REVIEW REQUIRED \u2014 do not promote to public_supported until all groups have been spot-checked. Coerced/low-confidence groups default to 'unknown'/'general'."
+}
