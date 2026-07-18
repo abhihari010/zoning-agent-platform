@@ -1,0 +1,158 @@
+[
+  {
+    "id": "henrico-county-va-r1-single-family",
+    "address": "202 Sleepy Hollow Rd, Henrico, VA 23229",
+    "project_description": "Build a new one-family detached dwelling on a vacant 25,000 square foot lot in the R-1 One-Family Residence District, meeting the district's 150-foot minimum lot width and 50-foot minimum front yard setback.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 24-3305."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "henrico-county-va-r1-home-bakery-food-permit",
+    "address": "202 Sleepy Hollow Rd, Henrico, VA 23229",
+    "project_description": "Operate a licensed home bakery out of my single-family dwelling in the R-1 One-Family Residence District, selling baked goods to the public under a Virginia Department of Health food service permit.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 24-4419."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "henrico-county-va-r1-backyard-chickens",
+    "address": "202 Sleepy Hollow Rd, Henrico, VA 23229",
+    "project_description": "Keep a small flock of backyard chickens outside the dwelling as an accessory use on my single-family lot in the R-1 One-Family Residence District.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["conditional", "restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 24-4420."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "henrico-county-va-r1-short-term-rental",
+    "address": "202 Sleepy Hollow Rd, Henrico, VA 23229",
+    "project_description": "Offer my single-family home in the R-1 One-Family Residence District as an unhosted short-term rental for more than 60 days per calendar year.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["conditional", "restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 24-4431."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "henrico-county-va-b2-drive-thru-restaurant",
+    "address": "3715 Mechanicsville Tpke, Henrico, VA 23223",
+    "project_description": "Construct a new drive-thru specialty restaurant in the B-2 Business District meeting the district's 45-foot maximum structure height standard.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 24-3409."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "henrico-county-va-b2-outdoor-merchandise-storage",
+    "address": "3715 Mechanicsville Tpke, Henrico, VA 23223",
+    "project_description": "Add an outdoor storage and display area for shopping carts and merchandise adjacent to my retail building in the B-2 Business District.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["conditional", "restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 24-4424."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "henrico-county-va-m1-light-manufacturing",
+    "address": "9851 Brook Rd, Glen Allen, VA 23059",
+    "project_description": "Build a new light manufacturing and assembly facility in the M-1 Light Industrial District, entirely within an enclosed building, meeting the district's 110-foot maximum structure height standard.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 24-3411."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "henrico-county-va-m1-accessory-data-center",
+    "address": "9851 Brook Rd, Glen Allen, VA 23059",
+    "project_description": "Add an accessory data center with emergency backup generators to an existing industrial building in the M-1 Light Industrial District.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["conditional", "likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 24-4438."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "henrico-county-va-umu-pd-mixed-use",
+    "address": "1601 Willow Lawn Dr, Henrico, VA 23230",
+    "project_description": "Develop a compact, walkable neighborhood in the UMU-PD Urban Mixed-Use Planned Development District combining ground-floor commercial and civic uses with multi-story residential above, per an approved PD Master Plan.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 24-3507."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "henrico-county-va-umu-pd-no-master-plan",
+    "address": "1601 Willow Lawn Dr, Henrico, VA 23230",
+    "project_description": "Begin construction of a new building in the UMU-PD Urban Mixed-Use Planned Development District without an approved PD Master Plan and PD Terms and Conditions Document on file for the site.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["restricted", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 24-3503."],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "henrico-county-va-abstain-cannabis-dispensary",
+    "address": "4301 E Parham Rd, Henrico, VA 23228",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "henrico-county-va-abstain-casino",
+    "address": "4301 E Parham Rd, Henrico, VA 23228",
+    "project_description": "Open a full-scale casino and gaming hall with slot machines and table games open to the public.",
+    "jurisdiction_id": "henrico-county-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]

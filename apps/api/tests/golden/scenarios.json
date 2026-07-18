@@ -1156,5 +1156,111 @@
         "newport-news-va"
       ]
     }
+  },
+  {
+    "id": "henrico-county-va-source-indexed-r1-front-yard-setback",
+    "project_description": "Build a new one-family detached dwelling with four employees, posted operating hours, and interior renovation only, meeting the minimum 25,000 square foot lot area and 50-foot minimum front yard setback in the R-1 One-Family Residence District.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "henrico-county-va",
+    "jurisdiction_name": "Henrico County, VA",
+    "normalized_address": "202 Sleepy Hollow Rd, Henrico, VA 23229",
+    "sources": [
+      {
+        "source_id": "henrico-county-va-sec-24-3305",
+        "title": "Sec. 24-3305. - R-1 One-Family Residence District.",
+        "excerpt": "R-1 District Dimensional Standards: Lot area, minimum 25,000 sf (dwellings); Lot width, minimum 150 feet; Structure height, maximum 40 feet (dwellings); Front yard, minimum 50 feet.",
+        "section_ref": "Sec. 24-3305.",
+        "jurisdiction_id": "henrico-county-va",
+        "url": "https://library.municode.com/va/henrico_county/codes/code_of_ordinances?nodeId=CD_ORD_CH24ZO_ART3ZODI_DIV3REDI_S24-3305OMIREDI",
+        "effective_date": "2025-06-10",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va"
+      ]
+    }
+  },
+  {
+    "id": "henrico-county-va-source-indexed-m1-structure-height",
+    "project_description": "Build a light manufacturing and assembly facility with four employees, posted operating hours, and interior renovation only of an existing building, entirely within an enclosed structure, meeting the 110-foot maximum structure height in the M-1 Light Industrial District.",
+    "district": "industrial-zone",
+    "jurisdiction_id": "henrico-county-va",
+    "jurisdiction_name": "Henrico County, VA",
+    "normalized_address": "9851 Brook Rd, Glen Allen, VA 23059",
+    "sources": [
+      {
+        "source_id": "henrico-county-va-sec-24-3411",
+        "title": "Sec. 24-3411. - M-1 Light Industrial District.",
+        "excerpt": "M-1 District Dimensional Standards: Structure height, maximum 110 feet; Front yard, minimum 25 feet; Interior side yard, minimum 0/15 feet; Rear yard, minimum 30 feet. Allowed uses include light manufacturing, laboratories, warehouses, and recycling, and many industrial activities are only allowed if conducted within enclosed buildings.",
+        "section_ref": "Sec. 24-3411.",
+        "jurisdiction_id": "henrico-county-va",
+        "url": "https://library.municode.com/va/henrico_county/codes/code_of_ordinances?nodeId=CD_ORD_CH24ZO_ART3ZODI_DIV4NOMIEDI_S24-3411LIINDI",
+        "effective_date": "2025-06-10",
+        "districts": [
+          "industrial-zone"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va"
+      ]
+    }
   }
 ]
