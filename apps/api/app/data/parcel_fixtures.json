@@ -367,5 +367,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "Newport News 'Zoning' layer (maps.nnva.gov/gis/rest/services/Operational/Zoning/MapServer/0) spatial intersect at lat:37.099557 lon:-76.494464 returning ZONECLASS='M1' (Light Industrial District, ord Article XXV); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M1 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "10 oldenburg ln",
+    "jurisdiction_id": "hampton-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:37.070401 lon:-76.290349 returning ZONE_='R-22' (One Family Residential District, ord Chapter 4); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-22 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "162 westview dr",
+    "jurisdiction_id": "hampton-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:37.081761 lon:-76.441878 returning ZONE_='R-M' (Multiple Residential District, ord Chapter 5); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-M (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "1809 kecoughtan rd",
+    "jurisdiction_id": "hampton-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:36.999810 lon:-76.384161 returning ZONE_='C-1' (Neighborhood Commercial District, ord Chapter 6); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed C-1 (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "8 shuttle ct",
+    "jurisdiction_id": "hampton-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:37.101465 lon:-76.395449 returning ZONE_='M-1' (Limited Manufacturing District, ord Chapter 7); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-17)"
   }
 ]

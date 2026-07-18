@@ -1,0 +1,158 @@
+[
+  {
+    "id": "hampton-va-r22-single-family",
+    "address": "10 Oldenburg Ln, Hampton, VA 23664",
+    "project_description": "Build a new one-family detached dwelling on a vacant lot in the R-22 One Family Residential District, sized to meet the minimum 22,000 square foot lot area with a 110-foot minimum frontage, a 30-foot front yard setback, and a 35-foot maximum building height.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 4-44"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "hampton-va-r22-freight-container-storage",
+    "address": "10 Oldenburg Ln, Hampton, VA 23664",
+    "project_description": "Permanently store several stacked freight shipping containers on my residential lot in the R-22 One Family Residential District for personal storage.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 3-3"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "hampton-va-r22-home-kennel",
+    "address": "10 Oldenburg Ln, Hampton, VA 23664",
+    "project_description": "Operate a home-based dog boarding kennel as a home occupation inside my single-family dwelling in the R-22 One Family Residential District.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 3-3"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "hampton-va-r22-short-term-rental",
+    "address": "10 Oldenburg Ln, Hampton, VA 23664",
+    "project_description": "Offer up to four bedrooms of my single-family home in the R-22 One Family Residential District as a short-term vacation rental for overnight lodgers.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 3-3"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "hampton-va-rm-multifamily-apartments",
+    "address": "162 Westview Dr, Hampton, VA 23666",
+    "project_description": "Build a multiple-family apartment building in the R-M Multiple Residential District at a density of 10 dwelling units per buildable acre.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 5-16"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "hampton-va-rm-two-family-duplex",
+    "address": "162 Westview Dr, Hampton, VA 23666",
+    "project_description": "Build a two-family duplex dwelling in the R-M Multiple Residential District on a 6,000 square foot lot with 60 feet of frontage.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 5-3"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "hampton-va-c1-retail-store",
+    "address": "1809 Kecoughtan Rd, Hampton, VA 23661",
+    "project_description": "Construct a new neighborhood retail store building in the C-1 Neighborhood Commercial District meeting the district's 2.5-story / 35-foot maximum height standard.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 6-3"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "hampton-va-c1-second-hand-store",
+    "address": "1809 Kecoughtan Rd, Hampton, VA 23661",
+    "project_description": "Open a second-hand store selling used merchandise in the C-1 Neighborhood Commercial District.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 3-3"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "hampton-va-m1-light-manufacturing",
+    "address": "8 Shuttle Ct, Hampton, VA 23666",
+    "project_description": "Build a light manufacturing and assembly facility in the M-1 Limited Manufacturing District meeting the district's 35-foot maximum building height and setback regulations.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 7-4"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "hampton-va-m1-outdoor-container-storage",
+    "address": "8 Shuttle Ct, Hampton, VA 23666",
+    "project_description": "Store stacked freight shipping containers outdoors as part of a contractor's storage yard on my M-1 Limited Manufacturing District property, set back from the property lines.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 3-3"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "hampton-va-abstain-cannabis-dispensary",
+    "address": "22 Lincoln St, Hampton, VA 23669",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "hampton-va-abstain-data-center",
+    "address": "22 Lincoln St, Hampton, VA 23669",
+    "project_description": "Construct a hyperscale data center campus with large-scale server farms and standby diesel generators.",
+    "jurisdiction_id": "hampton-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
