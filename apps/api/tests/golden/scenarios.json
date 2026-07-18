@@ -1262,5 +1262,113 @@
         "hampton-va"
       ]
     }
+  },
+  {
+    "id": "fredericksburg-va-source-indexed-r2-single-family",
+    "project_description": "Build a new single-family detached dwelling with two employees, posted operating hours, and interior renovation only, meeting the district's 15,000 square foot minimum lot area and 2 dwelling units per acre maximum density standard in the R-2 Residential District.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "fredericksburg-va",
+    "jurisdiction_name": "Fredericksburg, VA",
+    "normalized_address": "5517 River Rd, Fredericksburg, VA 22407",
+    "sources": [
+      {
+        "source_id": "fredericksburg-va-72-31-2",
+        "title": "72-31.2: R-2 Residential District.",
+        "excerpt": "A. Purpose. The R-2 Residential District is established to provide for single-family detached dwellings in suburban-style subdivisions at a density not to exceed two dwelling units per acre. B. Dimensional standards. Residential Density, Maximum 2 dwelling units/acre; Lot Area, Minimum (square feet) 15,000.",
+        "section_ref": "72-31.2",
+        "jurisdiction_id": "fredericksburg-va",
+        "url": "https://ecode360.com/29012224",
+        "effective_date": "2020-02-11",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va"
+      ]
+    }
+  },
+  {
+    "id": "fredericksburg-va-source-indexed-pdmu-mixed-use",
+    "project_description": "Develop a mixed-use project with six employees, posted operating hours, and interior renovation only, combining ground-floor retail and upper-story residential dwellings with two or more different use groups in the Planned Development-Mixed-Use (PD-MU) District.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "fredericksburg-va",
+    "jurisdiction_name": "Fredericksburg, VA",
+    "normalized_address": "1220 Spur Ln, Fredericksburg, VA 22401",
+    "sources": [
+      {
+        "source_id": "fredericksburg-va-72-33-3",
+        "title": "72-33.3: Planned Development-Mixed-Use District.",
+        "excerpt": "E. Minimum use mix. (1) A PD-MU District shall include two or more different use groups from the following list: (a) Residential; (b) Lodging; (c) Office, Institutional, and Educational; (d) Retail and Consumer. (2) In a PD-MU District, no single use group shall make up more than 75% of the total gross floor area of the development.",
+        "section_ref": "72-33.3",
+        "jurisdiction_id": "fredericksburg-va",
+        "url": "https://ecode360.com/29012388",
+        "effective_date": "2022-09-13",
+        "districts": [
+          "mixed-use-core"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va"
+      ]
+    }
   }
 ]

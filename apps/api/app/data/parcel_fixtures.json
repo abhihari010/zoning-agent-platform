@@ -447,5 +447,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) spatial intersect returning ZONE_LABEL='UMU-PD' (UMU-PD Urban Mixed-Use Planned Development District, ord Sec. 24-3507); note: base CMU district (Sec. 24-3403) has only 2 unconditional/conditional parcels county-wide and neither round-tripped through the Census geocoder, so UMU-PD -- Henrico's actually-developed urban mixed-use district on the Willow Lawn corridor -- was used instead; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed UMU-PD (verified 2026-07-17)"
+  },
+  {
+    "address_pattern": "5517 river rd",
+    "jurisdiction_id": "fredericksburg-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at parcel-point lat:38.30827 lon:-77.52553 (from the city's 'Addresses' layer) returning ZONING='R2'; cross-checked against the 'Addresses' layer's own Zoning attribute='R2 - RESIDENTIAL 2' for the same parcel (ord Sec. 72-31.2, R-2 Residential District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "3300 plank rd",
+    "jurisdiction_id": "fredericksburg-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at address-geocoded (US Census onelineaddress) lat:38.29538 lon:-77.51667 returning ZONING='CH'; cross-checked against the 'Addresses' layer's own Zoning attribute='CH - COMMERCIAL-HIGHWAY' for the same parcel (ord Sec. 72-32.4, Commercial-Highway District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "480 central rd",
+    "jurisdiction_id": "fredericksburg-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at parcel-point lat:38.28313 lon:-77.47208 (from the city's 'Addresses' layer) returning ZONING='I2'; cross-checked against the 'Addresses' layer's own Zoning attribute='I2 - GENERAL INDUSTRIAL' for the same parcel (ord Sec. 72-32.6, General Industrial District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "1220 spur ln",
+    "jurisdiction_id": "fredericksburg-va",
+    "parcel_id": null,
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at parcel-point lat:38.28805 lon:-77.47719 (from the city's 'Addresses' layer) returning ZONING='PD-MU'; cross-checked against the 'Addresses' layer's own Zoning attribute='PDMU - PLND DEV-MIXED USE' for the same parcel (ord Sec. 72-33.3, Planned Development-Mixed-Use District) (verified 2026-07-18)"
   }
 ]

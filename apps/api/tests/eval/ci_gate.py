@@ -92,6 +92,11 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # but the district-scoped base-district refs are a minority of the
     # dataset; live vector recall is the quality signal).
     "henrico-county-va": 0.35,
+    # 2026-07-18: fredericksburg-va 1.000 (all 10 non-abstain scenarios cite a
+    # district's own dimensional/purpose section from the "Zoning Districts"
+    # article — human-authored title-level rules per district, so the refs
+    # are the same short, keyword-dense sections the retriever ranks first).
+    "fredericksburg-va": 0.85,
 }
 
 
