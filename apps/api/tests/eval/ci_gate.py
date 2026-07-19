@@ -128,6 +128,12 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # occupation 18.150.x, backyard hens 18.153.x — whose per-topic
     # vocabulary is diluted across sibling sections).
     "staunton-va": 0.70,
+    # 2026-07-19: suffolk-va 0.600 (the UDO concentrates all districts in
+    # shared giant sections — the 22-column Use Matrix at SEC. 31-406 and
+    # the dimensional table at 31-407 — so table-derived refs are
+    # keyword-hard; same caveat as chesapeake/newport-news, live vector
+    # recall is the quality signal).
+    "suffolk-va": 0.50,
 }
 
 
