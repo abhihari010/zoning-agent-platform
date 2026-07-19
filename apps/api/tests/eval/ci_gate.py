@@ -122,6 +122,12 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # prefix title_contains rules per district, so the refs are the same
     # short, keyword-dense sections the retriever ranks first).
     "salem-va": 0.85,
+    # 2026-07-19: staunton-va 0.818 (per-district SCC chapters keyed by
+    # numeric prefix like salem/lynchburg are keyword-friendly; the misses
+    # are refs into the shared Article-5 special-use chapters — home
+    # occupation 18.150.x, backyard hens 18.153.x — whose per-topic
+    # vocabulary is diluted across sibling sections).
+    "staunton-va": 0.70,
 }
 
 

@@ -1824,5 +1824,138 @@
         "salem-va"
       ]
     }
+  },
+  {
+    "id": "staunton-va-source-indexed-r2-residential",
+    "project_description": "Build a new single-family detached dwelling with two employees, posted operating hours, and interior renovation only, in the R-2 low density residential district, consistent with the district's purpose of single-family residential development with low to moderate population densities.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "staunton-va",
+    "jurisdiction_name": "Staunton, VA",
+    "normalized_address": "1020 Blackburn St, Staunton, VA 24401",
+    "sources": [
+      {
+        "source_id": "staunton-va-18-25-020",
+        "title": "§ 18.25.020: Permitted principal and accessory uses and structures.",
+        "excerpt": "Property and buildings in an R-2 district shall be used only for the following purposes: (1) Detached single-family dwellings, but not including trailer houses or mobile homes. (2) Temporary buildings for uses incidental to construction work, which buildings shall be immediately adjacent to said construction work and which buildings shall be removed upon completion or abandonment of the construction work. (3) Transportation and utility easements, alleys, and rights-of-way. (4) Accessory uses and buildings, provided such uses are incidental to the principal use and do not include any activity commonly conducted as a business.",
+        "section_ref": "§ 18.25.020",
+        "jurisdiction_id": "staunton-va",
+        "url": "https://ecode360.com/49104327",
+        "effective_date": "2026-06-28",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va",
+        "salem-va"
+      ]
+    }
+  },
+  {
+    "id": "staunton-va-source-indexed-b2-downtown-restaurant",
+    "project_description": "Open a sit-down restaurant with two employees, posted operating hours, and interior renovation only, in an existing storefront in downtown Staunton's B-2 general business district, which permits every B-1 local business use including eating and drinking establishments.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "staunton-va",
+    "jurisdiction_name": "Staunton, VA",
+    "normalized_address": "1 Lawyers Row, Staunton, VA 24401",
+    "sources": [
+      {
+        "source_id": "staunton-va-18-60-020",
+        "title": "§ 18.60.020: Uses permitted.",
+        "excerpt": "The following uses shall be permitted in the B-2 general business district: (1) Any use permitted in the B-1 local business district. (2) Auto, manufactured home or truck parking, storage, service and repair shop, or sales lots; provided, that all manufactured homes are in a state of good repair and dismantled or junked cars or trucks unfit for operation on the highways shall not be stored therein. (3) Bakeries employing not more than 10 persons and where products are sold at retail on the premises.",
+        "section_ref": "§ 18.60.020",
+        "jurisdiction_id": "staunton-va",
+        "url": "https://ecode360.com/49104861",
+        "effective_date": "2026-06-28",
+        "districts": [
+          "mixed-use-core"
+        ],
+        "uses": [
+          "general"
+        ]
+      },
+      {
+        "source_id": "staunton-va-18-55-020",
+        "title": "§ 18.55.020: Uses permitted.",
+        "excerpt": "The following uses shall be permitted in the B-1 local business district: (1) Living and/or sleeping quarters shall be a permitted use when constructed above the ground and basement floors. (6) Barbershops, beauty parlors, chiropody, massages, or similar personal service shops. (7) Catering and delicatessen business. (11) Drugstore. (13) Eating and drinking establishments.",
+        "section_ref": "§ 18.55.020",
+        "jurisdiction_id": "staunton-va",
+        "url": "https://ecode360.com/49104786",
+        "effective_date": "2026-06-28",
+        "districts": [
+          "mixed-use-core"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va",
+        "salem-va"
+      ]
+    }
   }
 ]

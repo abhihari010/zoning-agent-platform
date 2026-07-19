@@ -647,5 +647,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '531 KING ST, PORTSMOUTH, VA, 23704' (lon:-76.302820954988 lat:36.834427482527), returning ZONING='T4' (Downtown D1, T4 Sub-District General Urban); independently cross-checked against the City's tax-assessor Parcels_new layer, same point returning SITE_ADDRE='517 KING ST' (adjoining parcel, same King St downtown block), ZONING='T4', MPN='13-351', NEIGHBORHD='DOWNTOWN', TYPE_PROP='COMMERCIAL', consistent with the ordinance's T4 description ('contains a mix of uses, but maintains a predominantly residential urban fabric... nearest to the Olde Towne Historic District, represent[ing] moderately intense urbanism in the downtown') (ord Sec. 40.2-207(B)(1)(b), T4 Sub-District (General Urban), within the whole-category 'Downtown D1 District and Sub-Districts' section) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "1020 blackburn st",
+    "jurisdiction_id": "staunton-va",
+    "parcel_id": "582",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '1020 BLACKBURN ST, STAUNTON, VA, 24401' (lon:-79.084470925821 lat:38.137115916455), returning LABEL_FLD='R-2' (Low density residential district, SCC 18.15.010 classification table); independently cross-checked against the City's 911 AddressPoints layer (same org, AddressPoints/FeatureServer/0, point for 1020 BLACKBURN ST inside the same R-2 polygon) and its Tax_Parcels assessor layer (Tax_Parcels/FeatureServer/0), the address point's parcel returning MAP_INFO='1020 BLACKBURN ST' (exact match), ZONING='R2', PARCEL_IDA='582', USE_CODE='RESIDENTIAL LAND (LOW DENSITY)', NEIGHBORHO='VISTA HTS' -- a single-family Vista Heights block consistent with the ordinance's R-2 chapter ('single-family residential development with low to moderate population densities') (SCC Ch. 18.25, § 18.25.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "1 lawyers row",
+    "jurisdiction_id": "staunton-va",
+    "parcel_id": "5159",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.85,
+    "method": "gis_verified",
+    "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '1 LAWYERS ROW, STAUNTON, VA, 24401' (lon:-79.071972587062 lat:38.148988902576), returning LABEL_FLD='B-2' (General business district); independently cross-checked against the City's 911 AddressPoints layer (same org, point for 1 LAWYERS ROW inside the same B-2 polygon) and its Tax_Parcels assessor layer, same parcel returning MAP_INFO='1 LAWYERS ROW' (exact match), ZONING='B2', PARCEL_IDA='5159', USE_CODE='GENERAL OFFICE', NEIGHBORHO='CEN BUS DIST' (the assessor's own central-business-district coding for downtown Staunton, by the courthouse); B-2 is a human judgment-call mapping to mixed-use-core rather than commercial-employment (see classification_rules.json _notes: B-2 inherits every B-1 use including upper-floor living/sleeping quarters by right per § 18.55.020(1)/§ 18.60.020(1), and is downtown Staunton's district), hence confidence 0.85 not 0.9 (SCC Ch. 18.60, § 18.60.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "200 national ave",
+    "jurisdiction_id": "staunton-va",
+    "parcel_id": "11500",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '200 NATIONAL AVE, STAUNTON, VA, 24401' (lon:-79.049449152587 lat:38.141174013921), returning LABEL_FLD='I-1' (Light industrial district); independently cross-checked against the City's 911 AddressPoints layer (same org, point for 200 NATIONAL AVE inside an I-1 polygon of the same National Ave industrial corridor -- Census interpolates ~0.5 km along the street from the address point, both points landing in I-1) and its Tax_Parcels assessor layer at the address point, returning MAP_INFO='200 NATIONAL AVE' (exact match), ZONING='I1', PARCEL_IDA='11500', USE_CODE='GENERAL COMMERCIAL', NEIGHBORHO='SMART&BYERS', consistent with the ordinance's I-1 chapter ('light manufacturing or wholesaling... do not directly adversely affect nearby residential and business uses'; § 18.75.020(2) bars residential use) (SCC Ch. 18.75, § 18.75.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "508 w frederick st",
+    "jurisdiction_id": "staunton-va",
+    "parcel_id": "1616",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.85,
+    "method": "gis_verified",
+    "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '508 W FREDERICK ST, STAUNTON, VA, 24401' (lon:-79.078026879092 lat:38.150021656949), returning LABEL_FLD='B-3' (Planned business district); independently cross-checked against the City's 911 AddressPoints layer (same org, point for 508 W FREDERICK ST inside the same B-3 polygon) and its Tax_Parcels assessor layer, same parcel returning MAP_INFO='508 W FREDERICK ST' (exact match), ZONING='B3', PARCEL_IDA='1616', NEIGHBORHO='NEW TOWN'; B-3 maps to commercial-employment (see classification_rules.json _notes: B-1's use list but every use only on planning-commission-plus-council review per § 18.65.020, no by-right residential), hence confidence 0.85 not 0.9 (SCC Ch. 18.65, § 18.65.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)"
   }
 ]
