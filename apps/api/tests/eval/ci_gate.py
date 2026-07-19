@@ -116,6 +116,12 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # per district family, so the refs are the same short, keyword-dense
     # sections the retriever ranks first).
     "portsmouth-va": 0.85,
+    # 2026-07-18: salem-va 1.000 (all 10 non-abstain scenarios cite a
+    # district's own numeric-prefix section cluster from the "DISTRICT
+    # REGULATIONS" article — human-authored article_contains + numeric-
+    # prefix title_contains rules per district, so the refs are the same
+    # short, keyword-dense sections the retriever ranks first).
+    "salem-va": 0.85,
 }
 
 

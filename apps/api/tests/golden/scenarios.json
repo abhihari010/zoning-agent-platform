@@ -1594,6 +1594,64 @@
     }
   },
   {
+    "id": "salem-va-source-indexed-rsf-residential",
+    "project_description": "Build a new single-family detached dwelling with two employees, posted operating hours, and interior renovation only, in the RSF Residential Single Family District, consistent with the district's purpose of accommodating infill single-family development on Salem's relatively small residential lots.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "salem-va",
+    "jurisdiction_name": "Salem, VA",
+    "normalized_address": "2820 Fairway Forest Dr, Salem, VA 24153",
+    "sources": [
+      {
+        "source_id": "salem-va-sec-106-202-1",
+        "title": "Sec. 106-202.1. - Statement of intent.",
+        "excerpt": "(A) The RSF Residential Single Family District is created in recognition that most residential neighborhoods in Salem are comprised primarily of single family dwellings on relatively small lots. It is anticipated that most future residential development will occur in this district. Proposed development standards such as lot sizes and frontage requirements in the RSF District reflect Salem's compact development pattern and recognition that future residential development will be \"infill development\" Limited uses other than residential are permitted.",
+        "section_ref": "Sec. 106-202.1.",
+        "jurisdiction_id": "salem-va",
+        "url": "https://library.municode.com/va/salem/codes/code_of_ordinances?nodeId=PTIICO_CH106ZO_ARTIIDIRE_S106-202.1STIN",
+        "effective_date": "0001-01-01",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va"
+      ]
+    }
+  },
+  {
     "id": "portsmouth-va-source-indexed-nr-residential",
     "project_description": "Build a new single-family detached dwelling with two employees, posted operating hours, and interior renovation only, in the Neighborhood Residential (NR) District, discouraging any use that would interfere with the district's quiet single-family character.",
     "district": "residential-low-density",
@@ -1646,7 +1704,66 @@
         "henrico-county-va",
         "fredericksburg-va",
         "lynchburg-va",
-        "manassas-va"
+        "manassas-va",
+        "salem-va"
+      ]
+    }
+  },
+  {
+    "id": "salem-va-source-indexed-hbd-highway-business",
+    "project_description": "Open a general office and retail sales building with six employees, posted operating hours, and interior renovation only, in the HBD Highway Business District, consistent with the district's purpose of providing commercial and service uses along major transportation arterials.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "salem-va",
+    "jurisdiction_name": "Salem, VA",
+    "normalized_address": "140 Sheraton Dr, Salem, VA 24153",
+    "sources": [
+      {
+        "source_id": "salem-va-sec-106-214-1",
+        "title": "Sec. 106-214.1. - Statement of intent.",
+        "excerpt": "The HBD Highway Business District has been created to provide and allow a wide variety of commercial and service uses that are typically found along or near major transportation arterials. This district provides a location and development standards for more intensive commercial uses not appropriate for the Downtown (DBD) or Residential (RB) Districts.",
+        "section_ref": "Sec. 106-214.1.",
+        "jurisdiction_id": "salem-va",
+        "url": "https://library.municode.com/va/salem/codes/code_of_ordinances?nodeId=PTIICO_CH106ZO_ARTIIDIRE_S106-214.1STIN",
+        "effective_date": "0001-01-01",
+        "districts": [
+          "commercial-employment"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va"
       ]
     }
   },
@@ -1703,7 +1820,8 @@
         "henrico-county-va",
         "fredericksburg-va",
         "lynchburg-va",
-        "manassas-va"
+        "manassas-va",
+        "salem-va"
       ]
     }
   }
