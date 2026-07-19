@@ -110,6 +110,12 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # the refs are the same short, keyword-dense sections the retriever
     # ranks first).
     "manassas-va": 0.85,
+    # 2026-07-18: portsmouth-va 1.000 (all 10 non-abstain scenarios cite a
+    # whole-category district section from the "Zoning Districts" article —
+    # human-authored title_contains rules per category, one citable chunk
+    # per district family, so the refs are the same short, keyword-dense
+    # sections the retriever ranks first).
+    "portsmouth-va": 0.85,
 }
 
 
