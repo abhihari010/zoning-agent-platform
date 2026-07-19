@@ -567,5 +567,45 @@
     "confidence": 0.85,
     "method": "gis_verified",
     "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.752763 lon:-77.466891 returning FULL_ADDRESS='8912 QUARRY RD', ZONING='B3', GPIN_NUM='7795-78-4290', USE_CODE='915R' MODEL_DESC='2STY FRAME' (Old Town Manassas, one block off Main St); address forward-geocoded via US Census onelineaddress to '8912 QUARRY RD, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 36.4m); cross-checked against neighboring parcels in the same buffer -- adjacent B-3.5 (city center planned, also mapped mixed-use-core) parcels on Quarry Rd/Fairview Ave, plus R-2-S residential parcels one block over on Centreville Rd, consistent with B-3's purpose text describing 'an attractive and successful mixed-use historic downtown with pedestrian-oriented retail, commercial, and institutional uses along with residential uses'; B-3 is a human judgment-call mapping to mixed-use-core (see classification_rules.json _notes) rather than a vocabulary term the ordinance names directly, hence confidence 0.85 not 0.9 (ord Sec. 130-303, B-3 City Center Commercial (Old Town) District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "2820 fairway forest dr",
+    "jurisdiction_id": "salem-va",
+    "parcel_id": "317-3-5",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Salem Zoning attribute service (services7.arcgis.com/RL8aZgZHmJOdyNXk/arcgis/rest/services/Zoning/FeatureServer/0, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '2820 FAIRWAY FOREST DR, SALEM, VA, 24153' (lon:-80.048566009662 lat:37.253687985766), returning ZONING='RSF' (Residential Single Family District); independently cross-checked against the City's own Address_points layer (services7.arcgis.com/.../Address_points/FeatureServer/4, FULLADDR='2820 FAIRWAY FOREST DR', same coordinate exactly) and its TaxParcels tax-assessor layer (services7.arcgis.com/.../TaxParcels/FeatureServer/5), same point returning FullAddress='2820 FAIRWAY FOREST DR', zoning='RSF', tax_map_number='317-3-5', property_use='Residential Improved' (Fairway Forest neighborhood off Keagy Rd, adjoining the Hidden Valley Country Club), consistent with the ordinance's RSF purpose text ('most residential neighborhoods in Salem are comprised primarily of single family dwellings on relatively small lots... future residential development will be \"infill development\"') (ord Sec. 106-202.1, RSF Residential Single Family District, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "103 richfield ave",
+    "jurisdiction_id": "salem-va",
+    "parcel_id": "120-1-2",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Salem Zoning attribute service (services7.arcgis.com/RL8aZgZHmJOdyNXk/arcgis/rest/services/Zoning/FeatureServer/0, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '103 RICHFIELD AVE, SALEM, VA, 24153' (lon:-80.052505988293 lat:37.292827795276), returning ZONING='RB' (Residential Business District); independently cross-checked against the City's own Address_points layer (FULLADDR='103 RICHFIELD AVE' confirmed present in the same RB polygon) and its TaxParcels tax-assessor layer, same point returning FullAddress='103 RICHFIELD AVE', zoning='RB', tax_map_number='120-1-2', property_use='Residential Improved', class_code='Urban Residential' (a single-family home fronting Richfield Ave near Downtown Salem), consistent with the ordinance's RB purpose text ('some older residential areas near the center of the city may be suitable for the integration of residential and limited commercial uses... a walkable, livable residential community with a mixture of residential and nonresidential uses') (ord Sec. 106-208.1, RB Residential Business District, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "140 sheraton dr",
+    "jurisdiction_id": "salem-va",
+    "parcel_id": "4-1-2.2",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Salem Zoning attribute service (services7.arcgis.com/RL8aZgZHmJOdyNXk/arcgis/rest/services/Zoning/FeatureServer/0, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '140 SHERATON DR, SALEM, VA, 24153' (lon:-80.032399444106 lat:37.321326268001), returning ZONING='HBD' (Highway Business District); independently cross-checked against the City's own Address_points layer (FULLADDR='140 SHERATON DR' confirmed present in the same HBD polygon) and its TaxParcels tax-assessor layer, same point returning FullAddress='140 SHERATON DR', zoning='HBD', tax_map_number='4-1-2.2', property_use='Hotel/Motel', property_desc='Hotel', class_code='Commercial/Industrial' (a hotel fronting Electric Rd/Rte 419 near the I-81 interchange), consistent with the ordinance's HBD purpose text ('a wide variety of commercial and service uses that are typically found along or near major transportation arterials... more intensive commercial uses not appropriate for the Downtown (DBD) or Residential (RB) Districts') (ord Sec. 106-214.1, HBD Highway Business District, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "525 branch dr",
+    "jurisdiction_id": "salem-va",
+    "parcel_id": "51-3-2",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Salem Zoning attribute service (services7.arcgis.com/RL8aZgZHmJOdyNXk/arcgis/rest/services/Zoning/FeatureServer/0, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '525 BRANCH DR, SALEM, VA, 24153' (lon:-80.03108583717 lat:37.305048394796), returning ZONING='LM' (Light Manufacturing District); independently cross-checked against the City's own Address_points layer (FULLADDR='525 BRANCH DR' confirmed present in the same LM polygon) and its TaxParcels tax-assessor layer, same point returning FullAddress='525 BRANCH DR', zoning='LM', tax_map_number='51-3-2', property_use='Commercial Warehouse', property_desc='Warehouse', class_code='Commercial/Industrial' (Branch Dr industrial park off Kessler Mill Rd), consistent with the ordinance's LM purpose text ('a wide variety of industrial and warehouse uses and activities that occur primarily within enclosed structures, with minimal or no environmental impacts associated with smoke, odor, and noise') (ord Sec. 106-218.1, LM Light Manufacturing District, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-18)"
   }
 ]

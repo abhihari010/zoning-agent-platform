@@ -1,0 +1,207 @@
+[
+  {
+    "id": "salem-va-rsf-single-family-detached",
+    "address": "2820 Fairway Forest Dr, Salem, VA 24153",
+    "project_description": "Build a new single-family detached dwelling on a vacant lot in the RSF Residential Single Family District, meeting the district's 9,000 square foot minimum lot area and 75-foot minimum frontage standards.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 106-202.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "salem-va-rsf-two-family-conditional",
+    "address": "2820 Fairway Forest Dr, Salem, VA 24153",
+    "project_description": "Convert the existing single-family dwelling into a two-family dwelling with a second unit, on the same lot in the RSF Residential Single Family District.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "conditional",
+        "restricted"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 106-202.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "salem-va-rsf-multifamily-restricted",
+    "address": "2820 Fairway Forest Dr, Salem, VA 24153",
+    "project_description": "Demolish the existing single-family dwelling and build a 12-unit multi-family apartment building on the same lot in the RSF Residential Single Family District.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "restricted"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 106-202.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "salem-va-rb-general-offices-permitted",
+    "address": "103 Richfield Ave, Salem, VA 24153",
+    "project_description": "Open a small general office in a converted residence in the RB Residential Business District, consistent with the district's purpose of integrating residential and limited commercial uses of benefit to neighborhood residents.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 106-208.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "salem-va-rb-multifamily-conditional",
+    "address": "103 Richfield Ave, Salem, VA 24153",
+    "project_description": "Replace the existing single-family dwelling with a multi-family apartment building on the same lot in the RB Residential Business District.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 106-208.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "salem-va-hbd-general-offices-permitted",
+    "address": "140 Sheraton Dr, Salem, VA 24153",
+    "project_description": "Open a general office and retail sales building in the HBD Highway Business District, consistent with the district's purpose of providing a wide variety of commercial and service uses typically found along major transportation arterials.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 106-214.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "salem-va-hbd-hospital-conditional",
+    "address": "140 Sheraton Dr, Salem, VA 24153",
+    "project_description": "Add a hospital use to the site, a use the HBD Highway Business District's own regulations list as permitted only by special exception rather than by right.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 106-214.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "salem-va-hbd-height-above-maximum-restricted",
+    "address": "140 Sheraton Dr, Salem, VA 24153",
+    "project_description": "Build a new principal structure 130 feet in height in the HBD Highway Business District, exceeding the district's 80-foot maximum height of structures standard.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "restricted"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 106-214.3."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "salem-va-lm-warehousing-permitted",
+    "address": "525 Branch Dr, Salem, VA 24153",
+    "project_description": "Open a warehousing and distribution facility in the LM Light Manufacturing District, consistent with the district's purpose of accommodating industrial and warehouse uses occurring primarily within enclosed structures with minimal environmental impacts.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 106-218.2."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "salem-va-lm-height-above-maximum-restricted",
+    "address": "525 Branch Dr, Salem, VA 24153",
+    "project_description": "Build a new principal structure 110 feet in height in the LM Light Manufacturing District, exceeding the district's 70-foot maximum height of structures standard.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "restricted"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 106-218.3."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "salem-va-abstain-cannabis-dispensary",
+    "address": "2171 Apperson Dr, Salem, VA 24153",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "unknown"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "salem-va-abstain-data-center",
+    "address": "802 Kesler Mill Rd, Salem, VA 24153",
+    "project_description": "Build a hyperscale data center campus with on-site backup power generation and cooling towers.",
+    "jurisdiction_id": "salem-va",
+    "expect": {
+      "decision_in": [
+        "unknown"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
