@@ -1,0 +1,158 @@
+[
+  {
+    "id": "suffolk-va-rm-single-family",
+    "address": "608 Sunset Ave, Suffolk, VA 23434",
+    "project_description": "Build a new single-family detached dwelling on a lot in the RM Residential Medium Density district.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["SEC. 31-406"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "suffolk-va-rm-home-occupation",
+    "address": "608 Sunset Ave, Suffolk, VA 23434",
+    "project_description": "Run a small home-based bookkeeping office as a home occupation inside a dwelling in the RM residential district.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["SEC. 31-707"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "suffolk-va-rm-bed-breakfast",
+    "address": "608 Sunset Ave, Suffolk, VA 23434",
+    "project_description": "Convert a house in the RM residential district into a bed and breakfast with three guest bedrooms.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["SEC. 31-703"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "suffolk-va-rm-livestock-prohibited",
+    "address": "608 Sunset Ave, Suffolk, VA 23434",
+    "project_description": "Keep goats and other livestock in the backyard of a home in the RM Residential Medium Density district.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["likely_prohibited"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["SEC. 31-702"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "suffolk-va-cbd-restaurant",
+    "address": "821 W Washington St, Suffolk, VA 23434",
+    "project_description": "Open a sit-down restaurant in an existing storefront in the CBD Central Business District of downtown Suffolk.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["SEC. 31-406"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "suffolk-va-cbd-dimensional-standards",
+    "address": "821 W Washington St, Suffolk, VA 23434",
+    "project_description": "What are the dimensional and density regulations, including setbacks and height, for constructing a new commercial building in the CBD Central Business District?",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["SEC. 31-407"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "suffolk-va-b2-retail-store",
+    "address": "3468 Pruden Blvd, Suffolk, VA 23434",
+    "project_description": "Open a general retail store in the B-2 General Commercial District along the Pruden Boulevard corridor.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["SEC. 31-406"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "suffolk-va-b2-superstore-standards",
+    "address": "3468 Pruden Blvd, Suffolk, VA 23434",
+    "project_description": "Develop a 70,000 square foot single superstore retail building in the B-2 General Commercial District.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["SEC. 31-715"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "suffolk-va-m1-warehouse",
+    "address": "719 Carolina Rd, Suffolk, VA 23434",
+    "project_description": "Establish an indoor warehouse and freight storage operation with enclosed loading in the M-1 Light Industrial District.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["SEC. 31-726"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "suffolk-va-m1-solar-conditional",
+    "address": "719 Carolina Rd, Suffolk, VA 23434",
+    "project_description": "Develop a ground-mounted solar energy facility on an industrial parcel in the M-1 Light Industrial District.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["SEC. 31-724"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "suffolk-va-abstain-cannabis-dispensary",
+    "address": "442 W Washington St, Suffolk, VA 23434",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "suffolk-va-abstain-data-center",
+    "address": "110 Finney Ave, Suffolk, VA 23434",
+    "project_description": "Construct a hyperscale data center campus with multiple server buildings and on-site electrical substations.",
+    "jurisdiction_id": "suffolk-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]

@@ -1957,5 +1957,140 @@
         "salem-va"
       ]
     }
+  },
+  {
+    "id": "suffolk-va-source-indexed-rm-residential",
+    "project_description": "Build a new single-family detached dwelling with two employees, posted operating hours, and interior renovation only, in the RM Residential Medium Density district, where Table 406-1 lists single-family detached dwellings as a permitted use.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "suffolk-va",
+    "jurisdiction_name": "Suffolk, VA",
+    "normalized_address": "608 Sunset Ave, Suffolk, VA 23434",
+    "sources": [
+      {
+        "source_id": "suffolk-va-sec-31-406",
+        "title": "SEC. 31-406. - USE REGULATIONS.",
+        "excerpt": "Those uses permitted as permitted uses, and conditional uses within each zoning district shall be those uses listed in the Use Matrices (Table 406-1) to this Ordinance. TABLE 406-1: PRINCIPAL USES PERMITTED IN ZONING DISTRICTS Specific Use Type Zoning Districts C A RR RE RL RLM RM RC RU RU-12 RU-18 RU-24 MUC-40 B-1 B-2 VC CBD O-I CP M-1 M-2 FRRD. Dwelling, single-family detached (§ 31-712) — P P P P P P P P P — — — — — P P — — — — P.",
+        "section_ref": "SEC. 31-406",
+        "jurisdiction_id": "suffolk-va",
+        "url": "https://library.municode.com/va/suffolk/codes/unified_development_ordinance?nodeId=SUFFOLK_UNIFIED_DEVELOPMENT_ORDINANCE_ART4ZO_S31-406USRE",
+        "effective_date": "2025-06-18",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va",
+        "salem-va",
+        "staunton-va"
+      ]
+    }
+  },
+  {
+    "id": "suffolk-va-source-indexed-cbd-restaurant",
+    "project_description": "Open a sit-down restaurant with two employees, posted operating hours, and interior renovation only, in an existing storefront in the CBD Central Business District of downtown Suffolk, where Table 406-1 lists sit-down restaurants as a permitted use.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "suffolk-va",
+    "jurisdiction_name": "Suffolk, VA",
+    "normalized_address": "821 W Washington St, Suffolk, VA 23434",
+    "sources": [
+      {
+        "source_id": "suffolk-va-sec-31-406",
+        "title": "SEC. 31-406. - USE REGULATIONS.",
+        "excerpt": "Those uses permitted as permitted uses, and conditional uses within each zoning district shall be those uses listed in the Use Matrices (Table 406-1) to this Ordinance. TABLE 406-1: PRINCIPAL USES PERMITTED IN ZONING DISTRICTS Specific Use Type Zoning Districts C A RR RE RL RLM RM RC RU RU-12 RU-18 RU-24 MUC-40 B-1 B-2 VC CBD O-I CP M-1 M-2 FRRD. Restaurants, sit-down/delicatessen — — — — — — — — — — — P P P P P P P C P P P.",
+        "section_ref": "SEC. 31-406",
+        "jurisdiction_id": "suffolk-va",
+        "url": "https://library.municode.com/va/suffolk/codes/unified_development_ordinance?nodeId=SUFFOLK_UNIFIED_DEVELOPMENT_ORDINANCE_ART4ZO_S31-406USRE",
+        "effective_date": "2025-06-18",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      },
+      {
+        "source_id": "suffolk-va-sec-31-403",
+        "title": "SEC. 31-403. - RELATION OF ZONING DISTRICTS TO COMPREHENSIVE PLAN AND PURPOSE STATEMENTS.",
+        "excerpt": "CBD (CENTRAL BUSINESS DISTRICT). The CBD district provides concentrated downtown civic retail, service, office, residential and other uses in the existing central business district of the City of Suffolk. Urban design standards are required in order to protect property values, promote pedestrian activity and to maintain the unique character of the center. The CBD district promotes the long-term vitality of this economic and residential mixed use center.",
+        "section_ref": "SEC. 31-403",
+        "jurisdiction_id": "suffolk-va",
+        "url": "https://library.municode.com/va/suffolk/codes/unified_development_ordinance?nodeId=SUFFOLK_UNIFIED_DEVELOPMENT_ORDINANCE_ART4ZO_S31-403REZODICOPLPUST",
+        "effective_date": "2025-06-18",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va",
+        "salem-va",
+        "staunton-va"
+      ]
+    }
   }
 ]

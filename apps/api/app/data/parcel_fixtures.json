@@ -687,5 +687,45 @@
     "confidence": 0.85,
     "method": "gis_verified",
     "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '508 W FREDERICK ST, STAUNTON, VA, 24401' (lon:-79.078026879092 lat:38.150021656949), returning LABEL_FLD='B-3' (Planned business district); independently cross-checked against the City's 911 AddressPoints layer (same org, point for 508 W FREDERICK ST inside the same B-3 polygon) and its Tax_Parcels assessor layer, same parcel returning MAP_INFO='508 W FREDERICK ST' (exact match), ZONING='B3', PARCEL_IDA='1616', NEIGHBORHO='NEW TOWN'; B-3 maps to commercial-employment (see classification_rules.json _notes: B-1's use list but every use only on planning-commission-plus-council review per § 18.65.020, no by-right residential), hence confidence 0.85 not 0.9 (SCC Ch. 18.65, § 18.65.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "608 sunset ave",
+    "jurisdiction_id": "suffolk-va",
+    "parcel_id": "",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE -- same org as the hampton-va layer; its CODE roster matches Suffolk UDO SEC. 31-402's district table exactly; data last edited 2025-09) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '608 SUNSET AVE, SUFFOLK, VA, 23434' (lon:-76.571921110177 lat:36.727542372258), returning CODE='RM' (Residential Medium Density); independently cross-checked against the VGIN statewide Virginia Address Points layer (vginmaps.vdem.virginia.gov/arcgis/rest/services/VA_Base_Layers/VA_Address_Points/FeatureServer/0, FULLADDR='608 SUNSET AVE' point inside the same RM polygon); Table 406-1 lists 'Dwelling, single-family detached' as P (permitted) in RM, consistent with a residential block off downtown (SEC. 31-403 RM purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "821 w washington st",
+    "jurisdiction_id": "suffolk-va",
+    "parcel_id": "",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.85,
+    "method": "gis_verified",
+    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '821 W WASHINGTON ST, SUFFOLK, VA, 23434' (lon:-76.596626791683 lat:36.730475631934), returning CODE='CBD' (Central Business District); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='821 W WASHINGTON ST' point inside the same CBD polygon); CBD is a human judgment-call mapping to mixed-use-core (SEC. 31-403 purpose text: 'concentrated downtown civic retail, service, office, residential and other uses... promotes the long-term vitality of this economic and residential mixed use center'), hence confidence 0.85 not 0.9 (SEC. 31-403 CBD purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "3468 pruden blvd",
+    "jurisdiction_id": "suffolk-va",
+    "parcel_id": "",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '3468 PRUDEN BLVD, SUFFOLK, VA, 23434' (lon:-76.621704320511 lat:36.778265696317), returning CODE='B-2' (General Commercial District); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='3468 PRUDEN BLVD' point inside the same B-2 polygon), a Pruden Blvd/US-460 highway-commercial corridor parcel consistent with the B-2 purpose statement (SEC. 31-403 B-2 purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "719 carolina rd",
+    "jurisdiction_id": "suffolk-va",
+    "parcel_id": "",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '719 CAROLINA RD, SUFFOLK, VA, 23434' (lon:-76.595157304849 lat:36.707609505798), returning CODE='M-1' (Light Industrial District); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='719 CAROLINA RD' point inside the same M-1 polygon), a Carolina Rd industrial corridor parcel south of downtown; Table 406-1 lists warehouse/freight storage as P and dwellings as not permitted in M-1 (SEC. 31-403 M-1 purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)"
   }
 ]
