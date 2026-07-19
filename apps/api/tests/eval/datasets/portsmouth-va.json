@@ -1,0 +1,207 @@
+[
+  {
+    "id": "portsmouth-va-nr-single-family-detached",
+    "address": "3005 Carney St, Portsmouth, VA 23703",
+    "project_description": "Build a new single-family detached dwelling on a vacant lot in the Neighborhood Residential (NR) District, consistent with the district's purpose of accommodating single-family detached residential dwellings at low densities.",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 40.2-202"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "portsmouth-va-nr-accessory-dwelling-unit-conditional",
+    "project_description": "Add an accessory dwelling unit above a detached garage on the same lot in the Neighborhood Residential (NR) District, providing an additional housing option as contemplated by the district's diverse-housing purpose.",
+    "address": "3005 Carney St, Portsmouth, VA 23703",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 40.2-202"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "portsmouth-va-nr-multifamily-use-restricted",
+    "project_description": "Convert the single-family lot into an eight-unit multi-family apartment building in the Neighborhood Residential (NR) District, a use the district's regulations discourage as substantially interfering with the quiet single-family residential nature of the district.",
+    "address": "3005 Carney St, Portsmouth, VA 23703",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "restricted"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 40.2-202"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "portsmouth-va-gmu-office-retail-permitted",
+    "project_description": "Open a professional office with ground-floor retail space in the General Mixed-Use (GMU) District, consistent with the district's purpose of providing professional offices and light-to-moderate intensity commercial uses proximate to residential districts.",
+    "address": "704 Airline Blvd, Portsmouth, VA 23707",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 40.2-203"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "portsmouth-va-gmu-heavy-commercial-intensity-restricted",
+    "project_description": "Build a large-format warehouse club with an outdoor truck marshaling yard in the General Mixed-Use (GMU) District, a scale and intensity of use out of character with the district's purpose of a compatible mixed-use environment integrating residential, commercial, and institutional uses.",
+    "address": "704 Airline Blvd, Portsmouth, VA 23707",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "conditional",
+        "restricted"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 40.2-203"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "portsmouth-va-il-light-manufacturing-permitted",
+    "project_description": "Open a small-scale light manufacturing and distribution facility with minimal exterior movement of vehicles and materials in the Light Industrial (IL) District, consistent with the district's purpose of accommodating small-scale light manufacturing, assembly, fabrication, and distribution uses.",
+    "address": "3307 Harding St, Portsmouth, VA 23703",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 40.2-204"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "portsmouth-va-il-research-development-conditional",
+    "project_description": "Add a research and development annex with expanded loading docks to the existing light industrial building in the Light Industrial (IL) District, increasing the site's exterior vehicle and materials movement.",
+    "address": "3307 Harding St, Portsmouth, VA 23703",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 40.2-204"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "portsmouth-va-il-heavy-manufacturing-large-scale-restricted",
+    "project_description": "Build a large-scale heavy manufacturing plant with extensive exterior movement of vehicles, materials, and goods and greater potential for adverse environmental impacts in the Light Industrial (IL) District, a use the district's own purpose text reserves for the more intensive Industrial (IN) District instead.",
+    "address": "3307 Harding St, Portsmouth, VA 23703",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "restricted"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 40.2-204"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "portsmouth-va-t4-mixed-use-existing-building-permitted",
+    "project_description": "Renovate an existing building's ground floor into retail space with upper-floor residential units in the T4 Sub-District (General Urban) of the Downtown D1 District, consistent with its purpose of a predominantly residential urban fabric with a mix of uses at moderately intense urbanism.",
+    "address": "531 King St, Portsmouth, VA 23704",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 40.2-207"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "portsmouth-va-t4-density-above-maximum-restricted",
+    "project_description": "Build a new multi-family building at 140 dwelling units per acre in the T4 Sub-District (General Urban) of the Downtown D1 District, exceeding the sub-district's maximum residential density of 24 to 55 dwelling units per acre under Table 40.2-207.",
+    "address": "531 King St, Portsmouth, VA 23704",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "restricted"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 40.2-207"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "portsmouth-va-abstain-cannabis-dispensary",
+    "address": "100 High St, Portsmouth, VA 23704",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "unknown"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "portsmouth-va-abstain-data-center",
+    "address": "500 Elm Ave, Portsmouth, VA 23707",
+    "project_description": "Build a hyperscale data center campus with on-site backup power generation and cooling towers.",
+    "jurisdiction_id": "portsmouth-va",
+    "expect": {
+      "decision_in": [
+        "unknown"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
