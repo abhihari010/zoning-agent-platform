@@ -567,5 +567,45 @@
     "confidence": 0.85,
     "method": "gis_verified",
     "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.752763 lon:-77.466891 returning FULL_ADDRESS='8912 QUARRY RD', ZONING='B3', GPIN_NUM='7795-78-4290', USE_CODE='915R' MODEL_DESC='2STY FRAME' (Old Town Manassas, one block off Main St); address forward-geocoded via US Census onelineaddress to '8912 QUARRY RD, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 36.4m); cross-checked against neighboring parcels in the same buffer -- adjacent B-3.5 (city center planned, also mapped mixed-use-core) parcels on Quarry Rd/Fairview Ave, plus R-2-S residential parcels one block over on Centreville Rd, consistent with B-3's purpose text describing 'an attractive and successful mixed-use historic downtown with pedestrian-oriented retail, commercial, and institutional uses along with residential uses'; B-3 is a human judgment-call mapping to mixed-use-core (see classification_rules.json _notes) rather than a vocabulary term the ordinance names directly, hence confidence 0.85 not 0.9 (ord Sec. 130-303, B-3 City Center Commercial (Old Town) District) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "3005 carney st",
+    "jurisdiction_id": "portsmouth-va",
+    "parcel_id": "767-180",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '3005 CARNEY ST, PORTSMOUTH, VA, 23703' (lon:-76.372573146773 lat:36.842614887), returning ZONING='NR' (Neighborhood Residential); independently cross-checked against the City's own tax-assessor Parcels_new layer (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/Parcels_new/FeatureServer/0), same point returning SITE_ADDRE='3001 CARNEY ST' (adjoining parcel), ZONING='NR', MPN='767-180', NEIGHBORHD='GREEN ACRES', TYPE_PROP='RESIDENTIAL' -- a coherent single-family Green Acres neighborhood consistent with the ordinance's NR purpose text ('accommodate single-family detached residential dwellings at low densities') (ord Sec. 40.2-202(B), Neighborhood Residential (NR) District, within the whole-category 'Residential Zoning Districts' section) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "704 airline blvd",
+    "jurisdiction_id": "portsmouth-va",
+    "parcel_id": "300-411",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.85,
+    "method": "gis_verified",
+    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '704 AIRLINE BLVD, PORTSMOUTH, VA, 23707' (lon:-76.341112595924 lat:36.832776976779), returning ZONING='GMU' (General Mixed-Use); independently cross-checked against the City's tax-assessor Parcels_new layer, same point returning SITE_ADDRE='704 AIRLINE BL' (exact match), ZONING='GMU', MPN='300-411', NEIGHBORHD='WESTHAVEN PARK', TYPE_PROP='COMMERCIAL'; GMU is a human judgment-call mapping to mixed-use-core rather than commercial-employment (see classification_rules.json _notes: GMU's own purpose text reads 'encourage the formation and continuance of a compatible mixed-use environment that includes residential, commercial, and institutional uses', same test manassas-va used for its B-3), hence confidence 0.85 not 0.9 (ord Sec. 40.2-203(C), General Mixed-Use (GMU) District, within the whole-category 'Commercial Zoning Districts' section) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "3307 harding st",
+    "jurisdiction_id": "portsmouth-va",
+    "parcel_id": "701-260",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '3307 HARDING ST, PORTSMOUTH, VA, 23703' (lon:-76.346642909136 lat:36.864162431414), returning ZONING='IL' (Light Industrial); independently cross-checked against the City's tax-assessor Parcels_new layer, same point returning SITE_ADDRE='3340 WEST NORFOLK RD' (adjoining parcel, same West Norfolk industrial block), ZONING='IL', MPN='701-260', NEIGHBORHD='WEST NORFOLK', TYPE_PROP='INDUSTRIAL', consistent with the ordinance's IL purpose text ('light manufacturing, assembly, fabrication, processing, distribution, storage... small-scale... minimal exterior movement') (ord Sec. 40.2-204(B), Light Industrial (IL) District, within the whole-category 'Industrial Zoning Districts' section) (verified 2026-07-18)"
+  },
+  {
+    "address_pattern": "531 king st",
+    "jurisdiction_id": "portsmouth-va",
+    "parcel_id": "13-351",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '531 KING ST, PORTSMOUTH, VA, 23704' (lon:-76.302820954988 lat:36.834427482527), returning ZONING='T4' (Downtown D1, T4 Sub-District General Urban); independently cross-checked against the City's tax-assessor Parcels_new layer, same point returning SITE_ADDRE='517 KING ST' (adjoining parcel, same King St downtown block), ZONING='T4', MPN='13-351', NEIGHBORHD='DOWNTOWN', TYPE_PROP='COMMERCIAL', consistent with the ordinance's T4 description ('contains a mix of uses, but maintains a predominantly residential urban fabric... nearest to the Olde Towne Historic District, represent[ing] moderately intense urbanism in the downtown') (ord Sec. 40.2-207(B)(1)(b), T4 Sub-District (General Urban), within the whole-category 'Downtown D1 District and Sub-Districts' section) (verified 2026-07-18)"
   }
 ]

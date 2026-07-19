@@ -1592,5 +1592,119 @@
         "lynchburg-va"
       ]
     }
+  },
+  {
+    "id": "portsmouth-va-source-indexed-nr-residential",
+    "project_description": "Build a new single-family detached dwelling with two employees, posted operating hours, and interior renovation only, in the Neighborhood Residential (NR) District, discouraging any use that would interfere with the district's quiet single-family character.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "portsmouth-va",
+    "jurisdiction_name": "Portsmouth, VA",
+    "normalized_address": "3005 Carney St, Portsmouth, VA 23703",
+    "sources": [
+      {
+        "source_id": "portsmouth-va-sec-40-2-202",
+        "title": "Sec. 40.2-202. - Residential Zoning Districts.",
+        "excerpt": "(B) Neighborhood Residential (NR) District. The Neighborhood Residential (NR) district is established to accommodate single-family detached residential dwellings at low densities. District regulations are intended to discourage any use that substantially interferes with the development of single-family detached dwellings or that is detrimental to the quiet residential nature of the district.",
+        "section_ref": "Sec. 40.2-202",
+        "jurisdiction_id": "portsmouth-va",
+        "url": "https://library.municode.com/va/portsmouth/codes/code_of_ordinances?nodeId=CH40.2ZO_ARTIIZODI_S40.2-202REZODI",
+        "effective_date": "2025-10-28",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va"
+      ]
+    }
+  },
+  {
+    "id": "portsmouth-va-source-indexed-gmu-mixed-use",
+    "project_description": "Develop a mixed-use project with six employees, posted operating hours, and interior renovation only, combining residential units with commercial and institutional uses in the General Mixed-Use (GMU) District.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "portsmouth-va",
+    "jurisdiction_name": "Portsmouth, VA",
+    "normalized_address": "704 Airline Blvd, Portsmouth, VA 23707",
+    "sources": [
+      {
+        "source_id": "portsmouth-va-sec-40-2-203",
+        "title": "Sec. 40.2-203. - Commercial Zoning Districts.",
+        "excerpt": "(C) General Mixed-Use (GMU) District. The General Mixed-Use (GMU) district is established to provide a wide variety of professional offices and institutions and a broad range of light and moderate intensity commercial uses proximate to residential and more intense business districts so as to satisfy the demand for services. The district regulations are designed to encourage the formation and continuance of a compatible mixed-use environment that includes residential, commercial, and institutional uses.",
+        "section_ref": "Sec. 40.2-203",
+        "jurisdiction_id": "portsmouth-va",
+        "url": "https://library.municode.com/va/portsmouth/codes/code_of_ordinances?nodeId=CH40.2ZO_ARTIIZODI_S40.2-203COZODI",
+        "effective_date": "2025-10-28",
+        "districts": [
+          "mixed-use-core"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va"
+      ]
+    }
   }
 ]
