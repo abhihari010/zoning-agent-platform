@@ -1,0 +1,158 @@
+[
+  {
+    "id": "staunton-va-r2-single-family",
+    "address": "1020 Blackburn St, Staunton, VA 24401",
+    "project_description": "Build a new detached single-family dwelling on a lot in the R-2 low density residential district, meeting the district's 25-foot front yard and side yard requirements.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 18.25.020"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "staunton-va-r2-church-on-review",
+    "address": "1020 Blackburn St, Staunton, VA 24401",
+    "project_description": "Establish a small church with accessory structures in the R-2 low density residential district.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 18.25.030"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "staunton-va-r2-home-kennel-prohibited",
+    "address": "1020 Blackburn St, Staunton, VA 24401",
+    "project_description": "Run a dog breeding kennel as a home occupation out of an attached garage at a single-family house in the R-2 residential district.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["likely_prohibited"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 18.150.040"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "staunton-va-r2-backyard-hens",
+    "address": "1020 Blackburn St, Staunton, VA 24401",
+    "project_description": "Keep four backyard hens in an enclosed coop in the rear yard of a single-family home in the R-2 residential district.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 18.153.030"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "staunton-va-b2-downtown-restaurant",
+    "address": "1 Lawyers Row, Staunton, VA 24401",
+    "project_description": "Open a sit-down restaurant (eating and drinking establishment) in an existing downtown storefront in the B-2 general business district.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 18.60.020", "§ 18.55.020"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "staunton-va-b2-multifamily-on-review",
+    "address": "1 Lawyers Row, Staunton, VA 24401",
+    "project_description": "Convert a downtown building in the B-2 general business district into a multiple-family dwelling, including apartments on the ground floor.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 18.60.070"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "staunton-va-i1-contractor-storage",
+    "address": "200 National Ave, Staunton, VA 24401",
+    "project_description": "Operate a contractor's equipment storage yard in the I-1 light industrial district.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 18.75.020"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "staunton-va-i1-solar-on-review",
+    "address": "200 National Ave, Staunton, VA 24401",
+    "project_description": "Develop a ground-mounted solar energy facility on an industrial parcel in the I-1 light industrial district.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 18.75.040"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "staunton-va-i1-apartment-prohibited",
+    "address": "200 National Ave, Staunton, VA 24401",
+    "project_description": "Build a new multi-family apartment building in the I-1 light industrial district.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["likely_prohibited"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 18.75.020"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "staunton-va-b3-retail-on-review",
+    "address": "508 W Frederick St, Staunton, VA 24401",
+    "project_description": "Open a retail store in the B-3 planned business district.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["§ 18.65.020"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "staunton-va-abstain-cannabis-dispensary",
+    "address": "1301 Commerce Rd, Staunton, VA 24401",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "staunton-va-abstain-data-center",
+    "address": "1004 N Augusta St, Staunton, VA 24401",
+    "project_description": "Construct a hyperscale data center campus with multiple server buildings and on-site electrical substations.",
+    "jurisdiction_id": "staunton-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
