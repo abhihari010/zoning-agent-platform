@@ -1,0 +1,158 @@
+[
+  {
+    "id": "danville-va-sr-single-family",
+    "address": "206 Piney Rd, Danville, VA 24541",
+    "project_description": "Build a new single-family detached dwelling with public water and sewer service in the S-R Suburban Residential District.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.C.B"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "danville-va-sr-bed-breakfast",
+    "address": "206 Piney Rd, Danville, VA 24541",
+    "project_description": "Convert a house in the S-R Suburban Residential District into a bed and breakfast inn with guest rooms.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.C.C"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "danville-va-sr-auto-repair-prohibited",
+    "address": "206 Piney Rd, Danville, VA 24541",
+    "project_description": "Open an automobile repair shop with outdoor vehicle storage on a residential lot in the S-R Suburban Residential District.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["likely_prohibited"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.C.B"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "danville-va-cbc-restaurant",
+    "address": "413 Jefferson St, Danville, VA 24541",
+    "project_description": "Open a sit-down restaurant in an existing storefront in the CB-C Central Business Commercial District of downtown Danville.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.K.B"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "danville-va-cbc-fast-food",
+    "address": "413 Jefferson St, Danville, VA 24541",
+    "project_description": "Open a fast food restaurant with a drive-thru in the CB-C Central Business Commercial District.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.K.C"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "danville-va-cbc-multifamily-principal",
+    "address": "413 Jefferson St, Danville, VA 24541",
+    "project_description": "Develop a multifamily residential building as the principal use of a lot in the CB-C Central Business Commercial District.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.K.C"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "danville-va-hrc-car-wash",
+    "address": "855 Luna Lake Rd, Danville, VA 24541",
+    "project_description": "Build a car wash on a commercial parcel in the HR-C Highway Retail Commercial District.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.M.B"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "danville-va-hrc-commercial-kennel",
+    "address": "855 Luna Lake Rd, Danville, VA 24541",
+    "project_description": "Operate a commercial kennel boarding dogs overnight in the HR-C Highway Retail Commercial District.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.M.C"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "danville-va-im-metal-fabrication",
+    "address": "501 Pruitt Rd, Danville, VA 24541",
+    "project_description": "Establish a metal fabrication shop inside an enclosed industrial building in the M-I Industrial Manufacturing District.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.Q.B"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "danville-va-im-new-residential-prohibited",
+    "address": "501 Pruitt Rd, Danville, VA 24541",
+    "project_description": "Build new residential apartments on a parcel in the M-I Industrial Manufacturing District.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["likely_prohibited"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.Q.D"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "danville-va-abstain-crematorium",
+    "address": "628 Main St, Danville, VA 24541",
+    "project_description": "Construct a crematorium with on-site cremation services for human remains.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "danville-va-abstain-shooting-range",
+    "address": "511 Patton St, Danville, VA 24541",
+    "project_description": "Open an outdoor shooting range with earthen berms and live-fire lanes.",
+    "jurisdiction_id": "danville-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]

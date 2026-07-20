@@ -727,5 +727,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '719 CAROLINA RD, SUFFOLK, VA, 23434' (lon:-76.595157304849 lat:36.707609505798), returning CODE='M-1' (Light Industrial District); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='719 CAROLINA RD' point inside the same M-1 polygon), a Carolina Rd industrial corridor parcel south of downtown; Table 406-1 lists warehouse/freight storage as P and dwellings as not permitted in M-1 (SEC. 31-403 M-1 purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "206 piney rd",
+    "jurisdiction_id": "danville-va",
+    "parcel_id": "76210",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '206 PINEY RD, DANVILLE, VA, 24541' (lon:-79.394686985246 lat:36.543448970916), returning ZONE='SR' (ZONE_DESC='Suburban Residential', Chapter 41 Article 3.C S-R district); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='206 PINEY RD' returning ZONING='SR' and ACCOUNT='76210' (exact address match); single-family use consistent with Article 3.C.B permitted uses (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "413 jefferson st",
+    "jurisdiction_id": "danville-va",
+    "parcel_id": "24125",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '413 JEFFERSON ST, DANVILLE, VA, 24541' (lon:-79.394226766714 lat:36.581713483026), returning ZONE='CBC' (ZONE_DESC='Central Business Commercial', Chapter 41 Article 3.K CB-C district, mapped to mixed-use-core per this pack's classification_rules -- downtown district with by-right residential above first-floor commercial, 3.K.B item 22); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='413 JEFFERSON ST' returning ZONING='CBC' and ACCOUNT='24125' (exact address match) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "855 luna lake rd",
+    "jurisdiction_id": "danville-va",
+    "parcel_id": "75611",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '855 LUNA LAKE RD, DANVILLE, VA, 24541' (lon:-79.425801155842 lat:36.548436818325), returning ZONE='HRC' (ZONE_DESC='Highway Retail Commercial', Chapter 41 Article 3.M HR-C district); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='855 LUNA LAKE RD' returning ZONING='HRC' and ACCOUNT='75611' (exact address match) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "501 pruitt rd",
+    "jurisdiction_id": "danville-va",
+    "parcel_id": "75371",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '501 PRUITT RD, DANVILLE, VA, 24541' (lon:-79.451777020854 lat:36.542541681146), returning ZONE='IM' (ZONE_DESC='Industrial Manufacturing', Chapter 41 Article 3.Q M-I district); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='501 PRUITT RD' returning ZONING='IM' and ACCOUNT='75371' (exact address match); 3.Q.D expressly prohibits new residential uses in M-I (verified 2026-07-19)"
   }
 ]
