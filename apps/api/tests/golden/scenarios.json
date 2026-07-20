@@ -2092,5 +2092,127 @@
         "staunton-va"
       ]
     }
+  },
+  {
+    "id": "danville-va-source-indexed-sr-residential",
+    "project_description": "Build a new single-family detached dwelling with two employees, posted operating hours, and interior renovation only, in the S-R Suburban Residential District, with public water and sewer service consistent with the district's permitted uses.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "danville-va",
+    "jurisdiction_name": "Danville, VA",
+    "normalized_address": "206 Piney Rd, Danville, VA 24541",
+    "sources": [
+      {
+        "source_id": "danville-va-3-c-b",
+        "title": "B. - Permitted Uses.",
+        "excerpt": "1. Single family detached dwellings, with public water and sewer service. 2. Accessory buildings and uses, limited to detached carport and garages, tool sheds, children's playhouses and play structures, doghouses, and accessory off-street parking and loading spaces. 3. Churches and places of worship. 4. Home occupations. 5. Private swimming pools and tennis courts. 6. Public parks and playgrounds. 7. Yard sale and/or garage sale (temporary). (Ord. No. 2004-02.04, Art. 3.C, § B, 2-17-04)",
+        "section_ref": "3.C.B",
+        "jurisdiction_id": "danville-va",
+        "url": "https://library.municode.com/va/danville/codes/zoning?nodeId=CH41ZOOR_ART3.CSUREDISIFAREDI_BPEUS",
+        "effective_date": "2025-06-03",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va",
+        "salem-va",
+        "staunton-va",
+        "suffolk-va"
+      ]
+    }
+  },
+  {
+    "id": "danville-va-source-indexed-cbc-restaurant",
+    "project_description": "Open a sit-down restaurant with six employees, posted operating hours, and interior renovation of an existing storefront, in the CB-C Central Business Commercial District of downtown Danville, consistent with the district's permitted restaurant use.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "danville-va",
+    "jurisdiction_name": "Danville, VA",
+    "normalized_address": "413 Jefferson St, Danville, VA 24541",
+    "sources": [
+      {
+        "source_id": "danville-va-3-k-b",
+        "title": "B. - Permitted Uses.",
+        "excerpt": "Permitted uses shall be those in the following categories which do not exceed 20,000 square feet in lot coverage or a floor area ratio (FAR) of 3.0: 1. Banks and financial institutions (without drive-thru facilities). 2. Bed and breakfast, inn, or tourist home (as defined). 3. Business service and office supply establishments. 4. Call center. 5. Churches and places of worship. 6. Day-care facilities (adult or child). 7. Data storage and data processing center. 8. Health club, spa and fitness center. 9. Home occupations. 15. Offices (general and professional). 16. Patio dining. 18. Personal service establishments. 22. Residential dwellings, as an ancillary use in structures with commercial uses on the first floor, and subject to Additional Regulations pertaining to this district. 23. Restaurants. 24. Retail sales establishments.",
+        "section_ref": "3.K.B",
+        "jurisdiction_id": "danville-va",
+        "url": "https://library.municode.com/va/danville/codes/zoning?nodeId=CH41ZOOR_ART3.KCEBUDICEBUCODI._BPEUS",
+        "effective_date": "2025-06-03",
+        "districts": [
+          "mixed-use-core"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va",
+        "salem-va",
+        "staunton-va",
+        "suffolk-va"
+      ]
+    }
   }
 ]

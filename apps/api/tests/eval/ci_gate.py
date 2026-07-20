@@ -134,6 +134,12 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # keyword-hard; same caveat as chesapeake/newport-news, live vector
     # recall is the quality signal).
     "suffolk-va": 0.50,
+    # 2026-07-19: danville-va 0.500 (Chapter 41 gives each district its own
+    # ARTICLE 3.X, but the citable sections are lettered stubs — "B. -
+    # Permitted Uses." — whose titles carry no district or use vocabulary,
+    # so keyword scoring leans entirely on body text and misses the
+    # special-use lists; live vector recall is the quality signal).
+    "danville-va": 0.40,
 }
 
 

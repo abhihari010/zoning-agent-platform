@@ -1,0 +1,24 @@
+{
+  "schema_version": "source-classification-rules/v1",
+  "_notes": "Human-authored 2026-07-19 (this pack never had a classify_districts.py run; authored directly to avoid an unnecessary Groq pass). Danville Chapter 41 is the cleanest structure in the VA breadth set: every district gets its own ARTICLE 3.X with the district code IN the article heading (e.g. 'ARTICLE 3.C: - S-R, SUBURBAN RESIDENTIAL DISTRICT'), and breadcrumbs are uniformly 3 levels ('Zoning' > 'Chapter 41 - ZONING ORDINANCE' > 'ARTICLE ...'). Per app/source_classifier.py, breadcrumb[1] is 'article' (always 'Chapter 41 - ZONING ORDINANCE' here) and breadcrumb[2] is 'division', so this pack keys on division_contains='ARTICLE 3.X:' -- the trailing colon makes each key unique (plain 'ARTICLE 3.' would also match the Article 3 index sections, which are deliberately left unmapped along with Articles 1-2 and 4+). District identities confirmed against the city's live ArcGIS zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE, 17 distinct codes: SRR TR SR NTR OTR AR MR MHPR TOC NC CBC TWC HRC PSC LEDI CP1 IM -- exactly the 17 base districts of Articles 3.A-3.Q + 3.V's C-E has no polygons yet). Mapping rationale: (1) residential-low-density: 3.A SR-R Sandy River, 3.B T-R Threshold, 3.C S-R Suburban, 3.D NT-R Neo-Traditional, 3.E OT-R Old Town (all single-family), plus the all-residential collapse per lynchburg/salem/staunton precedent for 3.F A-R Attached (townhouse), 3.G M-R Multifamily, 3.H MHP-R Manufactured Home Park. (2) mixed-use-core JUDGMENT CALLS mirroring the user-approved staunton P-1/B-1/B-2 calls: 3.I TO-C Transitional Office ('Transitional Residential/Office District' -- the staunton P-1 analogue), 3.J N-C Neighborhood Commercial (neighborhood retail, the staunton B-1 analogue), 3.K CB-C Central Business (downtown; residential dwellings by right above first-floor commercial per 3.K.B item 22), 3.L TW-C Tobacco Warehouse (downtown River District adaptive-reuse commercial). (3) commercial-employment: 3.M HR-C Highway Retail (corridor retail, staunton B-3 analogue), 3.N PS-C Planned Shopping Center, 3.P CP-1 Cyber Park One (economic-development office/tech park, staunton HE-1 style institutional/employment), 3.V C-E Casino Entertainment (destination resort/entertainment employment district; no by-right residential). (4) industrial-zone: 3.O LED-I Light Economic Development Industrial, 3.Q M-I Industrial Manufacturing (3.Q.D expressly prohibits new residential uses). No agricultural district exists in Danville. Deliberately left UNMAPPED (fall through to unknown/general): overlays 3.R HP-O Historic Preservation, 3.S A-O Airport, 3.T FP-O Floodplain, 3.U PSC-O Planned Shopping Center Overlay (all span underlying base districts), plus Articles 1-2 (general regs), the Article 3 index sections, and Articles 4+ (procedures, signs, parking, definitions).",
+  "rules": [
+    {"division_contains": "ARTICLE 3.A:", "districts": ["residential-low-density"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.B:", "districts": ["residential-low-density"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.C:", "districts": ["residential-low-density"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.D:", "districts": ["residential-low-density"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.E:", "districts": ["residential-low-density"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.F:", "districts": ["residential-low-density"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.G:", "districts": ["residential-low-density"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.H:", "districts": ["residential-low-density"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.I:", "districts": ["mixed-use-core"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.J:", "districts": ["mixed-use-core"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.K:", "districts": ["mixed-use-core"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.L:", "districts": ["mixed-use-core"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.M:", "districts": ["commercial-employment"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.N:", "districts": ["commercial-employment"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.P:", "districts": ["commercial-employment"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.V:", "districts": ["commercial-employment"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.O:", "districts": ["industrial-zone"], "uses": ["general"]},
+    {"division_contains": "ARTICLE 3.Q:", "districts": ["industrial-zone"], "uses": ["general"]}
+  ]
+}
