@@ -767,5 +767,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '501 PRUITT RD, DANVILLE, VA, 24541' (lon:-79.451777020854 lat:36.542541681146), returning ZONE='IM' (ZONE_DESC='Industrial Manufacturing', Chapter 41 Article 3.Q M-I district); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='501 PRUITT RD' returning ZONING='IM' and ACCOUNT='75371' (exact address match); 3.Q.D expressly prohibits new residential uses in M-I (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "921 quail st",
+    "jurisdiction_id": "norfolk-va",
+    "parcel_id": "",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '921 QUAIL ST, NORFOLK, VA, 23513' (lon:-76.248480201116 lat:36.894928717624), returning ZONE='SF-6' (Single Family 6 district, ordinance section 3.2.5); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='921 SOUTH QUAIL ST' point inside the same SF-6 polygon; Census normalizes the street name to plain QUAIL ST), a Norview-area single-family block; Table 3.2.12 lists 'Dwelling, single-family detached' as P in the SF districts (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "810 union st",
+    "jurisdiction_id": "norfolk-va",
+    "parcel_id": "",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '810 UNION ST, NORFOLK, VA, 23510' (lon:-76.287113976767 lat:36.844469217893), returning ZONE='D-BC' (Downtown - Business Center district, ordinance section 3.4.6, mapped to mixed-use-core per this pack's classification_rules); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='810 UNION ST' point inside the same D-BC polygon), a downtown civic-center block; Table 3.4.11 lists Restaurant P/C and Hotel P in all downtown base districts (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "5560 iowa ave",
+    "jurisdiction_id": "norfolk-va",
+    "parcel_id": "",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '5560 IOWA AVE, NORFOLK, VA, 23513' (lon:-76.221480720672 lat:36.889376236725), returning ZONE='C-C' (Community Commercial district, ordinance section 3.3.4); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='5560 IOWA AVE' point inside the same C-C polygon), a Norview commercial-corridor parcel; Table 3.3.9 lists Restaurant P/C across the commercial base districts (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "602 ford dr",
+    "jurisdiction_id": "norfolk-va",
+    "parcel_id": "",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '602 FORD DR, NORFOLK, VA, 23523' (lon:-76.250516629324 lat:36.834706495487), returning ZONE='I-G' (Industrial - General district, ordinance section 3.5.4); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='602 FORD DR' point inside the same I-G polygon), a Berkley/Ford plant industrial tract; Table 3.5.7 lists Warehouse P/C in I-G and marks Visitor Accommodation Uses as not permitted in the industrial base districts (verified 2026-07-19)"
   }
 ]
