@@ -1,0 +1,158 @@
+[
+  {
+    "id": "norfolk-va-sf6-single-family",
+    "address": "921 Quail St, Norfolk, VA 23513",
+    "project_description": "Build a new single-family detached dwelling on a lot in the SF-6 Single Family 6 district.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.2.12"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "norfolk-va-sf6-home-occupation",
+    "address": "921 Quail St, Norfolk, VA 23513",
+    "project_description": "Run a small home-based bookkeeping office as a home occupation inside a dwelling in the SF-6 single-family district.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.2.12"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "norfolk-va-sf6-car-dealership-prohibited",
+    "address": "921 Quail St, Norfolk, VA 23513",
+    "project_description": "Open a used car dealership with outdoor vehicle sales and display on a lot in the SF-6 single-family residential district.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["likely_prohibited"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.2.12"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "norfolk-va-dbc-restaurant",
+    "address": "810 Union St, Norfolk, VA 23510",
+    "project_description": "Open a sit-down restaurant on the ground floor of a building in the D-BC Downtown Business Center district.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4.11"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "norfolk-va-dbc-hotel",
+    "address": "810 Union St, Norfolk, VA 23510",
+    "project_description": "Develop a hotel with conference space in the D-BC Downtown Business Center district.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4.11"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "norfolk-va-dbc-multifamily",
+    "address": "810 Union St, Norfolk, VA 23510",
+    "project_description": "Develop a multi-family apartment building in the D-BC Downtown Business Center district.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4.11"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "norfolk-va-cc-restaurant",
+    "address": "5560 Iowa Ave, Norfolk, VA 23513",
+    "project_description": "Open a sit-down restaurant in an existing commercial building in the C-C Community Commercial district.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "norfolk-va-cc-dance-studio",
+    "address": "5560 Iowa Ave, Norfolk, VA 23513",
+    "project_description": "Open a dance and martial arts studio in a storefront in the C-C Community Commercial district.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "norfolk-va-ig-warehouse",
+    "address": "602 Ford Dr, Norfolk, VA 23523",
+    "project_description": "Establish a warehouse and distribution operation in the I-G Industrial General district.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.5.7"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "norfolk-va-ig-hotel-prohibited",
+    "address": "602 Ford Dr, Norfolk, VA 23523",
+    "project_description": "Build a hotel with overnight visitor accommodations on a parcel in the I-G Industrial General district.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["likely_prohibited"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.5.7"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "norfolk-va-abstain-crematorium",
+    "address": "500 E Main St, Norfolk, VA 23510",
+    "project_description": "Construct a crematorium with on-site cremation services for human remains.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "norfolk-va-abstain-shooting-range",
+    "address": "735 Granby St, Norfolk, VA 23510",
+    "project_description": "Open an outdoor shooting range with earthen berms and live-fire lanes.",
+    "jurisdiction_id": "norfolk-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]

@@ -2214,5 +2214,129 @@
         "suffolk-va"
       ]
     }
+  },
+  {
+    "id": "norfolk-va-source-indexed-sf6-residential",
+    "project_description": "Build a new single-family detached dwelling with two employees, posted operating hours, and interior renovation only, in the SF-6 Single Family 6 district, consistent with the district's purpose of low-density single family detached dwellings.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "norfolk-va",
+    "jurisdiction_name": "Norfolk, VA",
+    "normalized_address": "921 Quail St, Norfolk, VA 23513",
+    "sources": [
+      {
+        "source_id": "norfolk-va-3-2-12",
+        "title": "3.2.12. Uses for the Residential Base Zoning District",
+        "excerpt": "PURPOSE The purpose of this section is to authorize the establishment and continuation of land uses that are allowed on a parcel in a Residential base zoning district. Table 3.2.12, Principal, Accessory, and Temporary Use Table for Residential Base Zoning Districts, lists allowable uses: RESIDENTIAL USES Household Living Uses: Dwelling, single-family detached P P P P P P/C P P (permitted in the SF-2, SF-4, SF-6, SF-10, and SF-T single-family districts); Dwelling, multi-family P/C P/C P/C P/C; Home occupation P/C P/C P/C P/C P/C P/C P/C P/C P/C. COMMERCIAL USES Vehicle Sales and Service Uses: Not permitted.",
+        "section_ref": "3.2.12",
+        "jurisdiction_id": "norfolk-va",
+        "url": "https://www.norfolkva.gov/norfolkzoningordinance/Content/Norfolk-ZO/3_2_Residential_Base_Zoning_Districts.htm#_Toc502655657",
+        "effective_date": "2026-07-03",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va",
+        "salem-va",
+        "staunton-va",
+        "suffolk-va",
+        "danville-va"
+      ]
+    }
+  },
+  {
+    "id": "norfolk-va-source-indexed-dbc-restaurant",
+    "project_description": "Open a sit-down restaurant with six employees, posted operating hours, and interior renovation of an existing ground-floor space, in the D-BC Downtown Business Center district, consistent with the downtown use table's restaurant allowance.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "norfolk-va",
+    "jurisdiction_name": "Norfolk, VA",
+    "normalized_address": "810 Union St, Norfolk, VA 23510",
+    "sources": [
+      {
+        "source_id": "norfolk-va-3-4-11",
+        "title": "3.4.11. Uses for the Downtown Base Zoning Districts",
+        "excerpt": "PURPOSE The purpose of this section is to authorize the establishment and continuation of land uses that are allowed on a parcel in a Downtown base zoning district. Table 3.4.11, Principal, Accessory, and Temporary Use Table for Downtown Base Zoning Districts, lists allowable uses: COMMERCIAL USES Eating and Drinking Uses: Restaurant P/C P/C P/C P/C P/C P/C (permitted in all six downtown base districts, D-W, D-BC, D-MU, D-AD, D-FN, and D-SP); Hotel or motel P P P P P P; RESIDENTIAL USES Dwelling, multi-family P P P P P P/C; Dwelling, townhouse P P P P P.",
+        "section_ref": "3.4.11",
+        "jurisdiction_id": "norfolk-va",
+        "url": "https://www.norfolkva.gov/norfolkzoningordinance/Content/Norfolk-ZO/3_4_Downtown_Base_Zoning_Districts.htm#_Toc502655678",
+        "effective_date": "2026-07-03",
+        "districts": [
+          "mixed-use-core"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va",
+        "salem-va",
+        "staunton-va",
+        "suffolk-va",
+        "danville-va"
+      ]
+    }
   }
 ]

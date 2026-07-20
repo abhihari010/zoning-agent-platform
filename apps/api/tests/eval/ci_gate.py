@@ -140,6 +140,12 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # so keyword scoring leans entirely on body text and misses the
     # special-use lists; live vector recall is the quality signal).
     "danville-va": 0.40,
+    # 2026-07-19: norfolk-va 0.600 (the 2018 ordinance concentrates uses in
+    # four group tables — 3.2.12/3.3.9/3.4.11/3.5.7 — shared by all
+    # districts of a family, so table-derived refs are keyword-hard; same
+    # caveat as suffolk/chesapeake, live vector recall is the quality
+    # signal).
+    "norfolk-va": 0.50,
 }
 
 
