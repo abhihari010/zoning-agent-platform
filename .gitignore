@@ -41,3 +41,18 @@ apps/api/tests/golden/traces/
 progress.md
 testing-progress.md
 .playwright-mcp/
+
+# Local scratch / one-off debug dumps — never commit
+.scratch_*
+*.sqlite3-journal
+**/_classification_report.json
+apps/api/tests/eval/reports/
+apps/api/diag_*.py
+apps/api/scripts_local_bootstrap_eval.py
+apps/api/probe.out
+apps/api/*.html
+apps/api/*.htm
+apps/api/*.xml
+apps/api/*.js
+**/.impeccable/
+scripts/va_breadth_cities.json
