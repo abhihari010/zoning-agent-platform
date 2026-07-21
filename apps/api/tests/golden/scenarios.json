@@ -2338,5 +2338,131 @@
         "danville-va"
       ]
     }
+  },
+  {
+    "id": "alexandria-va-source-indexed-r8-residential",
+    "project_description": "Build a new single-unit dwelling with two employees, posted operating hours, and interior renovation only, in the R-8 residential zone, consistent with the zone's permitted single-unit dwelling use.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "alexandria-va",
+    "jurisdiction_name": "Alexandria, VA",
+    "normalized_address": "2906 Pierpont St, Alexandria, VA 22302",
+    "sources": [
+      {
+        "source_id": "alexandria-va-3-302",
+        "title": "3-302 - Permitted uses.",
+        "excerpt": "The following uses are permitted in the R-8 zone: (A) Single-unit dwelling; (A.1) Two-unit dwelling; (A.2) Multi-unit dwelling up to four units; (B) Accessory uses, as permitted by section 7-100; (C) Child or elder care home, as permitted by section 7-500; (D) Church; (E) Home occupation, as permitted by section 7-300; (F) Public park; (G) Public school; (H) Utilities, as permitted by section 7-1200.",
+        "section_ref": "3-302",
+        "jurisdiction_id": "alexandria-va",
+        "url": "https://library.municode.com/va/alexandria/codes/zoning?nodeId=ARTIIIREZORE_3-302PEUS",
+        "effective_date": "2025-06-14",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va",
+        "salem-va",
+        "staunton-va",
+        "suffolk-va",
+        "danville-va",
+        "norfolk-va"
+      ]
+    }
+  },
+  {
+    "id": "alexandria-va-source-indexed-cg-office",
+    "project_description": "Open a business and professional office with six employees, posted operating hours, and interior renovation of an existing commercial space, in the CG commercial general zone, consistent with the zone's permitted office use.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "alexandria-va",
+    "jurisdiction_name": "Alexandria, VA",
+    "normalized_address": "1049 W Glebe Rd, Alexandria, VA 22305",
+    "sources": [
+      {
+        "source_id": "alexandria-va-4-402",
+        "title": "4-402 - Permitted uses.",
+        "excerpt": "The following uses are permitted in the CG zone: (A) Single-unit dwelling; (A.1) Two-unit dwelling; (A.2) Townhouse dwelling; (B) Multi-unit dwelling; (B.1) Auxiliary dwelling, not to exceed four units; (C) Business and professional office; (D) Cemetery; (E) Church; (E.1) Day care center; (E.2) Health and athletic club or fitness studio; (F) Medical laboratory; (G) Health profession office; (I) Personal service establishment; (J) Public school; (J.1) Recreation and entertainment uses, indoor; (J.2) Restaurant.",
+        "section_ref": "4-402",
+        "jurisdiction_id": "alexandria-va",
+        "url": "https://library.municode.com/va/alexandria/codes/zoning?nodeId=ARTIVCOOFINZO_4-402PEUS",
+        "effective_date": "2025-06-14",
+        "districts": [
+          "commercial-employment"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va",
+        "richmond-va",
+        "chesapeake-va",
+        "loudoun-county-va",
+        "prince-william-county-va",
+        "albemarle-county-va",
+        "winchester-va",
+        "virginia-beach-va",
+        "newport-news-va",
+        "hampton-va",
+        "henrico-county-va",
+        "fredericksburg-va",
+        "lynchburg-va",
+        "manassas-va",
+        "portsmouth-va",
+        "salem-va",
+        "staunton-va",
+        "suffolk-va",
+        "danville-va",
+        "norfolk-va"
+      ]
+    }
   }
 ]

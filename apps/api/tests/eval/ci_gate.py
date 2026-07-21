@@ -146,6 +146,12 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # caveat as suffolk/chesapeake, live vector recall is the quality
     # signal).
     "norfolk-va": 0.50,
+    # 2026-07-20: alexandria-va 0.800 (human-authored article_contains rules
+    # over 2-level "Zoning" breadcrumbs, with numeric-prefix title_contains
+    # overrides inside Article IV — each district's uses live in its own
+    # keyword-dense Sec. 3-3xx/4-xxxx section, so the refs are what the
+    # retriever ranks first; the misses are Article-VII supplemental refs).
+    "alexandria-va": 0.70,
 }
 
 

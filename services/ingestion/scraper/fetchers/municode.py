@@ -293,6 +293,35 @@ def parse_content_sections(
     return records
 
 
+def null_content_section_doc_ids(content_json: str | dict) -> list[str]:
+    """Doc node ids in a CodesContent response that look like substantive
+    sections but carry no usable ``Content``.
+
+    Municode serves some oversized chunk groups (e.g. Alexandria's Articles
+    II—IV, 135—190 docs each) with ``Content: null`` on every doc; the text for
+    those sections is only returned by a per-doc ``CodesContent?nodeId={docId}``
+    call.  The fetcher uses this list to fall back to per-doc fetches.
+    """
+    payload = _as_dict(content_json)
+    docs = payload.get("Docs")
+    if not isinstance(docs, list):
+        return []
+    out: list[str] = []
+    for doc in docs:
+        if not isinstance(doc, dict):
+            continue
+        title = str(doc.get("Title") or "").strip()
+        node_id = str(doc.get("Id") or "").strip()
+        if not title or not node_id or _RESERVED_RE.search(title):
+            continue
+        if not (_SECTION_REF_RE.match(title) or _LETTER_OUTLINE_RE.match(title)):
+            continue
+        if clean_html(str(doc.get("Content") or "")).strip():
+            continue
+        out.append(node_id)
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Deep-link builder
 # ---------------------------------------------------------------------------
@@ -406,7 +435,15 @@ class MunicodeFetcher:
                     zoning_node_id, zoning_heading = find_zoning_node(toc_root)
                     dedicated_children = None
             else:
-                zoning_node_id, zoning_heading = find_zoning_node(toc_root)
+                try:
+                    zoning_node_id, zoning_heading = find_zoning_node(toc_root)
+                except ValueError:
+                    # Some codes split the TOC into "volume" nodes (e.g. Roanoke
+                    # City's two "CODE OF THE CITY OF ROANOKE (1979)" roots) with
+                    # the zoning chapter one level down — descend and rescan.
+                    zoning_node_id, zoning_heading = self._find_zoning_node_in_volumes(
+                        client, job_id, product_id, toc_root
+                    )
 
             sections = self._collect_sections(
                 client=client,
@@ -435,6 +472,52 @@ class MunicodeFetcher:
                 "zoning_heading": zoning_heading,
             },
         )
+
+    def _find_zoning_node_in_volumes(
+        self,
+        client: PoliteHttpClient,
+        job_id: int,
+        product_id: int,
+        toc_root: str | dict,
+    ) -> tuple[str, str]:
+        """Locate the zoning chapter one level below the TOC root.
+
+        Used when ``find_zoning_node`` finds nothing at the root: some combined
+        codes wrap their chapters in intermediate "volume" nodes (e.g. Roanoke
+        City's second "CODE OF THE CITY OF ROANOKE (1979)" node holds Chapters
+        28—36.2, including "Chapter 36.2 - ZONING").  Each child-bearing root
+        node is descended one level and rescanned with the same heading rules.
+        """
+        root = _as_dict(toc_root)
+        candidates: list[tuple[str, str, bool]] = []
+        for node in root.get("Children") or []:
+            if not isinstance(node, dict) or not node.get("HasChildren"):
+                continue
+            for c in self._children(client, job_id, product_id, str(node.get("Id") or "")):
+                heading = c["heading"]
+                lowered = heading.lower()
+                if not c["id"] or not heading:
+                    continue
+                if any(bad in lowered for bad in _ZONING_HEADING_EXCLUDE):
+                    continue
+                if any(hint in lowered for hint in _ZONING_HEADING_HINTS):
+                    candidates.append((c["id"], heading, c["has_children"]))
+        if not candidates:
+            raise ValueError(
+                "Could not locate a zoning ordinance node in the Municode TOC (root or volumes)."
+            )
+        # A "Chapter 36.2 - ZONING" / "Appendix A - Zoning Ordinance" chapter
+        # node must outrank incidental matches such as a charter's "§ 62 -
+        # Zoning" powers section; then prefer populated and specific headings.
+        candidates.sort(
+            key=lambda item: (
+                not re.match(r"^\s*(chapter|appendix|article)\b", item[1], re.IGNORECASE),
+                not item[2],
+                "zoning ordinance" not in item[1].lower(),
+                item[1],
+            )
+        )
+        return candidates[0][0], candidates[0][1]
 
     def _children(
         self, client: PoliteHttpClient, job_id: int, product_id: int, node_id: str
@@ -507,6 +590,23 @@ class MunicodeFetcher:
                 records.setdefault(record.node_id or record.section_ref, record)
                 if self.max_sections is not None and len(records) >= self.max_sections:
                     return list(records.values())
+            # Some oversized chunk groups come back with Content=null on every
+            # doc (e.g. Alexandria Articles II—IV); their text is only served
+            # per doc, so fall back to one CodesContent call per empty section.
+            for doc_id in null_content_section_doc_ids(content_raw):
+                leaf_raw = client.get_text(
+                    f"{API_BASE}/CodesContent?jobId={job_id}&nodeId={doc_id}&productId={product_id}",
+                    cache_suffix=f".content_{doc_id}.json",
+                )
+                for record in parse_content_sections(
+                    leaf_raw,
+                    deep_link=deep_link,
+                    breadcrumb=breadcrumb,
+                    effective_date=effective_date,
+                ):
+                    records.setdefault(record.node_id or record.section_ref, record)
+                    if self.max_sections is not None and len(records) >= self.max_sections:
+                        return list(records.values())
 
         return list(records.values())
 

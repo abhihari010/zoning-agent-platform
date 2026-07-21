@@ -1,0 +1,158 @@
+[
+  {
+    "id": "alexandria-va-r8-single-family",
+    "address": "2906 Pierpont St, Alexandria, VA 22302",
+    "project_description": "Build a new single-unit dwelling on a lot in the R-8 residential zone.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3-302"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "alexandria-va-r8-private-school",
+    "address": "2906 Pierpont St, Alexandria, VA 22302",
+    "project_description": "Open a private school in the R-8 residential zone.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3-303"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "alexandria-va-r8-retail-prohibited",
+    "address": "2906 Pierpont St, Alexandria, VA 22302",
+    "project_description": "Open a retail sales store on a residential lot in the R-8 residential zone.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["likely_prohibited"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3-304"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "alexandria-va-cg-professional-office",
+    "address": "1049 W Glebe Rd, Alexandria, VA 22305",
+    "project_description": "Open a business and professional office in the CG commercial general zone.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4-402"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "alexandria-va-cg-auto-service-station",
+    "address": "1049 W Glebe Rd, Alexandria, VA 22305",
+    "project_description": "Build an automobile service station in the CG commercial general zone.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4-403"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "alexandria-va-cg-drive-through",
+    "address": "1049 W Glebe Rd, Alexandria, VA 22305",
+    "project_description": "Add a drive through facility to a commercial building in the CG commercial general zone.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4-403"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "alexandria-va-crmum-multifamily",
+    "address": "6035 Ricketts Walk, Alexandria, VA 22312",
+    "project_description": "Develop a multi-unit dwelling building in the CRMU-M commercial residential mixed use medium zone.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["5-202"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "alexandria-va-crmum-hotel",
+    "address": "6035 Ricketts Walk, Alexandria, VA 22312",
+    "project_description": "Develop a hotel in the CRMU-M commercial residential mixed use medium zone.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["5-203"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "alexandria-va-i-machine-shop",
+    "address": "5190 Dawes Ave, Alexandria, VA 22311",
+    "project_description": "Establish a machine shop with light manufacturing in the I industrial zone.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["likely_allowed", "conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4-1202"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "alexandria-va-i-junkyard",
+    "address": "5190 Dawes Ave, Alexandria, VA 22311",
+    "project_description": "Operate a junkyard on a parcel in the I industrial zone.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4-1203"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "alexandria-va-abstain-cannabis-dispensary",
+    "address": "301 King St, Alexandria, VA 22314",
+    "project_description": "Open a retail cannabis dispensary selling recreational marijuana products to the public.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  },
+  {
+    "id": "alexandria-va-abstain-data-center",
+    "address": "2000 Duke St, Alexandria, VA 22314",
+    "project_description": "Construct a hyperscale data center campus with multiple server buildings and on-site electrical substations.",
+    "jurisdiction_id": "alexandria-va",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
