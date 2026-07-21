@@ -5,6 +5,7 @@ from services.ingestion.scraper.fetchers.municode import (
     _section_ref_from_title,
     _slugify_product,
     find_zoning_node,
+    null_content_section_doc_ids,
     parse_client_id,
     parse_code_product_id,
     parse_content_sections,
@@ -195,3 +196,80 @@ def test_parse_content_sections_letter_outline_without_article_is_skipped():
         ]
     }
     assert parse_content_sections(payload, deep_link=deep_link) == []
+
+
+def test_null_content_section_doc_ids_flags_only_empty_substantive_sections():
+    # Municode serves some oversized chunk groups (e.g. Alexandria Articles
+    # II—IV) with Content=null on every doc; those sections must be re-fetched
+    # per doc.  Structural, reserved, and content-bearing docs are not flagged.
+    payload = {
+        "Docs": [
+            {
+                "Id": "ARTIIIREZORE",
+                "Title": "ARTICLE III. - RESIDENTIAL ZONE REGULATIONS",
+                "Content": None,
+            },
+            {
+                "Id": "ARTIIIREZORE_3-101PU",
+                "Title": "3-101 - Purpose.",
+                "Content": None,
+            },
+            {
+                "Id": "ARTIIIREZORE_S3-100R-REZO",
+                "Title": "Sec. 3-100 - R-20 Residential zone.",
+                "Content": "",
+            },
+            {
+                "Id": "ARTIIIREZORE_3-103RE",
+                "Title": "3-103 - Reserved.",
+                "Content": None,
+            },
+            {
+                "Id": "ARTIIIREZORE_3-102PEUS",
+                "Title": "3-102 - Permitted uses.",
+                "Content": "<p>The following uses are permitted.</p>",
+            },
+        ]
+    }
+    assert null_content_section_doc_ids(payload) == [
+        "ARTIIIREZORE_3-101PU",
+        "ARTIIIREZORE_S3-100R-REZO",
+    ]
+
+
+def test_find_zoning_node_in_volumes_prefers_chapter_over_charter_section():
+    # Roanoke City pattern: no zoning heading at the TOC root; chapters live
+    # under intermediate volume nodes, and the charter volume contains an
+    # incidental "Sec. 62 - Zoning." powers section that must NOT win over
+    # "Chapter 36.2 - ZONING".
+    import json as _json
+
+    from services.ingestion.scraper.fetchers.municode import MunicodeFetcher
+
+    toc_root = {
+        "Children": [
+            {"Id": "CH", "Heading": "CHARTER", "HasChildren": True},
+            {"Id": "VOL2", "Heading": "CODE OF THE CITY OF ROANOKE (1979)", "HasChildren": True},
+        ]
+    }
+    children_by_node = {
+        "CH": [
+            {"Id": "CH_S62ZO", "Heading": "Sec. 62 - Zoning.", "HasChildren": False},
+        ],
+        "VOL2": [
+            {"Id": "CORO1979_CH35WA", "Heading": "Chapter 35 - WATER", "HasChildren": True},
+            {"Id": "CORO1979_CH36.2ZO", "Heading": "Chapter 36.2 - ZONING", "HasChildren": True},
+        ],
+    }
+
+    class _FakeClient:
+        def get_text(self, url, cache_suffix=None):
+            node_id = url.rsplit("nodeId=", 1)[1]
+            return _json.dumps(children_by_node[node_id])
+
+    fetcher = MunicodeFetcher()
+    node_id, heading = fetcher._find_zoning_node_in_volumes(
+        _FakeClient(), job_id=1, product_id=2, toc_root=toc_root
+    )
+    assert node_id == "CORO1979_CH36.2ZO"
+    assert heading == "Chapter 36.2 - ZONING"

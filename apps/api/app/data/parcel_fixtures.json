@@ -807,5 +807,45 @@
     "confidence": 0.9,
     "method": "gis_verified",
     "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '602 FORD DR, NORFOLK, VA, 23523' (lon:-76.250516629324 lat:36.834706495487), returning ZONE='I-G' (Industrial - General district, ordinance section 3.5.4); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='602 FORD DR' point inside the same I-G polygon), a Berkley/Ford plant industrial tract; Table 3.5.7 lists Warehouse P/C in I-G and marks Visitor Accommodation Uses as not permitted in the industrial base districts (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "2906 pierpont st",
+    "jurisdiction_id": "alexandria-va",
+    "parcel_id": "023.01-04",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '2906 PIERPONT ST, ALEXANDRIA, VA, 22302' (lon:-77.073820593889 lat:38.83093033043), returning ZONING='R8' (R-8 residential zone, ordinance Sec. 3-300); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='2906 PIERPONT ST' returning ZONING='R 8', PID_GIS='023.01-04', ACCOUNTNO='50686400' (exact address match); single-unit dwellings permitted per 3-302(A) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "6035 ricketts walk",
+    "jurisdiction_id": "alexandria-va",
+    "parcel_id": "047.01-03-04",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '6035 RICKETTS WALK, ALEXANDRIA, VA, 22312' (lon:-77.136430205245 lat:38.817543478892), returning ZONING='CRMU/M' (CRMU-M commercial residential mixed use medium zone, ordinance Sec. 5-200, Article V mixed use -> mixed-use-core per this pack's classification_rules); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='6035 RICKETTS WALK' returning PID_GIS='047.01-03-04', ACCOUNTNO='50635010' (exact address match) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "1049 w glebe rd",
+    "jurisdiction_id": "alexandria-va",
+    "parcel_id": "006.01-01-08",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '1049 W GLEBE RD, ALEXANDRIA, VA, 22305' (lon:-77.076062378502 lat:38.842781996559), returning ZONING='CG' (CG commercial general zone, ordinance Sec. 4-400); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='1049 W GLEBE RD' returning PID_GIS='006.01-01-08', ACCOUNTNO='50055010' (exact address match) (verified 2026-07-19)"
+  },
+  {
+    "address_pattern": "5190 dawes ave",
+    "jurisdiction_id": "alexandria-va",
+    "parcel_id": "002.04-01-30",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '5190 DAWES AVE, ALEXANDRIA, VA, 22311' (lon:-77.118487413453 lat:38.84016238515), returning ZONING='I' (I industrial zone, ordinance Sec. 4-1200); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='5190 DAWES AVE' returning PID_GIS='002.04-01-30', ACCOUNTNO='44080000' (exact address match); machine shops and manufacturing permitted per 4-1202 (verified 2026-07-19)"
   }
 ]

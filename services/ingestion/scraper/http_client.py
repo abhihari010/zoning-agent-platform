@@ -149,6 +149,13 @@ class PoliteHttpClient:
         if self.config.cache_dir is None:
             return None
         digest = hashlib.sha256(url.encode("utf-8")).hexdigest()[:24]
+        # Municode doc node ids can encode entire headings, producing suffixes
+        # that push the path past Windows' 260-char MAX_PATH — clamp long
+        # suffixes to a stable digest-tagged stem (the URL digest already
+        # guarantees uniqueness; the suffix is only a human-readable hint).
+        if len(suffix) > 80:
+            ext = Path(suffix).suffix or ".cache"
+            suffix = f".{hashlib.sha256(suffix.encode('utf-8')).hexdigest()[:12]}{ext}"
         return self.config.cache_dir / f"{digest}{suffix}"
 
     def _read_cache(self, path: Path | None) -> str | None:
