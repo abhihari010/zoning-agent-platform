@@ -340,9 +340,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -383,9 +381,7 @@
       ],
       "min_citations": 1,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -428,9 +424,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -471,9 +465,7 @@
       ],
       "min_citations": 1,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -516,9 +508,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -561,9 +551,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -606,9 +594,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -652,9 +638,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -698,9 +682,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -745,9 +727,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -792,9 +772,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -840,9 +818,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -888,9 +864,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -937,9 +911,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -986,9 +958,7 @@
       "min_citations": 1,
       "min_confidence": 0.7,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1037,9 +1007,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1088,9 +1056,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1140,9 +1106,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1192,9 +1156,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1245,9 +1207,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1298,9 +1258,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1352,9 +1310,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1406,9 +1362,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1461,9 +1415,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1516,9 +1468,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1572,9 +1522,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1628,9 +1576,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1686,9 +1632,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1744,9 +1688,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1802,9 +1744,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1860,9 +1800,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1934,9 +1872,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -1993,9 +1929,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -2068,9 +2002,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -2128,9 +2060,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -2189,9 +2119,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -2250,9 +2178,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -2312,9 +2238,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -2374,9 +2298,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",
@@ -2437,9 +2359,7 @@
       "min_citations": 1,
       "min_confidence": 0.5,
       "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
+      "required_warning_substrings": [],
       "forbidden_citation_jurisdiction_ids": [
         "blacksburg-va",
         "montgomery-county-va",

@@ -36,7 +36,7 @@ jobs:
       - name: Validate source packs
         run: python scripts/validate_source_packs.py
       - name: Check public support candidates
-        run: python scripts/check_public_support_candidates.py blacksburg-va montgomery-county-va richmond-va
+        run: python scripts/check_public_support_candidates.py blacksburg-va montgomery-county-va richmond-va albemarle-county-va alexandria-va chesapeake-va danville-va franklin-tn fredericksburg-va hampton-va henrico-county-va loudoun-county-va lynchburg-va manassas-va newport-news-va norfolk-va portsmouth-va prince-william-county-va salem-va staunton-va suffolk-va virginia-beach-va winchester-va
       - name: Check source freshness
         run: python scripts/check_source_freshness.py --max-age-days 90
 
