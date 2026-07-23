@@ -179,7 +179,11 @@ def detect_jurisdiction(
         if jurisdiction.match_strategy == "county":
             place_match = county_match
         elif jurisdiction.match_strategy == "locality_and_county":
-            place_match = locality_match and county_match
+            # Independent cities (VA) are their own county-equivalent, so geocoders
+            # return no administrative_area_level_2 for them. When the geocoder gives
+            # us no county to check, locality + state already uniquely identify the
+            # city; requiring a county component would reject every real address.
+            place_match = locality_match and (county_match or not county)
         else:
             place_match = locality_match
         if place_match and state_match:
