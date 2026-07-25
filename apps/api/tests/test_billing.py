@@ -503,6 +503,41 @@ def test_webhook_subscription_deleted_downgrades_to_free(monkeypatch):
     assert store.get_user("user-1").subscription_tier == "free"
 
 
+def test_webhook_subscription_updated_lapsed_status_downgrades(monkeypatch):
+    monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
+    client = TestClient(app)
+    store.upsert_user(UserRecord(user_id="user-1", role="user"))
+    store.set_subscription_tier("user-1", "pro", stripe_customer_id="cus_abc")
+
+    # A lapsed subscription fires updated (past_due/unpaid) with no deleted event.
+    event = _stripe_event("customer.subscription.updated", {"customer": "cus_abc", "status": "unpaid"})
+    monkeypatch.setattr("app.routers.api.stripe.Webhook.construct_event", lambda *a, **k: event)
+
+    response = client.post("/api/v1/billing/webhook", headers={"stripe-signature": "sig"}, content=b"{}")
+
+    assert response.status_code == 200
+    assert store.get_user("user-1").subscription_tier == "free"
+
+
+def test_webhook_subscription_updated_cancel_at_period_end_keeps_pro(monkeypatch):
+    monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
+    client = TestClient(app)
+    store.upsert_user(UserRecord(user_id="user-1", role="user"))
+    store.set_subscription_tier("user-1", "pro", stripe_customer_id="cus_abc")
+
+    # Still active until the period ends -- Pro until the deleted event arrives.
+    event = _stripe_event(
+        "customer.subscription.updated",
+        {"customer": "cus_abc", "status": "active", "cancel_at_period_end": True},
+    )
+    monkeypatch.setattr("app.routers.api.stripe.Webhook.construct_event", lambda *a, **k: event)
+
+    response = client.post("/api/v1/billing/webhook", headers={"stripe-signature": "sig"}, content=b"{}")
+
+    assert response.status_code == 200
+    assert store.get_user("user-1").subscription_tier == "pro"
+
+
 def test_webhook_unknown_user_is_ignored_not_500(monkeypatch):
     monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_test")
     client = TestClient(app)

@@ -652,9 +652,24 @@ async def stripe_webhook(request: Request):
         user = _resolve_user(data_object.get("client_reference_id"), customer_id)
         if not user:
             return {"status": "ignored"}
+        # subscription.updated also fires when a subscription lapses (past_due,
+        # unpaid) without a subsequent deleted event -- only an active/trialing
+        # subscription is Pro, or a lapsed payer keeps the deliverable for free.
+        # A cancel_at_period_end subscription stays "active" until it ends, so it
+        # correctly keeps Pro until the deleted event arrives.
+        lapsed = event_type == "customer.subscription.updated" and data_object.get("status") not in {
+            "active",
+            "trialing",
+        }
+        tier = "free" if lapsed else "pro"
         # Idempotent: re-applying the same event just re-sets the same tier.
-        store.set_subscription_tier(user.user_id, "pro", stripe_customer_id=customer_id)
-        store.audit("billing.tier.upgraded", user.user_id, {"event_type": event_type}, user_id=user.user_id)
+        store.set_subscription_tier(user.user_id, tier, stripe_customer_id=customer_id)
+        store.audit(
+            f"billing.tier.{'downgraded' if lapsed else 'upgraded'}",
+            user.user_id,
+            {"event_type": event_type},
+            user_id=user.user_id,
+        )
         return {"status": "ok"}
 
     if event_type == "customer.subscription.deleted":
