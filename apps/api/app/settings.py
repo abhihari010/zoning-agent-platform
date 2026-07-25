@@ -97,6 +97,12 @@ class Settings:
     daily_analysis_limit_free: int
     daily_project_limit_free: int
     burst_llm_limit_per_min: int
+    daily_analysis_limit_pro: int
+    stripe_secret_key: str
+    stripe_webhook_secret: str
+    stripe_price_id_pro: str
+    stripe_success_url: str
+    stripe_cancel_url: str
     auto_seed_sources: bool
     auto_reindex_on_empty: bool
     startup_reindex_enabled: bool
@@ -213,6 +219,12 @@ def get_settings() -> Settings:
         daily_analysis_limit_free=int(_env("DAILY_ANALYSIS_LIMIT_FREE", "10")),
         daily_project_limit_free=int(_env("DAILY_PROJECT_LIMIT_FREE", "25")),
         burst_llm_limit_per_min=int(_env("BURST_LLM_LIMIT_PER_MIN", "8")),
+        daily_analysis_limit_pro=int(_env("DAILY_ANALYSIS_LIMIT_PRO", "50")),
+        stripe_secret_key=_env("STRIPE_SECRET_KEY"),
+        stripe_webhook_secret=_env("STRIPE_WEBHOOK_SECRET"),
+        stripe_price_id_pro=_env("STRIPE_PRICE_ID_PRO"),
+        stripe_success_url=_env("STRIPE_SUCCESS_URL"),
+        stripe_cancel_url=_env("STRIPE_CANCEL_URL"),
         auto_seed_sources=_env_bool("AUTO_SEED_SOURCES", True),
         auto_reindex_on_empty=_env_bool("AUTO_REINDEX_ON_EMPTY", True),
         startup_reindex_enabled=_env_bool("STARTUP_REINDEX_ENABLED", True),

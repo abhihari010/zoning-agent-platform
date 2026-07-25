@@ -86,6 +86,12 @@ class StoreRepository(Protocol):
 
     def get_user(self, user_id: str) -> UserRecord | None: ...
 
+    def get_user_by_stripe_customer_id(self, stripe_customer_id: str) -> UserRecord | None: ...
+
+    def set_subscription_tier(
+        self, user_id: str, tier: str, stripe_customer_id: str | None = None
+    ) -> None: ...
+
     def delete_user_data(self, user_id: str) -> int: ...
 
     def record_usage(self, event_type: str, user_id: str | None = None) -> None: ...
@@ -212,6 +218,10 @@ class SQLAlchemyStore:
             },
             "sessions": {
                 "user_id": "VARCHAR(200)",
+            },
+            "users": {
+                "subscription_tier": "VARCHAR(50) NOT NULL DEFAULT 'free'",
+                "stripe_customer_id": "VARCHAR(200)",
             },
             "analyses": {
                 "user_id": "VARCHAR(200)",
@@ -484,6 +494,11 @@ class SQLAlchemyStore:
         existing = self.get_user(user.user_id)
         created_at = existing.created_at if existing else user.created_at
         disabled_at = existing.disabled_at if existing and existing.disabled_at is not None else user.disabled_at
+        # Billing fields are set by the Stripe webhook, not by the per-request
+        # auth upsert (_persist_user) -- preserve them the same way disabled_at
+        # is preserved, so a Pro user never gets silently reset to free.
+        subscription_tier = existing.subscription_tier if existing else user.subscription_tier
+        stripe_customer_id = existing.stripe_customer_id if existing else user.stripe_customer_id
         try:
             with self.engine.begin() as connection:
                 values = {
@@ -492,6 +507,8 @@ class SQLAlchemyStore:
                     "created_at": created_at,
                     "last_seen_at": user.last_seen_at,
                     "disabled_at": disabled_at,
+                    "subscription_tier": subscription_tier,
+                    "stripe_customer_id": stripe_customer_id,
                 }
                 result = connection.execute(
                     update(users).where(users.c.user_id == user.user_id).values(**values)
@@ -500,7 +517,14 @@ class SQLAlchemyStore:
                     connection.execute(insert(users).values(user_id=user.user_id, **values))
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not save user {user.user_id}: {exc}") from exc
-        return user.model_copy(update={"created_at": created_at, "disabled_at": disabled_at})
+        return user.model_copy(
+            update={
+                "created_at": created_at,
+                "disabled_at": disabled_at,
+                "subscription_tier": subscription_tier,
+                "stripe_customer_id": stripe_customer_id,
+            }
+        )
 
     def get_user(self, user_id: str) -> UserRecord | None:
         try:
@@ -511,6 +535,43 @@ class SQLAlchemyStore:
 
         if not row:
             return None
+        return self._user_from_row(row)
+
+    def get_user_by_stripe_customer_id(self, stripe_customer_id: str) -> UserRecord | None:
+        try:
+            with self.engine.connect() as connection:
+                row = connection.execute(
+                    select(users).where(users.c.stripe_customer_id == stripe_customer_id)
+                ).first()
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(
+                f"Could not load user by stripe_customer_id {stripe_customer_id}: {exc}"
+            ) from exc
+
+        if not row:
+            return None
+        return self._user_from_row(row)
+
+    def set_subscription_tier(
+        self, user_id: str, tier: str, stripe_customer_id: str | None = None
+    ) -> None:
+        """Set a user's billing tier directly (Stripe webhook only).
+
+        Bypasses upsert_user's preserve-existing-tier logic on purpose: that
+        logic protects against the per-request auth upsert (_persist_user)
+        silently resetting a Pro user, but the webhook IS the source of truth
+        for a tier change and must be able to apply one.
+        """
+        values: dict[str, Any] = {"subscription_tier": tier}
+        if stripe_customer_id is not None:
+            values["stripe_customer_id"] = stripe_customer_id
+        try:
+            with self.engine.begin() as connection:
+                connection.execute(update(users).where(users.c.user_id == user_id).values(**values))
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not update subscription tier for {user_id}: {exc}") from exc
+
+    def _user_from_row(self, row: Any) -> UserRecord:
         data = row._mapping
         return UserRecord(
             user_id=data["user_id"],
@@ -519,6 +580,8 @@ class SQLAlchemyStore:
             created_at=_coerce_datetime(data["created_at"]),
             last_seen_at=_coerce_datetime(data["last_seen_at"]),
             disabled_at=_coerce_datetime(data["disabled_at"]) if data["disabled_at"] else None,
+            subscription_tier=data.get("subscription_tier") or "free",
+            stripe_customer_id=data.get("stripe_customer_id"),
         )
 
     def delete_user_data(self, user_id: str) -> int:
