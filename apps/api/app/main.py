@@ -91,6 +91,17 @@ async def enforce_api_auth(request: Request, call_next):
         if throttle_response:
             return throttle_response
 
+    # Burst-limit the expensive LLM endpoints (per IP). Daily per-user caps still apply downstream.
+    # ponytail: in-memory per-instance window; fine at 1 Render instance. If we scale
+    # horizontally, move the window to Postgres/Redis.
+    p = request.url.path
+    if request.method == "POST" and (
+        p == "/api/v1/projects/intake" or (p.startswith("/api/v1/projects/") and p.endswith("/analyze"))
+    ):
+        burst_response = _throttle_response(request, scope="llm-endpoint", limit=settings.burst_llm_limit_per_min)
+        if burst_response:
+            return burst_response
+
     if (
         settings.auth_required
         and request.url.path.startswith("/api/v1/")

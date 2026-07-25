@@ -14,7 +14,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.models import AnalyzeResult, Checklist, Feasibility, ProjectRecord, UserRecord
-from app.main import app
+from app.main import app, _throttle_windows
 from app.storage import store
 
 
@@ -30,9 +30,13 @@ def clear_store(monkeypatch: pytest.MonkeyPatch) -> None:
         "CORS_ALLOW_ORIGINS",
         "DAILY_ANALYSIS_LIMIT_FREE",
         "DAILY_PROJECT_LIMIT_FREE",
+        "BURST_LLM_LIMIT_PER_MIN",
     ]:
         monkeypatch.delenv(name, raising=False)
     store.reset()
+    # The burst-limit windows are in-memory and module-level (main.py); clear
+    # between tests so one test's requests don't bleed into the next.
+    _throttle_windows.clear()
 
 
 def _jwt(
@@ -1000,3 +1004,63 @@ def test_import_local_docs_reindex_creates_stable_chunks_with_metadata():
         assert [stored.chunk_id for stored in store.list_source_chunks()] == [first_chunk_id]
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def _intake_payload() -> dict:
+    return {
+        "session_id": str(uuid4()),
+        "project_description": "Convert garage to bakery with two employees and set operating hours.",
+        "address": "123 Main St",
+    }
+
+
+def test_burst_limit_throttles_intake_after_limit(monkeypatch):
+    monkeypatch.setenv("BURST_LLM_LIMIT_PER_MIN", "3")
+    client = TestClient(app)
+
+    for _ in range(3):
+        response = client.post("/api/v1/projects/intake", json=_intake_payload())
+        assert response.status_code != 429
+
+    fourth_response = client.post("/api/v1/projects/intake", json=_intake_payload())
+    assert fourth_response.status_code == 429
+
+
+def test_burst_limit_is_per_ip(monkeypatch):
+    monkeypatch.setenv("BURST_LLM_LIMIT_PER_MIN", "3")
+    client = TestClient(app)
+
+    for _ in range(3):
+        response = client.post(
+            "/api/v1/projects/intake",
+            json=_intake_payload(),
+            headers={"X-Forwarded-For": "1.1.1.1"},
+        )
+        assert response.status_code != 429
+
+    throttled_response = client.post(
+        "/api/v1/projects/intake",
+        json=_intake_payload(),
+        headers={"X-Forwarded-For": "1.1.1.1"},
+    )
+    assert throttled_response.status_code == 429
+
+    other_ip_response = client.post(
+        "/api/v1/projects/intake",
+        json=_intake_payload(),
+        headers={"X-Forwarded-For": "2.2.2.2"},
+    )
+    assert other_ip_response.status_code != 429
+
+
+def test_burst_limit_prefix_matches_analyze_path(monkeypatch):
+    monkeypatch.setenv("BURST_LLM_LIMIT_PER_MIN", "3")
+    client = TestClient(app)
+    payload = {"project_id": str(uuid4()), "clarification_answers": {}}
+
+    for _ in range(3):
+        response = client.post(f"/api/v1/projects/{uuid4()}/analyze", json=payload)
+        assert response.status_code != 429
+
+    fourth_response = client.post(f"/api/v1/projects/{uuid4()}/analyze", json=payload)
+    assert fourth_response.status_code == 429
