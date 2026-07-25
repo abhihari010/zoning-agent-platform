@@ -43,6 +43,8 @@ users = Table(
     Column("created_at", DateTime(timezone=True), nullable=False),
     Column("last_seen_at", DateTime(timezone=True), nullable=False),
     Column("disabled_at", DateTime(timezone=True), nullable=True),
+    Column("subscription_tier", String(50), nullable=False, server_default="free"),
+    Column("stripe_customer_id", String(200), nullable=True),
 )
 
 projects = Table(

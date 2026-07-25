@@ -402,6 +402,7 @@ class AnalyzeResult(BaseModel):
     disclaimers: list[str]
     follow_up_questions: list[str]
     warnings: list[str]
+    gated: bool = False
 
 
 class AuditEvent(BaseModel):
@@ -466,6 +467,8 @@ class UserRecord(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_seen_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     disabled_at: datetime | None = None
+    subscription_tier: Literal["free", "pro"] = "free"
+    stripe_customer_id: str | None = None
 
 
 class CurrentUserResponse(BaseModel):
@@ -473,6 +476,7 @@ class CurrentUserResponse(BaseModel):
     email: str | None = None
     role: Literal["anonymous", "user", "admin"] = "anonymous"
     auth_mode: Literal["disabled", "supabase"] = "disabled"
+    subscription_tier: Literal["free", "pro"] = "free"
 
 
 class ProjectSummary(BaseModel):

@@ -67,6 +67,7 @@ export interface CurrentUser {
   email?: string | null;
   role: "anonymous" | "user" | "admin";
   authMode: "disabled" | "supabase";
+  subscriptionTier: "free" | "pro";
 }
 
 export interface ProjectSummary {
@@ -274,12 +275,14 @@ export async function fetchCurrentUser(): Promise<CurrentUser> {
     email?: string | null;
     role: CurrentUser["role"];
     auth_mode: CurrentUser["authMode"];
+    subscription_tier?: CurrentUser["subscriptionTier"];
   };
   return {
     userId: payload.user_id,
     email: payload.email,
     role: payload.role,
     authMode: payload.auth_mode,
+    subscriptionTier: payload.subscription_tier ?? "free",
   };
 }
 
@@ -629,6 +632,7 @@ export function parseAnalysisPayload(payload: any): AnalyzeResponse {
     disclaimers: payload.disclaimers,
     followUpQuestions: toFollowUpQuestions(payload.follow_up_questions),
     warnings: payload.warnings,
+    gated: payload.gated ?? false,
   };
 }
 

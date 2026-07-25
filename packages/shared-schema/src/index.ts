@@ -124,4 +124,5 @@ export interface AnalyzeResponse {
   disclaimers: string[];
   followUpQuestions: FollowUpQuestion[];
   warnings: string[];
+  gated?: boolean;
 }

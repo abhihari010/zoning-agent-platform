@@ -6,8 +6,10 @@ from datetime import datetime, time, timezone
 from uuid import UUID, uuid4
 
 import httpx
+import stripe
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 
+from app.billing import daily_analysis_limit, gate_result_for_tier, resolve_tier
 from app.cache import invalidate_all_caches, invalidate_source_dependent_caches
 from app.ai.source_registry_retriever import ensure_source_index_ready
 from app.ai.registry import get_embedding_provider
@@ -118,6 +120,7 @@ def get_me(request: Request) -> CurrentUserResponse:
         email=auth.email,
         role=auth.role,
         auth_mode=auth.auth_mode if auth.auth_mode != "disabled" else settings.auth_provider,
+        subscription_tier=resolve_tier(auth),
     )
 
 
@@ -241,12 +244,12 @@ def address_suggest(
 @router.post("/projects/{project_id}/analyze")
 def analyze(project_id: UUID, payload: AnalyzeRequest, request: Request):
     auth = current_auth(request)
-    settings = get_settings()
     if project_id != payload.project_id:
         raise HTTPException(status_code=400, detail="Path project_id must match payload project_id")
 
     project = require_project_access(project_id, auth)
-    reserve_daily_usage("analysis", settings.daily_analysis_limit_free, auth)
+    tier = resolve_tier(auth)
+    reserve_daily_usage("analysis", daily_analysis_limit(tier), auth)
 
     store.audit("analysis.started", str(project_id), user_id=auth.user_id)
     if payload.clarification_answers:
@@ -273,7 +276,7 @@ def analyze(project_id: UUID, payload: AnalyzeRequest, request: Request):
     )
     store.save_analysis(AnalysisRecord(project_id=project_id, result=result, user_id=project.user_id))
     store.audit(f"analysis.completed.{result.status}", str(project_id), user_id=auth.user_id)
-    return result
+    return gate_result_for_tier(result, tier)
 
 
 @router.get("/projects", response_model=ProjectListResponse)
@@ -326,7 +329,7 @@ def get_result(project_id: UUID, request: Request):
     analysis = store.get_analysis(project_id)
     if not analysis:
         raise HTTPException(status_code=404, detail="Analysis not found")
-    return analysis.result
+    return gate_result_for_tier(analysis.result, resolve_tier(auth))
 
 
 @router.delete("/projects/{project_id}")
@@ -578,6 +581,91 @@ def usage_summary(request: Request) -> UsageSummaryResponse:
         project_limit=settings.daily_project_limit_free,
         analysis_limit=settings.daily_analysis_limit_free,
     )
+
+
+# ---------------------------------------------------------------------------
+# Billing (Stripe) -- fully inert until STRIPE_* settings are configured.
+# ponytail: no self-serve /billing/portal endpoint -- cancel via the Stripe
+# dashboard until someone asks for self-serve cancellation.
+# ---------------------------------------------------------------------------
+
+
+@router.post("/billing/checkout")
+def create_checkout_session(request: Request):
+    auth = require_user(request)
+    settings = get_settings()
+    if not settings.stripe_secret_key or not settings.stripe_price_id_pro:
+        raise HTTPException(status_code=503, detail="Billing is not configured.")
+
+    stripe.api_key = settings.stripe_secret_key
+    user = store.get_user(auth.user_id)
+    customer_kwargs = (
+        {"customer": user.stripe_customer_id}
+        if user and user.stripe_customer_id
+        else {"customer_email": auth.email}
+    )
+    try:
+        session = stripe.checkout.Session.create(
+            mode="subscription",
+            line_items=[{"price": settings.stripe_price_id_pro, "quantity": 1}],
+            client_reference_id=auth.user_id,
+            success_url=settings.stripe_success_url,
+            cancel_url=settings.stripe_cancel_url,
+            **customer_kwargs,
+        )
+    except stripe.StripeError as exc:
+        raise HTTPException(status_code=502, detail=f"Stripe checkout failed: {exc}") from exc
+
+    return {"url": session.url}
+
+
+@router.post("/billing/webhook")
+async def stripe_webhook(request: Request):
+    settings = get_settings()
+    if not settings.stripe_webhook_secret:
+        raise HTTPException(status_code=503, detail="Billing is not configured.")
+
+    # Signature verification MUST use the raw bytes -- read the body before any
+    # JSON parsing, or re-serialization drift breaks the HMAC check.
+    raw_body = await request.body()
+    signature = request.headers.get("stripe-signature", "")
+    try:
+        event = stripe.Webhook.construct_event(raw_body, signature, settings.stripe_webhook_secret)
+    except (ValueError, stripe.SignatureVerificationError) as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid webhook payload: {exc}") from exc
+
+    event_type = event["type"]
+    data_object = event["data"]["object"]
+
+    def _resolve_user(client_reference_id: str | None, customer_id: str | None):
+        # subscription.* events carry no client_reference_id, only a customer id.
+        if client_reference_id:
+            user = store.get_user(client_reference_id)
+            if user:
+                return user
+        if customer_id:
+            return store.get_user_by_stripe_customer_id(customer_id)
+        return None
+
+    if event_type in {"checkout.session.completed", "customer.subscription.updated"}:
+        customer_id = data_object.get("customer")
+        user = _resolve_user(data_object.get("client_reference_id"), customer_id)
+        if not user:
+            return {"status": "ignored"}
+        # Idempotent: re-applying the same event just re-sets the same tier.
+        store.set_subscription_tier(user.user_id, "pro", stripe_customer_id=customer_id)
+        store.audit("billing.tier.upgraded", user.user_id, {"event_type": event_type}, user_id=user.user_id)
+        return {"status": "ok"}
+
+    if event_type == "customer.subscription.deleted":
+        user = _resolve_user(None, data_object.get("customer"))
+        if not user:
+            return {"status": "ignored"}
+        store.set_subscription_tier(user.user_id, "free")
+        store.audit("billing.tier.downgraded", user.user_id, {"event_type": event_type}, user_id=user.user_id)
+        return {"status": "ok"}
+
+    return {"status": "ignored"}
 
 
 @router.get("/health")

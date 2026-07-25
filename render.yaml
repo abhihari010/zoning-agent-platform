@@ -40,6 +40,21 @@ services:
         value: https://zoning-agent-platform.vercel.app
       - key: BURST_LLM_LIMIT_PER_MIN
         value: "8"
+      - key: DAILY_ANALYSIS_LIMIT_FREE
+        value: "10"
+      - key: DAILY_ANALYSIS_LIMIT_PRO
+        value: "50"
+      # Stripe secrets: value pasted in the Render dashboard, never committed.
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_ID_PRO
+        sync: false
+      - key: STRIPE_SUCCESS_URL
+        sync: false
+      - key: STRIPE_CANCEL_URL
+        sync: false
       - key: GOOGLE_MAPS_API_KEY
         sync: false
       - key: GROQ_API_KEY

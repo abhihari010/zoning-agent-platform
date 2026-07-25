@@ -44,7 +44,7 @@ from app.settings import ConfigurationError, get_settings
 from app.startup import liveness_health, prepare_source_index_for_startup, readiness_health
 
 
-PUBLIC_API_PATHS = {"/api/v1/jurisdictions/coverage"}
+PUBLIC_API_PATHS = {"/api/v1/jurisdictions/coverage", "/api/v1/billing/webhook"}
 THROTTLED_PUBLIC_PATHS = {"/api/v1/address/suggest", "/api/v1/jurisdictions/coverage"}
 logger = logging.getLogger("zoning_agent.api")
 _throttle_windows: dict[str, deque[float]] = defaultdict(deque)
