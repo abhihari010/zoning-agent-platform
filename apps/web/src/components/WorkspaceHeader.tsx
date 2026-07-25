@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Link } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { authMode, type CurrentUser } from "../api";
+import { useCheckout } from "../hooks/useCheckout";
 import type { Workspace } from "../types/app";
 
 export function BenchmarkMark({ className = "h-8 w-8" }: { className?: string }) {
@@ -36,6 +37,29 @@ function initialsFor(email?: string | null): string {
     return (parts[0][0] + parts[1][0]).toUpperCase();
   }
   return handle.slice(0, 2).toUpperCase();
+}
+
+function PlanBadge({ tier }: { tier: CurrentUser["subscriptionTier"] | undefined }) {
+  const { pending, error, start } = useCheckout();
+  if (!tier || tier === "pro") {
+    return tier === "pro" ? <span className="tag tag-ok">Pro</span> : null;
+  }
+  return (
+    <div className="flex items-center gap-2">
+      <span className="tag tag-neutral">Free</span>
+      <button
+        type="button"
+        onClick={() => {
+          void start();
+        }}
+        disabled={pending}
+        className="btn-outline px-2.5 py-1 text-xs"
+      >
+        {pending ? "Redirecting…" : "Upgrade"}
+      </button>
+      {error && <span className="text-xs text-ink-faint">{error}</span>}
+    </div>
+  );
 }
 
 function AccountMenu({
@@ -201,7 +225,8 @@ export function WorkspaceHeader({
         )}
 
         {authMode === "supabase" && (
-          <div className="ml-auto flex items-center py-2.5">
+          <div className="ml-auto flex items-center gap-3 py-2.5">
+            <PlanBadge tier={currentUser?.subscriptionTier} />
             <AccountMenu
               currentUser={currentUser}
               authSession={authSession}

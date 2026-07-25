@@ -199,6 +199,19 @@ async function parseError(
   }
 }
 
+// Carries the HTTP status alongside the message so callers that care about a
+// specific status (429 daily limit, 503 billing not configured) don't have to
+// pattern-match the message string. Other callers keep using plain
+// `instanceof Error` checks — ApiError extends Error.
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 async function parseAdminActionError(
   response: Response,
   action: string,
@@ -466,7 +479,10 @@ export async function intakeProject(input: {
     body: JSON.stringify(input),
   });
   if (!response.ok) {
-    throw new Error(await parseError(response, "Project intake failed"));
+    throw new ApiError(
+      await parseError(response, "Project intake failed"),
+      response.status,
+    );
   }
 
   const payload = (await response.json()) as {
@@ -518,10 +534,28 @@ export async function analyzeProject(
   });
 
   if (!response.ok) {
-    throw new Error(await parseError(response, "Analysis request failed"));
+    throw new ApiError(
+      await parseError(response, "Analysis request failed"),
+      response.status,
+    );
   }
 
   return parseAnalysisPayload(await response.json());
+}
+
+export async function createCheckoutSession(): Promise<string> {
+  const response = await fetch(`${API_BASE}/billing/checkout`, {
+    method: "POST",
+    headers: requestHeaders(),
+  });
+  if (!response.ok) {
+    throw new ApiError(
+      await parseError(response, "Failed to start checkout"),
+      response.status,
+    );
+  }
+  const payload = (await response.json()) as { url: string };
+  return payload.url;
 }
 
 export async function fetchProjectResult(

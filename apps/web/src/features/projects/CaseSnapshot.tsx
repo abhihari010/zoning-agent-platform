@@ -98,9 +98,11 @@ export function CaseSnapshot({
           </div>
           {result && (
             <div className="mt-4 grid gap-2 border-t border-rule pt-4">
-              <button type="button" onClick={onDownloadChecklist} className="btn-primary w-full">
-                Download checklist
-              </button>
+              {!result.gated && (
+                <button type="button" onClick={onDownloadChecklist} className="btn-primary w-full">
+                  Download checklist
+                </button>
+              )}
               {authMode === "supabase" && (
                 <button
                   type="button"
