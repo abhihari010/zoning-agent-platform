@@ -1,0 +1,365 @@
+{
+  "status": "success",
+  "trace_id": "trace-demo-blacksburg-bakery",
+  "pipeline": {
+    "version": "single_orchestrator_v1",
+    "prompt_version": "2026_05_single_orchestrator",
+    "provider": "deterministic",
+    "rag_provider": "source_registry",
+    "embedding_provider": "none",
+    "trace_id": "trace-demo-blacksburg-bakery"
+  },
+  "trust_indicators": {
+    "jurisdiction_analyzed": true,
+    "jurisdiction_supported": true,
+    "jurisdiction_name": "Blacksburg, VA",
+    "zoning_district": "mixed-use-core",
+    "district_confidence": 0.9,
+    "district_source": "fixture",
+    "source_count": 27,
+    "citation_count": 5,
+    "vector_readiness": true,
+    "last_source_update": "2026-07-25T00:18:01.916595"
+  },
+  "citation_validation": {
+    "valid": true,
+    "citation_coverage": 1.0,
+    "unsupported_claims": [],
+    "invalid_citation_ids": [],
+    "confidence_adjustment": "none",
+    "warnings": [],
+    "jurisdiction_id": "blacksburg-va"
+  },
+  "pipeline_stages": [
+    {
+      "key": "intake",
+      "label": "Understand Project",
+      "status": "completed",
+      "headline": "Captured a home-business request to open a bakery from an attached garage conversion.",
+      "details": [
+        "Project category: home-business",
+        "Inferred use: home-based-food-business",
+        "Missing details: 0",
+        "Triggers: change_of_use, parking, health_department, building_permit"
+      ]
+    },
+    {
+      "key": "location",
+      "label": "Resolve Property",
+      "status": "completed",
+      "headline": "Resolved jurisdiction and district context for retrieval.",
+      "details": [
+        "Jurisdiction: Blacksburg, VA",
+        "District context: mixed-use-core"
+      ]
+    },
+    {
+      "key": "retrieval",
+      "label": "Retrieve Sources",
+      "status": "completed",
+      "headline": "Retrieved 5 relevant zoning source excerpts for review.",
+      "details": [
+        "District searched: mixed-use-core",
+        "Use searched: home-based-food-business",
+        "Virginia Department of Health Food Establishment Plan Review (Food Establishment Permit Guidance)",
+        "Town of Blacksburg Planning and Building Department Building Safety Review (Building Safety)",
+        "Town of Blacksburg Zoning Guidance for Business Licenses and Home Occupations (Business Licenses and Home Occupations)"
+      ]
+    },
+    {
+      "key": "compliance",
+      "label": "Analyze Compliance",
+      "status": "completed",
+      "headline": "Garage-to-bakery conversion appears conditionally feasible with fire, health, and parking approvals.",
+      "details": [
+        "Decision: conditional",
+        "Confidence: 0.97",
+        "Citation coverage: 1.00"
+      ]
+    },
+    {
+      "key": "checklist",
+      "label": "Generate Checklist",
+      "status": "completed",
+      "headline": "Prepared permit steps, required documents, and review departments.",
+      "details": [
+        "Checklist steps: 3",
+        "Permits: 3",
+        "Warnings: 0"
+      ]
+    }
+  ],
+  "agents": [
+    {
+      "key": "intake",
+      "label": "Understand Project",
+      "status": "completed",
+      "headline": "Captured a home-business request to open a bakery from an attached garage conversion.",
+      "details": [
+        "Project category: home-business",
+        "Inferred use: home-based-food-business",
+        "Missing details: 0",
+        "Triggers: change_of_use, parking, health_department, building_permit"
+      ]
+    },
+    {
+      "key": "location",
+      "label": "Resolve Property",
+      "status": "completed",
+      "headline": "Resolved jurisdiction and district context for retrieval.",
+      "details": [
+        "Jurisdiction: Blacksburg, VA",
+        "District context: mixed-use-core"
+      ]
+    },
+    {
+      "key": "retrieval",
+      "label": "Retrieve Sources",
+      "status": "completed",
+      "headline": "Retrieved 5 relevant zoning source excerpts for review.",
+      "details": [
+        "District searched: mixed-use-core",
+        "Use searched: home-based-food-business",
+        "Virginia Department of Health Food Establishment Plan Review (Food Establishment Permit Guidance)",
+        "Town of Blacksburg Planning and Building Department Building Safety Review (Building Safety)",
+        "Town of Blacksburg Zoning Guidance for Business Licenses and Home Occupations (Business Licenses and Home Occupations)"
+      ]
+    },
+    {
+      "key": "compliance",
+      "label": "Analyze Compliance",
+      "status": "completed",
+      "headline": "Garage-to-bakery conversion appears conditionally feasible with fire, health, and parking approvals.",
+      "details": [
+        "Decision: conditional",
+        "Confidence: 0.97",
+        "Citation coverage: 1.00"
+      ]
+    },
+    {
+      "key": "checklist",
+      "label": "Generate Checklist",
+      "status": "completed",
+      "headline": "Prepared permit steps, required documents, and review departments.",
+      "details": [
+        "Checklist steps: 3",
+        "Permits: 3",
+        "Warnings: 0"
+      ]
+    }
+  ],
+  "feasibility": {
+    "decision": "conditional",
+    "confidence": 0.97,
+    "summary": "Garage-to-bakery conversion appears conditionally feasible with fire, health, and parking approvals."
+  },
+  "compliance": {
+    "feasibility": "conditional",
+    "confidence": 0.5,
+    "summary": "Garage-to-bakery conversion appears conditionally feasible with fire, health, and parking approvals.",
+    "findings": [
+      {
+        "category": "permitted_use",
+        "status": "conditional",
+        "summary": "Garage-to-bakery conversion appears conditionally feasible with fire, health, and parking approvals.",
+        "citation_ids": [
+          "va-vdh-food-establishment-plan-review:chunk:0:4738bafe58b3:f5fdd4a4",
+          "blacksburg-building-safety-review:chunk:0:d82a691cc529:9939665a",
+          "blacksburg-business-zoning-home-occupation:chunk:0:1b19269964c7:d544a534"
+        ],
+        "confidence": 0.5
+      }
+    ],
+    "required_permits": [
+      "Zoning review",
+      "Building permit",
+      "Health department approval"
+    ],
+    "permit_path": "special_use_permit",
+    "warnings": [],
+    "unresolved_questions": [],
+    "citation_chunk_ids": [
+      "va-vdh-food-establishment-plan-review:chunk:0:4738bafe58b3:f5fdd4a4",
+      "blacksburg-building-safety-review:chunk:0:d82a691cc529:9939665a",
+      "blacksburg-business-zoning-home-occupation:chunk:0:1b19269964c7:d544a534",
+      "blacksburg-home-occupation-standards:chunk:0:b0786fe40739:18989c30",
+      "blacksburg-home-occupation-standards:chunk:1:b0786fe40739:db8c0393"
+    ]
+  },
+  "checklist": {
+    "steps": [
+      {
+        "order": 1,
+        "action": "Request zoning verification letter for the parcel",
+        "required_docs": [
+          "site plan",
+          "property ownership proof"
+        ],
+        "department": "Planning Department"
+      },
+      {
+        "order": 2,
+        "action": "Submit change-of-use permit application",
+        "required_docs": [
+          "business description",
+          "floor plan",
+          "parking plan"
+        ],
+        "department": "Permit Office"
+      },
+      {
+        "order": 3,
+        "action": "Complete fire and health compliance inspections",
+        "required_docs": [
+          "equipment specification",
+          "ventilation design"
+        ],
+        "department": "Fire Marshal and Health Department"
+      }
+    ],
+    "permits": [
+      "Zoning review",
+      "Building permit",
+      "Health department approval"
+    ],
+    "documents": [
+      "Site Plan",
+      "Floor Plan",
+      "Parking Plan",
+      "Fire Safety Plan"
+    ],
+    "departments": [
+      "Planning",
+      "Permitting",
+      "Fire",
+      "Health"
+    ]
+  },
+  "citations": [
+    {
+      "source_id": "va-vdh-food-establishment-plan-review",
+      "title": "Virginia Department of Health Food Establishment Plan Review",
+      "excerpt": "[Virginia Department of Health Food Establishment Plan Review] Virginia Department of Health guidance directs new or remodeled foodservice facilities to submit plan review materials, apply for a food establishment permit before opening, and obtain inspection before permit issuance.",
+      "section_ref": "Food Establishment Permit Guidance",
+      "chunk_id": "va-vdh-food-establishment-plan-review:chunk:0:4738bafe58b3:f5fdd4a4",
+      "jurisdiction_id": "*",
+      "source_type": "health_code",
+      "url": "https://www.vdh.virginia.gov/environmental-health/food-safety-in-virginia/foodapplication/",
+      "effective_date": "2026-05-08",
+      "retrieved_at": null,
+      "score": 1.0,
+      "metadata": {
+        "jurisdiction_scope": "global",
+        "state": "VA",
+        "applies_to_states": [
+          "VA"
+        ],
+        "coverage_status": "",
+        "county": "",
+        "municipality": "",
+        "source_version": "4738bafe58b38a6f",
+        "content_hash": "4738bafe58b38a6f99b061423d96bce41fd153061645c2159b4e614395b3010b"
+      }
+    },
+    {
+      "source_id": "blacksburg-building-safety-review",
+      "title": "Town of Blacksburg Planning and Building Department Building Safety Review",
+      "excerpt": "[Town of Blacksburg Planning and Building Department Building Safety Review] The Building Safety Division reviews construction plans for conformance with the Virginia Uniform Statewide Building Code and town ordinances, issues construction permits, inspects projects for approved-plan compliance, and issues certificates of occupancy.",
+      "section_ref": "Building Safety",
+      "chunk_id": "blacksburg-building-safety-review:chunk:0:d82a691cc529:9939665a",
+      "jurisdiction_id": "blacksburg-va",
+      "source_type": "zoning_ordinance",
+      "url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building",
+      "effective_date": "2026-03-19",
+      "retrieved_at": null,
+      "score": 1.0,
+      "metadata": {
+        "jurisdiction_scope": "local",
+        "state": "VA",
+        "county": "Montgomery County",
+        "municipality": "Blacksburg",
+        "coverage_status": "public_supported",
+        "source_version": "d82a691cc5296ba9",
+        "content_hash": "d82a691cc5296ba9521b090719344c5cfbd05eb003273a639d9c37147c7cced3"
+      }
+    },
+    {
+      "source_id": "blacksburg-business-zoning-home-occupation",
+      "title": "Town of Blacksburg Zoning Guidance for Business Licenses and Home Occupations",
+      "excerpt": "[Town of Blacksburg Zoning Guidance for Business Licenses and Home Occupations] The Town instructs prospective businesses to confirm that zoning allows the proposed business use before applying for a business license. The Town's zoning page states that home occupations, meaning businesses run administratively out of the home, are allowed in every Blacksburg zoning district subject to the Home Occupation Application ordinance standards.",
+      "section_ref": "Business Licenses and Home Occupations",
+      "chunk_id": "blacksburg-business-zoning-home-occupation:chunk:0:1b19269964c7:d544a534",
+      "jurisdiction_id": "blacksburg-va",
+      "source_type": "zoning_ordinance",
+      "url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
+      "effective_date": "2026-03-19",
+      "retrieved_at": null,
+      "score": 1.0,
+      "metadata": {
+        "jurisdiction_scope": "local",
+        "state": "VA",
+        "county": "Montgomery County",
+        "municipality": "Blacksburg",
+        "coverage_status": "public_supported",
+        "source_version": "1b19269964c76136",
+        "content_hash": "1b19269964c76136ba349a0c3423773481426a8f894bd880cfefb7e7bf9051ec"
+      }
+    },
+    {
+      "source_id": "blacksburg-home-occupation-standards",
+      "title": "Town of Blacksburg Home Occupation Use and Design Standards",
+      "excerpt": "[Town of Blacksburg Home Occupation Use and Design Standards] (a) Intent\u2014Under certain unique circumstances a small-scaled commercial activity may be an appropriate use within a residential dwelling. The standards and procedure for establishing such uses are intended to limit the scope and nature of such uses and ensure compatibility with the adjoining properties. (b) General standards: (1) Home occupations shall be clearly incidental and secondary to the use of the dwelling for residential purposes and shall not change its character as a residence. The use of colors, materials, construction, lighting, or other means inconsistent with a residential use shall be prohibited. (2) No equipment or process shall be used in a home occupation which creates noise in excess of 60 dB(A) measured at the property line, or vibration, glare, fumes, odors, or electrical interference detectable to the normal senses off the premises or through common walls. In the",
+      "section_ref": "Zoning Ordinance Sec. 4211(B)(3)-(8)",
+      "chunk_id": "blacksburg-home-occupation-standards:chunk:0:b0786fe40739:18989c30",
+      "jurisdiction_id": "blacksburg-va",
+      "source_type": "zoning_ordinance",
+      "url": "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
+      "effective_date": "2026-03-19",
+      "retrieved_at": null,
+      "score": 1.0,
+      "metadata": {
+        "jurisdiction_scope": "local",
+        "state": "VA",
+        "county": "Montgomery County",
+        "municipality": "Blacksburg",
+        "coverage_status": "public_supported",
+        "full_text_source": "https://library.municode.com/va/blacksburg/codes/code_of_ordinances?nodeId=CO_APXAORNO1137BLZOOR_ARTIVUSDEST_DIV2REUS_S4211HOOC",
+        "full_text_section_ref": "Sec. 4211",
+        "verification_status": "scraped_full_text",
+        "source_version": "b0786fe407397fde",
+        "content_hash": "b0786fe407397fde9dee457bad93901ad4b5641a1c4fb54547bd9a6bda5e3a2d"
+      }
+    },
+    {
+      "source_id": "blacksburg-home-occupation-standards",
+      "title": "Town of Blacksburg Home Occupation Use and Design Standards",
+      "excerpt": "[Town of Blacksburg Home Occupation Use and Design Standards] case of electrical interference, no equipment or process shall be used which creates visual or audible interference in any radio or television receivers off the premises or through common walls. (3) There shall be no outside storage of goods, products, equipment, or other materials associated with the home occupation, nor shall these materials be stored inside an accessory structure. No toxic, explosive, flammable, radioactive, or other hazardous materials used in conjunction with the home occupation shall be used, sold, or stored on the site. (4) The maximum floor area permitted for a home occupation shall be twenty-five (25) percent of the finished floor area of the dwelling unit. Storage of goods or products shall not exceed five (5) percent of the finished floor area. (5) One (1) person who is not a permanent resident of the dwelling may be engaged or employed in the home occupation.",
+      "section_ref": "Zoning Ordinance Sec. 4211(B)(3)-(8)",
+      "chunk_id": "blacksburg-home-occupation-standards:chunk:1:b0786fe40739:db8c0393",
+      "jurisdiction_id": "blacksburg-va",
+      "source_type": "zoning_ordinance",
+      "url": "https://www.blacksburg.gov/home/showpublisheddocument/7642/636676037038930000",
+      "effective_date": "2026-03-19",
+      "retrieved_at": null,
+      "score": 1.0,
+      "metadata": {
+        "jurisdiction_scope": "local",
+        "state": "VA",
+        "county": "Montgomery County",
+        "municipality": "Blacksburg",
+        "coverage_status": "public_supported",
+        "full_text_source": "https://library.municode.com/va/blacksburg/codes/code_of_ordinances?nodeId=CO_APXAORNO1137BLZOOR_ARTIVUSDEST_DIV2REUS_S4211HOOC",
+        "full_text_section_ref": "Sec. 4211",
+        "verification_status": "scraped_full_text",
+        "source_version": "b0786fe407397fde",
+        "content_hash": "b0786fe407397fde9dee457bad93901ad4b5641a1c4fb54547bd9a6bda5e3a2d"
+      }
+    }
+  ],
+  "disclaimers": [
+    "This tool provides educational zoning guidance and is not legal advice.",
+    "Always verify requirements with your local planning office before action."
+  ],
+  "follow_up_questions": [],
+  "warnings": []
+}

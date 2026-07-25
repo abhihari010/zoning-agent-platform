@@ -7,6 +7,7 @@ import { AuthProvider } from "./auth/AuthContext";
 import { RequireAuth } from "./routes/RequireAuth";
 import { MarketingShell } from "./shells/MarketingShell";
 import { AuthShell } from "./shells/AuthShell";
+import { DemoPage } from "./pages/DemoPage";
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
@@ -74,6 +75,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 </RequireAuth>
               }
             />
+
+            {/* Logged-out demo: no RequireAuth, no shell — renders for anonymous visitors. */}
+            <Route path="demo" element={<DemoPage />} />
 
             <Route path="app" element={<Navigate to="/review" replace />} />
             <Route path="*" element={<NotFound />} />

@@ -1,0 +1,25 @@
+{
+  "project_id": "demo-blacksburg-bakery",
+  "normalized_address": "250 S Main St, Blacksburg, VA 24060, USA",
+  "district": "mixed-use-core",
+  "district_confidence": 0.9,
+  "district_method": "fixture",
+  "place_id": "fixture-250-s-main-st",
+  "latitude": 37.2296,
+  "longitude": -80.414,
+  "status": "created",
+  "support_status": "supported",
+  "jurisdiction_id": "blacksburg-va",
+  "jurisdiction_name": "Blacksburg, VA",
+  "coverage_status": "public_supported",
+  "planning_contact": {
+    "department": "Planning and Building Department",
+    "url": "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building",
+    "phone": "540-443-1300"
+  },
+  "official_source_urls": [
+    "https://www.blacksburg.gov/departments/departments-l-z/planning-and-building/zoning",
+    "https://library.municode.com/va/blacksburg"
+  ],
+  "follow_up_questions": []
+}
