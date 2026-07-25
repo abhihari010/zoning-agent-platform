@@ -518,188 +518,7 @@ export async function analyzeProject(
     throw new Error(await parseError(response, "Analysis request failed"));
   }
 
-  const payload = (await response.json()) as {
-    status: AnalyzeResponse["status"];
-    trace_id: string;
-    pipeline?: {
-      version: string;
-      prompt_version: string;
-      provider: string;
-      rag_provider: string;
-      embedding_provider: string;
-      trace_id: string;
-    } | null;
-    trust_indicators?: {
-      jurisdiction_analyzed: boolean;
-      jurisdiction_supported?: boolean | null;
-      jurisdiction_name?: string | null;
-      zoning_district: string;
-      district_confidence: number;
-      district_source: string;
-      source_count: number;
-      citation_count: number;
-      vector_readiness: boolean;
-      last_source_update?: string | null;
-    } | null;
-    citation_validation?: {
-      valid: boolean;
-      citation_coverage: number;
-      unsupported_claims: string[];
-      invalid_citation_ids: string[];
-      confidence_adjustment: "none" | "downgrade_low_confidence";
-      warnings: string[];
-      jurisdiction_id?: string | null;
-    } | null;
-    agents: Array<{
-      key: "intake" | "location" | "retrieval" | "compliance" | "checklist";
-      label: string;
-      status: "completed" | "needs_clarification" | "warning" | "skipped";
-      headline: string;
-      details: string[];
-    }>;
-    pipeline_stages?: Array<{
-      key: "intake" | "location" | "retrieval" | "compliance" | "checklist";
-      label: string;
-      status: "completed" | "needs_clarification" | "warning" | "skipped";
-      headline: string;
-      details: string[];
-    }>;
-    feasibility: AnalyzeResponse["feasibility"];
-    compliance?: {
-      feasibility: "feasible" | "conditional" | "infeasible" | "unknown";
-      confidence: number;
-      summary: string;
-      findings: Array<{
-        category: string;
-        status: "compliant" | "conditional" | "non_compliant" | "unknown";
-        summary: string;
-        citation_ids: string[];
-        confidence: number;
-      }>;
-      required_permits: string[];
-      permit_path?: string | null;
-      warnings: string[];
-      unresolved_questions: string[];
-      citation_chunk_ids: string[];
-    } | null;
-    checklist: {
-      steps: Array<{
-        order: number;
-        action: string;
-        required_docs: string[];
-        department: string;
-      }>;
-      permits: string[];
-      documents: string[];
-      departments: string[];
-    };
-    citations: Array<{
-      source_id: string;
-      title: string;
-      excerpt: string;
-      section_ref: string;
-      chunk_id?: string | null;
-      jurisdiction_id?: string | null;
-      source_type?: string | null;
-      url?: string;
-      effective_date?: string;
-      retrieved_at?: string | null;
-      score?: number | null;
-      metadata?: Record<string, unknown>;
-    }>;
-    disclaimers: string[];
-    follow_up_questions: string[];
-    warnings: string[];
-  };
-
-  return {
-    status: payload.status,
-    traceId: payload.trace_id,
-    pipeline: payload.pipeline
-      ? {
-          version: payload.pipeline.version,
-          promptVersion: payload.pipeline.prompt_version,
-          provider: payload.pipeline.provider,
-          ragProvider: payload.pipeline.rag_provider,
-          embeddingProvider: payload.pipeline.embedding_provider,
-          traceId: payload.pipeline.trace_id,
-        }
-      : null,
-    trustIndicators: payload.trust_indicators
-      ? {
-          jurisdictionAnalyzed: payload.trust_indicators.jurisdiction_analyzed,
-          jurisdictionSupported:
-            payload.trust_indicators.jurisdiction_supported,
-          jurisdictionName: payload.trust_indicators.jurisdiction_name,
-          zoningDistrict: payload.trust_indicators.zoning_district,
-          districtConfidence: payload.trust_indicators.district_confidence,
-          districtSource: payload.trust_indicators.district_source,
-          sourceCount: payload.trust_indicators.source_count,
-          citationCount: payload.trust_indicators.citation_count,
-          vectorReadiness: payload.trust_indicators.vector_readiness,
-          lastSourceUpdate: payload.trust_indicators.last_source_update,
-        }
-      : null,
-    citationValidation: payload.citation_validation
-      ? {
-          valid: payload.citation_validation.valid,
-          citationCoverage: payload.citation_validation.citation_coverage,
-          unsupportedClaims: payload.citation_validation.unsupported_claims,
-          invalidCitationIds: payload.citation_validation.invalid_citation_ids,
-          confidenceAdjustment:
-            payload.citation_validation.confidence_adjustment,
-          warnings: payload.citation_validation.warnings,
-          jurisdictionId: payload.citation_validation.jurisdiction_id,
-        }
-      : null,
-    pipelineStages: payload.pipeline_stages,
-    feasibility: payload.feasibility,
-    compliance: payload.compliance
-      ? {
-          feasibility: payload.compliance.feasibility,
-          confidence: payload.compliance.confidence,
-          summary: payload.compliance.summary,
-          findings: payload.compliance.findings.map((finding) => ({
-            category: finding.category,
-            status: finding.status,
-            summary: finding.summary,
-            citationIds: finding.citation_ids,
-            confidence: finding.confidence,
-          })),
-          requiredPermits: payload.compliance.required_permits,
-          permitPath: payload.compliance.permit_path,
-          warnings: payload.compliance.warnings,
-          unresolvedQuestions: payload.compliance.unresolved_questions,
-          citationChunkIds: payload.compliance.citation_chunk_ids,
-        }
-      : null,
-    checklist: {
-      ...payload.checklist,
-      steps: payload.checklist.steps.map((step) => ({
-        order: step.order,
-        action: step.action,
-        requiredDocs: step.required_docs,
-        department: step.department,
-      })),
-    },
-    citations: payload.citations.map((citation) => ({
-      sourceId: citation.source_id,
-      title: citation.title,
-      excerpt: citation.excerpt,
-      sectionRef: citation.section_ref,
-      chunkId: citation.chunk_id,
-      jurisdictionId: citation.jurisdiction_id,
-      sourceType: citation.source_type,
-      url: citation.url,
-      effectiveDate: citation.effective_date,
-      retrievedAt: citation.retrieved_at,
-      score: citation.score,
-      metadata: citation.metadata ?? {},
-    })),
-    disclaimers: payload.disclaimers,
-    followUpQuestions: toFollowUpQuestions(payload.follow_up_questions),
-    warnings: payload.warnings,
-  };
+  return parseAnalysisPayload(await response.json());
 }
 
 export async function fetchProjectResult(
@@ -713,10 +532,13 @@ export async function fetchProjectResult(
       await parseError(response, "Failed to load project result"),
     );
   }
-  return mapAnalyzePayload(await response.json());
+  return parseAnalysisPayload(await response.json());
 }
 
-function mapAnalyzePayload(payload: any): AnalyzeResponse {
+// ponytail: one parser, two live callers (analyzeProject, fetchProjectResult)
+// plus the logged-out /demo replay (DemoPage) — no divergence between real and
+// demo response shapes.
+export function parseAnalysisPayload(payload: any): AnalyzeResponse {
   if (payload.traceId) {
     return payload as AnalyzeResponse;
   }

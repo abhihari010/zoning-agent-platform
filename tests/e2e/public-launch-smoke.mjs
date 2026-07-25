@@ -465,6 +465,34 @@ async function runWorkspaceFlow() {
   await expectBodyIncludes("Christiansburg, VA", "Sources indexed", "Request coverage");
 }
 
+// /demo is a static-fixture replay (Workflow 2): it must never call /analyze.
+// Runs with NO api mocks installed — any accidental network call 404s.
+async function checkDemoPage(demoPage) {
+  const analyzeRequests = [];
+  demoPage.on("request", (request) => {
+    if (request.url().includes("/api/v1/projects/") && request.url().includes("/analyze")) {
+      analyzeRequests.push(request.url());
+    }
+  });
+
+  await demoPage.goto(new URL("/demo", baseUrl).href, {
+    waitUntil: "networkidle",
+    timeout: 30_000,
+  });
+  await demoPage.locator(".stamp").getByText("Conditional").waitFor({ timeout: 10_000 });
+  const bodyText = await demoPage.locator("body").innerText({ timeout: 10_000 });
+  if (!/Demo — sample result, not live/i.test(bodyText)) {
+    throw new Error("/demo is missing the sample-result badge.");
+  }
+  if (!/Blacksburg/i.test(bodyText) || !/Permit checklist/i.test(bodyText)) {
+    throw new Error("/demo did not render the determination record.");
+  }
+  if (analyzeRequests.length > 0) {
+    throw new Error(`/demo made a live /analyze request: ${JSON.stringify(analyzeRequests)}`);
+  }
+  console.log(`/demo smoke passed for ${baseUrl} (no /analyze network call)`);
+}
+
 try {
   if (mode === "fixture") {
     await installApiMocks(page);
@@ -502,6 +530,11 @@ try {
     assertNoBrowserErrors();
     console.log(`Public launch browser smoke passed for ${baseUrl}`);
   }
+
+  // Fresh, unmocked page/context: /demo must render without any api mocks.
+  const demoPage = await browser.newPage({ viewport: { width: 1366, height: 900 } });
+  await checkDemoPage(demoPage);
+  await demoPage.close();
 } finally {
   await browser.close();
 }

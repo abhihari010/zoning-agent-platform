@@ -420,6 +420,9 @@ export function Home() {
                   {isAuthenticated ? "Go to review" : "Sign up"}
                 </Link>
               </motion.div>
+              <Link to="/demo" className={DUSK_OUTLINE}>
+                See a live demo
+              </Link>
               <a href="#how" className={DUSK_OUTLINE}>
                 See how it works
               </a>
