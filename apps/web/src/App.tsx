@@ -12,6 +12,7 @@ import type {
 } from "@zoning-agent/shared-schema";
 import {
   analyzeProject,
+  ApiError,
   authMode,
   createSession,
   deleteMyData,
@@ -60,6 +61,7 @@ import { ClarificationModal } from "./features/results/ClarificationModal";
 import { ResultSection } from "./features/results/ResultSection";
 import { ReviewRecordPage } from "./features/results/ReviewRecordPage";
 import { useAddressAutocomplete } from "./hooks/useAddressAutocomplete";
+import { useCheckout } from "./hooks/useCheckout";
 import { useCoverage } from "./hooks/useCoverage";
 import { useFeedback } from "./hooks/useFeedback";
 import { useLegalAck } from "./hooks/useLegalAck";
@@ -123,6 +125,8 @@ export function App() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [activeStageIndex, setActiveStageIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [dailyLimitReached, setDailyLimitReached] = useState(false);
+  const checkout = useCheckout();
   const [intake, setIntake] = useState<IntakeResponse | null>(null);
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
   const { trace, setTrace, traceLoading } = useTrace({
@@ -308,6 +312,20 @@ export function App() {
     return undefined;
   }
 
+  // ponytail: one status check, not a message-string parser. Both the
+  // per-project intake limit and the analysis limit return 429; either one
+  // surfaces the same upgrade prompt.
+  function applyRunError(runError: unknown, fallback: string) {
+    setPhase("error");
+    if (runError instanceof ApiError && runError.status === 429) {
+      setError("Daily limit reached — upgrade for more.");
+      setDailyLimitReached(true);
+      return;
+    }
+    setDailyLimitReached(false);
+    setError(runError instanceof Error ? runError.message : fallback);
+  }
+
   async function refreshProjects(message?: string) {
     if (authMode !== "supabase") {
       return;
@@ -400,6 +418,7 @@ export function App() {
 
   async function runSubmitFlow() {
     setError(null);
+    setDailyLimitReached(false);
     setResult(null);
     setIntake(null);
     setTrace([]);
@@ -439,12 +458,7 @@ export function App() {
 
       await runAnalysis(intakeResult.projectId);
     } catch (submitError) {
-      setPhase("error");
-      setError(
-        submitError instanceof Error
-          ? submitError.message
-          : "Something went wrong during analysis.",
-      );
+      applyRunError(submitError, "Something went wrong during analysis.");
     }
   }
 
@@ -483,12 +497,7 @@ export function App() {
       setClarificationOpen(false);
       await runAnalysis(intake.projectId, clarificationAnswers);
     } catch (clarificationError) {
-      setPhase("error");
-      setError(
-        clarificationError instanceof Error
-          ? clarificationError.message
-          : "Clarification request failed.",
-      );
+      applyRunError(clarificationError, "Clarification request failed.");
     } finally {
       setClarificationSubmitting(false);
     }
@@ -575,6 +584,7 @@ export function App() {
     resetAddress();
     setPhase("idle");
     setError(null);
+    setDailyLimitReached(false);
     setIntake(null);
     setResult(null);
     setTrace([]);
@@ -629,6 +639,12 @@ export function App() {
                 indexedCoverage={indexedCoverage}
                 canSubmit={canSubmit}
                 error={error}
+                dailyLimitReached={dailyLimitReached}
+                checkoutPending={checkout.pending}
+                checkoutError={checkout.error}
+                onUpgrade={() => {
+                  void checkout.start();
+                }}
                 intake={intake}
                 jurisdictionRequestSubmitting={jurisdictionRequestSubmitting}
                 jurisdictionRequestMessage={jurisdictionRequestMessage}

@@ -6,6 +6,7 @@ import {
   TrustIndicatorBar,
   UnsupportedJurisdiction,
 } from "../../components/ResultTrust";
+import { useCheckout } from "../../hooks/useCheckout";
 import type { FeedbackState, ResultView } from "../../types/app";
 import {
   confidenceLabel,
@@ -271,30 +272,81 @@ function SupportingDetailsTabs({
               );
             })}
           </div>
-          <button
-            type="button"
-            onClick={onDownloadChecklist}
-            className="btn-outline px-3 py-1.5 text-sm"
-          >
-            Download checklist
-          </button>
+          {!result.gated && (
+            <button
+              type="button"
+              onClick={onDownloadChecklist}
+              className="btn-outline px-3 py-1.5 text-sm"
+            >
+              Download checklist
+            </button>
+          )}
         </div>
       </div>
 
       {resultView === "checklist" ? (
-        <ChecklistView result={result} />
+        result.gated ? (
+          <LockedDeliverablePanel variant="checklist" className="mt-6" />
+        ) : (
+          <ChecklistView result={result} />
+        )
       ) : resultView === "evidence" ? (
         <div className="mt-6 space-y-5">
           <TrustIndicatorBar result={result} />
-          {result.citationValidation && (
-            <CitationValidationNote validation={result.citationValidation} />
+          {result.gated ? (
+            <LockedDeliverablePanel variant="evidence" />
+          ) : (
+            <>
+              {result.citationValidation && (
+                <CitationValidationNote validation={result.citationValidation} />
+              )}
+              <EvidencePanel citations={result.citations} />
+            </>
           )}
-          <EvidencePanel citations={result.citations} />
         </div>
       ) : (
         <TraceView result={result} trace={trace} traceLoading={traceLoading} />
       )}
     </section>
+  );
+}
+
+// Shown in place of the checklist/evidence tab bodies for free-tier users —
+// the server already stripped these fields (models.py `gate_result_for_tier`),
+// this is cosmetic on top, not a client-side re-derivation of the gate.
+function LockedDeliverablePanel({
+  variant,
+  className = "",
+}: {
+  variant: "checklist" | "evidence";
+  className?: string;
+}) {
+  const { pending, error, start } = useCheckout();
+  const copy =
+    variant === "checklist"
+      ? "The full permit checklist, required documents, and department routing are ready — upgrade to see them."
+      : "The ordinance citations and compliance findings behind this determination are ready — upgrade to see them.";
+
+  return (
+    <div
+      className={`rounded-sm border border-rule bg-well/60 p-6 text-center ${className}`}
+    >
+      <p className="text-sm font-bold text-ink">Unlock the full deliverable</p>
+      <p className="mx-auto mt-1.5 max-w-md text-sm leading-6 text-ink-soft">
+        {copy}
+      </p>
+      <button
+        type="button"
+        onClick={() => {
+          void start();
+        }}
+        disabled={pending}
+        className="btn-primary mt-4"
+      >
+        {pending ? "Redirecting…" : "Upgrade to Pro — $8/mo"}
+      </button>
+      {error && <p className="mt-3 text-xs leading-5 text-ink-soft">{error}</p>}
+    </div>
   );
 }
 

@@ -30,6 +30,10 @@ export function ProjectIntakePanel({
   indexedCoverage,
   canSubmit,
   error,
+  dailyLimitReached,
+  checkoutPending,
+  checkoutError,
+  onUpgrade,
   intake,
   jurisdictionRequestSubmitting,
   jurisdictionRequestMessage,
@@ -56,6 +60,11 @@ export function ProjectIntakePanel({
   indexedCoverage: JurisdictionCoverage[];
   canSubmit: boolean;
   error: string | null;
+  /** True when the error above is the daily-limit 429 — shows the upgrade CTA. */
+  dailyLimitReached: boolean;
+  checkoutPending: boolean;
+  checkoutError: string | null;
+  onUpgrade: () => void;
   intake: IntakeResponse | null;
   jurisdictionRequestSubmitting: boolean;
   jurisdictionRequestMessage: string;
@@ -240,6 +249,23 @@ export function ProjectIntakePanel({
           >
             <div className="mt-6 rounded-sm border border-verdict-stop/25 bg-verdict-stopwash p-4 text-sm text-verdict-stop">
               <p className="leading-6">{error}</p>
+              {dailyLimitReached && (
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={onUpgrade}
+                    disabled={checkoutPending}
+                    className="btn-primary"
+                  >
+                    {checkoutPending ? "Redirecting…" : "Upgrade to Pro — $8/mo"}
+                  </button>
+                  {checkoutError && (
+                    <p className="mt-2 text-xs leading-5 text-ink-soft">
+                      {checkoutError}
+                    </p>
+                  )}
+                </div>
+              )}
               {intake?.supportStatus === "unsupported" && (
                 <div className="mt-4 rounded-sm border border-rule bg-sheet p-4 text-ink">
                   <p className="font-medium">
