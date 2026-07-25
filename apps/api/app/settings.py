@@ -216,7 +216,7 @@ def get_settings() -> Settings:
         supabase_jwt_secret=_env("SUPABASE_JWT_SECRET"),
         supabase_anon_key=_env("SUPABASE_ANON_KEY"),
         admin_user_emails=admin_user_emails,
-        daily_analysis_limit_free=int(_env("DAILY_ANALYSIS_LIMIT_FREE", "10")),
+        daily_analysis_limit_free=int(_env("DAILY_ANALYSIS_LIMIT_FREE", "3")),
         daily_project_limit_free=int(_env("DAILY_PROJECT_LIMIT_FREE", "25")),
         burst_llm_limit_per_min=int(_env("BURST_LLM_LIMIT_PER_MIN", "8")),
         daily_analysis_limit_pro=int(_env("DAILY_ANALYSIS_LIMIT_PRO", "50")),

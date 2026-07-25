@@ -41,7 +41,7 @@ services:
       - key: BURST_LLM_LIMIT_PER_MIN
         value: "8"
       - key: DAILY_ANALYSIS_LIMIT_FREE
-        value: "10"
+        value: "3"
       - key: DAILY_ANALYSIS_LIMIT_PRO
         value: "50"
       # Stripe secrets: value pasted in the Render dashboard, never committed.

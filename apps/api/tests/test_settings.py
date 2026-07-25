@@ -52,7 +52,7 @@ def test_settings_default_to_offline_providers(monkeypatch: pytest.MonkeyPatch) 
     assert not settings.uses_openai
     assert settings.auth_provider == "disabled"
     assert settings.auth_required is False
-    assert settings.daily_analysis_limit_free == 10
+    assert settings.daily_analysis_limit_free == 3
     assert settings.daily_project_limit_free == 25
     assert settings.local_model_base_url == "http://localhost:11434/v1"
     assert settings.local_model_name == "llama3.1:8b"
