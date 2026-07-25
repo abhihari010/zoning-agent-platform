@@ -155,7 +155,7 @@ def _stripe_event(event_type: str, data_object: dict) -> dict:
 
 def test_daily_analysis_limit_by_tier():
     assert daily_analysis_limit("pro") == 50
-    assert daily_analysis_limit("free") == 10
+    assert daily_analysis_limit("free") == 3
 
 
 def test_resolve_tier_no_auth_required_is_pro():
