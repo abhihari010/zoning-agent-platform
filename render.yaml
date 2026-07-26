@@ -86,14 +86,19 @@ databases:
   # Replaces Supabase Postgres (Supabase stays for Auth only), which removes the
   # API<->DB egress that blew the free-org quota.
   #
-  # ponytail: free plan for the cutover, not forever. 1 GB cap (DB is 198 MB) and
-  # NO backups of any kind -- it expires 30 days after creation, then a 14-day
-  # grace, then Render deletes it AND its data. Upgrading to basic-256mb (~$7/mo)
-  # happens in place and preserves the data, so this is a bridge, not a second
-  # migration. Upgrade before Stripe goes live or by ~2026-08-25, whichever first.
+  # basic-256mb (~$7/mo), not free: only ONE free Postgres can be active per
+  # Render workspace and that slot is already taken. Paid also buys what the free
+  # tier can't -- no 30-day expiry, and point-in-time recovery, which is the
+  # stated precondition for taking real Stripe subscriptions.
+  #
+  # Same region as the API so DB traffic stays on Render's private network and
+  # never counts as egress anywhere. That is the whole point of the move, and the
+  # reason an external free provider (Neon 5 GB/mo, etc.) does not substitute --
+  # a single reindex already spent 11.93 GB.
+  #
   # ipAllowList omitted on purpose = allow all, needed for the external restore.
   - name: zoning-agent-db
-    plan: free
+    plan: basic-256mb
     region: ohio
     postgresMajorVersion: "17"
     databaseName: zoning_agent
