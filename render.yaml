@@ -11,12 +11,13 @@ services:
     healthCheckPath: /health
     autoDeploy: true
     envVars:
-      # Still the Supabase pooler URL (dashboard-set). Repointed to
-      # zoning-agent-db via fromDatabase in a SECOND blueprint change, only
-      # after the dump/restore is verified -- wiring it here would point prod
-      # at an empty database the moment this syncs.
+      # connectionString is the PRIVATE-network URL, so API<->DB traffic is not
+      # egress for anyone to meter. That is the point of leaving Supabase
+      # Postgres; Supabase keeps serving Auth only.
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: zoning-agent-db
+          property: connectionString
       - key: APP_ENV
         value: production
       - key: AUTH_PROVIDER
