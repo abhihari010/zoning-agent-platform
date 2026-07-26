@@ -11,6 +11,10 @@ services:
     healthCheckPath: /health
     autoDeploy: true
     envVars:
+      # Still the Supabase pooler URL (dashboard-set). Repointed to
+      # zoning-agent-db via fromDatabase in a SECOND blueprint change, only
+      # after the dump/restore is verified -- wiring it here would point prod
+      # at an empty database the moment this syncs.
       - key: DATABASE_URL
         sync: false
       - key: APP_ENV
@@ -77,3 +81,20 @@ services:
         sync: false
       - key: SENTRY_DSN
         sync: false
+
+databases:
+  # Replaces Supabase Postgres (Supabase stays for Auth only), which removes the
+  # API<->DB egress that blew the free-org quota.
+  #
+  # ponytail: free plan for the cutover, not forever. 1 GB cap (DB is 198 MB) and
+  # NO backups of any kind -- it expires 30 days after creation, then a 14-day
+  # grace, then Render deletes it AND its data. Upgrading to basic-256mb (~$7/mo)
+  # happens in place and preserves the data, so this is a bridge, not a second
+  # migration. Upgrade before Stripe goes live or by ~2026-08-25, whichever first.
+  # ipAllowList omitted on purpose = allow all, needed for the external restore.
+  - name: zoning-agent-db
+    plan: free
+    region: ohio
+    postgresMajorVersion: "17"
+    databaseName: zoning_agent
+    user: zoning_agent
