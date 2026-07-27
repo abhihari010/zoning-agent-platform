@@ -89,7 +89,7 @@ export function Signup() {
           Create your account
         </h1>
         <p className="mt-2 text-sm font-light leading-6 text-dusk-soft">
-          Free while in beta. Save reviews and request new jurisdictions.
+          Free to start, no card. Save reviews and request new jurisdictions.
         </p>
 
         {authMode !== "supabase" && (

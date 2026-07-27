@@ -36,7 +36,10 @@ function HeroGlow() {
 const HERO_PROOF = [
   { value: "§ cited", label: "Every determination" },
   { value: "< 60s", label: "Address to answer" },
-  { value: "$0", label: "Free while in beta" },
+  // ponytail: price duplicated from the upgrade CTAs (ResultSection,
+  // ProjectIntakePanel). Three hardcodes is the point at which it should come
+  // from the API instead -- move it if a fourth appears.
+  { value: "$8/mo", label: "Full report — verdict free" },
 ];
 
 export function Home() {
@@ -207,7 +210,7 @@ export function Home() {
                   </motion.button>
                 </div>
                 <p className="mt-2.5 text-xs leading-5 text-dusk-faint">
-                  US addresses only. Free while in beta.{" "}
+                  US addresses only. Free verdict, no card.{" "}
                   <Link
                     to="/login"
                     className="font-medium text-dusk-soft underline-offset-2 hover:text-paper hover:underline"
@@ -409,7 +412,7 @@ export function Home() {
               Check a property in the next minute.
             </h2>
             <p className="mt-5 text-[16px] font-normal leading-[1.8] text-dusk-soft">
-              Free while in beta. No card required.
+              Free verdict, no card required. Full report $8/mo.
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <motion.div {...hoverLift}>
