@@ -15,14 +15,39 @@ import { ResetPassword } from "./pages/ResetPassword";
 import { NotFound } from "./pages/NotFound";
 import "./styles.css";
 
-const sentryDsn = import.meta.env.VITE_SENTRY_DSN as string | undefined;
-if (sentryDsn) {
-  import("@sentry/react").then(({ init, browserTracingIntegration }) => {
+// The deployed DSN arrived with a UTF-8 BOM, which Sentry rejects as an invalid
+// DSN -- error reporting was silently dead in production for two weeks. Fixing
+// the env var is the real fix; stripping here stops it recurring silently,
+// because the tooling that writes these vars keeps emitting BOMs.
+const sentryDsn = (import.meta.env.VITE_SENTRY_DSN as string | undefined)
+  ?.replace(/^\uFEFF/, "")
+  .trim();
+
+// Preview deploys get a hashed vercel.app subdomain. Matching on that rather
+// than the production hostname means a custom domain later still reports.
+const isPreviewDeploy = /-[a-z0-9]{8,}\.vercel\.app$/i.test(window.location.hostname);
+
+if (sentryDsn && import.meta.env.PROD && !isPreviewDeploy) {
+  import("@sentry/react").then(({ init }) => {
     init({
       dsn: sentryDsn,
-      integrations: [browserTracingIntegration()],
-      tracesSampleRate: 0.1,
+      environment: "production",
+      // ponytail: errors only. Tracing spans bill against a separate and much
+      // smaller free-tier quota, and there is not enough traffic yet for the
+      // performance data to be worth the budget. Re-add
+      // browserTracingIntegration when the plan or the traffic justifies it.
+      tracesSampleRate: 0,
       sendDefaultPii: false,
+      // On a 5k events/month budget, noise is what hides the one real error.
+      ignoreErrors: [
+        "ResizeObserver loop limit exceeded",
+        "ResizeObserver loop completed with undelivered notifications",
+        "Non-Error promise rejection captured",
+        /^AbortError/,
+        /^NetworkError/,
+        "Failed to fetch",
+      ],
+      denyUrls: [/extensions\//i, /^chrome-extension:\/\//i, /^moz-extension:\/\//i],
     });
   });
 }
