@@ -116,6 +116,12 @@ function DecisionSummary({
   showHumanFallback: boolean;
 }) {
   const confidencePct = Math.round(result.feasibility.confidence * 100);
+  // The free-tier gate empties citations[] but leaves trust_indicators intact,
+  // so reading the array told free users "No cited sources" beside a 97%
+  // confidence verdict -- the exact opposite of "no cited source means no
+  // confident answer". Count comes from the trust indicators; the citation text
+  // stays locked.
+  const citationCount = result.trustIndicators?.citationCount ?? result.citations.length;
   // The signature moment: the stamp lands like a physical stamp and the
   // card takes a one-frame 1px hit on impact (brief §5C).
   const [stamped, setStamped] = useState(false);
@@ -165,10 +171,10 @@ function DecisionSummary({
           <dt className="text-xs font-medium text-ink-faint">Evidence</dt>
           <dd className="mt-1 flex items-baseline gap-2">
             <span className="tabular font-mono text-2xl font-semibold text-ink">
-              {result.citations.length}
+              {citationCount}
             </span>
             <span className="text-xs text-ink-soft">
-              {evidenceLabel(result.citations.length).replace(/^\d+ /, "")}
+              {evidenceLabel(citationCount).replace(/^\d+ /, "")}
             </span>
           </dd>
         </div>

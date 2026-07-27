@@ -210,6 +210,12 @@ def test_gate_result_for_tier_free_strips_deliverable_but_keeps_hook():
     # The hook survives the gate.
     assert gated.feasibility == result.feasibility
     assert gated.trust_indicators == result.trust_indicators
+    # The UI reads the evidence COUNT from trust_indicators precisely because
+    # citations[] is emptied here -- otherwise a free user sees "No cited
+    # sources" under a high-confidence verdict. Keep the count when gating.
+    assert gated.trust_indicators is not None
+    assert gated.trust_indicators.citation_count == result.trust_indicators.citation_count
+    assert gated.trust_indicators.citation_count > 0
     assert gated.status == result.status
     assert gated.disclaimers == result.disclaimers
 
