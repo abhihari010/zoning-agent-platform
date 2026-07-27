@@ -23,11 +23,18 @@ const sentryDsn = (import.meta.env.VITE_SENTRY_DSN as string | undefined)
   ?.replace(/^\uFEFF/, "")
   .trim();
 
-// Preview deploys get a hashed vercel.app subdomain. Matching on that rather
-// than the production hostname means a custom domain later still reports.
-const isPreviewDeploy = /-[a-z0-9]{8,}\.vercel\.app$/i.test(window.location.hostname);
+// Keep preview-deploy noise out of the 5k events/month budget.
+//
+// Do NOT try to pattern-match the preview hash: "zoning-agent-platform" ends in
+// "-platform", which is indistinguishable from a hash suffix and silently
+// disabled Sentry in production. Name the production host instead, and treat
+// anything off vercel.app as production too so a custom domain still reports.
+const host = window.location.hostname;
+const isProductionHost =
+  host === "zoning-agent-platform.vercel.app" ||
+  !/(^localhost$|^127\.|\.vercel\.app$)/i.test(host);
 
-if (sentryDsn && import.meta.env.PROD && !isPreviewDeploy) {
+if (sentryDsn && import.meta.env.PROD && isProductionHost) {
   import("@sentry/react").then(({ init }) => {
     init({
       dsn: sentryDsn,
