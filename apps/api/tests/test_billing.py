@@ -144,8 +144,13 @@ def _seed_project(user_id: str = "user-1") -> ProjectRecord:
     return project
 
 
-def _stripe_event(event_type: str, data_object: dict) -> dict:
-    return {"type": event_type, "data": {"object": data_object}}
+def _stripe_event(event_type: str, data_object: dict):
+    # A real StripeObject, not a dict literal. construct_event returns one of
+    # these in production, and it does not behave like a dict -- a plain-dict
+    # fixture let an AttributeError on data_object.get() reach prod.
+    return stripe.Event.construct_from(
+        {"type": event_type, "data": {"object": data_object}}, "sk_test_fixture"
+    )
 
 
 # ---------------------------------------------------------------------------

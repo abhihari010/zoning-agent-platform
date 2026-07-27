@@ -635,7 +635,10 @@ async def stripe_webhook(request: Request):
         raise HTTPException(status_code=400, detail=f"Invalid webhook payload: {exc}") from exc
 
     event_type = event["type"]
-    data_object = event["data"]["object"]
+    # StripeObject stopped subclassing dict after stripe 11, so .get() on it
+    # raises AttributeError instead of returning None. to_dict() hands back a
+    # plain dict on every version the pin allows.
+    data_object = event["data"]["object"].to_dict()
 
     def _resolve_user(client_reference_id: str | None, customer_id: str | None):
         # subscription.* events carry no client_reference_id, only a customer id.
