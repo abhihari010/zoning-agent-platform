@@ -51,7 +51,11 @@ export function TrustIndicatorBar({ result }: { result: AnalyzeResponse }) {
   const jurisdictionReady = Boolean(trust?.jurisdictionAnalyzed);
   const districtReady = Boolean(trust && trust.districtConfidence >= 0.7);
   const sourceReady = Boolean(trust && trust.sourceCount > 0 && trust.vectorReadiness);
-  const citationReady = result.citations.length > 0;
+  // This bar renders for gated users too, and the gate empties citations[].
+  // Reading the array marked the Evidence cell "0 cited excerpts" and not-ready
+  // on results that actually had citations behind them.
+  const citationCount = trust?.citationCount ?? result.citations.length;
+  const citationReady = citationCount > 0;
 
   return (
     <section className="sheet grid divide-y divide-rule sm:grid-cols-2 sm:divide-y-0 md:grid-cols-4 md:divide-x">
@@ -79,7 +83,7 @@ export function TrustIndicatorBar({ result }: { result: AnalyzeResponse }) {
       />
       <TrustCell
         label="Evidence"
-        value={`${result.citations.length} cited excerpt${result.citations.length === 1 ? "" : "s"}`}
+        value={`${citationCount} cited excerpt${citationCount === 1 ? "" : "s"}`}
         note={
           result.citationValidation
             ? `${percent(result.citationValidation.citationCoverage)} validation coverage`
