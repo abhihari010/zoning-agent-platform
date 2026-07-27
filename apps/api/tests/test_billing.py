@@ -15,6 +15,7 @@ from app.auth import AuthContext
 from app.billing import daily_analysis_limit, gate_result_for_tier, resolve_tier
 from app.main import app, _throttle_windows
 from app.models import (
+    AnalysisRecord,
     AnalyzeResult,
     Checklist,
     ChecklistStep,
@@ -576,3 +577,93 @@ def test_webhook_unhandled_event_type_is_ignored(monkeypatch):
 
     assert response.status_code == 200
     assert response.json()["status"] == "ignored"
+
+
+# ---------------------------------------------------------------------------
+# Clarification round-trips do not double-charge the daily cap
+# ---------------------------------------------------------------------------
+
+
+def _spy_on_reservations(monkeypatch: pytest.MonkeyPatch) -> list[str]:
+    reserved: list[str] = []
+
+    def _record(event_type, limit, auth):
+        reserved.append(event_type)
+
+    monkeypatch.setattr("app.routers.api.reserve_daily_usage", _record)
+    return reserved
+
+
+def _store_prior_analysis(project_id, status: str) -> None:
+    store.save_analysis(
+        AnalysisRecord(
+            project_id=project_id,
+            result=_full_result().model_copy(update={"status": status}),
+            user_id="user-1",
+        )
+    )
+
+
+def test_clarification_continuation_does_not_consume_a_second_slot(monkeypatch):
+    _enable_auth(monkeypatch)
+    client = TestClient(app)
+    project = _seed_project()
+    _store_prior_analysis(project.project_id, "needs_clarification")
+    monkeypatch.setattr("app.routers.api.analyze_project", lambda **_: _full_result())
+    reserved = _spy_on_reservations(monkeypatch)
+
+    response = client.post(
+        f"/api/v1/projects/{project.project_id}/analyze",
+        headers=_auth_headers("user-1"),
+        json={
+            "project_id": str(project.project_id),
+            "clarification_answers": {"hours": "weekdays 7am-2pm"},
+        },
+    )
+
+    assert response.status_code == 200
+    # The first half of this determination was already charged.
+    assert reserved == []
+
+
+def test_forged_clarification_answers_still_consume_a_slot(monkeypatch):
+    """clarification_answers is client-supplied -- trusting it alone would let
+    anyone bypass the daily cap forever by always sending it."""
+    _enable_auth(monkeypatch)
+    client = TestClient(app)
+    project = _seed_project()
+    _store_prior_analysis(project.project_id, "success")
+    monkeypatch.setattr("app.routers.api.analyze_project", lambda **_: _full_result())
+    reserved = _spy_on_reservations(monkeypatch)
+
+    response = client.post(
+        f"/api/v1/projects/{project.project_id}/analyze",
+        headers=_auth_headers("user-1"),
+        json={
+            "project_id": str(project.project_id),
+            "clarification_answers": {"pretending": "to resume"},
+        },
+    )
+
+    assert response.status_code == 200
+    assert reserved == ["analysis"]
+
+
+def test_first_analysis_with_no_prior_result_consumes_a_slot(monkeypatch):
+    _enable_auth(monkeypatch)
+    client = TestClient(app)
+    project = _seed_project()
+    monkeypatch.setattr("app.routers.api.analyze_project", lambda **_: _full_result())
+    reserved = _spy_on_reservations(monkeypatch)
+
+    response = client.post(
+        f"/api/v1/projects/{project.project_id}/analyze",
+        headers=_auth_headers("user-1"),
+        json={
+            "project_id": str(project.project_id),
+            "clarification_answers": {"answers": "sent with no question asked"},
+        },
+    )
+
+    assert response.status_code == 200
+    assert reserved == ["analysis"]

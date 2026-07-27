@@ -249,7 +249,27 @@ def analyze(project_id: UUID, payload: AnalyzeRequest, request: Request):
 
     project = require_project_access(project_id, auth)
     tier = resolve_tier(auth)
-    reserve_daily_usage("analysis", daily_analysis_limit(tier), auth)
+    # One delivered verdict, one slot. A needs_clarification result is a
+    # question, not a product, and the answer to it re-enters this same
+    # endpoint -- charging both halves meant one real determination cost two of
+    # a free user's three daily runs.
+    #
+    # The check reads the stored prior status rather than trusting
+    # clarification_answers alone: that field is client-supplied, so believing
+    # it would let anyone bypass the cap forever by always sending it.
+    #
+    # ponytail: if the pipeline asks for clarification repeatedly on one
+    # project, each continuation is a free run. Rate-limited by
+    # BURST_LLM_LIMIT_PER_MIN and hard to force on purpose -- cap free
+    # continuations per project only if it shows up in the numbers.
+    prior = store.get_analysis(project_id)
+    resuming_clarification = (
+        bool(payload.clarification_answers)
+        and prior is not None
+        and prior.result.status == "needs_clarification"
+    )
+    if not resuming_clarification:
+        reserve_daily_usage("analysis", daily_analysis_limit(tier), auth)
 
     store.audit("analysis.started", str(project_id), user_id=auth.user_id)
     if payload.clarification_answers:
