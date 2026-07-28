@@ -68,6 +68,22 @@ services:
       # tuned model choice; defaults to llama-3.3-70b-versatile when unset.
       - key: GROQ_MODEL
         sync: false
+      # Without this, Groq is a single point of failure: once it exhausts its 6
+      # retries the request degrades to deterministic_feasibility(), which is a
+      # fine answer for a free verdict and a bad one for a paying subscriber.
+      #
+      # Safe to deploy before the keys below are pasted in the dashboard --
+      # _build_named_analysis_provider returns None for a fallback with no API
+      # key and the registry skips it, leaving plain Groq rather than a broken
+      # chain. Both fallbacks are free-tier llama-3.3-70b, so no provider spend,
+      # and all three share ANALYSIS_SYSTEM_PROMPT so failing over does not
+      # change how the model is asked to reason.
+      - key: AI_PROVIDER_FALLBACKS
+        value: cerebras,openrouter
+      - key: CEREBRAS_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
       - key: QDRANT_URL
         sync: false
       - key: QDRANT_API_KEY
