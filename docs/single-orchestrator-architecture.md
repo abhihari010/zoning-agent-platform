@@ -34,7 +34,7 @@ The frontend presents these as pipeline stages:
 - `apps/api/app/tools/compliance_tool.py` runs compliance synthesis and only invokes the selected model provider when source evidence exists.
 - `apps/api/app/tools/citation_tool.py` validates citation IDs, effective dates, and source jurisdiction.
 - `apps/api/app/tools/report_tool.py` builds pipeline stage reports and the user-facing checklist.
-- `apps/api/app/ai/` remains the provider boundary for deterministic, OpenAI-compatible, local, and WatsonX-backed analysis/retrieval.
+- `apps/api/app/ai/` remains the provider boundary for deterministic, Groq, OpenAI-compatible, and local analysis/retrieval.
 
 ## Compatibility Contracts
 
@@ -58,7 +58,7 @@ Moving address normalization fully inside the orchestrator is intentionally defe
 
 ## Free/Local Deployment Path
 
-No ChromaDB, pgvector, or paid vector service is required for Phase 1.
+No vector service is required to run the app. Production adds one (Qdrant), but it is optional.
 
 The free/local path is:
 
@@ -67,7 +67,7 @@ The free/local path is:
 - `RAG_PROVIDER=source_registry` or `hybrid_local`.
 - `EMBEDDING_PROVIDER=local` for deterministic local hash embeddings.
 
-Dedicated vector storage should wait for Phase 2 RAG hardening, when the source corpus is large enough or retrieval quality requires persisted vector indexes.
+Production has since added dedicated vector storage: `EMBEDDING_PROVIDER=gemini` with `VECTOR_PROVIDER=qdrant`. SQL remains the durable source of truth, and the vector index is rebuildable from it.
 
 ## Phase Boundary
 

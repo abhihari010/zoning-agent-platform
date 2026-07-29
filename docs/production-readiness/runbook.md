@@ -17,7 +17,7 @@ Local:
 - `APP_ENV=local` or unset.
 - `AUTH_PROVIDER=disabled`, `AUTH_REQUIRED=false`.
 - SQLite fallback through `ZONING_DB_PATH`.
-- No Google, Supabase, OpenAI, WatsonX, Render, or Vercel credential required for tests.
+- No Google, Supabase, OpenAI, Groq, Render, or Vercel credential required for tests.
 
 CI:
 
@@ -27,7 +27,7 @@ CI:
 Render production:
 
 - `APP_ENV=production`
-- `DATABASE_URL=<Supabase pooler URL>`
+- `DATABASE_URL` — wired automatically from the `zoning-agent-db` Render Postgres resource via `fromDatabase` in `render.yaml`, so it resolves to the private-network URL. Supabase is Auth-only.
 - `AUTH_PROVIDER=supabase`
 - `AUTH_REQUIRED=true`
 - `SUPABASE_PROJECT_URL=<Supabase project URL>`
@@ -36,6 +36,7 @@ Render production:
 - `CORS_ALLOW_ORIGINS=https://zoning-agent-platform.vercel.app`
 - `AI_PROVIDER=groq`
 - `GROQ_API_KEY=<Groq key>`
+- `AI_PROVIDER_FALLBACKS=cerebras,openrouter` with `CEREBRAS_API_KEY` / `OPENROUTER_API_KEY` — keeps Groq from being a single point of failure. A fallback with no key is skipped, so the chain degrades to plain Groq rather than breaking.
 - `RAG_PROVIDER=hybrid_local`
 - `EMBEDDING_PROVIDER=gemini`
 - `GEMINI_API_KEY=<Gemini key>`
@@ -44,16 +45,20 @@ Render production:
 - `QDRANT_API_KEY=<Qdrant key>`
 - `STARTUP_REINDEX_ENABLED=false` (boot-time reindex blocks Render's port scan — keep OFF; retag via the offline `scripts/update_source_classification.py`)
 - `CORS_ALLOW_ORIGIN_REGEX=https://zoning-agent-platform[^.]*\.vercel\.app` (covers Vercel previews + production)
-- Optional during migration: `BETA_ACCESS_KEYS`, `ADMIN_ACCESS_KEY`, `ADMIN_USER_EMAILS`
+- `ADMIN_ACCESS_KEY` and `ADMIN_USER_EMAILS` for source-admin access
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_PRO`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL` for subscription billing
+- `SENTRY_DSN` for backend error reporting
 
 > Render is **blueprint-synced** via `render.yaml`. Dashboard edits get reset on the next deploy — change provider/env values in `render.yaml`, not the dashboard. Provider/DB secrets (`GROQ_API_KEY`, `GEMINI_API_KEY`, `QDRANT_API_KEY`, `DATABASE_URL` password) live only in the dashboard/secret store, never in the repo.
 
 Vercel production:
 
 - `VITE_API_URL=https://zoning-agent-api.onrender.com`
-- `VITE_AUTH_MODE=supabase`
 - `VITE_SUPABASE_URL=<Supabase project URL>`
 - `VITE_SUPABASE_ANON_KEY=<Supabase anon key>`
+- `VITE_SENTRY_DSN=<frontend Sentry DSN>`
+
+> `VITE_*` values are inlined into the bundle at build time. Changing one in the Vercel dashboard has no effect until you redeploy.
 
 ## Deploy Checklist
 
@@ -152,9 +157,9 @@ Citation quality issue:
 
 Quota or abuse issue:
 
-- Confirm daily project/analysis limits.
+- Confirm daily project/analysis limits (`DAILY_ANALYSIS_LIMIT_FREE`, `DAILY_ANALYSIS_LIMIT_PRO`).
 - Temporarily lower limits if necessary.
-- Remove beta keys before broad public launch.
+- Check `BURST_LLM_LIMIT_PER_MIN` for per-IP abuse on the expensive endpoints.
 
 ## CI Expectations
 

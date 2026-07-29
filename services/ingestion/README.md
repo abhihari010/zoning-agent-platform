@@ -1,8 +1,9 @@
-# Ingestion Service (Planned)
+# Ingestion Helpers
 
-This folder is reserved for the zoning document ingestion pipeline.
+This folder holds seeding helpers and local documents for the zoning ingestion pipeline.
+It is not a standalone deployable service; the API owns parsing, chunking, and indexing.
 
-Planned stages:
+Pipeline stages:
 
 1. Source registration
 2. Document fetch and versioning
@@ -20,11 +21,16 @@ Current helpers:
   `.txt`, and `.json` source files from this directory or from another directory
   you provide.
 
-Bundled Blacksburg coverage currently uses official Town/Municode/State source
-URLs for home occupation standards, business zoning guidance, off-street parking,
-building safety review, and food-establishment permitting. Keep `jurisdiction_id`
-set to `blacksburg-va` and preserve district/use tags when refreshing these
-curated excerpts.
+The bundled `source_registry.json` holds the original Blacksburg coverage, which uses
+official Town/Municode/State source URLs for home occupation standards, business zoning
+guidance, off-street parking, building safety review, and food-establishment permitting.
+Keep `jurisdiction_id` set to `blacksburg-va` and preserve district/use tags when
+refreshing these curated excerpts.
+
+Every other supported jurisdiction ships as its own pack under
+`apps/api/app/data/source_packs/<state>/<jurisdiction-id>/`. See
+`docs/public-launch/source-pack-spec.md` for the pack format and
+`docs/public-launch/document-acquisition-workflow.md` for how packs are built.
 
 Document parsing format:
 
@@ -40,5 +46,6 @@ After the metadata header, the remaining body text is condensed into the source 
 Provider notes:
 
 - The API default retrieval provider is `source_registry`, which is local and deterministic.
-- WatsonX retrieval is optional legacy support selected with `RAG_PROVIDER=watsonx`.
-- Embeddings and vector databases are not required for the current default path.
+- Embeddings and vector databases are not required for the default path.
+- Production uses `RAG_PROVIDER=hybrid_local` with Gemini embeddings and a Qdrant index, which
+  combines vector search with keyword scoring and metadata filters.

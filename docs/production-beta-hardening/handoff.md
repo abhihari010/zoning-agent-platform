@@ -1,5 +1,12 @@
 # Production Beta Handoff
 
+> **Superseded — historical reference only.** This captures the private-beta hardening phase, which
+> has shipped. Several specifics are no longer true: the private-beta key gate (`BETA_ACCESS_KEY` /
+> `BETA_ACCESS_KEYS`) and `scripts/smoke_beta_api.py` have been removed in favour of Supabase JWT
+> auth and `scripts/smoke_public_api.py`, the watsonx adapter is deleted, and the database has moved
+> from Supabase to Render Postgres. For current state see `docs/PROJECT-STATUS.md`; for operations
+> see `docs/production-readiness/runbook.md`.
+
 Last updated: May 23, 2026
 
 ## Current Repo State
