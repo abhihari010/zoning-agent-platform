@@ -19,21 +19,31 @@ The frontend is designed to connect those stages together visibly for the user, 
 - downloadable permit checklist
 - prominent legal disclaimer
 
-## Provider-Agnostic Operation and Roadmap
+## Current State
 
-The current backend defaults to a provider-agnostic local mode: deterministic analysis with source-registry retrieval. That default does not require IBM watsonx credentials or any other external AI provider. WatsonX support remains available only as an optional legacy adapter selected with `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`.
+The product is live and taking paid subscriptions.
 
-The roadmap keeps the useful shape of the original system while expanding beyond a single provider. The goal is a zoning assistant that supports local source ingestion, pluggable LLM providers, richer retrieval, broader geography, and a more polished user workflow.
+- **24 supported jurisdictions** (23 Virginia + Franklin, TN), all data-driven — see `apps/api/app/data/jurisdictions.json`.
+- **Auth** is Supabase JWT. `ADMIN_ACCESS_KEY` separately gates source-admin writes.
+- **Billing** is Stripe subscriptions: a free tier and a Pro tier, with per-user daily analysis caps.
+- **Production providers**: Groq for analysis (with failover to Cerebras and OpenRouter), `hybrid_local` retrieval, Gemini embeddings, and a Qdrant vector index.
+- **Data**: Render Postgres is the source of truth. Supabase is retained for Auth only.
+
+Local development needs none of that. The default mode is deterministic analysis with source-registry retrieval and runs with zero external AI credentials; only Google Maps is needed for live address intake.
+
+## Provider-Agnostic Operation
+
+The backend routes analysis, retrieval, and embeddings through provider-neutral interfaces in `apps/api/app/ai/`, resolved at request time by `apps/api/app/ai/registry.py`. The same orchestrator runs against deterministic logic, Groq, any OpenAI-compatible endpoint, or a local model, so swapping providers is a config change rather than a code change.
 
 ### Guiding Principles
 
 - Keep zoning answers citation-first. Every recommendation should link back to source text, effective dates, jurisdiction, and section references.
 - Treat AI output as assisted drafting, not legal authority. The app should always explain uncertainty and route low-confidence cases to human review.
 - Separate the orchestrated workflow from the model provider. The same staged pipeline should work with hosted providers, local models, or deterministic fallback logic.
-- Make geography configurable. Blacksburg should become the first supported jurisdiction, not a hard-coded boundary.
+- Make geography configurable. Blacksburg was the first supported jurisdiction, not a hard-coded boundary.
 - Design for expansion through source data, not one-off conditionals. Adding a city should mostly mean adding jurisdiction metadata, parcel/district mapping, and ordinance documents.
 
-### Target Architecture
+### Pipeline Tools
 
 1. `Intake Tool`
    - Understands the user's project description.
@@ -43,7 +53,7 @@ The roadmap keeps the useful shape of the original system while expanding beyond
 2. `Jurisdiction & Parcel Tool`
    - Normalizes the address.
    - Determines jurisdiction, parcel context, zoning district, overlays, and special areas when available.
-   - Replaces the current Blacksburg-only address restriction with configurable jurisdiction support.
+   - Jurisdiction support is data-driven; there is no hard-coded city restriction.
 
 3. `Retrieval Tool`
    - Searches the local zoning knowledge base.
@@ -58,202 +68,68 @@ The roadmap keeps the useful shape of the original system while expanding beyond
    - Shows confidence, source coverage, unresolved questions, and user feedback.
    - Stores traces so bad answers can be debugged and improved.
 
-### Phase 1: Provider Boundary Foundation
+### What Shipped
 
-Phase 1 is implemented in the current codebase. The backend now routes analysis and retrieval through provider-neutral interfaces in `apps/api/app/ai/`, and `apps/api/app/orchestrator/ZoningOrchestrator` coordinates the staged review through tool modules under `apps/api/app/tools/`. `apps/api/app/services.py` remains as a compatibility facade for the existing API route and tests.
+The staged pipeline, the provider boundary, real document ingestion, multi-jurisdiction
+support, and the trust/quality work are all implemented and running in production.
+
+**Provider boundary.** Analysis and retrieval run through provider-neutral interfaces in
+`apps/api/app/ai/`, and `ZoningOrchestrator` coordinates the staged review through tool
+modules under `apps/api/app/tools/`. `apps/api/app/services.py` remains a compatibility
+facade for older API routes and tests.
 
 Implemented provider settings:
 
-- `AI_PROVIDER=deterministic|openai|watsonx|local`
-- `RAG_PROVIDER=source_registry|hybrid_local|watsonx`
-- `EMBEDDING_PROVIDER=none|local|openai`
+- `AI_PROVIDER=deterministic|openai|groq|cerebras|openrouter|local` (default `deterministic`)
+- `RAG_PROVIDER=source_registry|hybrid_local` (default `source_registry`)
+- `EMBEDDING_PROVIDER=none|local|openai|gemini` (default `none`)
+- `VECTOR_PROVIDER=none|qdrant` (default `none`)
 
-Default behavior:
+Analysis providers can be chained for resilience. `AI_PROVIDER_FALLBACKS` takes an ordered
+comma-separated list; when the primary provider exhausts its retries, each fallback is tried
+in turn before the request degrades to deterministic analysis. A fallback with no API key
+configured is skipped rather than failing the chain. The eval gate never sets this, so
+accuracy runs always execute against a single pinned provider for reproducibility.
 
-- `AI_PROVIDER=deterministic`
-- `RAG_PROVIDER=source_registry`
-- no WatsonX credentials required
-- missing citations force an `unknown` or low-confidence result instead of a high-confidence zoning conclusion
-- `hybrid_local` can retrieve from indexed chunks with deterministic local embeddings when enabled
-- the free/local path uses SQLite or the configured Postgres store as the source of truth, with optional embedded ChromaDB vectors for Phase 2 retrieval
+**Retrieval.** SQL-backed source/chunk records are the durable source of truth; the vector
+index is rebuildable state selected with `VECTOR_PROVIDER=qdrant`. `POST /api/v1/ingestion/reindex`
+computes embeddings and syncs vectors, and `hybrid_local` combines vector search with keyword
+scoring and metadata filters, falling back to SQL if the vector store is unavailable. The
+vector index can be deleted and rebuilt from SQL at any time.
 
-WatsonX behavior:
+**Jurisdictions.** 24 jurisdictions are publicly supported. Adding one means adding
+jurisdiction metadata, district mapping rules, and a source pack under
+`apps/api/app/data/source_packs/` — not code. The app distinguishes "valid address,
+unsupported jurisdiction" from "invalid address", and the UI shows which jurisdiction was analyzed.
 
-- WatsonX is optional legacy support behind `apps/api/app/ai/watsonx_provider.py`.
-- Missing WatsonX credentials only matter when `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`.
-- If WatsonX analysis fails after retrieval, the backend falls back to deterministic analysis and adds a warning.
+**Trust and quality.** The compliance step returns structured JSON validated with Pydantic.
+Citation IDs the model invents are stripped, and confidence is capped when no valid citation
+survives. Traces record prompt inputs, retrieval filters, source IDs, and the resolved provider
+name. An offline eval gate scores golden scenarios per jurisdiction and blocks regressions in CI.
 
-OpenAI behavior:
+The key invariant throughout: **no citations means no verdict.** If retrieval returns nothing,
+the orchestrator returns `unknown` / low-confidence and recommends human planning review. It
+never synthesizes a zoning conclusion from an empty evidence set.
 
-- OpenAI analysis is optional and selected with `AI_PROVIDER=openai`.
-- OpenAI embeddings are optional and selected with `EMBEDDING_PROVIDER=openai`.
-- Tests and local defaults do not require OpenAI credentials.
+### Roadmap
 
-Local model behavior:
+- Broaden jurisdiction coverage beyond Virginia; `docs/handoff-nationwide-expansion.md` is the living plan.
+- Add an evidence viewer with filters by source, section, district, and confidence.
+- Add document version history and source health checks to the admin area.
+- Add saved-project comparison views.
 
-- Local model analysis is optional and selected with `AI_PROVIDER=local`.
-- The local provider calls an OpenAI-compatible chat completions endpoint using `LOCAL_MODEL_BASE_URL`, `LOCAL_MODEL_NAME`, and `LOCAL_MODEL_TIMEOUT_SECONDS`.
-- Deterministic local mode remains the default; local model credentials or services are not required for tests.
+Reference docs:
 
-Phase 1 reference docs:
-
-- `docs/single-orchestrator-architecture.md`
-- `docs/agent-agnostic-zoning-platform/spec.md`
-- `docs/agent-agnostic-zoning-platform/plan.md`
-
-### Phase 2: Build a Real Local RAG Pipeline
-
-Phase 2 is implemented around SQL-backed source/chunk records plus an optional embedded ChromaDB vector index. SQL remains the durable source of truth; Chroma is rebuildable index state selected with `VECTOR_PROVIDER=chroma`.
-
-Implemented pieces:
-
-1. Source records include source type, retrieval timestamp, source version, content hash, and full document text.
-2. Local `.md`, `.txt`, and `.json` imports preserve full text while keeping `excerpt` as a preview field.
-3. Reindexing builds deterministic, hash-versioned SQL chunks with stable chunk IDs.
-4. `POST /api/v1/ingestion/reindex` computes embeddings and syncs Chroma vectors when `VECTOR_PROVIDER=chroma`.
-5. `hybrid_local` retrieves chunk citations through Chroma vector search plus keyword scoring and metadata filters, with a SQL-backed fallback if Chroma is unavailable.
-6. Ingestion status reports vector provider, collection, vector count, readiness, and warnings.
-
-Success criteria:
-
-- `POST /api/v1/ingestion/import-local-docs` can ingest real ordinance documents.
-- `POST /api/v1/ingestion/reindex` actually rebuilds the retrieval index.
-- Retrieval returns source-backed chunks with section references and URLs.
-- Chroma can be deleted and rebuilt from SQL source/chunk records.
-
-### Phase 3: Expand Beyond Blacksburg
-
-The current address flow intentionally rejects non-Blacksburg addresses. To expand, jurisdiction handling should become data-driven.
-
-Recommended steps:
-
-1. Introduce a `jurisdictions.json` or database table with:
-   - jurisdiction ID
-   - display name
-   - state/county/city matching rules
-   - official zoning map/source URLs
-   - supported document collections
-   - planning department contact info
-2. Replace hard-coded Blacksburg validation in `normalize_address`.
-3. Store `jurisdiction_id` on each project and source.
-4. Add district mapping rules per jurisdiction.
-5. Add an "unsupported jurisdiction" state that still helps the user by explaining what is missing.
-6. Start with 2-3 nearby jurisdictions before scaling broadly.
-
-Good first expansion targets:
-
-- Montgomery County, VA
-- Christiansburg, VA
-- Roanoke, VA
-
-Success criteria:
-
-- The app can distinguish "valid address, unsupported jurisdiction" from "invalid address."
-- Sources and retrieval are scoped to the correct jurisdiction.
-- The UI clearly shows which jurisdiction is being analyzed.
-
-### Phase 4: Improve Agent Quality and Trust
-
-Once retrieval is grounded in real documents, improve the reasoning workflow.
-
-Recommended steps:
-
-1. Require structured JSON from the compliance agent.
-2. Validate every model response with Pydantic before returning it.
-3. Add citation coverage checks:
-   - no citations means `unknown`
-   - contradictory citations means `low_confidence`
-   - missing district/use match lowers confidence
-4. Add an evidence grading step before final synthesis.
-5. Save agent traces for debugging:
-   - prompt inputs
-   - retrieval filters
-   - source IDs
-   - model provider
-   - response validation errors
-6. Add golden test cases for common scenarios.
-
-Success criteria:
-
-- The app refuses to overstate uncertain answers.
-- Every answer has visible evidence or a clear explanation of why evidence is missing.
-- Regression tests catch prompt/schema drift.
-
-### Phase 5: UI Expansion
-
-The frontend already has an assistant workspace, admin source editor, progress tracker, clarification modal, citations, checklist download, and feedback. The next UI pass should make the product feel less like a demo and more like a planning workspace.
-
-Recommended improvements:
-
-1. Rename/rebrand the app away from IBM-specific language.
-2. Add jurisdiction and source coverage indicators near the address field.
-3. Show a structured project intake panel:
-   - use type
-   - construction scope
-   - operating hours
-   - employees
-   - parking/loading
-   - food/fire/health triggers
-4. Add an evidence viewer with filters by source, section, district, and confidence.
-5. Add a side-by-side "Answer" and "Evidence" layout for completed reviews.
-6. Improve the admin area:
-   - source upload status
-   - index status
-   - document version history
-   - source health checks
-7. Add saved projects and comparison views later.
-
-Success criteria:
-
-- Users understand why the answer was reached.
-- Admins can see what source coverage exists before trusting the assistant.
-- The experience works for incomplete or unsupported cases, not just happy paths.
-
-### Suggested Next Sprint
-
-The production beta foundation is in place. The next narrow sprint should validate deployed behavior with real configuration before adding accounts, billing, or broader jurisdiction coverage. Current handoff details live in `docs/production-beta-hardening/handoff.md`.
-
-1. Deploy the API to Render with `DATABASE_URL` pointed at staging Postgres and a private beta key.
-2. Deploy the web app to Vercel with `VITE_API_URL` pointed at Render.
-3. Seed/import source documents, reindex, and confirm nonzero chunk counts.
-4. Run the supported and unsupported jurisdiction smoke tests.
-5. Collect early beta feedback before expanding providers or jurisdictions.
-
-### Open Technical Decisions
-
-- Which LLM provider should be the first non-IBM provider?
-- Should production add pgvector on top of Postgres for retrieval, or keep the current relational schema plus local embeddings?
-- Should document ingestion fetch official URLs automatically, or should admins upload curated documents first?
-- How much parcel-level GIS data should the app attempt to handle in the first expansion?
-- Should jurisdiction expansion start regionally around Virginia, or support arbitrary uploaded jurisdictions?
-
-### Near-Term Implementation Checklist
-
-- [x] Create `apps/api/app/ai/` provider interfaces.
-- [x] Add `AI_PROVIDER` and `RAG_PROVIDER` settings.
-- [x] Wrap the existing watsonx client as one optional legacy provider.
-- [x] Add deterministic/local providers for tests and development.
-- [x] Update tests so the backend works without external AI credentials.
-- [x] Rework package and user-facing copy away from IBM-specific product naming.
-- [x] Implement real document chunking and indexing.
-- [x] Replace hard-coded Blacksburg-only validation with jurisdiction support states.
-- [x] Add UI indicators for source coverage, index status, and confidence.
-- [x] Add structured zoning fact intake fields.
-- [x] Add optional external provider seams for OpenAI analysis and embeddings.
-- [x] Add jurisdiction metadata to source registry entries.
-- [x] Add private beta API access gate and deployment runbook.
-- [x] Add Postgres-backed storage with SQLite retained for local tests.
-- [x] Add official Blacksburg and Montgomery County source coverage.
-- [x] Add source readiness automation and deployed smoke-test coverage.
-- [x] Add separate source-admin access and frontend readiness indicators.
-- [x] Add production beta handoff documentation.
+- `docs/PROJECT-STATUS.md` — current state and next steps
+- `docs/single-orchestrator-architecture.md` — orchestrator design
+- `docs/production-readiness/runbook.md` — operational runbook
 
 ## Structure
 
 - `apps/web`: React + TypeScript + Vite frontend with Tailwind CSS
 - `apps/api`: FastAPI backend
 - `packages/shared-schema`: Shared TypeScript contracts
-- `services/ingestion`: Placeholder for document ingestion pipeline
+- `services/ingestion`: Source-seeding helpers and local documents for the ingestion pipeline
 
 ## Quick Start
 
@@ -272,7 +148,7 @@ The production beta foundation is in place. The next narrow sprint should valida
 5. Optional: from the repo root, copy `.env.example` to `.env` if you want persistent local settings
 6. `uvicorn app.main:app --reload --port 8000`
 
-The default backend provider mode runs without WatsonX credentials:
+The default backend provider mode needs no AI credentials at all:
 
 - `AI_PROVIDER=deterministic`
 - `RAG_PROVIDER=source_registry`
@@ -283,36 +159,43 @@ Set environment variables before starting the API when needed:
 
 - `GOOGLE_MAPS_API_KEY`: required Google Maps API key with Geocoding and Places enabled
 - `GOOGLE_MAPS_TIMEOUT_SECONDS`: optional timeout (default `8`)
-- `DATABASE_URL`: optional SQLAlchemy-compatible database URL. Render staging and production must set this to Postgres.
+- `DATABASE_URL`: optional SQLAlchemy-compatible database URL. Staging and production must set this to Postgres.
 - `ZONING_DB_PATH`: optional SQLite database path for local fallback only (default `apps/api/app/data/app.sqlite3`)
-- `BETA_ACCESS_KEY`: optional private beta key; when set, every `/api/v1/*` request must include `X-Beta-Access-Key`
-- `BETA_ACCESS_KEYS`: optional rotatable beta keys as comma-separated `label:key` pairs, for example `alice:invite-one,bob:invite-two`. These work alongside `BETA_ACCESS_KEY`.
+- `AUTH_PROVIDER`: `supabase` to require Supabase JWT auth, or unset/`disabled` for local development
+- `AUTH_REQUIRED`: when `true`, every `/api/v1/*` request needs a valid bearer token
+- `SUPABASE_PROJECT_URL`: Supabase project URL; also used to verify the JWT issuer and fetch JWKS for ES256 tokens
+- `SUPABASE_ANON_KEY`: sent as the `apikey` header when fetching JWKS
+- `SUPABASE_JWT_SECRET`: fallback for HS256 tokens; ES256 (the current default) does not need it
 - `ADMIN_ACCESS_KEY`: optional source-admin key. When set, `POST /api/v1/ingestion/sources`, `POST /api/v1/ingestion/reindex`, and `POST /api/v1/ingestion/import-local-docs` require `X-Admin-Access-Key`.
-- `AI_PROVIDER`: optional analysis provider (`deterministic`, `openai`, `local`, or `watsonx`, default `deterministic`)
-- `RAG_PROVIDER`: optional retrieval provider (`source_registry`, `hybrid_local`, or `watsonx`, default `source_registry`)
-- `EMBEDDING_PROVIDER`: optional embedding provider (`none`, `local`, or `openai`, default `none`)
+- `ADMIN_USER_EMAILS`: comma-separated emails granted the `admin` role on login
+- `AI_PROVIDER`: optional analysis provider (`deterministic`, `openai`, `groq`, `cerebras`, `openrouter`, or `local`, default `deterministic`)
+- `AI_PROVIDER_FALLBACKS`: optional ordered comma-separated fallback providers tried when the primary fails, for example `cerebras,openrouter`. Empty disables failover.
+- `RAG_PROVIDER`: optional retrieval provider (`source_registry` or `hybrid_local`, default `source_registry`)
+- `EMBEDDING_PROVIDER`: optional embedding provider (`none`, `local`, `openai`, or `gemini`, default `none`)
 - `EMBEDDING_MODEL`: model name used when `EMBEDDING_PROVIDER=openai`
-- `VECTOR_PROVIDER`: optional vector index provider (`none` or `chroma`, default `none`; use `chroma` with `RAG_PROVIDER=hybrid_local`)
-- `CHROMA_PATH`: embedded ChromaDB persistence path (default `apps/api/app/data/chroma`)
-- `CHROMA_COLLECTION`: Chroma collection name (default `zoning_source_chunks`)
-- `CHROMA_RESET_ON_REINDEX`: whether `/ingestion/reindex` should reset the Chroma collection before upsert (default `false`)
+- `VECTOR_PROVIDER`: optional vector index provider (`none` or `qdrant`, default `none`; use `qdrant` with `RAG_PROVIDER=hybrid_local`)
+- `QDRANT_URL`: Qdrant cluster URL, required when `VECTOR_PROVIDER=qdrant`
+- `QDRANT_API_KEY`: Qdrant API key
+- `QDRANT_COLLECTION`: Qdrant collection name (default `zoning_source_chunks`)
+- `STARTUP_REINDEX_ENABLED`: whether to warm/repair the source index during API startup. Must stay `false` in production — re-embedding the corpus at boot blocks the platform port scan.
+- `GROQ_API_KEY`: required when `AI_PROVIDER=groq`
+- `GROQ_MODEL`: model name used when `AI_PROVIDER=groq` (default `llama-3.3-70b-versatile`)
+- `GEMINI_API_KEY`: required when `EMBEDDING_PROVIDER=gemini`
+- `GEMINI_EMBEDDING_MODEL`: embedding model used when `EMBEDDING_PROVIDER=gemini` (default `gemini-embedding-001`)
 - `OPENAI_API_KEY`: required when `AI_PROVIDER=openai` or `EMBEDDING_PROVIDER=openai`
 - `OPENAI_MODEL`: model name used when `AI_PROVIDER=openai`
 - `OPENAI_BASE_URL`: optional OpenAI-compatible API base URL
 - `OPENAI_TIMEOUT_SECONDS`: optional timeout for OpenAI HTTP calls
+- `CEREBRAS_API_KEY` / `OPENROUTER_API_KEY`: required to activate those providers, whether as primary or as a fallback
+- `LOCAL_MODEL_BASE_URL`, `LOCAL_MODEL_NAME`, `LOCAL_MODEL_TIMEOUT_SECONDS`: used when `AI_PROVIDER=local` against an OpenAI-compatible server such as Ollama, vLLM, or LM Studio
+- `BURST_LLM_LIMIT_PER_MIN`: per-IP burst limit on the expensive intake/analyze endpoints
+- `DAILY_ANALYSIS_LIMIT_FREE` / `DAILY_ANALYSIS_LIMIT_PRO`: per-user daily analysis caps by subscription tier
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_PRO`, `STRIPE_SUCCESS_URL`, `STRIPE_CANCEL_URL`: subscription billing. Leave empty to keep billing inert.
+- `SENTRY_DSN`: optional backend error reporting
 - `GOOGLE_DISTRICT_KEYWORD_MAP`: optional JSON mapping used when district cannot be inferred from components, example:
   - `{"downtown":"mixed-use-core","industrial":"industrial-zone"}`
-- `IBM_ZONING_DB_PATH`: legacy local fallback for `ZONING_DB_PATH` during migration
-- `WATSONX_ENABLED`: legacy compatibility flag that selects WatsonX providers when set to a truthy value; prefer `AI_PROVIDER` and `RAG_PROVIDER` for new setup
-- `WATSONX_API_KEY`: required when `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`
-- `WATSONX_URL`: required when `AI_PROVIDER=watsonx` (example `https://us-south.ml.cloud.ibm.com`)
-- `WATSONX_PLATFORM_URL`: optional IBM Cloud IAM URL override for WatsonX retrieval
-- `WATSONX_PROJECT_ID`: required when `AI_PROVIDER=watsonx` or `RAG_PROVIDER=watsonx`
-- `WATSONX_VECTOR_INDEX_ID`: required when `RAG_PROVIDER=watsonx`
-- `WATSONX_MODEL_ID`: required when `AI_PROVIDER=watsonx`
-- `WATSONX_TIMEOUT_SECONDS`: optional timeout for IAM + inference (default `20`)
-- `WATSONX_MAX_ATTEMPTS`: optional retry attempts for WatsonX HTTP calls (default `3`)
-- `WATSONX_RETRY_DELAY_SECONDS`: optional backoff base delay for WatsonX retries (default `0.6`)
+- `IBM_ZONING_DB_PATH`: legacy local fallback for `ZONING_DB_PATH`, still read but deprecated
+
 
 `.env` loading:
 
@@ -342,10 +225,10 @@ Analysis behavior:
 
 - If no provider variables are set, analysis uses deterministic local logic and retrieval uses the source registry.
 - If `AI_PROVIDER=openai`, analysis attempts an OpenAI Responses API structured-output call.
-- If `RAG_PROVIDER=hybrid_local`, retrieval ranks indexed chunks with metadata filters, keyword overlap, and Chroma vectors when `VECTOR_PROVIDER=chroma`.
-- If `AI_PROVIDER=watsonx`, analysis attempts watsonx model inference.
-- If `RAG_PROVIDER=watsonx`, retrieval attempts the WatsonX vector index.
-- If watsonx call fails, backend falls back to deterministic analysis and records a warning.
+- If `AI_PROVIDER=groq`, analysis calls Groq's OpenAI-compatible endpoint, retrying rate limits with backoff before giving up.
+- If `RAG_PROVIDER=hybrid_local`, retrieval ranks indexed chunks with metadata filters, keyword overlap, and vector search when `VECTOR_PROVIDER=qdrant`.
+- If the analysis provider fails and `AI_PROVIDER_FALLBACKS` is set, each fallback provider is tried in order.
+- If every analysis provider fails, the backend falls back to deterministic analysis and records a warning rather than failing the request.
 - If retrieval returns no citations, the backend returns an `unknown` or low-confidence result and recommends human planning review.
 - `POST /api/v1/projects/{project_id}/analyze` also accepts `clarification_answers`, allowing the frontend to pause for follow-up questions and re-run the orchestration with added user detail.
 
@@ -356,73 +239,65 @@ Run backend tests:
 
 Frontend expects backend at `http://localhost:8000`.
 
-## Production Beta Runbook
+## Production Runbook
 
-Current detailed handoff: `docs/production-beta-hardening/handoff.md`
+Detailed operational docs: `docs/production-readiness/runbook.md`.
 
-Target beta shape:
+Deployment shape:
 
 - Vercel hosts the Vite frontend.
-- Render hosts the FastAPI backend from `apps/api/Dockerfile`.
-- Render staging and production use Postgres through `DATABASE_URL`.
-- The current free staging database is Supabase project `tzstkgifmftqcdguhshn` in `us-east-2`.
-- `ZONING_DB_PATH` is local fallback only and should not be set on Render.
-- Private beta access is enforced by `BETA_ACCESS_KEY` and/or labeled entries in `BETA_ACCESS_KEYS`.
-- Admin source writes can be separated from tester access with `ADMIN_ACCESS_KEY`; source status/list remain available to beta testers.
+- Render hosts the FastAPI backend from `apps/api/Dockerfile`, defined declaratively in `render.yaml`.
+- Render Postgres (`zoning-agent-db`) is the source of truth, reached over Render's private network so
+  API-to-database traffic is never metered as egress.
+- Supabase is retained for Auth only.
+- `ZONING_DB_PATH` is local fallback only and must not be set on Render.
+- User auth is Supabase JWT. `ADMIN_ACCESS_KEY` separately gates source write/import/reindex routes.
 
 Current deployed targets:
 
 - Frontend: `https://zoning-agent-platform.vercel.app`
 - API: `https://zoning-agent-api.onrender.com`
 
-### Free Staging Database
-
-Use the Supabase session pooler connection string for Render because it works over IPv4 for a persistent web service. Keep the password only in the Supabase and Render dashboards:
-
-```text
-postgresql://postgres.tzstkgifmftqcdguhshn:[PASSWORD]@aws-1-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require
-```
-
-If SQLAlchemy receives a `postgres://` URL, the API normalizes it to `postgresql+psycopg://` internally. Do not commit the real password or a full secret connection string. If the Supabase database password is exposed or shared too broadly, rotate it in Supabase and immediately update Render's `DATABASE_URL`.
-
-Free Supabase staging is for pre-user validation only. Before inviting real testers or storing real beta data, move production to a paid database plan with backups/retention and a documented restore path.
-
 ### Deploy API to Render
 
-1. Create or update the Render Web Service from this repo.
-2. Use Docker deployment with root directory `apps/api`.
-3. Do not mount or depend on a Render disk for database persistence.
-4. Set health check path to `/health`.
-5. Set API environment variables:
-   - `DATABASE_URL=<Supabase session pooler URL with password from dashboard>`
-   - `CORS_ALLOW_ORIGINS=https://zoning-agent-platform.vercel.app`
-   - `BETA_ACCESS_KEY=<long random beta key>`
-   - `BETA_ACCESS_KEYS=<label:key,label2:key2>` for additional tester keys, if needed
-   - `ADMIN_ACCESS_KEY=<long random admin key>` before exposing Source Admin write actions
-   - `GOOGLE_MAPS_API_KEY=<restricted server key>`
-   - `AI_PROVIDER=deterministic`
-   - `RAG_PROVIDER=hybrid_local`
-   - `EMBEDDING_PROVIDER=local`
-6. Leave `ZONING_DB_PATH`, `OPENAI_*`, and `WATSONX_*` unset unless intentionally testing local fallback or those providers.
-7. Apply database migrations before or during the first deploy:
+Render is blueprint-synced: `render.yaml` is the source of truth and a sync resets dashboard drift.
+Change service or environment configuration there, not in the dashboard, except for secrets — those
+are declared with `sync: false` (name only, no value) and pasted into the dashboard.
+
+Note that saving an environment variable in the Render dashboard does **not** trigger a deploy on its
+own. Deploy afterward for the change to take effect.
+
+Production provider configuration lives in `render.yaml`:
+
+- `AI_PROVIDER=groq` with `AI_PROVIDER_FALLBACKS=cerebras,openrouter`
+- `RAG_PROVIDER=hybrid_local`
+- `EMBEDDING_PROVIDER=gemini`
+- `VECTOR_PROVIDER=qdrant`
+- `STARTUP_REINDEX_ENABLED=false` — reindexing is an explicit admin action via
+  `POST /api/v1/ingestion/reindex`, never a boot-time task. Re-embedding the corpus during startup
+  blocks the lifespan long enough for Render's port scan to time out.
+
+Secrets pasted in the dashboard: `DATABASE_URL` is wired automatically from the database resource;
+`GROQ_API_KEY`, `GEMINI_API_KEY`, `QDRANT_URL`, `QDRANT_API_KEY`, `GOOGLE_MAPS_API_KEY`,
+`SUPABASE_*`, `ADMIN_ACCESS_KEY`, `STRIPE_*`, and `SENTRY_DSN`.
+
+If a database password contains reserved URL characters such as `@`, `:`, `/`, `?`, or `#`,
+percent-encode them in `DATABASE_URL` — `@` becomes `%40`. Otherwise the driver parses part of the
+password as the host. If SQLAlchemy receives a `postgres://` URL, the API normalizes it to
+`postgresql+psycopg://` internally. Never commit a real password or full connection string.
+
+The Docker image runs `alembic upgrade head` before starting Uvicorn, so migrations apply on deploy.
+To run them manually against a target database:
 
 ```powershell
 cd apps/api
-$env:DATABASE_URL="postgresql://postgres.tzstkgifmftqcdguhshn:[PASSWORD]@aws-1-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require"
+$env:DATABASE_URL="<connection string from the dashboard>"
 alembic upgrade head
 ```
 
-Restrict the Google Maps key in Google Cloud to the Geocoding and Places APIs. Keep production CORS locked to `https://zoning-agent-platform.vercel.app`.
+Restrict the Google Maps key in Google Cloud to the Geocoding and Places APIs. Keep production CORS
+locked to `https://zoning-agent-platform.vercel.app`.
 
-### Paid Production Switch
-
-Before real users are onboarded:
-
-1. Upgrade the web service plan if free-service cold starts are no longer acceptable.
-2. Move the production database to a paid Supabase or Render Postgres plan with backups enabled.
-3. Rotate the database password during the cutover and update only the Render dashboard `DATABASE_URL`.
-4. Run `alembic upgrade head` against the paid production database.
-5. Keep staging and production on separate database projects or instances.
 
 ### Deploy Web to Vercel
 
@@ -436,11 +311,14 @@ Production builds should set the deployed API URL explicitly:
 
 - `VITE_API_URL=https://your-render-api.onrender.com`
 
-Public beta builds should use Supabase Auth instead of the legacy beta gate:
+Auth is Supabase, so builds also need:
 
-- `VITE_AUTH_MODE=supabase`
 - `VITE_SUPABASE_URL=<Supabase project URL>`
 - `VITE_SUPABASE_ANON_KEY=<Supabase anon key>`
+
+Optional: `VITE_SENTRY_DSN` for frontend error reporting.
+
+These are inlined at build time, so changing any `VITE_*` value requires a redeploy to take effect.
 
 To avoid browser CORS failures, set this variable in the API host after Vercel gives you a deployment URL:
 
@@ -448,7 +326,7 @@ To avoid browser CORS failures, set this variable in the API host after Vercel g
 
 ### Deployed API Smoke Test
 
-Run the public-beta smoke scripts after Render deploys, database migrations, or source registry changes. They use only redacted tokens and should never print secrets.
+Run the smoke scripts after Render deploys, database migrations, or source registry changes. They use only redacted tokens and should never print secrets.
 
 ```powershell
 $env:PUBLIC_BASE_API_URL="https://zoning-agent-api.onrender.com"
@@ -471,9 +349,9 @@ The script verifies:
 - feedback can be submitted
 - unsupported-jurisdiction intake is distinguishable from supported intake
 
-The supported and unsupported address values should be harmless non-user test addresses; do not use real customer data. Keep `scripts/smoke_beta_api.py` only for temporary legacy QA while beta keys still exist.
+The supported and unsupported address values should be harmless non-user test addresses; do not use real customer data.
 
-### Launch Checklist
+### Release Checklist
 
 1. Confirm GitHub Actions CI is green.
 2. Deploy the API and confirm `GET /health` and `GET /ready` return healthy JSON.

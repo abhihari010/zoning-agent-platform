@@ -11,6 +11,6 @@ deploy details, see `docs/single-orchestrator-architecture.md` and
 
 | File | What it is | Status |
 |---|---|---|
-| `agent-agnostic-zoning-platform-spec.md` | Original spec to convert the inherited IBM watsonx assistant into a provider-agnostic platform. Explains *why* the orchestrator is provider-agnostic. | Shipped (watsonx now legacy; deterministic/Groq are the active providers). |
+| `agent-agnostic-zoning-platform-spec.md` | Original spec to convert the inherited IBM watsonx assistant into a provider-agnostic platform. Explains *why* the orchestrator is provider-agnostic. | Shipped. The watsonx adapter has since been deleted entirely; deterministic and Groq are the active providers. |
 | `production-beta-hardening-spec.md` | Spec behind the production-readiness push: Postgres persistence, migrations, source coverage, beta access, free→paid path. | Shipped. |
 | `jurisdiction-rag-expansion-plan.md` | Detailed plan for scaling from regional to broad US jurisdiction coverage without dumping unverified national docs into one vector store. | Partially executed; **still relevant** to the active expansion phase — cross-check against `docs/handoff-nationwide-expansion.md` (the living roadmap) before relying on specifics. |
