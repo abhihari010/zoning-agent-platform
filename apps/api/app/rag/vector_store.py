@@ -191,14 +191,20 @@ class QdrantVectorStore:
 
         Used to make reindexing incremental: a chunk_id encodes its source's
         content hash, so an unchanged source keeps the same id and can be
-        skipped instead of re-embedded. Returns an empty set if the collection
-        does not exist yet (nothing has been indexed), so callers treat a fresh
-        collection as "embed everything".
+        skipped instead of re-embedded.
+
+        A collection that does not exist yet legitimately means "nothing indexed",
+        and returns an empty set so callers embed everything. Every other failure
+        -- an unreachable host, a rejected api key, a missing qdrant-client --
+        must raise. Reporting "nothing is indexed" when we simply could not look
+        turns an incremental reindex into a full re-embed of the entire corpus at
+        full cost, and it does so silently. Callers that want to degrade already
+        catch this (see ``sync_vector_index``).
         """
-        try:
-            return set(self._scroll_all_chunk_ids())
-        except Exception:
+        client = self._get_client()
+        if not client.collection_exists(self.collection_name):
             return set()
+        return set(self._scroll_all_chunk_ids())
 
     def _scroll_all_chunk_ids(self) -> list[str]:
         client = self._get_client()
