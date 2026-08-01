@@ -1,0 +1,687 @@
+{
+  "schema_version": "source-pack/v1",
+  "jurisdiction": {
+    "jurisdiction_id": "goodlettsville-tn",
+    "name": "Goodlettsville, TN",
+    "coverage_status": "source_indexed",
+    "state": "TN",
+    "state_fips": "47",
+    "county_fips": "TODO_COUNTY_FIPS",
+    "place_fips": "TODO_PLACE_FIPS",
+    "jurisdiction_type": "municipality",
+    "parent_jurisdiction_id": null,
+    "county_name": null,
+    "official_source_urls": [
+      "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": null,
+    "planning_contact": {
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances"
+    }
+  },
+  "verification_notes": "WS1 scraped source pack generated on 2026-07-31 (25 ordinance section(s)). Coverage status is 'source_indexed'; promote to public_supported only after district mapping and golden QA pass. Fetcher: municode.",
+  "sources": [
+    {
+      "source_id": "goodlettsville-tn-sec-14-101",
+      "title": "Sec. 14-101. - Creation and membership.",
+      "excerpt": "Pursuant to the provisions of T.C.A. § 13-4-101, there is hereby created a municipal planning commission, hereinafter re",
+      "section_ref": "Sec. 14-101",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1MUPLCO_S14-101CRME",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1MUPLCO_S14-101CRME",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-102",
+      "title": "Sec. 14-102. - Organization, powers, duties, etc.",
+      "excerpt": "The planning commission shall be organized and shall carry out its powers, functions, and duties in accordance with all ",
+      "section_ref": "Sec. 14-102",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1MUPLCO_S14-102ORPODUET",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1MUPLCO_S14-102ORPODUET",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-201",
+      "title": "Sec. 14-201. - Provisions relating to construction of language and definitions.",
+      "excerpt": "(1) Intent and purpose. This title is enacted pursuant to T.C.A. tit. 13 for the following purposes: (a) To promote and  [...] s to which buildings or structures shall conform; (h) To prohibit uses, buildings or structures which are incompatible with the character of development or the permitted uses within specified zoning districts; (i) To prevent such additions to, and alterations or remodeling of, existing buildings or structures as would not comply wit [...] ch are not designed or used as sales, display, storage, service, or production areas. Floor area ratio means the total floor area on a zone lot, divided by the lot area of that zone lot. (For example, a building containing 20,000 square feet of floor area on a zone lot of 10,000 square feet has a floor area ratio of 2.0.) Food tr [...] Width of a lot shall be considered to be the distance along a straight line connecting the side lots lines measured across the lot at the point of the required front yard setback. Lot of record means a lot which is part of a subdivision recorded in the office of the county recorder, or a lot or parcel described by metes and bounds, the  [...]  primary function of an establishment, institution, household, or other entity. Required yard means that portion of a zone lot that is required by the specific district regulations to be open from the ground to the sky and may contain only explicitly listed obstructions. Residence means a building or part of a building containing one or m [...] of this title: Yard, front means extending along the full length of a front lot line. In the case of a corner lot, a yard of at least full depth required for a front yard in these regulations, and extending along the full length of a street line shall also be established. Each lot shall have a designated front yard. Yard, rear means an open space, except for permitted accessory structures, extending for the full length of a rear lot line. Yard, side means an open unoccupi",
+      "section_ref": "Sec. 14-201",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-201PRRECOLADE",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-201PRRECOLADE",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-202",
+      "title": "Sec. 14-202. - Use classification.",
+      "excerpt": "(1) General classification rules. The provisions of this chapter shall be known as the use classifications. The purpose  [...] ts, no above-ground storage tank, container or vessel in which flammable or combustible liquids or gases are kept may be located in any required front, rear or side yard. Further, the location, construction and installation of all such tanks, containers or vessels must meet the provisions of the International Building Code and  [...] tate. The following dwelling types as defined by this title are permanent residential activities, however, only those dwelling types as indicated by individual district regulations may be permitted therein. (i) Dwelling, attached. (ii) Dwelling, one-family detached. (iii) Dwelling, two-family detached. (iv) Dwelling, semi-detached. (v) Dw [...] as defined by this title are considered as semi-permanent residential activities, however, only those dwelling or rooming unit types as indicated by individual district regulations may be permitted therein. (i) Apartment hotel. (ii) Boarding or rooming house. (iii) Residential hotel. (6) Community facility activities. (a) Administrative s",
+      "section_ref": "Sec. 14-202",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-202USCL",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-202USCL",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-203",
+      "title": "Sec. 14-203. - Application of regulations.",
+      "excerpt": "(1) Application. No structure shall be constructed, erected, placed or maintained and no land use commenced or continued",
+      "section_ref": "Sec. 14-203",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-203APRE",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-203APRE",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-204",
+      "title": "Sec. 14-204. - Establishment of districts and provisions for official zoning map.",
+      "excerpt": "(1) Establishment of districts. (a) Regular districts. In order to implement all purposes and provisions of this title, the following districts are hereby established: (i) Residential districts: A—Agricultural district R-40—Low density residential district R-25—Low density residential district R-15—Medium density residential [...] ercial core district CG—C (1) Establishment of districts. (a) Regular districts. In order to implement all purposes and provisions of this title, the following districts are hereby established: (i) Residential districts: A—Agricultural district R-40—Low density residential district R-25—Low density residential district R-15—Medium density residential",
+      "section_ref": "Sec. 14-204",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-204ESDIPROFZOMA",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-204ESDIPROFZOMA",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-205",
+      "title": "Sec. 14-205. - Residential district regulations.",
+      "excerpt": "(1) Statement of purpose. The residential districts established in this title are designed to promote and protect the he [...] tures indicated herein may be permitted within the various residential districts only in the manner and subject to any specific design criteria that apply. (a) Uses permitted: (i) Principal permitted uses. Principal permitted uses for all residential districts are listed in table I, the land use activity matrix, as presented in appe [...] which do not comply with one or more of the applicable bulk regulations are classified as noncomplying and are subject to the provisions of section 14-212. (a) Minimum lot size. Within all residential districts, the minimum size lot and width of lot (measured at the building line) used for residential purposes shall be as established  [...] dix A. (f) Yard regulations. Within all residential districts, the minimum yard regulations established in table II as presented in appendix A shall apply. (g) Minimum lot area coverage. Within the residential districts, the principal building shall meet the minimum lot area coverage as indicated: R40 1,500 square feet; 1,100 square feet for 1st floor of 2 story plus 2 car attached garage R25 1,325 square feet; 1,100 square feet fo",
+      "section_ref": "Sec. 14-205",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-205REDIRE",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-205REDIRE",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-206",
+      "title": "Sec. 14-206. - Commercial district regulations.",
+      "excerpt": "(1) Statement of purpose. The commercial districts established in this title are designed to promote and protect the hea [...] rict is designed to provide a low intensity commercial area for appropriate locations and a transitional zone between residential and intense commercial areas. Permitted uses are those which tend to attract small numbers of people and generate lower volumes of traffic. Less building bulk is permitted and more open space is required. [...] and buildings or other structures located on any zone lot or portion of a zone lot including all new development, enlargements, extensions, or conversions. (a) Minimum lot size. Within all commercial districts, the minimum size lot and width of lot (measured at the building line) used for commercial purposes shall be as established in [...] dix A. (e) Yard regulations. Within all commercial districts, the minimum yard regulations established in table III as presented in appendix A shall apply. The minimum lot width may be reduced 25 feet for lots in the CS, CSL, CG zoning districts when the lot includes adjacent access easements with the dimension of the easement located  [...] lots. (5) Other regulations. The following regulations are supplementary and apply as indicated. (a) Special provisions applying to required yards and building setbacks along district boundaries coincident with side and rear lot line of zone lot in any residential district. In all commercial districts, along such portion of t [...] ich coincides with a lot line of a zone lot in any residential district the following yard provisions shall apply. (i) Special front setback. Regardless of the front yard provisions established for any commercial district, no building located on any zone lot adjacent to any residential district with frontage on the same street s [...] cated within 100 feet of the lot whereon the commercial activity is located; provided that no building shall be required to setback more than twice the minimum front yard applicable within the commercial district. (ii) Special side and rear yards. Along all portions of the boundary of any commercial zone lot where such lot abuts [...] ial zoned properties including commercial planned unit developments within the defined interstate sign districts. The planning commission may approve increased building height not exceeding seven stories for properties within the defined interstate sign districts and the planning commission may extend the increased building story hei [...]  one bedroom units 800 square feet Two bedroom units 1,000 square feet Three or more bedroom units 1,200 square feet (c) Bulk, lot and open space requirements. Minimum lot area 10,000 square feet Minimum street frontage 100 feet Minimum front setback 15 feet Minimum side setback 15 feet Minimum rear setback 10 feet Maximum lot coverag [...] re ground floor building area (except for access to the upper levels) is only for the non-residential/commercial use. The residential density is permitted at a maximum density of 15 residential units per acre. The permitted residential use shall only be within a principal building including a ground floor non-residential/commercial u",
+      "section_ref": "Sec. 14-206",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-206CODIRE",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-206CODIRE",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-207",
+      "title": "Sec. 14-207. - Industrial district regulations.",
+      "excerpt": "(1) Statement of purpose. The industrial districts established by this title are designed to provide sufficient space, i [...] structures indicated herein may be permitted within the various commercial districts only in manner and subject to any specific design criteria that apply. (a) Uses permitted. (i) Principal permitted uses. Principal permitted uses for both industrial districts are listed in table I as presented in appendix A. Additionally, adult-ori [...] d buildings or other structures, located on any zone lot or portion of a zone lot including all new developments, enlargements, extensions, or conversions. (a) Minimum lot size. Within all industrial districts, the minimum size lot and width of lot (measured at the street line) used for permitted purposes shall be as established in ta [...] pply. (5) Other regulations. The following regulations are supplementary and apply as indicated: (a) Special provisions applying to required yards and building setbacks along district boundaries coincident with side or rear lot line of zone lot in any residential district. In all industrial districts, along such portion of th [...]  zone lot in any residential district or in a PUD, OP, or CSL district, the following yard provisions shall apply: (i) Special front setback. Regardless of the front yard provisions established for any industrial district, no building located on any zone lot adjacent to any residential, PUD, OP, or CSL district with frontage on  [...] cated within 100 feet of the lot whereon the industrial activity is located; provided that no building shall be required to setback more than twice the minimum front yard applicable within the commercial district. (ii) Special side and rear yards. Along all portions of the boundary of any industrial zoned lot were such lot abuts or is contiguous to a side or rear yard of any residential, PUD, OP. or CSL, zone lot, the minimum yards within the industrial district shall generally conform to the respective yard requirements for the adjoining other district. However, in no instance shall any rear or side yard required herein have a minimum width or depth of less than ten feet. (iii) Buffer yards. Along all portions of the boundary of any industrial zone lot where such lot abuts or is contiguous to any ",
+      "section_ref": "Sec. 14-207",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-207INDIRE",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-207INDIRE",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-208",
+      "title": "Sec. 14-208. - Supplementary district regulations.",
+      "excerpt": "(1) Regulations applicable to all districts. (a) Visibility at intersections. On a corner lot in any district nothing sh [...] ry building if the accessory building(s) or structure is constructed entirely behind and separate from the primary building and is constructed per the building setbacks of the zoning district. The primary exterior wall and roof materials of the principal building shall be extended on all sides of the exterior walls and roof o [...] ny two buildings on any single zone lot shall be as provided in this section, except that these provisions do not apply to space between a building enclosing a principal permitted use and a garage or other unoccupied building accessory thereto. (i) Minimum distance between buildings. Within the districts as permitted, two or more buildin [...] ved onto a lot occupied by a house. (ii) Minimum required yard area. Regardless of the orientation of buildings, no less than the minimum yards required by the district regulations in which such development is located shall be maintained along the outer boundaries of the zone lot. (iii) Minimum distance between windows and side or rear lo [...] pertaining to bulk, yards, open space, and parking and loading requirements of the district in which they are located. (g) Exception to height regulations. The height limitation contained in the district regulations do not apply to spires, belfries, cupolas, antennas, water tanks, ventilators, chimneys, or other appurtenances usua [...] provements which has been approved by the Goodlettsville Municipal/Regional Planning Commission and will be in private ownership and control in perpetuity. (i) Rear yard abutting a public street. When the rear yard of a lot abuts a public street, all structures built in that rear yard shall observe the same setback from the street line, center line of the street, or property line, as required for adjacent properties which front on that stree [...] ee acres in area or has less than 15 mobile home spaces. (iii) Density. The number of mobile homes permitted within any mobile home park shall not exceed seven units per acre. Along the entire periphery of a mobile home park, yards shall be provided as follows: Front 40 feet Side 30 feet Rear 40 feet (iv) Yards. Along the entire per [...] n walk system. A common walk system shall be provided and maintained between locations where pedestrian traffic is concentrated. Such common walks shall have a minimum width of four feet. (iii) Individual walks. All mobile home stands shall be connected to common walks, streets, driveways and parking spaces by individual walks. Suc [...] ays and parking areas shall be paved with either asphalt or concrete where a majority of the other housing units on the same street are so paved. (C) Lots. The minimum lot size required for any such dwelling unit shall be as stipulated by the development area per dwelling unit as provided in each respective district. (D) Parking. (1) ",
+      "section_ref": "Sec. 14-208",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-208SUDIRE",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-208SUDIRE",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-209",
+      "title": "Sec. 14-209. - Floodplain districts.",
+      "excerpt": "(1) Statutory authorization, findings of fact, purpose and objectives. (a) Statutory Authorization. The Legislature of t [...] are occasions. Flood heights may be increased by man-made or natural causes. This section does not imply that land outside the areas of special flood hazard or uses permitted within such areas will be free from flooding or flood damages. This section shall not create liability on the part of the City of Goodlettsville, Tennessee or ",
+      "section_ref": "Sec. 14-209",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-209FLDI",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-209FLDI",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-210",
+      "title": "Sec. 14-210. - Planned unit development district regulations.",
+      "excerpt": "(1) Purpose. These districts are designed to promote flexibility in design and permit planned diversification in the loc [...] , and open space regulations. (i) Low density residential planned unit development. The maximum overall density shall be 1.7 dwelling units per gross acre. The minimum lot size shall be 15,000 square feet. The remaining area shall be left as common open space and used for the designated purposes. The minimum yard requirements for each lot are as follows: Minimum front yard 30 feet. Minimum side yard ten feet. Minimum rear yard 20 feet. Minimum open space ten percent. The Goodlettsville Municipal/Regional Planning Commission may consider a request to vary the minimum lot size, and side yard requirements based upon characteristics of the lot, type of house and building footprint with the minimum separation between buildings shall be 15 feet. (ii) Medium density residential planned unit development. The maximum overall density shall be three dwelling units per acre. The minimum lot size and setbacks shall be established by the preliminary and final master plans based on the purpose and characteristics of the PUD and the area in which it is proposed to be  [...] herein. (C) Yard requirements are waived and the following minimum controls shall be applied: Maximum density 7/acre and minimum open space 25 percent. Maximum building height three stories. (D) The Goodlettsville Municipal/Regional Planning Commission and City Commission may authorize a high density residential planned unit developm [...] reen screen along the perimeter of the wall or fence. Planning commission may review landscaping only screens when the available clear buffer width exceeds the minimum width. The minimum height of the wall, fence, evergreen planting screen height to be a minimum of eight feet and maximum height of 12 feet. Project buffers along pro",
+      "section_ref": "Sec. 14-210",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-210PLUNDEDIRE",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-210PLUNDEDIRE",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-211",
+      "title": "Sec. 14-211. - Performance standards.",
+      "excerpt": "(1) Purpose and intent. The purpose of this section is to establish regulations and standards for the installation and o",
+      "section_ref": "Sec. 14-211",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-211PEST",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-211PEST",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-212",
+      "title": "Sec. 14-212. - Provisions governing nonconforming uses and noncomplying buildings or other structures.",
+      "excerpt": "(1) Nonconforming uses. The provisions of this section are applicable to all uses which are not permitted within the dis [...] en made: (A) In order to comply with requirements of law regarding fire protection, safety of the structure, etc., or (B) In order to conform to the applicable district regulations or performance standards. (iii) Alteration of commercial and industrial uses. Any commercial or industrial use subject to the provisions of this section shall ",
+      "section_ref": "Sec. 14-212",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-212PRGONOUSNOBUOTST",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-212PRGONOUSNOBUOTST",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-213",
+      "title": "Sec. 14-213. - Administration and enforcement.",
+      "excerpt": "(1) Organization and purpose. The administration and enforcement of this title is hereby vested in the following offices [...] reet. Locations shall be limited to collector or arterial streets specified on the official major thoroughfare plan. (iii) In commercial districts the side and rear yard requirements of the adjoining residential district, which has the highest standards shall apply. (iv) A fenced outdoor play area shall be provided of at least  [...] one lot unless it contains twice the lot area requirements of the districts; provided, however, that if such community assembly includes outdoor activities the minimum lot area shall be four acres. (B) All bulk regulations of the zone district shall apply. (C) Off-street parking: (1) For non-profit clubs, lodges, meeting halls and rec [...] s substation, a sewer or water pump station or a water storage tank, the following conditions shall apply: (A) All such facilities shall have a minimum 50 feet setback line from any public street or residential lot line. (B) Buffer yard 2 shall be provided around the perimeter of the site on which the facility is proposed to be located. (viii) Special conditions for health care. (A) Minimum lot area. (1) No health clinic shall be permitted on a zone lot unless it contains 10,000 square feet, or twice the lot area requirements of the district, whichever is  [...]  ten percent of the area of the park or one acre whichever is smaller; (C) Such campground shall meet the following standards: (1) Minimum size: Ten acres. (2) Maximum density: Ten campsites per gross acre. (3) Sanitary facilities, including flush toilets and showers: Within 300 feet walking distance of each campsite. (4) Portable wa [...] . (A) This shall apply to the keeping of farm animals only, provided however, that hog pens and game roosters and/or fighting roosters shall be prohibited. (B) Minimum lot size shall be five acres for keeping, raising, or grazing horses, cattle, goats, sheep, or chickens. (C) This shall not be construed to include any kind of feed lot [...] constructed per the requirements of the zoning ordinance accessory building requirements regarding location, maximum floor area ratio and lot coverage, maximum building height; and (6) The accessory guest buildings units shall be constructed to be consistent with the wall and roof materials of the primary single family dwelling unit;",
+      "section_ref": "Sec. 14-213",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-213ADEN",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-213ADEN",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-214",
+      "title": "Sec. 14-214. - Legal status provisions.",
+      "excerpt": "(1) Interpretation. In their interpretation and application, the provisions of this section shall be held to the minimum",
+      "section_ref": "Sec. 14-214",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-214LESTPR",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-214LESTPR",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-301",
+      "title": "Sec. 14-301. - Purpose and scope.",
+      "excerpt": "(1) Legislative purpose. The purpose of these regulations is to promote the well-being of the community by establishing ",
+      "section_ref": "Sec. 14-301",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3SIRE_S14-301PUSC",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3SIRE_S14-301PUSC",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-302",
+      "title": "Sec. 14-302. - Definitions.",
+      "excerpt": "For the purpose of this chapter the following definitions, terms, phrases, words, and their derivation shall have the me",
+      "section_ref": "Sec. 14-302",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3SIRE_S14-302DE",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3SIRE_S14-302DE",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-303",
+      "title": "Sec. 14-303. - General provisions.",
+      "excerpt": "The following requirements apply to all signs in all districts. (1) General standards. (a) No sign except for those spec [...] rea. If the angle of the sign faces exceeds 30 degrees, then both faces shall be used to compute the display surface area. (4) Height of signs and minimum sign setbacks. The following general rules shall apply in the determination of the height of signs and minimum sign setbacks. (a) The height of any sign shall be measured to the topmost point of the sign or sign structure from the average grade level at the base of the supports or t [...]  lot is graded shall be measured from the finished or established grade around such features. (c) All signs ten feet and less in height shall include a minimum setback of five feet from the street right-of-way line. All signs exceeding ten feet in height up to 20 feet in height shall include a minimum setback of ten feet from",
+      "section_ref": "Sec. 14-303",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3SIRE_S14-303GEPR",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3SIRE_S14-303GEPR",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-304",
+      "title": "Sec. 14-304. - Signs permitted in residential and agricultural districts.",
+      "excerpt": "Within the residential and agricultural districts as delineated by the Goodlettsville Zoning Ordinance, permanent access [...] as shall be attractively landscaped. (d) The maximum display surface area of a residential identification sign shall not exceed 32 square feet in size. (e) The maximum height of such signs shall be seven feet. (f) All residential identification signs and the attendant landscaped area shall be owned and maintained either by the owner",
+      "section_ref": "Sec. 14-304",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3SIRE_S14-304SIPEREAGDI",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3SIRE_S14-304SIPEREAGDI",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-305",
+      "title": "Sec. 14-305. - Signs permitted in commercial and industrial districts.",
+      "excerpt": "Within the commercial districts, commercial and office planned unit development districts and industrial districts, as d [...] all be permitted with a minimum separation of 100 feet between the signs. (ii) Such sign shall have a maximum display surface area of 50 square feet. (iii) The maximum height of a ground sign shall be four feet. Ground signs which are integrated into an attractive brick, stone, or wood architectural feature or an earth berm, all of  [...] re feet. In the event the above ratio results in a sign less than 50 square feet in size, then a minimum size sign of 50 square feet shall be permitted. A sign setback of ten feet from the street right-of-way line shall be observed. Between a distance of ten feet and 20 feet from the street right-of-way line, all signs shall  [...] th berm, all of which shall be permanently landscaped, may exceed four feet in height to a maximum of seven feet. Pole signs are permitted subject to a minimum setback from the street right-of-way line of 20 feet. The maximum height of pole sign shall be 30 feet. (ii) Additional signage may be permitted on the building(s) wit [...] ollow Pike or Rivergate Parkway shall not exceed seven feet in height and 36 square feet in area. Ground signs shall be installed meeting the following minimum setback from the property line as listed: 4 sq. ft. and under 1 foot minimum setback 5-9 sq. ft. 2 feet minimum setback 10-16 sq. ft. 3 feet minimum setback 17-20 sq. ",
+      "section_ref": "Sec. 14-305",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3SIRE_S14-305SIPECOINDI",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3SIRE_S14-305SIPECOINDI",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-306",
+      "title": "Sec. 14-306. - Temporary sign provisions.",
+      "excerpt": "Temporary signs shall be permitted for any lawful activity on a lot or parcel subject to the provisions set forth herein [...] face area shall be 35 square feet except for banner signs that have been specifically authorized by the board of commissioners, which shall not be limited. (b) Maximum height shall be 12 feet except that banner signs displayed over a public street shall have a minimum clearance of 15 feet. (c) Temporary signs shall not be illuminate",
+      "section_ref": "Sec. 14-306",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3SIRE_S14-306TESIPR",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3SIRE_S14-306TESIPR",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-307",
+      "title": "Sec. 14-307. - Nonconforming sign provisions.",
+      "excerpt": "Any sign lawfully existing at the time of the enactment of this chapter but which is not permitted either by type of sig [...] property may be removed and a new sign installed on the same property the signs were removed from and shall not exceed the maximum sign height and minimum sign setback requirements of the provisions of the sign ordinance. The square footage of the combined single sign shall be less than the existing sign square footages but s",
+      "section_ref": "Sec. 14-307",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3SIRE_S14-307NOSIPR",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3SIRE_S14-307NOSIPR",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-308",
+      "title": "Sec. 14-308. - Administration and enforcement.",
+      "excerpt": "(1) Enforcing officer. The administration and enforcement of this chapter is vested with the city manager or his/her des",
+      "section_ref": "Sec. 14-308",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3SIRE_S14-308ADEN",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3SIRE_S14-308ADEN",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "goodlettsville-tn-sec-14-309",
+      "title": "Sec. 14-309. - Legal status provision.",
+      "excerpt": "(1) Exercise of police power. This entire chapter shall be deemed and construed to be an exercise of the police power of",
+      "section_ref": "Sec. 14-309",
+      "jurisdiction_id": "goodlettsville-tn",
+      "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3SIRE_S14-309LESTPR",
+      "effective_date": "2025-08-14",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3SIRE_S14-309LESTPR",
+        "breadcrumb": [
+          "Title 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    }
+  ],
+  "scrape_provenance": {
+    "fetcher": "municode",
+    "client_id": 2392,
+    "product_id": 17087,
+    "product_name": "Code of Ordinances",
+    "dedicated_zoning_product": false,
+    "code_slug": "code_of_ordinances",
+    "job_id": 481901,
+    "zoning_node_id": "TIT14ZOLAUSCO",
+    "zoning_heading": "Title 14 - ZONING AND LAND USE CONTROL",
+    "source_home_url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances"
+  }
+}

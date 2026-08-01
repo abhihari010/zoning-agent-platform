@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -9,6 +10,26 @@ from urllib.parse import urlparse
 
 
 SCHEMA_VERSION = "source-pack/v1"
+
+# Topics every real zoning ordinance covers somewhere. We count how many distinct
+# topics appear, not how often -- density scales with how much administrative
+# boilerplate a code carries, so it ranks large genuine ordinances below small ones.
+ZONING_REGULATION_MARKERS = {
+    "lot area": r"minimum lot area|lot area of|minimum lot size",
+    "yards": r"\b(front|rear|side) yard\b",
+    "setbacks": r"\bsetback",
+    "height limits": r"maximum height|building height|height limit",
+    "permitted uses": r"permitted uses|uses permitted|principal permitted|uses are permitted",
+    "district regulations": r"district regulations|districts are hereby established|zoning districts established",
+    "lot width": r"minimum lot width|lot width of|minimum width",
+    "density": r"dwelling units per acre|maximum density|units per acre",
+}
+
+# Below this many zoning_ordinance sources a pack is a curated list of official
+# links rather than a scraped ordinance, so it carries no body text to judge.
+SUBSTANCE_MIN_ORDINANCE_SOURCES = 3
+SUBSTANCE_ERROR_BELOW = 5
+SUBSTANCE_WARNING_BELOW = 7
 
 ALLOWED_COVERAGE_STATUSES = {
     "source_discovery",
@@ -248,6 +269,56 @@ def _validate_manifest(
             seen_source_ids=seen_source_ids,
             result=result,
         )
+
+    _validate_substance(path, sources, result)
+
+
+def _validate_substance(path: Path, sources: list, result: ValidationResult) -> None:
+    """Reject packs that are schema-valid but contain no zoning regulation.
+
+    Municipal codes routinely carry a "Zoning" title that only adopts a separate
+    ordinance by reference. A scraper that lands there produces a clean, well-formed
+    pack of planning-commission bylaws. The abstention invariant does not catch this:
+    there *are* citations, they are simply about the wrong subject, so the answer comes
+    back confident and irrelevant. Schema validity is not substantive correctness.
+    """
+    ordinance_text = " ".join(
+        f"{_text(source.get('excerpt'))} {_text(source.get('full_text'))}"
+        for source in sources
+        if isinstance(source, dict) and _text(source.get("source_type")) == "zoning_ordinance"
+    ).lower()
+    ordinance_count = sum(
+        1
+        for source in sources
+        if isinstance(source, dict) and _text(source.get("source_type")) == "zoning_ordinance"
+    )
+    if ordinance_count < SUBSTANCE_MIN_ORDINANCE_SOURCES:
+        return
+
+    missing = sorted(
+        topic
+        for topic, pattern in ZONING_REGULATION_MARKERS.items()
+        if not re.search(pattern, ordinance_text)
+    )
+    found_count = len(ZONING_REGULATION_MARKERS) - len(missing)
+    if found_count >= SUBSTANCE_WARNING_BELOW:
+        return
+
+    detail = (
+        f"covers only {found_count} of {len(ZONING_REGULATION_MARKERS)} zoning regulation "
+        f"topics across {ordinance_count} zoning_ordinance source(s); missing: {', '.join(missing)}."
+    )
+    if found_count < SUBSTANCE_ERROR_BELOW:
+        result.errors.append(
+            SourcePackIssue(
+                path,
+                f"Pack {detail} This usually means the scraper landed on a title that adopts "
+                "the zoning ordinance by reference (planning-commission bylaws, administrative "
+                "provisions) rather than the ordinance itself.",
+            )
+        )
+    else:
+        result.warnings.append(SourcePackIssue(path, f"Pack {detail} Review before promoting."))
 
 
 def _validate_jurisdiction(path: Path, jurisdiction: dict, result: ValidationResult) -> None:

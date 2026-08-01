@@ -1,0 +1,141 @@
+{
+  "schema_version": "source-pack/v1",
+  "jurisdiction": {
+    "jurisdiction_id": "hendersonville-tn",
+    "name": "Hendersonville, TN",
+    "coverage_status": "source_indexed",
+    "state": "TN",
+    "state_fips": "47",
+    "county_fips": "TODO_COUNTY_FIPS",
+    "place_fips": "TODO_PLACE_FIPS",
+    "jurisdiction_type": "municipality",
+    "parent_jurisdiction_id": null,
+    "county_name": null,
+    "official_source_urls": [
+      "https://library.municode.com/tn/hendersonville/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": null,
+    "planning_contact": {
+      "url": "https://library.municode.com/tn/hendersonville/codes/code_of_ordinances"
+    }
+  },
+  "verification_notes": "WS1 scraped source pack generated on 2026-07-31 (4 ordinance section(s)). Coverage status is 'source_indexed'; promote to public_supported only after district mapping and golden QA pass. Fetcher: municode.",
+  "sources": [
+    {
+      "source_id": "hendersonville-tn-14-101",
+      "title": "14-101. - Creation and membership.",
+      "excerpt": "Pursuant to the provisions of Tennessee Code Annotated, § 13-4-101 there is hereby created a municipal Planning Commissi",
+      "section_ref": "14-101",
+      "jurisdiction_id": "hendersonville-tn",
+      "url": "https://library.municode.com/tn/hendersonville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1MUPLCO_14-101CRME",
+      "effective_date": "2025-09-23",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1MUPLCO_14-101CRME",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "hendersonville-tn-14-102",
+      "title": "14-102. - Organization, powers, duties, etc.",
+      "excerpt": "The Planning Commission shall be organized and shall carry out its powers, functions, and duties in accordance with all ",
+      "section_ref": "14-102",
+      "jurisdiction_id": "hendersonville-tn",
+      "url": "https://library.municode.com/tn/hendersonville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1MUPLCO_14-102ORPODUET",
+      "effective_date": "2025-09-23",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1MUPLCO_14-102ORPODUET",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "hendersonville-tn-14-103",
+      "title": "14-103. - Video recordings and livestreaming of Planning Commission Meetings.",
+      "excerpt": "Each meeting of the Planning Commission shall be video recorded and livestreamed, to the extent possible, and shall incl",
+      "section_ref": "14-103",
+      "jurisdiction_id": "hendersonville-tn",
+      "url": "https://library.municode.com/tn/hendersonville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1MUPLCO_14-103VIRELIPLCOME",
+      "effective_date": "2025-09-23",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1MUPLCO_14-103VIRELIPLCOME",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "hendersonville-tn-14-201",
+      "title": "14-201. - Land use to be governed by zoning ordinance.",
+      "excerpt": "Land use within the City of Hendersonville shall be governed by Ordinance Number 2019-45, titled \"Zoning Ordinance, Hend",
+      "section_ref": "14-201",
+      "jurisdiction_id": "hendersonville-tn",
+      "url": "https://library.municode.com/tn/hendersonville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_14-201LAUSBEGOZOOR",
+      "effective_date": "2025-09-23",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_14-201LAUSBEGOZOOR",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1. - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    }
+  ],
+  "scrape_provenance": {
+    "fetcher": "municode",
+    "client_id": 2582,
+    "product_id": 17272,
+    "product_name": "Code of Ordinances",
+    "dedicated_zoning_product": false,
+    "code_slug": "code_of_ordinances",
+    "job_id": 483915,
+    "zoning_node_id": "TIT14ZOLAUSCO",
+    "zoning_heading": "TITLE 14 - ZONING AND LAND USE CONTROL",
+    "source_home_url": "https://library.municode.com/tn/hendersonville/codes/code_of_ordinances"
+  }
+}
