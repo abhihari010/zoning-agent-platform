@@ -35,8 +35,8 @@
   }
 
   body {
-    /* Inter body, comfortable measure. Light aesthetic; small UI text stays 400
-       for legibility, large landing prose opts into font-light where it reads. */
+    /* Public Sans body, comfortable measure. Light aesthetic; small UI text stays
+       400 for legibility, large landing prose opts into font-light where it reads. */
     @apply m-0 bg-dusk font-sans text-[15px] font-normal leading-[1.65] text-ink antialiased;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
