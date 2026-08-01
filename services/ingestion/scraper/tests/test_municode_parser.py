@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import pytest
+
 from services.ingestion.scraper.fetchers.municode import (
     DeepLinker,
+    _as_dict,
     _section_ref_from_title,
     _slugify_product,
     find_zoning_node,
@@ -70,6 +73,31 @@ def test_section_ref_from_title_handles_both_numbering_styles():
     # Structural / non-section headings parse to None.
     assert _section_ref_from_title("ARTICLE 6. - RESIDENTIAL DISTRICTS") is None
     assert _section_ref_from_title("ARTICLE III. - RESIDENTIAL ZONE REGULATIONS") is None
+
+
+def test_section_ref_from_title_handles_appendix_letter_numbering():
+    """Springfield, TN publishes its zoning ordinance as "Appendix A" with sections
+    numbered A-501, so a digit-leading pattern extracts nothing and the whole
+    ordinance scrapes to zero sections."""
+    assert _section_ref_from_title("A-501. - Statement of Purpose.") == "A-501"
+    assert _section_ref_from_title("A-504. - R40 Low Density Residential Districts.") == "A-504"
+    assert _section_ref_from_title("AB-12 - Something.") == "AB-12"
+
+    # District labels are letter + a single digit and appear as ordinary body
+    # headings; they are not citable sections and must not be captured.
+    assert _section_ref_from_title("R-1 Residential District") is None
+    assert _section_ref_from_title("B-2 General Business District") is None
+    assert _section_ref_from_title("M-1 Light Industrial") is None
+
+
+def test_as_dict_reports_empty_municode_response_as_missing_content():
+    """Municode answers "registered but nothing published" with HTTP 204 and an empty
+    body (Lebanon, TN). Raw json.loads turns that into "Expecting value: line 1
+    column 1", which reads like a parser bug instead of absent content."""
+    with pytest.raises(ValueError, match="HTTP 204"):
+        _as_dict("")
+    with pytest.raises(ValueError, match="HTTP 204"):
+        _as_dict("   ")
 
 
 def test_deep_linker_uses_dedicated_code_slug():

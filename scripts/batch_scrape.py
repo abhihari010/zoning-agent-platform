@@ -74,7 +74,9 @@ Usage
 from __future__ import annotations
 
 import argparse
+import contextlib
 import importlib.util
+import io
 import json
 import sys
 import traceback
@@ -133,6 +135,31 @@ def _load_validate_module():
 # ---------------------------------------------------------------------------
 # Public types
 # ---------------------------------------------------------------------------
+
+class _Tee:
+    """Write to several streams at once (used to capture scraper stderr live)."""
+
+    def __init__(self, *streams: Any) -> None:
+        self._streams = streams
+
+    def write(self, data: str) -> int:
+        for stream in self._streams:
+            stream.write(data)
+        return len(data)
+
+    def flush(self) -> None:
+        for stream in self._streams:
+            stream.flush()
+
+
+def _reason_from_log(log: io.StringIO, fallback: str) -> str:
+    """Pull the scraper's own failure line out of its captured stderr."""
+    lines = [line.strip() for line in log.getvalue().splitlines() if line.strip()]
+    for line in reversed(lines):
+        if any(marker in line for marker in ("failed", "BLOCKED", "no sections", "ERROR")):
+            return line
+    return lines[-1] if lines else fallback
+
 
 SCRAPE_OK = "scraped"
 SCRAPE_BLOCKED = "blocked"
@@ -415,8 +442,14 @@ def run_batch(
         print(f"[batch] START {city}, {state} ({jurisdiction_id})", file=sys.stderr)
 
         # --- Scrape ---
+        # The scraper reports *why* it failed on stderr and returns a bare exit
+        # code, so a report recording only "Scraper exited 1." forces whoever
+        # reads it to re-run the city by hand to learn anything. Tee stderr:
+        # the operator still sees it live, and the reason lands in the report.
+        scrape_log = io.StringIO()
         try:
-            exit_code = _scraper_run(ns)
+            with contextlib.redirect_stderr(_Tee(sys.stderr, scrape_log)):
+                exit_code = _scraper_run(ns)
         except SystemExit as exc:
             # _build_fetcher raises SystemExit on bad args (string or int code).
             # Treat any SystemExit as a configuration failure (exit 1).
@@ -439,11 +472,15 @@ def run_batch(
             cr.section_count = _section_count_from_manifest(manifest_path)
         elif exit_code == 2:
             cr.status = SCRAPE_BLOCKED
-            cr.error_detail = cr.error_detail or "Fetcher returned exit 2 (blocked/rate-limited)."
+            cr.error_detail = cr.error_detail or _reason_from_log(
+                scrape_log, "Fetcher returned exit 2 (blocked/rate-limited)."
+            )
             print(f"[batch] BLOCKED {city}, {state}", file=sys.stderr)
         else:
             cr.status = SCRAPE_FAILED
-            cr.error_detail = cr.error_detail or f"Scraper exited {exit_code}."
+            cr.error_detail = cr.error_detail or _reason_from_log(
+                scrape_log, f"Scraper exited {exit_code}."
+            )
             print(f"[batch] FAILED  {city}, {state} (exit {exit_code})", file=sys.stderr)
 
         # --- Validate draft (only if scrape produced a manifest) ---
