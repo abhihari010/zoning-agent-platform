@@ -61,9 +61,15 @@ export default {
           faint: "#828A9B", // meta / mono labels (AA on all dark surfaces)
         },
       },
+      // One sans in many weights rather than two competing grotesques: Space
+      // Grotesk over Inter paired two faces that were similar without being
+      // identical, which muddies hierarchy. Public Sans is the US Web Design
+      // System face -- the typeface of civic documents -- which is what a
+      // determination record should read as. Mono stays for citations and data,
+      // where mono-vs-sans is a real contrast axis.
       fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
-        display: ["Space Grotesk", "Inter", "system-ui", "sans-serif"],
+        sans: ["Public Sans", "system-ui", "-apple-system", "sans-serif"],
+        display: ["Public Sans", "system-ui", "-apple-system", "sans-serif"],
         mono: ["JetBrains Mono", "SFMono-Regular", "Consolas", "monospace"],
       },
       letterSpacing: {
