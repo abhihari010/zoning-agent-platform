@@ -101,6 +101,38 @@ def test_replace_source_chunks_writes_every_row_across_insert_batches(tmp_path, 
     assert store.get_source_chunk_count() == len(build_source_chunks(sources[:2]))
 
 
+def test_replace_source_chunks_updates_rows_whose_chunk_id_is_unchanged(tmp_path) -> None:
+    """A retag keeps chunk_id but must still rewrite the row.
+
+    chunk_id hashes source_id/section_ref/chunk_index/source text only, so a districts
+    or uses reclassification leaves every id identical while the row content moves.
+    An 'insert new ids, delete missing ids' sync would skip these and serve stale
+    district tags, which retrieval filters on.
+    """
+    from app.ingestion import build_source_chunks
+
+    store = SQLiteStore(tmp_path / "local.sqlite3")
+    source = _sample_source("rule-1")
+    store.upsert_source(source)
+    store.replace_source_chunks(build_source_chunks([source]))
+    before = store.list_source_chunks()
+    fingerprint_before = store.source_chunk_fingerprint()
+    assert {d for c in before for d in c.districts} == {"unknown"}
+
+    retagged = source.model_copy(update={"districts": ["r-1"], "uses": ["single-family"]})
+    store.upsert_source(retagged)
+    store.replace_source_chunks(build_source_chunks([retagged]))
+    after = store.list_source_chunks()
+
+    # Same chunk ids -- the text did not change -- but the tags must have moved.
+    assert {c.chunk_id for c in after} == {c.chunk_id for c in before}
+    assert {d for c in after for d in c.districts} == {"r-1"}
+    assert {u for c in after for u in c.uses} == {"single-family"}
+    # The retrieval cache keys off this hash, so it must move even though no
+    # chunk_id did -- that is the whole point of folding the tag columns into it.
+    assert store.source_chunk_fingerprint() != fingerprint_before
+
+
 def test_normalize_database_url_selects_psycopg_for_render_postgres_urls() -> None:
     assert (
         normalize_database_url("postgres://user:pass@example.test:5432/zoning")

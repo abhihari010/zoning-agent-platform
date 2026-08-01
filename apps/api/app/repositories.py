@@ -974,6 +974,42 @@ class SQLAlchemyStore:
             raise DatabaseStorageError(f"Could not count sources: {exc}") from exc
         return int(count)
 
+    def _chunk_upsert_statement(self):
+        """INSERT ... ON CONFLICT (chunk_id) DO UPDATE for the active dialect.
+
+        Postgres and SQLite both support upsert but expose it through separate
+        dialect constructs, so the statement is built per-dialect rather than from
+        the generic ``insert()``. ``created_at`` is deliberately left out of the
+        update set: a chunk that survives a rebuild keeps its original creation time.
+        """
+        dialect = self.engine.dialect.name
+        if dialect == "postgresql":
+            from sqlalchemy.dialects.postgresql import insert as dialect_insert
+        elif dialect == "sqlite":
+            from sqlalchemy.dialects.sqlite import insert as dialect_insert
+        else:  # pragma: no cover - postgres and sqlite are the only supported targets
+            raise DatabaseStorageError(f"Chunk upsert is not implemented for dialect {dialect!r}.")
+
+        statement = dialect_insert(source_chunks)
+        return statement.on_conflict_do_update(
+            index_elements=[source_chunks.c.chunk_id],
+            set_={
+                column: statement.excluded[column]
+                for column in (
+                    "source_id",
+                    "chunk_index",
+                    "source_text_hash",
+                    "jurisdiction_id",
+                    "source_type",
+                    "source_version",
+                    "districts_csv",
+                    "uses_csv",
+                    "payload_json",
+                    "updated_at",
+                )
+            },
+        )
+
     def replace_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]:
         now = datetime.now(timezone.utc)
 
@@ -996,16 +1032,38 @@ class SQLAlchemyStore:
         with _REINDEX_LOCK:
             try:
                 with self.engine.begin() as connection:
-                    connection.execute(delete(source_chunks))
-                    # Insert in slices rather than one executemany over the whole
-                    # corpus. Building every row up front holds the full chunk text
-                    # (payload_json) for ~30k chunks in memory at once, and hands the
-                    # driver one enormous statement -- which is what makes a full
-                    # reindex spike on a 256MB Postgres plan. The delete and every
-                    # slice still share one transaction, so the swap stays atomic.
+                    # Upsert rather than wipe-and-reload. Rebuilding the corpus after
+                    # adding a few cities used to DELETE every row and re-INSERT all of
+                    # them -- ~58k row operations to change ~2k -- which is heavy on a
+                    # 256MB Postgres plan and leaves the table briefly empty mid-swap.
+                    #
+                    # Upserting on chunk_id (rather than skipping ids we already have)
+                    # is required for correctness, not just convenience: chunk_id hashes
+                    # only source_id/section_ref/chunk_index/source text, so a districts
+                    # or uses reclassification -- and a title change, which the header
+                    # stamp bakes into chunk_text -- keeps the id identical while the row
+                    # content moves. Skipping matching ids would silently serve stale
+                    # text and stale district tags.
                     for start in range(0, len(chunks), _CHUNK_INSERT_BATCH):
-                        batch = chunks[start : start + _CHUNK_INSERT_BATCH]
-                        connection.execute(insert(source_chunks), [row(c) for c in batch])
+                        batch = [row(c) for c in chunks[start : start + _CHUNK_INSERT_BATCH]]
+                        connection.execute(self._chunk_upsert_statement(), batch)
+
+                    # Drop rows whose source or section no longer exists. Chunked so the
+                    # id list never becomes one oversized statement.
+                    keep = {chunk.chunk_id for chunk in chunks}
+                    stale = [
+                        existing
+                        for (existing,) in connection.execute(select(source_chunks.c.chunk_id))
+                        if existing not in keep
+                    ]
+                    for start in range(0, len(stale), _CHUNK_INSERT_BATCH):
+                        connection.execute(
+                            delete(source_chunks).where(
+                                source_chunks.c.chunk_id.in_(
+                                    stale[start : start + _CHUNK_INSERT_BATCH]
+                                )
+                            )
+                        )
             except SQLAlchemyError as exc:
                 raise DatabaseStorageError(f"Could not replace source chunks: {exc}") from exc
 
