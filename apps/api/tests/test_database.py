@@ -73,6 +73,34 @@ def test_source_and_chunk_counts(tmp_path) -> None:
     assert store.get_source_chunk_count() >= 1
 
 
+def test_replace_source_chunks_writes_every_row_across_insert_batches(tmp_path, monkeypatch) -> None:
+    """A full replace inserts in slices to keep peak memory off the corpus size.
+
+    Shrink the batch so the corpus spans several slices plus a partial tail, which is
+    where an off-by-one in the slicing would silently drop chunks.
+    """
+    from app import repositories
+    from app.ingestion import build_source_chunks
+
+    monkeypatch.setattr(repositories, "_CHUNK_INSERT_BATCH", 3)
+
+    store = SQLiteStore(tmp_path / "local.sqlite3")
+    sources = [_sample_source(f"rule-{index}") for index in range(7)]
+    for source in sources:
+        store.upsert_source(source)
+    chunks = build_source_chunks(sources)
+    assert len(chunks) > 3, "fixture must span more than one insert batch"
+
+    store.replace_source_chunks(chunks)
+
+    assert store.get_source_chunk_count() == len(chunks)
+    assert {c.chunk_id for c in store.list_source_chunks()} == {c.chunk_id for c in chunks}
+
+    # A second replace must still fully swap, not accumulate.
+    store.replace_source_chunks(build_source_chunks(sources[:2]))
+    assert store.get_source_chunk_count() == len(build_source_chunks(sources[:2]))
+
+
 def test_normalize_database_url_selects_psycopg_for_render_postgres_urls() -> None:
     assert (
         normalize_database_url("postgres://user:pass@example.test:5432/zoning")

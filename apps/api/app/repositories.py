@@ -50,6 +50,10 @@ from app.jurisdictions import get_jurisdiction_scope, source_applies_to_jurisdic
 # (delete-then-insert is not safe under concurrent access with READ COMMITTED isolation).
 _REINDEX_LOCK = threading.Lock()
 
+# Rows per INSERT during a full chunk replace. Keeps peak memory proportional to
+# the batch instead of the corpus; 1000 rows of chunk payload is a few MB.
+_CHUNK_INSERT_BATCH = 1000
+
 
 class DatabaseStorageError(RuntimeError):
     """Raised when the configured database cannot satisfy a storage operation."""
@@ -972,31 +976,36 @@ class SQLAlchemyStore:
 
     def replace_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]:
         now = datetime.now(timezone.utc)
+
+        def row(chunk: SourceChunk) -> dict:
+            return {
+                "chunk_id": chunk.chunk_id,
+                "source_id": chunk.source_id,
+                "chunk_index": chunk.chunk_index,
+                "source_text_hash": chunk.source_text_hash,
+                "jurisdiction_id": chunk.jurisdiction_id,
+                "source_type": chunk.source_type,
+                "source_version": chunk.source_version,
+                "districts_csv": _make_filter_csv(chunk.districts),
+                "uses_csv": _make_filter_csv(chunk.uses),
+                "payload_json": chunk.model_dump(mode="json"),
+                "created_at": now,
+                "updated_at": now,
+            }
+
         with _REINDEX_LOCK:
             try:
                 with self.engine.begin() as connection:
                     connection.execute(delete(source_chunks))
-                    if chunks:
-                        connection.execute(
-                            insert(source_chunks),
-                            [
-                                {
-                                    "chunk_id": chunk.chunk_id,
-                                    "source_id": chunk.source_id,
-                                    "chunk_index": chunk.chunk_index,
-                                    "source_text_hash": chunk.source_text_hash,
-                                    "jurisdiction_id": chunk.jurisdiction_id,
-                                    "source_type": chunk.source_type,
-                                    "source_version": chunk.source_version,
-                                    "districts_csv": _make_filter_csv(chunk.districts),
-                                    "uses_csv": _make_filter_csv(chunk.uses),
-                                    "payload_json": chunk.model_dump(mode="json"),
-                                    "created_at": now,
-                                    "updated_at": now,
-                                }
-                                for chunk in chunks
-                            ],
-                        )
+                    # Insert in slices rather than one executemany over the whole
+                    # corpus. Building every row up front holds the full chunk text
+                    # (payload_json) for ~30k chunks in memory at once, and hands the
+                    # driver one enormous statement -- which is what makes a full
+                    # reindex spike on a 256MB Postgres plan. The delete and every
+                    # slice still share one transaction, so the swap stays atomic.
+                    for start in range(0, len(chunks), _CHUNK_INSERT_BATCH):
+                        batch = chunks[start : start + _CHUNK_INSERT_BATCH]
+                        connection.execute(insert(source_chunks), [row(c) for c in batch])
             except SQLAlchemyError as exc:
                 raise DatabaseStorageError(f"Could not replace source chunks: {exc}") from exc
 
