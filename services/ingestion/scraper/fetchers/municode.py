@@ -66,12 +66,18 @@ _ZONING_PRODUCT_HINTS = (
 #   "Sec. 4211 - Home occupations."   -> "Sec. 4211"
 #   "§ 6-100. - Intent."              -> "§ 6-100"   (Chesapeake-style § numbering)
 #   "3-101 - Purpose."                -> "3-101"     (Alexandria-style bare numbering)
+#   "A-501. - Statement of Purpose."  -> "A-501"     (Springfield-style appendix numbering)
 # The bare form requires a "." or "-" separator so structural docs ("ARTICLE
 # III. - ...") and lone numbers never false-match as sections.
+# The appendix form requires **two or more** digits after the letter: an appendix
+# ordinance numbers its sections A-501, A-14... while district labels that appear
+# as ordinary body headings are letter + single digit (R-1, B-2, M-1). Requiring
+# two digits keeps district labels from being mistaken for citable sections.
 _SECTION_REF_RE = re.compile(
     r"^\s*("
     r"Sec\.?\s*[0-9][0-9A-Za-z.\-]*"
     r"|§\s*[0-9][0-9A-Za-z.\-]*"
+    r"|[A-Z]{1,2}-[0-9]{2,}[0-9A-Za-z.\-]*"
     r"|[0-9]+[.\-][0-9A-Za-z][0-9A-Za-z.\-]*"
     r")",
     re.IGNORECASE,
@@ -650,6 +656,15 @@ class MunicodeFetcher:
 
 
 def _as_dict(value: str | dict) -> dict:
+    # Municode answers "registered but nothing published" with HTTP 204 and an
+    # empty body (e.g. Lebanon, TN: a client and productId exist, /Jobs/latest
+    # returns 204). Left to json.loads that surfaces as "Expecting value: line 1
+    # column 1", which reads like a parser bug rather than absent content.
+    if isinstance(value, str) and not value.strip():
+        raise ValueError(
+            "Municode returned an empty response (HTTP 204): the client exists but has "
+            "no published code for this product."
+        )
     payload = json.loads(value) if isinstance(value, str) else value
     if not isinstance(payload, dict):
         raise ValueError("Expected a JSON object.")
