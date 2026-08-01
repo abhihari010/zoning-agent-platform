@@ -1,0 +1,1311 @@
+{
+  "schema_version": "source-pack/v1",
+  "jurisdiction": {
+    "jurisdiction_id": "la-vergne-tn",
+    "name": "La Vergne, TN",
+    "coverage_status": "source_indexed",
+    "state": "TN",
+    "state_fips": "47",
+    "county_fips": "TODO_COUNTY_FIPS",
+    "place_fips": "TODO_PLACE_FIPS",
+    "jurisdiction_type": "municipality",
+    "parent_jurisdiction_id": null,
+    "county_name": null,
+    "official_source_urls": [
+      "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": null,
+    "planning_contact": {
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances"
+    }
+  },
+  "verification_notes": "WS1 scraped source pack generated on 2026-07-31 (49 ordinance section(s)). Coverage status is 'source_indexed'; promote to public_supported only after district mapping and golden QA pass. Fetcher: municode.",
+  "sources": [
+    {
+      "source_id": "la-vergne-tn-sec-14-101",
+      "title": "Sec. 14-101. - Creation and membership.",
+      "excerpt": "Pursuant to the provisions of Tennessee Code Annotated, § 13-4-101 there is hereby created a municipal planning commissi",
+      "section_ref": "Sec. 14-101",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1MUPLCO_S14-101CRME",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1MUPLCO_S14-101CRME",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-102",
+      "title": "Sec. 14-102. - Organization, powers, duties, etc.",
+      "excerpt": "The planning commission shall elect its own chairman from among its appointive membership for one (1) year. The transact",
+      "section_ref": "Sec. 14-102",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1MUPLCO_S14-102ORPODUET",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1MUPLCO_S14-102ORPODUET",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-103",
+      "title": "Sec. 14-103. - Jurisdiction—Subdivisions.",
+      "excerpt": "The rules and regulations governing the subdivision of land heretofore adopted on March 25, 1980, by the La Vergne Plann",
+      "section_ref": "Sec. 14-103",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1MUPLCO_S14-103JUUB",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1MUPLCO_S14-103JUUB",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-104",
+      "title": "Sec. 14-104. - Order of business.",
+      "excerpt": "At each meeting of the planning commission, the following order of business shall be observed unless dispensed with by t",
+      "section_ref": "Sec. 14-104",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1MUPLCO_S14-104ORBU",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1MUPLCO_S14-104ORBU",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-105",
+      "title": "Sec. 14-105. - Public comment period.",
+      "excerpt": "A public comment period shall be conducted to provide the public with the opportunity to comment on matters that are ger",
+      "section_ref": "Sec. 14-105",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1MUPLCO_S14-105PUCOPE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1MUPLCO_S14-105PUCOPE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-201",
+      "title": "Sec. 14-201. - Land use to be governed by zoning ordinance.",
+      "excerpt": "Land use within the City of La Vergne shall be governed by Ordinance Number 2025-27 titled \"City of La Vergne Zoning Ord",
+      "section_ref": "Sec. 14-201",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-201LAUSBEGOZOOR",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2ZOOR_S14-201LAUSBEGOZOOR",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-401",
+      "title": "Sec. 14-401. - General use of and construction in right-of-way.",
+      "excerpt": "Relationship with other laws. Construction work and maintenance of any and all facilities within the city's rights of wa",
+      "section_ref": "Sec. 14-401",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-401GEUSCORI-W",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-401GEUSCORI-W",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-402",
+      "title": "Sec. 14-402. - Construction.",
+      "excerpt": "(1) All construction and maintenance of any and all facilities within the city's rights of way incident to grantee's cab",
+      "section_ref": "Sec. 14-402",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-402CO",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-402CO",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-403",
+      "title": "Sec. 14-403. - Relocation.",
+      "excerpt": "The city shall have the right to require grantee to change the design or location of any of grantee's cables, lines, pip",
+      "section_ref": "Sec. 14-403",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-403RE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-403RE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-404",
+      "title": "Sec. 14-404. - Restoration of city's rights-of-way.",
+      "excerpt": "Whenever grantee disturbs the surface of any right of way for any purpose, the grantee shall be responsible for restorat",
+      "section_ref": "Sec. 14-404",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-404RERI-W",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-404RERI-W",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-405",
+      "title": "Sec. 14-405. - Maintenance and workmanship.",
+      "excerpt": "(1) Grantee's cables, lines, piping, fibers, and appurtenances shall be constructed and maintained so as not to interfer",
+      "section_ref": "Sec. 14-405",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-405MAWO",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-405MAWO",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-406",
+      "title": "Sec. 14-406. - Acquisition of facilities.",
+      "excerpt": "Upon grantee's acquisition of facilities in any city right of way, or upon the addition or annexation to the city of any",
+      "section_ref": "Sec. 14-406",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-406ACFA",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-406ACFA",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-407",
+      "title": "Sec. 14-407. - Reservation of city right-of-way rights.",
+      "excerpt": "Nothing in this chapter shall prevent the city from constructing, maintaining, or repairing any city right of way, or pu",
+      "section_ref": "Sec. 14-407",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-407RERI-WRI",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-407RERI-WRI",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-408",
+      "title": "Sec. 14-408. - Reservation of rights and privileges.",
+      "excerpt": "Nothing in this chapter shall deprive the city of any rights or privileges which it now has, or which may hereafter be c",
+      "section_ref": "Sec. 14-408",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-408RERIPR",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-408RERIPR",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-409",
+      "title": "Sec. 14-409. - Street vacation.",
+      "excerpt": "If any street or portion thereof used by grantee is vacated by the city during the term of their agreement, unless the c",
+      "section_ref": "Sec. 14-409",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-409STVA",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-409STVA",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-410",
+      "title": "Sec. 14-410. - Discontinuing use of facilities.",
+      "excerpt": "Whenever grantee intends to discontinue using any facility or capacity within the city's rights of way, grantee shall su",
+      "section_ref": "Sec. 14-410",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-410DIUSFA",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-410DIUSFA",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-411",
+      "title": "Sec. 14-411. - Hazardous substances.",
+      "excerpt": "(1) Grantee shall comply with all applicable state and federal laws, statutes, regulations and orders concerning hazardo",
+      "section_ref": "Sec. 14-411",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-411HASU",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-411HASU",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-412",
+      "title": "Sec. 14-412. - Undergrounding of cable.",
+      "excerpt": "Grantee is strongly encouraged to locate and construct its present and future cables and other facilities underground. G",
+      "section_ref": "Sec. 14-412",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-412UNCA",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-412UNCA",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-413",
+      "title": "Sec. 14-413. - Construction codes.",
+      "excerpt": "Grantee shall strictly adhere to all building and zoning codes currently or hereafter in affect. Grantee shall arrange i",
+      "section_ref": "Sec. 14-413",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-413COCO",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-413COCO",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-414",
+      "title": "Sec. 14-414. - Construction and use of poles.",
+      "excerpt": "Grantee shall negotiate and enter into pole attachment agreements with utilities maintaining poles in the grantee's fran",
+      "section_ref": "Sec. 14-414",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-414COUSPO",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-414COUSPO",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-415",
+      "title": "Sec. 14-415. - Tree trimmings.",
+      "excerpt": "The grantee must submit all construction plans and/or pruning plans to the city for initial review before any work begin",
+      "section_ref": "Sec. 14-415",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4RI-WMA_S14-415TRTR",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4RI-WMA_S14-415TRTR",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-501",
+      "title": "Sec. 14-501. - Creation and membership.",
+      "excerpt": "Pursuant to Tennessee Code Annotated, § 13-7-205, the board of mayor and aldermen does hereby create the La Vergne Board",
+      "section_ref": "Sec. 14-501",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH5BOZOAP_S14-501CRME",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH5BOZOAP_S14-501CRME",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-502",
+      "title": "Sec. 14-502. - Term of members.",
+      "excerpt": "The initial members of the board of zoning appeals shall serve terms where one (1) member's terms shall expire each year",
+      "section_ref": "Sec. 14-502",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH5BOZOAP_S14-502TEME",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH5BOZOAP_S14-502TEME",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-503",
+      "title": "Sec. 14-503. - Procedures and powers.",
+      "excerpt": "The procedures and powers of the board of zoning appeals shall be outlined in section 8.070 of the La Vergne Zoning Ordi",
+      "section_ref": "Sec. 14-503",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH5BOZOAP_S14-503PRPO",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH5BOZOAP_S14-503PRPO",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-601",
+      "title": "Sec. 14-601. - General provisions.",
+      "excerpt": "(1) Title. This chapter shall be known as the \"Stormwater Management Ordinance\" for the City of La Vergne, Tennessee. (2",
+      "section_ref": "Sec. 14-601",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-601GEPR",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-601GEPR",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-602",
+      "title": "Sec. 14-602. - Definitions.",
+      "excerpt": "For the purpose of this ordinance, the following definitions shall apply: Words used in the singular shall include the p",
+      "section_ref": "Sec. 14-602",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-602DE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-602DE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-603",
+      "title": "Sec. 14-603. - Stormwater system design: construction and permanent stormwater management; performance standards.",
+      "excerpt": "(1) Objectives. The objectives of this Ordinance are: (a) To protect human life and health. (b) To minimize the need for [...] ojects (including, but not limited to, brownfield redevelopment); and (ii) Vertical density (floor to area ratio of at least two (2), or at least eighteen (18) units per acre) (5) Stormwater quantity. To implement the objectives of this ordinance, the following general stormwater quantity policy statements shall apply: (a) New devel [...] feet 20 feet 8.1 feet to 12 feet 28 feet 12.1 feet to 16 feet 36 feet Deeper than 16.1 feet 50 feet (o) For drainage easements which contain open channels, the minimum width of the required easement will be the width of flow in the channel calculated for the 100-year/24-hour storm. (Ord. No. 2023-23, § II, 10-10-2023; Ord. No. 2025",
+      "section_ref": "Sec. 14-603",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-603STSYDECOPESTMAPEST",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-603STSYDECOPESTMAPEST",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-604",
+      "title": "Sec. 14-604. - Land disturbance permit.",
+      "excerpt": "(1) General. The land disturbance permit (permit) is to be obtained by the owner(s) or owner(s) designee(s) for a develo",
+      "section_ref": "Sec. 14-604",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-604LADIPE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-604LADIPE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-605",
+      "title": "Sec. 14-605. - Permanent stormwater management: operation, maintenance, and inspection.",
+      "excerpt": "(1) Record drawings. All applicants are required to submit record drawings for any stormwater management structures loca [...]  and canopy cover, as well as stormwater infiltration, filtration, and evapotranspiration. (a) A permanent and construction water quality riparian buffer zone (setback measured from the top of bank) shall be required along all streams as defined in this ordinance, for new development and redevelopment projects as outlined bel",
+      "section_ref": "Sec. 14-605",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-605PESTMAOPMAIN",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-605PESTMAOPMAIN",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-606",
+      "title": "Sec. 14-606. - Existing locations and ongoing developments.",
+      "excerpt": "(1) Requirements for existing locations and developments. The following requirements shall apply to all locations and de",
+      "section_ref": "Sec. 14-606",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-606EXLOONDE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-606EXLOONDE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-607",
+      "title": "Sec. 14-607. - Inspections.",
+      "excerpt": "Inspections shall be performed to ensure that vegetation, erosion and sediment control measures and other protective mea",
+      "section_ref": "Sec. 14-607",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-607IN",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-607IN",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-608",
+      "title": "Sec. 14-608. - Illicit discharges.",
+      "excerpt": "(1) Prohibition of illicit discharges. (a) Pursuant to the National Pollutant Discharge Elimination System (NPDES) Munic",
+      "section_ref": "Sec. 14-608",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-608ILDI",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-608ILDI",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-609",
+      "title": "Sec. 14-609. - Enforcement.",
+      "excerpt": "(1) Enforcement authority. The City Engineer or his designee shall have the authority to issue notices of violation and ",
+      "section_ref": "Sec. 14-609",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-609EN",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-609EN",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-610",
+      "title": "Sec. 14-610. - Penalties.",
+      "excerpt": "(1) Violations. Any person who shall commit any act declared unlawful under this ordinance, who violates any provision o",
+      "section_ref": "Sec. 14-610",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-610PE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-610PE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-611",
+      "title": "Sec. 14-611. - Appeals.",
+      "excerpt": "Pursuant to Tennessee Code Annotated, § 68-221- 1106(d), any person aggrieved by the imposition of a civil penalty, deci",
+      "section_ref": "Sec. 14-611",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-611AP",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-611AP",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-612",
+      "title": "Sec. 14-612. - Severability.",
+      "excerpt": "Should any article, section, subsection or provision of this Comprehensive Stormwater Management Ordinance be declared b",
+      "section_ref": "Sec. 14-612",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-612SE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-612SE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-701",
+      "title": "Sec. 14-701. - Definitions.",
+      "excerpt": "For the purpose of this chapter, the following definitions shall apply; words used in the singular shall include the plu",
+      "section_ref": "Sec. 14-701",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUSFE_S14-701DE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUSFE_S14-701DE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-702",
+      "title": "Sec. 14-702. - Stormwater user fee.",
+      "excerpt": "Subject to the provisions of this chapter, each and every residential developed property, nonresidential developed prope",
+      "section_ref": "Sec. 14-702",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUSFE_S14-702STUSFE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUSFE_S14-702STUSFE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-703",
+      "title": "Sec. 14-703. - Stormwater user fee collection.",
+      "excerpt": "The stormwater user fee for metered property shall be billed and collected monthly with the monthly city's services util",
+      "section_ref": "Sec. 14-703",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUSFE_S14-703STUSFECO",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUSFE_S14-703STUSFECO",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-704",
+      "title": "Sec. 14-704. - Stormwater user fee determination.",
+      "excerpt": "There is hereby established the following uniform schedule of rates for the services and use of facilities of the stormw",
+      "section_ref": "Sec. 14-704",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUSFE_S14-704STUSFEDE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUSFE_S14-704STUSFEDE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-801",
+      "title": "Sec. 14-801. - Creation and membership of the stormwater appeals and advisory board.",
+      "excerpt": "Pursuant to Tennessee Code Annotated, § 68-221-1106, the City of La Vergne hereby creates a board to hear and decide app",
+      "section_ref": "Sec. 14-801",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8STAPADBO_S14-801CRMESTAPADBO",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8STAPADBO_S14-801CRMESTAPADBO",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-802",
+      "title": "Sec. 14-802. - Terms and vacancies.",
+      "excerpt": "Members shall be appointed for four (4) year terms and shall serve at the pleasure of the board. Members shall be eligib",
+      "section_ref": "Sec. 14-802",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8STAPADBO_S14-802TEVA",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8STAPADBO_S14-802TEVA",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-803",
+      "title": "Sec. 14-803. - General administration.",
+      "excerpt": "The board shall meet as needed. The board shall be empowered to adopt bylaws to govern the order of proceedings as well ",
+      "section_ref": "Sec. 14-803",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8STAPADBO_S14-803GEAD",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8STAPADBO_S14-803GEAD",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-804",
+      "title": "Sec. 14-804. - Duties of the board.",
+      "excerpt": "(1) The board is hereby authorized to hear and decide appeals of any order, decision or ruling of the city engineer or d",
+      "section_ref": "Sec. 14-804",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8STAPADBO_S14-804DUBO",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8STAPADBO_S14-804DUBO",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-805",
+      "title": "Sec. 14-805. - Appeals to the board.",
+      "excerpt": "(1) Pursuant to Tennessee Code Annotated, § 68-221-1106(d), any person aggrieved by the imposition of a civil penalty or",
+      "section_ref": "Sec. 14-805",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8STAPADBO_S14-805APBO",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8STAPADBO_S14-805APBO",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-806",
+      "title": "Sec. 14-806. - Public hearing.",
+      "excerpt": "Upon receipt of an appeal or an application for a variance, the board shall hold a public hearing within thirty (30) day",
+      "section_ref": "Sec. 14-806",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8STAPADBO_S14-806PUHE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8STAPADBO_S14-806PUHE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-807",
+      "title": "Sec. 14-807. - Appealing decisions of the board.",
+      "excerpt": "Any alleged violator may appeal a decision of the board pursuant to the provisions of Tennessee Code Annotated, title 27",
+      "section_ref": "Sec. 14-807",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8STAPADBO_S14-807APDEBO",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8STAPADBO_S14-807APDEBO",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-808",
+      "title": "Sec. 14-808. - Order of business.",
+      "excerpt": "At each meeting of the stormwater appeals and advisory board, the following order of business shall be observed unless d",
+      "section_ref": "Sec. 14-808",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8STAPADBO_S14-808ORBU",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8STAPADBO_S14-808ORBU",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    },
+    {
+      "source_id": "la-vergne-tn-sec-14-809",
+      "title": "Sec. 14-809. - Public comment period.",
+      "excerpt": "A public comment period shall be conducted to provide the public with the opportunity to comment on matters that are ger",
+      "section_ref": "Sec. 14-809",
+      "jurisdiction_id": "la-vergne-tn",
+      "url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8STAPADBO_S14-809PUCOPE",
+      "effective_date": "2025-10-09",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8STAPADBO_S14-809PUCOPE",
+        "breadcrumb": [
+          "TITLE 14 - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1 - MUNICIPAL PLANNING COMMISSION"
+        ]
+      }
+    }
+  ],
+  "scrape_provenance": {
+    "fetcher": "municode",
+    "client_id": 2973,
+    "product_id": 17211,
+    "product_name": "Code of Ordinances",
+    "dedicated_zoning_product": false,
+    "code_slug": "code_of_ordinances",
+    "job_id": 431248,
+    "zoning_node_id": "TIT14ZOLAUSCO",
+    "zoning_heading": "TITLE 14 - ZONING AND LAND USE CONTROL",
+    "source_home_url": "https://library.municode.com/tn/la_vergne/codes/code_of_ordinances"
+  }
+}

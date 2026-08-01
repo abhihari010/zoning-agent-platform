@@ -5,9 +5,12 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 VALIDATOR_PATH = REPO_ROOT / "scripts" / "validate_source_packs.py"
+FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "source_packs"
 
 spec = importlib.util.spec_from_file_location("validate_source_packs", VALIDATOR_PATH)
 assert spec and spec.loader
@@ -120,6 +123,65 @@ def test_non_http_url_fails_without_curated_fallback(tmp_path: Path) -> None:
 
     assert not result.ok
     assert any("url must be an http or https URL" in error.message for error in result.errors)
+
+
+@pytest.mark.parametrize("pack", ["hendersonville-tn", "la-vergne-tn", "smyrna-tn"])
+def test_substance_guard_rejects_packs_without_zoning_regulation(pack: str) -> None:
+    """Real TN packs that scraped cleanly but hold only planning-commission bylaws.
+
+    Their Title 14 adopts the zoning ordinance by reference instead of containing it.
+    Every one of these passed schema validation before the substance guard existed.
+    """
+    result = validator.validate_source_packs(FIXTURES_DIR / "tn" / pack)
+
+    assert not result.ok
+    assert any("adopts the zoning ordinance by reference" in error.message for error in result.errors)
+
+
+@pytest.mark.parametrize("pack", ["nolensville-tn", "goodlettsville-tn"])
+def test_substance_guard_accepts_real_ordinances(pack: str) -> None:
+    """Two shapes that a naive heuristic gets wrong.
+
+    nolensville-tn is 229 sections whose zoning vocabulary is diluted by definitions and
+    administrative text; goodlettsville-tn is only 25 sections and opens with two
+    planning-commission bylaws before the ordinance itself. Both are complete and real.
+    """
+    result = validator.validate_source_packs(FIXTURES_DIR / "tn" / pack)
+
+    assert result.ok, [error.message for error in result.errors]
+
+
+def test_substance_guard_skips_link_only_packs() -> None:
+    """Curated packs point at official URLs and carry no ordinance body to judge."""
+    result = validator.validate_source_packs(
+        REPO_ROOT / "apps" / "api" / "app" / "data" / "source_packs" / "va" / "roanoke-va"
+    )
+
+    assert result.ok, [error.message for error in result.errors]
+
+
+def test_substance_guard_applies_once_a_pack_claims_scraped_sections(tmp_path: Path) -> None:
+    """The link-only exemption must not become a hole: enough ordinance sources to look
+    like a scrape means the pack gets judged, however thin its text."""
+    bylaws = "The planning commission shall consist of seven members appointed by the mayor."
+    _write_manifest(
+        tmp_path,
+        "tn/bylaws-tn/manifest.json",
+        _valid_manifest(
+            sources=[
+                {
+                    **_valid_source(source_id=f"bylaws-tn-{index}", jurisdiction_id="sample-va"),
+                    "excerpt": bylaws,
+                }
+                for index in range(validator.SUBSTANCE_MIN_ORDINANCE_SOURCES)
+            ]
+        ),
+    )
+
+    result = validator.validate_source_packs(tmp_path)
+
+    assert not result.ok
+    assert any("zoning regulation topics" in error.message for error in result.errors)
 
 
 def _write_manifest(root: Path, relative_path: str, payload: dict) -> Path:

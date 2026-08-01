@@ -1,0 +1,1285 @@
+{
+  "schema_version": "source-pack/v1",
+  "jurisdiction": {
+    "jurisdiction_id": "smyrna-tn",
+    "name": "Smyrna, TN",
+    "coverage_status": "source_indexed",
+    "state": "TN",
+    "state_fips": "47",
+    "county_fips": "TODO_COUNTY_FIPS",
+    "place_fips": "TODO_PLACE_FIPS",
+    "jurisdiction_type": "municipality",
+    "parent_jurisdiction_id": null,
+    "county_name": null,
+    "official_source_urls": [
+      "https://library.municode.com/tn/smyrna/codes/code_of_ordinances"
+    ],
+    "zoning_map_url": null,
+    "planning_contact": {
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances"
+    }
+  },
+  "verification_notes": "WS1 scraped source pack generated on 2026-07-31 (48 ordinance section(s)). Coverage status is 'source_indexed'; promote to public_supported only after district mapping and golden QA pass. Fetcher: municode.",
+  "sources": [
+    {
+      "source_id": "smyrna-tn-14-101",
+      "title": "§ 14-101 - LAND USE TO BE GOVERNED BY ZONING ORDINANCE.",
+      "excerpt": "Land use within the town shall be governed by the ordinance titled Zoning Ordinance, Smyrna, Tennessee@, and any amendme",
+      "section_ref": "§ 14-101",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1ZOOR_S14-101LAUSBEGOZOOR",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1ZOOR_S14-101LAUSBEGOZOOR",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-102",
+      "title": "§ 14-102 - VIOLATION AND PENALTY.",
+      "excerpt": "Violations of the zoning ordinance shall subject the offender to a penalty under the general penalty provision of this c",
+      "section_ref": "§ 14-102",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH1ZOOR_S14-102VIPE",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH1ZOOR_S14-102VIPE",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-201",
+      "title": "§ 14-201 - DEPARTMENT ESTABLISHED; FUNCTIONS.",
+      "excerpt": "There is hereby created and established a Planning Department, which Department shall provide planning services; adminis",
+      "section_ref": "§ 14-201",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2PLDE_S14-201DEESFU",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2PLDE_S14-201DEESFU",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-202",
+      "title": "§ 14-202 - TOWN PLANNER; APPOINTMENT; RESPONSIBILITIES.",
+      "excerpt": "The Town Manager shall appoint the planning manager, who shall serve as the head of the Planning Department and who shal",
+      "section_ref": "§ 14-202",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2PLDE_S14-202TOPLAPRE",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH2PLDE_S14-202TOPLAPRE",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-301",
+      "title": "§ 14-301 - CREATION AND MEMBERSHIP.",
+      "excerpt": "(1) Pursuant to the provisions of T.C.A. § 13-4-101, there is hereby created a town Planning Commission, hereinafter ref",
+      "section_ref": "§ 14-301",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3PLCO_S14-301CRME",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3PLCO_S14-301CRME",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-302",
+      "title": "§ 14-302 - ORGANIZATION, POWERS, FUNCTIONS, AND DUTIES.",
+      "excerpt": "The Planning Commission shall be organized and shall carry out its powers, functions, and duties in accordance with all ",
+      "section_ref": "§ 14-302",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3PLCO_S14-302ORPOFUDU",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3PLCO_S14-302ORPOFUDU",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-303",
+      "title": "§ 14-303 - CONTINUED EXISTENCE.",
+      "excerpt": "Notwithstanding anything herein to the contrary, the members of the Planning Commission, as such Planning Commission exi",
+      "section_ref": "§ 14-303",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3PLCO_S14-303COEX",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3PLCO_S14-303COEX",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-304",
+      "title": "§ 14-304 - TIME AND PLACE OF MEETINGS.",
+      "excerpt": "The Commission shall meet on the first Thursday of each month at the Town Hall and at other such times and locations as ",
+      "section_ref": "§ 14-304",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3PLCO_S14-304TIPLME",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3PLCO_S14-304TIPLME",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-305",
+      "title": "§ 14-305 - TRAINING AND CONTINUING EDUCATION.",
+      "excerpt": "Each Planning Commissioner shall attend training and continuing education as provided in T.C.A. § 13-4-101(c). (2007 Cod",
+      "section_ref": "§ 14-305",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH3PLCO_S14-305TRCOED",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH3PLCO_S14-305TRCOED",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-401",
+      "title": "§ 14-401 - SIGNAGE TO BE GOVERNED BY SIGN ORDINANCE.",
+      "excerpt": "Signage within the town shall be governed by the Town of Smyrna Sign Ordinance@ and any amendments thereto, as adopted a",
+      "section_ref": "§ 14-401",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4SIOR_S14-401SIBEGOSIOR",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4SIOR_S14-401SIBEGOSIOR",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-402",
+      "title": "§ 14-402 - VIOLATION AND PENALTY.",
+      "excerpt": "Violations of the sign ordinance shall subject the offender to a penalty under the general penalty provision of this cod",
+      "section_ref": "§ 14-402",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH4SIOR_S14-402VIPE",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH4SIOR_S14-402VIPE",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-501",
+      "title": "§ 14-501 - CREATION AND PURPOSE.",
+      "excerpt": "There is hereby created a Stormwater Advisory Committee of the town. The purpose of the Stormwater Advisory Committee is",
+      "section_ref": "§ 14-501",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH5STADCO_S14-501CRPU",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH5STADCO_S14-501CRPU",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-502",
+      "title": "§ 14-502 - MEMBERSHIP.",
+      "excerpt": "(1) Composition. The Committee shall consist of seven members. Members of the Committee shall serve without pay and shal",
+      "section_ref": "§ 14-502",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH5STADCO_S14-502ME",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH5STADCO_S14-502ME",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-503",
+      "title": "§ 14-503 - POWERS AND DUTIES.",
+      "excerpt": "(1) Bylaws and regulations. The Committee shall have the power to adopt and revise bylaws, rules, and regulations for th",
+      "section_ref": "§ 14-503",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH5STADCO_S14-503PODU",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH5STADCO_S14-503PODU",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-601",
+      "title": "§ 14-601 - GENERAL PROVISIONS.",
+      "excerpt": "This chapter shall be known as the Stormwater Management Ordinance for the town. (1) Introduction. (a) This chapter is i",
+      "section_ref": "§ 14-601",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-601GEPR",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-601GEPR",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-602",
+      "title": "§ 14-602 - DEFINITIONS.",
+      "excerpt": "For the purpose of this section, the following definitions shall apply: Words used in the singular shall include the plu [...] eceiving waters. Examples include systems which discharge through percolation, exfiltration, filtered bleed down, and evaporation processes. RIPARIAN BUFFER. A setback from the top of water body's bank of undisturbed vegetation, including trees, shrubs, and herbaceous vegetation; enhanced or restored vegetation; or the reesta",
+      "section_ref": "§ 14-602",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-602DE",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-602DE",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-603",
+      "title": "§ 14-603 - GRADING PERMITS.",
+      "excerpt": "(1) Requirements. No grading or building permit shall be issued until the applicant has submitted all required state and",
+      "section_ref": "§ 14-603",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-603GRPE",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-603GRPE",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-604",
+      "title": "§ 14-604 - STORMWATER SYSTEM DESIGN: CONSTRUCTION AND PERMANENT STORMWATER MANAGEMENT.",
+      "excerpt": "(1) MS4 stormwater design, BMP manuals, and illicit discharge detection and elimination. (a) The town adopts as its MS4  [...]  must also be identified on the plan and shown to scale. Information shall be supplied concerning the proposed destruction of exceptional and historic trees in setbacks and buffer strips, where they exist. Complete landscape plans may be submitted separately. The plan must include the sequence of implementation for tree prote [...] ns: 1. Redevelopment projects (including, but not limited to, brownfield redevelopment); 2. Vertical density (floor to area ratio of at least 2, or at least 18 units per acre); and 3. Incentives as identified by the permittee, submitted to the Division and approved by the Division in writing, and documented as part of the stormwater [...]  water quality riparian buffer as sheet flow, not as concentrated flow, where site conditions allow. (B) Water quality riparian buffers must have the following minimum widths, unless site specific conditions necessitate alternative widths, as described in subparagraph (d) of this paragraph: Average buffer width (feet) Minimum buffe [...] teration or unassessed waters 30 15 The criteria for the width of the riparian buffer can be established on an average width basis at a project, as long as the minimum width of the riparian buffer is more than the Exceptional Tennessee Waters or waters with unavailable parameters for siltation or habitat alteration 60 30 required minimum width at any measured location. If the new development or redevelopment site encompasses both sides of a stream, buffer averaging can be applied to both sides, but m",
+      "section_ref": "§ 14-604",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-604STSYDECOPESTMA",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-604STSYDECOPESTMA",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-605",
+      "title": "§ 14-605 - PERMANENT STORMWATER MANAGEMENT: OPERATION, MAINTENANCE, AND INSPECTION.",
+      "excerpt": "(1) As-built plans. All applicants are required to submit actual as-built plans for any structures located onsite after ",
+      "section_ref": "§ 14-605",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-605PESTMAOPMAIN",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-605PESTMAOPMAIN",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-606",
+      "title": "§ 14-606 - ILLICIT DISCHARGES.",
+      "excerpt": "(1) Scope. This section shall apply to all water generated on developed or undeveloped land entering the town's separate",
+      "section_ref": "§ 14-606",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-606ILDI",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-606ILDI",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-607",
+      "title": "§ 14-607 - ENFORCEMENT.",
+      "excerpt": "(1) Enforcement authority. The Town Manager or his or her designee, hereinafter called the \"Director\", shall have the au",
+      "section_ref": "§ 14-607",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-607EN",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-607EN",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-608",
+      "title": "§ 14-608 - PENALTIES.",
+      "excerpt": "(1) Violations. Any person who shall commit any act declared unlawful under this chapter, who violates any provision of ",
+      "section_ref": "§ 14-608",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-608PE",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-608PE",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-609",
+      "title": "§ 14-609 - APPEALS.",
+      "excerpt": "Pursuant to T.C.A. § 682211106(d), any person aggrieved by the imposition of a civil penalty or damage assessment as pro",
+      "section_ref": "§ 14-609",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-609AP",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-609AP",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-610",
+      "title": "§ 14-610 - AMENDMENTS.",
+      "excerpt": "The Town Council shall have the authority to enact amendments to this chapter from time to time. (Ord. 0448, passed 1-20",
+      "section_ref": "§ 14-610",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-610AM",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-610AM",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-611",
+      "title": "§ 14-611 - RIGHT OF ENTRY AND INSPECTION.",
+      "excerpt": "The Public Works Director, Stormwater Coordinator, inspector, or other duly authorized employee of the town, upon reason",
+      "section_ref": "§ 14-611",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-611RIENIN",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-611RIENIN",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-612",
+      "title": "§ 14-612 - DETENTION POND INSPECTION PROCEDURES.",
+      "excerpt": "(1) Inspection frequency. (a) Annually; or (b) If violation(s) are found, then frequency lessens to six months until vio",
+      "section_ref": "§ 14-612",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH6STMAOR_S14-612DEPOINPR",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH6STMAOR_S14-612DEPOINPR",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-701",
+      "title": "§ 14-701 - TITLE AND PURPOSE.",
+      "excerpt": "This chapter shall be known as the \"stormwater utility ordinance\" for the town. (1) Introduction. The town finds, determ",
+      "section_ref": "§ 14-701",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-701TIPU",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-701TIPU",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-702",
+      "title": "§ 14-702 - JURISDICTION.",
+      "excerpt": "The stormwater utility ordinance shall govern all properties within the corporate limits of the town. The stormwater uti",
+      "section_ref": "§ 14-702",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-702JU",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-702JU",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-703",
+      "title": "§ 14-703 - DEFINITIONS.",
+      "excerpt": "For the purpose of this chapter, the following definitions shall apply unless the context clearly indicates or requires ",
+      "section_ref": "§ 14-703",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-703DE",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-703DE",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-704",
+      "title": "§ 14-704 - FUNDING OF STORMWATER UTILITY.",
+      "excerpt": "(1) Funding for the stormwater utility's activities may include, but not be limited to, the following: (a) Stormwater us",
+      "section_ref": "§ 14-704",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-704FUSTUT",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-704FUSTUT",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-705",
+      "title": "§ 14-705 - STORMWATER UTILITY MANAGEMENT FUND.",
+      "excerpt": "All revenues generated by or on behalf of the stormwater utility shall be deposited in a Stormwater Utility Management F",
+      "section_ref": "§ 14-705",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-705STUTMAFU",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-705STUTMAFU",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-706",
+      "title": "§ 14-706 - OPERATING BUDGET.",
+      "excerpt": "The Town Council shall adopt, based on a recommendation from the stormwater utility, an operating budget for the Stormwa",
+      "section_ref": "§ 14-706",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-706OPBU",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-706OPBU",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-707",
+      "title": "§ 14-707 - STORMWATER USER FEE ESTABLISHED.",
+      "excerpt": "There shall be imposed on each and every developed property in the town, except exempt property, a stormwater user fee, ",
+      "section_ref": "§ 14-707",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-707STUSFEES",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-707STUSFEES",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-708",
+      "title": "§ 14-708 - EQUIVALENT RESIDENTIAL UNIT.",
+      "excerpt": "(1) Establishment. There is established, for purposes of calculating the stormwater user fees, the equivalent residentia",
+      "section_ref": "§ 14-708",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-708EQREUN",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-708EQREUN",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-709",
+      "title": "§ 14-709 - PROPERTY CLASSIFICATION FOR STORMWATER USER FEES.",
+      "excerpt": "(1) Property classifications. For purposes of determining the stormwater user fee, all properties in the town are classi",
+      "section_ref": "§ 14-709",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-709PRCLSTUSFE",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-709PRCLSTUSFE",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-710",
+      "title": "§ 14-710 - BASE RATE.",
+      "excerpt": "The Town Council shall, by ordinance in the fee schedule as adopted by the Town Council, establish the base rate for the",
+      "section_ref": "§ 14-710",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-710BARA",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-710BARA",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-711",
+      "title": "§ 14-711 - PROPERTY OWNERS TO PAY CHARGES.",
+      "excerpt": "(1) The owner of each property shall be obligated to pay the stormwater user fee as provided in this chapter, provided h",
+      "section_ref": "§ 14-711",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-711PROWPACH",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-711PROWPACH",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-712",
+      "title": "§ 14-712 - BILLING PROCEDURES AND PENALTIES FOR LATE PAYMENT.",
+      "excerpt": "(1) Rate and collection schedule. A stormwater user fee shall be set at a rate as set forth in the fee schedule as adopt",
+      "section_ref": "§ 14-712",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-712BIPRPELAPA",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-712BIPRPELAPA",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-713",
+      "title": "§ 14-713 - APPEALS OF FEES.",
+      "excerpt": "(1) Any person who disagrees with the calculation of the stormwater user fee, as provided in this chapter, may appeal su",
+      "section_ref": "§ 14-713",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-713APFE",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-713APFE",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-714",
+      "title": "§ 14-714 - STORMWATER USER FEE CREDIT AND ADJUSTMENT POLICY.",
+      "excerpt": "Stormwater user fee credits and adjustments are available to other developed property (i.e., non-single-family residenti",
+      "section_ref": "§ 14-714",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-714STUSFECRADPO",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-714STUSFECRADPO",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-715",
+      "title": "§ 14-715 - EFFECTIVE DATE.",
+      "excerpt": "This chapter shall become effective as of the date of its passage on second reading by the Town Council. Stormwater user",
+      "section_ref": "§ 14-715",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH7STUTOR_S14-715EFDA",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH7STUTOR_S14-715EFDA",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-801",
+      "title": "§ 14-801 - DEVELOPMENT AGREEMENT TO BE USED.",
+      "excerpt": "(1) In any instance in which there is to be a subdivision of land or any development on a parcel of land, a development ",
+      "section_ref": "§ 14-801",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8DEAG_S14-801DEAGBEUS",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8DEAG_S14-801DEAGBEUS",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-802",
+      "title": "§ 14-802 - MODEL DEVELOPMENT AGREEMENT.",
+      "excerpt": "The model development agreement to be used by the town is on file in the Clerk's office and may be changed from time to ",
+      "section_ref": "§ 14-802",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8DEAG_S14-802MODEAG",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8DEAG_S14-802MODEAG",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-803",
+      "title": "§ 14-803 - AUTHORITY TO EXECUTE ON BEHALF OF TOWN.",
+      "excerpt": "The development agreement shall be executed on behalf of the town by the Town Manager or his or her designee, if such de",
+      "section_ref": "§ 14-803",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8DEAG_S14-803AUEXBETO",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8DEAG_S14-803AUEXBETO",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-804",
+      "title": "§ 14-804 - EXECUTION OF DEVELOPER AGREEMENT.",
+      "excerpt": "The development agreement shall be executed on behalf of the developer or builder prior to any permits being issued and ",
+      "section_ref": "§ 14-804",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8DEAG_S14-804EXDEAG",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8DEAG_S14-804EXDEAG",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-805",
+      "title": "§ 14-805 - FAILURE TO EXECUTE DEVELOPER'S AGREEMENT.",
+      "excerpt": "No permits, inspections, or certificates of occupancy may be granted for any development after the effective date of thi",
+      "section_ref": "§ 14-805",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8DEAG_S14-805FAEXDEAG",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8DEAG_S14-805FAEXDEAG",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-806",
+      "title": "§ 14-806 - FAILURE TO ABIDE BY THE DEVELOPER'S AGREEMENT.",
+      "excerpt": "No permits, inspections, or certificates of occupancy may be granted if the developer fails to abide by the development ",
+      "section_ref": "§ 14-806",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8DEAG_S14-806FAABDEAG",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8DEAG_S14-806FAABDEAG",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    },
+    {
+      "source_id": "smyrna-tn-14-807",
+      "title": "§ 14-807 - VIOLATION AND PENALTY.",
+      "excerpt": "(1) Notwithstanding the provisions in §§ 14-805 and 14-806, and in addition to the remedies provided in §§ 14-805 and 14",
+      "section_ref": "§ 14-807",
+      "jurisdiction_id": "smyrna-tn",
+      "url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH8DEAG_S14-807VIPE",
+      "effective_date": "2026-02-10",
+      "retrieved_at": "2026-08-01",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general"
+      ],
+      "source_type": "zoning_ordinance",
+      "metadata": {
+        "verification_status": "scraped",
+        "scraper": "ws1",
+        "municode_node_id": "TIT14ZOLAUSCO_CH8DEAG_S14-807VIPE",
+        "breadcrumb": [
+          "TITLE 14: - ZONING AND LAND USE CONTROL",
+          "CHAPTER 1: - ZONING ORDINANCE"
+        ]
+      }
+    }
+  ],
+  "scrape_provenance": {
+    "fetcher": "municode",
+    "client_id": 16640,
+    "product_id": 17416,
+    "product_name": "Municipal Code",
+    "dedicated_zoning_product": false,
+    "code_slug": "code_of_ordinances",
+    "job_id": 492556,
+    "zoning_node_id": "TIT14ZOLAUSCO",
+    "zoning_heading": "TITLE 14: - ZONING AND LAND USE CONTROL",
+    "source_home_url": "https://library.municode.com/tn/smyrna/codes/code_of_ordinances"
+  }
+}
