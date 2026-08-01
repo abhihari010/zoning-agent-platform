@@ -778,6 +778,7 @@ export function App() {
               projects={projects}
               projectsLoading={projectsLoading}
               projectsMessage={projectsMessage}
+              isPro={currentUser?.subscriptionTier === "pro"}
               onRefresh={() => {
                 void refreshProjects();
               }}

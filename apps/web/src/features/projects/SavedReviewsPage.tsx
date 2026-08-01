@@ -6,12 +6,14 @@ export function SavedReviewsPage({
   projects,
   projectsLoading,
   projectsMessage,
+  isPro,
   onRefresh,
   onOpenProject,
 }: {
   projects: ProjectSummary[];
   projectsLoading: boolean;
   projectsMessage: string;
+  isPro: boolean;
   onRefresh: () => void;
   onOpenProject: (project: ProjectSummary) => void;
 }) {
@@ -26,9 +28,13 @@ export function SavedReviewsPage({
           <h1 className="font-display text-2xl font-bold tracking-[-0.01em] text-ink">
             Saved reviews
           </h1>
+          {/* gate_result_for_tier strips citations, compliance and the
+              checklist on read for free accounts, so only Pro can be promised
+              the full case file. */}
           <p className="mt-1.5 text-sm leading-6 text-ink-soft">
-            Every determination you have run. Open one to reload its full case
-            file and citations.
+            {isPro
+              ? "Every determination you have run. Open one to reload its full case file and citations."
+              : "Every determination you have run. Open one to reload its verdict; citations and the permit checklist unlock with Pro."}
           </p>
         </div>
         <button
