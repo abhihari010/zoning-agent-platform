@@ -1,0 +1,47 @@
+[
+  {
+    "city": "Brentwood",
+    "state": "TN",
+    "jurisdiction_id": "brentwood-tn",
+    "jurisdiction_type": "municipality",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Municode client 12055. Williamson County, adjacent to the live franklin-tn pack. Zoning is Ch. 78 of the Code of Ordinances."
+  },
+  {
+    "city": "Nolensville",
+    "state": "TN",
+    "jurisdiction_id": "nolensville-tn",
+    "jurisdiction_type": "municipality",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Municode client 20633. Williamson County. Zoning is Appendix A (APXANOZOOR)."
+  },
+  {
+    "city": "Goodlettsville",
+    "state": "TN",
+    "jurisdiction_id": "goodlettsville-tn",
+    "jurisdiction_type": "municipality",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Municode client 2392. Straddles Davidson and Sumner counties. Unusual among TN codes: its Title 14 Ch. 2 carries the zoning ordinance inline instead of adopting it by reference."
+  },
+  {
+    "city": "Springfield",
+    "state": "TN",
+    "jurisdiction_id": "springfield-tn",
+    "jurisdiction_type": "municipality",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Municode client 11467. Robertson County. Zoning is Appendix A with A-501 style numbering, which needs the appendix branch of _SECTION_REF_RE (PR #154)."
+  },
+  {
+    "city": "Clarksville",
+    "state": "TN",
+    "jurisdiction_id": "clarksville-tn",
+    "jurisdiction_type": "municipality",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Municode client 11500. Montgomery County TN - not the live montgomery-county-va pack."
+  }
+]
