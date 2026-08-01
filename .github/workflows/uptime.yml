@@ -2,7 +2,9 @@ name: Uptime
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    # Render free spins down after 15 min idle, and GitHub delays scheduled runs
+    # under load, so */15 raced the timeout. */5 tolerates two missed runs.
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -10,7 +12,8 @@ jobs:
     name: Ping production
     runs-on: ubuntu-latest
     steps:
-      # --max-time 90 + retries tolerate Render free-tier cold starts (~50s spin-up)
+      # --max-time 90 + retries still cover a cold start (~50s spin-up) for the
+      # case where the schedule did drop enough runs to let the instance sleep.
       - name: API /health
         run: >
           curl -fsS --retry 3 --retry-delay 20 --retry-all-errors --max-time 90
