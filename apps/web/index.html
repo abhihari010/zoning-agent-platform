@@ -24,10 +24,10 @@
       property="og:description"
       content="Type an address and what you want to build. Get a determination with the ordinance sections it's based on."
     />
-    <!-- og:image must be absolute, so it hardcodes the deployed origin. Update
-         both it and og:url when the custom domain lands. -->
-    <meta property="og:url" content="https://zoning-agent-platform.vercel.app/" />
-    <meta property="og:image" content="https://zoning-agent-platform.vercel.app/og.png" />
+    <!-- Absolute URLs are required here; VITE_SITE_URL is injected at build time
+         and defaults in vite.config.ts, so a domain change is an env change. -->
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
+    <meta property="og:image" content="%VITE_SITE_URL%/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Zoning Review" />
