@@ -34,6 +34,9 @@ class FakeQdrantClient:
             raise Exception(f"Collection '{collection_name}' does not exist")
         return self._collections[collection_name]
 
+    def collection_exists(self, collection_name: str) -> bool:
+        return collection_name in self._collections
+
     def create_collection(self, collection_name: str, vectors_config: object) -> None:
         self._collections[collection_name] = {"vectors_config": vectors_config, "points": {}}
 
@@ -697,3 +700,34 @@ def test_sync_vector_index_resume_after_partial_failure() -> None:
     assert total_embedded_second_run < len(chunks), (
         "Second run should skip already-committed chunks"
     )
+
+
+def test_existing_chunk_ids_raises_when_qdrant_cannot_be_reached() -> None:
+    """An unreachable Qdrant must not read as "nothing is indexed".
+
+    existing_chunk_ids drives the incremental skip. If a connection failure is
+    reported as an empty set, every chunk looks pending and a resumable reindex
+    silently re-embeds the whole corpus at full cost. A genuinely absent
+    collection is the one case that legitimately means "embed everything".
+    """
+    class UnreachableClient:
+        def collection_exists(self, collection_name: str) -> bool:
+            raise ConnectionError("connection refused")
+
+    store = QdrantVectorStore(
+        url="http://localhost:1",
+        api_key=None,
+        collection_name="zoning_source_chunks",
+        client=UnreachableClient(),
+    )
+    with pytest.raises(ConnectionError):
+        store.existing_chunk_ids()
+
+    # A collection that simply does not exist yet still means "embed everything".
+    empty = QdrantVectorStore(
+        url="http://localhost:1",
+        api_key=None,
+        collection_name="not_created_yet",
+        client=FakeQdrantClient(),
+    )
+    assert empty.existing_chunk_ids() == set()
