@@ -1,3 +1,24 @@
+# Managed Postgres (replaces Supabase Postgres; Supabase stays for Auth only).
+# Provisioning is a two-step migration — see the PR body / cutover runbook:
+#   Step A (this file): provision the empty DB. DATABASE_URL below stays
+#           `sync: false` (still pointed at Supabase) so nothing cuts over.
+#   Step B (follow-up one-liner, after pg_dump/pg_restore into this DB):
+#           flip DATABASE_URL to `fromDatabase` to point the API here.
+# Billing (~$7/mo, daily backups) starts when this block first syncs to main.
+databases:
+  - name: zoning-agent-db
+    plan: basic-256mb
+    region: ohio
+    databaseName: zoning
+    user: zoning
+    ipAllowList:
+      # Dynamic-IP external clients need access: the GH-Actions reindex workflow
+      # and the one-time migration pg_restore. The API itself connects over
+      # Render's internal network (fromDatabase connectionString), not this list.
+      # DB is additionally protected by a strong Render-generated password.
+      - source: 0.0.0.0/0
+        description: GH Actions reindex + one-time migration restore
+
 services:
   - type: web
     name: zoning-agent-api
