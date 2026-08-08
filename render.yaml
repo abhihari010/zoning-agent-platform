@@ -90,6 +90,10 @@ services:
         sync: false
       - key: SUPABASE_PROJECT_URL
         sync: false
+      # Sent as the apikey header when fetching JWKS for ES256 token validation.
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      # HS256 fallback only; real logins are ES256 via JWKS.
       - key: SUPABASE_JWT_SECRET
         sync: false
       - key: ADMIN_ACCESS_KEY
