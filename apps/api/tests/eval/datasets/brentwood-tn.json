@@ -1,0 +1,132 @@
+[
+  {
+    "id": "brentwood-tn-sfr-r1",
+    "address": "1500 Murray Ln, Brentwood, TN 37027",
+    "project_description": "Build a new detached single-family home on a vacant two-acre estate lot in an established large-lot residential neighborhood.",
+    "jurisdiction_id": "brentwood-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 78-142", "Sec. 78-14"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "brentwood-tn-sfr-r2",
+    "address": "5100 Country Club Dr, Brentwood, TN 37027",
+    "project_description": "Build a new single-family house on a vacant lot in a low-density suburban subdivision.",
+    "jurisdiction_id": "brentwood-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 78-162"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "brentwood-tn-office-c1",
+    "address": "5000 Meridian Blvd, Brentwood, TN 37027",
+    "project_description": "Lease and occupy a general business office suite for an executive, management and administrative office in the Maryland Farms office park.",
+    "jurisdiction_id": "brentwood-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 78-202"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "brentwood-tn-retail-c2",
+    "address": "330 Franklin Rd, Brentwood, TN 37027",
+    "project_description": "Open a small clothing and general merchandise retail shop in an existing commercial retail center.",
+    "jurisdiction_id": "brentwood-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 78-222"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "brentwood-tn-warehouse-c3",
+    "address": "7101 Executive Center Dr, Brentwood, TN 37027",
+    "project_description": "Operate a wholesale distribution and warehousing facility with indoor storage of goods and materials.",
+    "jurisdiction_id": "brentwood-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 78-242"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "brentwood-tn-restaurant-c4",
+    "address": "5211 Maryland Way, Brentwood, TN 37027",
+    "project_description": "Open a sit-down restaurant in a ground-floor storefront in the mixed-use town center district.",
+    "jurisdiction_id": "brentwood-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 78-252"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "brentwood-tn-manufacturing-r1",
+    "address": "9000 Split Log Rd, Brentwood, TN 37027",
+    "project_description": "Establish a small metal fabrication and light manufacturing shop on a two-acre residential estate lot.",
+    "jurisdiction_id": "brentwood-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 78-142", "Sec. 78-143"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "brentwood-tn-home-occupation-r2",
+    "address": "1200 Sunset Rd, Brentwood, TN 37027",
+    "project_description": "Run a one-chair hair salon as a home occupation out of a spare room in an owner-occupied single-family house in a suburban subdivision.",
+    "jurisdiction_id": "brentwood-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 78-166", "Sec. 78-167"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "brentwood-tn-church-si1",
+    "address": "1300 Wilson Pike, Brentwood, TN 37027",
+    "project_description": "Build a new church sanctuary with an associated fellowship hall on a vacant parcel.",
+    "jurisdiction_id": "brentwood-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 78-262"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "brentwood-tn-retirement-si4",
+    "address": "1710 Franklin Rd, Brentwood, TN 37027",
+    "project_description": "Develop a group living retirement community with independent living units and an assisted care building.",
+    "jurisdiction_id": "brentwood-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 78-322"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]

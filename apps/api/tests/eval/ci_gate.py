@@ -152,6 +152,17 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # keyword-dense Sec. 3-3xx/4-xxxx section, so the refs are what the
     # retriever ranks first; the misses are Article-VII supplemental refs).
     "alexandria-va": 0.70,
+    # 2026-08-02: brentwood-tn 0.538 (Chapter 78 gives each district its own
+    # DIVISION under ARTICLE III with a clean Municode breadcrumb, but every
+    # division repeats the SAME generic section titles — "Uses permitted.",
+    # "Uses prohibited.", "Limitations on home occupation uses." — with no
+    # district name anywhere in the title, so keyword scoring cannot tell
+    # R-1's Sec. 78-142 from R-2's 78-162 or SI-1's 78-262 and often lands on
+    # the division's "Intent." section instead; same titles-carry-no-district-
+    # vocabulary caveat as danville-va. The other miss is Sec. 78-14, a
+    # cross-cutting Article I lot-standards section. Live vector recall is the
+    # quality signal.
+    "brentwood-tn": 0.45,
 }
 
 
