@@ -163,6 +163,20 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # cross-cutting Article I lot-standards section. Live vector recall is the
     # quality signal.
     "brentwood-tn": 0.45,
+    # 2026-08-09: springfield-tn 0.600 (Appendix A gives each district ONE
+    # all-in-one section whose title carries the district label — "A-504. R40
+    # Low Density Residential Districts.", "A-603. CC Core Commercial
+    # Districts." — the keyword-friendly fredericksburg/manassas shape, and
+    # every residential and industrial ref lands. The misses are the six
+    # commercial districts, which all list the same Chapter A-3 activity
+    # names ("Food and Beverage Services", "Medical and Professional
+    # Services", "General Retail Trade"), so a retail/cafe/medical-office
+    # query matches A-602 through A-607 equally and the district label in the
+    # title cannot break the tie while the parcel's district is unknown. The
+    # remaining misses are the supporting refs A-802 and A-1306, cross-cutting
+    # sections whose vocabulary is diluted across every district that points
+    # at them. Live vector recall is the quality signal.
+    "springfield-tn": 0.50,
 }
 
 
