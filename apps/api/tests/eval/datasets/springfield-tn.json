@@ -1,0 +1,209 @@
+[
+  {
+    "id": "springfield-tn-sfr-r40",
+    "address": "3200 Kinneys Road, Springfield, TN 37172",
+    "project_description": "Build a new detached single-family home on a vacant one-acre lot in a low-density residential area on the edge of the city.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-504"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-sfr-rs20",
+    "address": "805 Mooreland Drive, Springfield, TN 37172",
+    "project_description": "Build a new single-family detached house on a vacant lot in an established single-family subdivision.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-506"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-duplex-r10",
+    "address": "612 West 9th Avenue, Springfield, TN 37172",
+    "project_description": "Build a two-family detached dwelling (duplex) on a vacant lot in a medium-density residential neighborhood.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-509"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-apartments-r10",
+    "address": "715 Evergreen Drive, Springfield, TN 37172",
+    "project_description": "Develop a 24-unit multi-family apartment building on a vacant parcel in a medium-density residential area.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-509",
+        "A-802"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-townhomes-r7",
+    "address": "430 East 9th Avenue, Springfield, TN 37172",
+    "project_description": "Build a row of eight attached townhouse dwellings on a vacant lot in a high-density residential area.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-511",
+        "A-804"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-church-rs20",
+    "address": "1450 Hillside Drive, Springfield, TN 37172",
+    "project_description": "Build a new church with a sanctuary and fellowship hall on a vacant parcel in a single-family residential neighborhood.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-506",
+        "A-1306"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-manufacturing-r40",
+    "address": "2950 Kinneys Road, Springfield, TN 37172",
+    "project_description": "Set up a small metal fabrication and manufacturing shop in an accessory building on a low-density residential lot.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "restricted"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-504"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-retail-cc",
+    "address": "500 South Main Street, Springfield, TN 37172",
+    "project_description": "Open a general retail clothing and gift store in a vacant downtown storefront on the courthouse square.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-603"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-restaurant-cls",
+    "address": "1810 Central Avenue West, Springfield, TN 37172",
+    "project_description": "Open a small sit-down cafe serving food and beverages in an existing limited-service commercial building.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-602"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-medical-office-mpo",
+    "address": "120 Northcrest Drive, Springfield, TN 37172",
+    "project_description": "Lease and fit out a medical office suite for a physician practice near the hospital campus.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-607"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-auto-repair-cs",
+    "address": "2405 Memorial Boulevard, Springfield, TN 37172",
+    "project_description": "Open an automotive servicing and repair garage with four service bays in an existing highway commercial building.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-605"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "springfield-tn-warehouse-gi",
+    "address": "1250 Bill Jones Industrial Drive, Springfield, TN 37172",
+    "project_description": "Build a distribution warehouse with truck loading docks for transport and warehousing of packaged goods in the industrial park.",
+    "jurisdiction_id": "springfield-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "A-703"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]
