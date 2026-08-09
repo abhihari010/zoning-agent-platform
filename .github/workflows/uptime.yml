@@ -26,7 +26,14 @@ jobs:
       # through a full Supabase outage (2026-08-08) and nothing alerted. This ping
       # also counts as project activity, which is what stops the free-tier
       # inactivity pause that caused that outage in the first place.
-      - name: Supabase auth
+      #
+      # JWKS, not /auth/v1/health: the health and settings routes 401 without an
+      # apikey header, and JWKS is both public and the exact dependency that
+      # broke -- _decode_supabase_jwt fetches it to verify every ES256 login, so
+      # if this 200s with a real key, logins work. grep guards against a 200
+      # carrying an empty or malformed key set, which -f alone would pass.
+      - name: Supabase auth (JWKS)
         run: >
           curl -fsS --retry 3 --retry-delay 10 --retry-all-errors --max-time 30
-          -o /dev/null https://loaxmpyckircnfliheui.supabase.co/auth/v1/health
+          https://loaxmpyckircnfliheui.supabase.co/auth/v1/.well-known/jwks.json
+          | grep -q '"kty"'
