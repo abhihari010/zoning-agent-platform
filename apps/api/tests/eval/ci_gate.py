@@ -177,6 +177,17 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # sections whose vocabulary is diluted across every district that points
     # at them. Live vector recall is the quality signal.
     "springfield-tn": 0.50,
+    # 2026-08-10: clarksville-tn 0.400 (Chapter 3 concentrates all ~250 uses
+    # across all 27 districts into ONE 17k-char section, 3.4 LAND USE TABLES,
+    # with no per-use or per-district isolation, so a "3.4" ref is keyword-hard
+    # almost everywhere — it lands only for the 2/12 scenarios whose vocabulary
+    # (restaurant, convenience store) also happens to dominate that section's
+    # retrieved fragment. The companion PC-use standards section, 5.1 STANDARDS
+    # FOR USES PERMITTED WITH CONDITIONS, is the opposite: it is prose keyed by
+    # literal use name ("Bed and Breakfast:", "Veterinary Clinic:", "Custom
+    # Manufacturing:", "Convenience Store:"), so all 4/4 conditional scenarios'
+    # "5.1" ref land. Live vector recall is the quality signal.
+    "clarksville-tn": 0.30,
 }
 
 
