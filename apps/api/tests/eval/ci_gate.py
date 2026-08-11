@@ -177,6 +177,21 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # sections whose vocabulary is diluted across every district that points
     # at them. Live vector recall is the quality signal.
     "springfield-tn": 0.50,
+    # 2026-08-10: goodlettsville-tn 0.750 (Title 14 gives each district FAMILY
+    # one all-in-one section — Sec. 14-205 residential, 14-206 commercial,
+    # 14-207 industrial — the same portsmouth-va shape, but the actual
+    # permitted/conditional/prohibited use LISTS live in "table I" of an
+    # appendix that was never scraped into this corpus; the sections
+    # themselves only carry district-purpose prose and cross-references to
+    # that missing table. The misses are the 3 of 12 scenarios (sfr-r40,
+    # manufacturing-accessory, church-residential) whose query keywords also
+    # heavily overlap the corpus's largest sections — Sec. 14-201 Definitions
+    # (42k chars), 14-202 Use classification (37k chars), and 14-210 PUD
+    # regulations (55k chars) — which crowd 14-205 out of the top-8 keyword
+    # results; duplex-r10, which cites the same Sec. 14-205, survives only
+    # because "duplex"/"two-family" is less diluted vocabulary. Live vector
+    # recall is the quality signal.
+    "goodlettsville-tn": 0.65,
 }
 
 

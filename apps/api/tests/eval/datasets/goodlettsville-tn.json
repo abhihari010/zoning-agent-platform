@@ -1,0 +1,158 @@
+[
+  {
+    "id": "goodlettsville-tn-sfr-r40",
+    "address": "1200 Freehill Road, Goodlettsville, TN 37072",
+    "project_description": "Build a new detached single-family home on a vacant one-acre lot in a low-density residential area on the edge of the city.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-205"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-duplex-r10",
+    "address": "310 Cedar Valley Drive, Goodlettsville, TN 37072",
+    "project_description": "Build a two-family detached dwelling (duplex) on a vacant lot in an established medium-density residential subdivision.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-205"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-home-salon-restricted",
+    "address": "212 Ashley Drive, Goodlettsville, TN 37072",
+    "project_description": "Run a one-chair hair and beauty salon as a home business out of a spare room in an owner-occupied single-family house, serving walk-in clients.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-208"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-manufacturing-accessory-restricted",
+    "address": "845 Boone Holleman Road, Goodlettsville, TN 37072",
+    "project_description": "Establish a small metal fabrication and light manufacturing shop in an accessory building on a two-acre residential lot.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-205"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-church-residential",
+    "address": "700 Hillside Drive, Goodlettsville, TN 37072",
+    "project_description": "Build a new church with a sanctuary and fellowship hall on a vacant parcel in a single-family residential neighborhood.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-205"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-retail-cc",
+    "address": "215 North Main Street, Goodlettsville, TN 37072",
+    "project_description": "Open a general retail clothing and gift store in a vacant storefront in the historic core commercial downtown.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-206"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-restaurant-cs",
+    "address": "1801 Gallatin Pike North, Goodlettsville, TN 37072",
+    "project_description": "Open a sit-down restaurant serving food and beverages in an existing commercial service building along the highway.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-206"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-office-op",
+    "address": "50 Professional Park Drive, Goodlettsville, TN 37072",
+    "project_description": "Lease and occupy a general business office suite for an administrative and professional office practice.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-206"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-mobile-home-retail-restricted",
+    "address": "2200 Long Hollow Pike, Goodlettsville, TN 37072",
+    "project_description": "Install a mobile home trailer to use as temporary retail space for a commercial storefront business.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-206"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-auto-repair-cs",
+    "address": "3100 Dickerson Pike, Goodlettsville, TN 37072",
+    "project_description": "Open an automotive servicing and repair garage with several service bays in an existing commercial service building.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-206"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-warehouse-industrial",
+    "address": "500 Industrial Park Drive, Goodlettsville, TN 37072",
+    "project_description": "Build a distribution warehouse with truck loading docks for transport and warehousing of packaged goods in the industrial park.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-207"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "goodlettsville-tn-outdoor-storage-restricted-industrial",
+    "address": "150 Atlas Powder Road, Goodlettsville, TN 37072",
+    "project_description": "Operate an outdoor scrap metal storage yard with all activities conducted in the open air, not within an enclosed building.",
+    "jurisdiction_id": "goodlettsville-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 14-207"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]
