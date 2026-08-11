@@ -1,0 +1,158 @@
+[
+  {
+    "id": "clarksville-tn-sfr-e1",
+    "address": "1420 Cane Brake Road, Clarksville, TN 37040",
+    "project_description": "Build a new detached single-family home on a vacant one-acre lot in an established large-lot estate residential neighborhood.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-duplex-r2d",
+    "address": "805 Cloverdale Drive, Clarksville, TN 37040",
+    "project_description": "Build a new two-family duplex dwelling on a vacant lot in a neighborhood with a mix of single-family and duplex housing types.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-apartments-r4",
+    "address": "2210 Dominion Drive, Clarksville, TN 37040",
+    "project_description": "Develop a 24-unit multi-family apartment building on a vacant parcel near retail services and public transit.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-restaurant-c2",
+    "address": "1750 Wilma Rudolph Boulevard, Clarksville, TN 37040",
+    "project_description": "Open a full-service sit-down restaurant in an existing commercial building along a busy retail corridor.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-medical-office-o1",
+    "address": "610 East College Street, Clarksville, TN 37040",
+    "project_description": "Lease and occupy a medical office suite for a physician practice near the hospital campus.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-convenience-store-c1",
+    "address": "1340 Warfield Boulevard, Clarksville, TN 37040",
+    "project_description": "Open a small neighborhood convenience store selling packaged food and beverages, with no fuel pumps.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4", "5.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-bed-breakfast-r1",
+    "address": "415 Honeysuckle Lane, Clarksville, TN 37040",
+    "project_description": "Convert a spare bedroom of an owner-occupied single-family house into a two-room bed and breakfast for overnight guests.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4", "5.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-vet-clinic-cbd",
+    "address": "220 Madison Street, Clarksville, TN 37040",
+    "project_description": "Open a small-animal veterinary clinic with indoor boarding in a storefront in the historic downtown business district.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4", "5.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-custom-manufacturing-m1",
+    "address": "980 Industrial Drive, Clarksville, TN 37040",
+    "project_description": "Set up a custom manufacturing and fabrication shop assembling made-to-order metal and wood products in an industrial park building.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4", "5.1"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-auto-assembly-r1",
+    "address": "512 Bay Lane, Clarksville, TN 37040",
+    "project_description": "Build a new automobile assembly plant on a vacant lot in a single-family residential subdivision.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-nightclub-r1",
+    "address": "760 Elmwood Road, Clarksville, TN 37040",
+    "project_description": "Open a bar and nightclub with a dance floor and live music on a lot in a single-family residential subdivision.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["3.4"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "clarksville-tn-abstain-data-center",
+    "address": "1500 Corporate Parkway Boulevard, Clarksville, TN 37040",
+    "project_description": "Construct a large hyperscale data center campus with multiple server buildings, on-site backup diesel generators and electrical substations.",
+    "jurisdiction_id": "clarksville-tn",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]
