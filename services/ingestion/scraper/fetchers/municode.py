@@ -5,7 +5,7 @@ API at ``api.municode.com``.  The endpoints used here were discovered by
 inspecting the SPA's network traffic (see ``../README.md`` for the full
 investigation log).  In summary:
 
-1. ``GET /Clients/name?clientName={city}&stateAbbr={ST}`` -> ``ClientID``.
+1. ``GET /Clients/stateAbbr?stateAbbr={ST}`` -> match ``ClientName`` -> ``ClientID``.
 2. ``GET /ClientContent/{clientId}`` -> the ``codes`` product list; we pick the
    product whose ``contentTypeId == "CODES"`` (e.g. ``productId`` 10159,
    "Code of Ordinances").
@@ -102,8 +102,29 @@ _ARTICLE_NUM_RE = re.compile(
 # ---------------------------------------------------------------------------
 
 
-def parse_client_id(client_json: str | dict) -> int:
-    payload = _as_dict(client_json)
+def parse_client_id(client_json: str | dict | list, city: str = "") -> int:
+    """Resolve a ``ClientID`` from either client-lookup response shape.
+
+    ``/Clients/name`` (single object) was retired by Municode in 2026 — it now
+    404s for every city, including ones we have long-standing packs for.  The
+    per-state listing ``/Clients/stateAbbr`` (a list) is the live replacement,
+    so this accepts both and matches the list form on ``ClientName``.
+    """
+    payload = json.loads(client_json) if isinstance(client_json, str) else client_json
+    if isinstance(payload, list):
+        wanted = city.strip().casefold()
+        names = [c.get("ClientName", "") for c in payload if isinstance(c, dict)]
+        for candidate in payload:
+            if isinstance(candidate, dict) and candidate.get("ClientName", "").casefold() == wanted:
+                payload = candidate
+                break
+        else:
+            near = [n for n in names if wanted and wanted in n.casefold()]
+            raise ValueError(
+                f"No Municode client named {city!r} in this state "
+                f"({len(names)} clients; closest: {near or 'none'})."
+            )
+    payload = _as_dict(payload)
     client_id = payload.get("ClientID")
     if not isinstance(client_id, int):
         raise ValueError("Municode client response missing integer ClientID.")
@@ -398,10 +419,10 @@ class MunicodeFetcher:
 
         with PoliteHttpClient(config) as client:
             client_json = client.get_text(
-                f"{API_BASE}/Clients/name?clientName={city}&stateAbbr={state}",
+                f"{API_BASE}/Clients/stateAbbr?stateAbbr={state}",
                 cache_suffix=".client.json",
             )
-            client_id = parse_client_id(client_json)
+            client_id = parse_client_id(client_json, city)
 
             content_json = client.get_text(
                 f"{API_BASE}/ClientContent/{client_id}",

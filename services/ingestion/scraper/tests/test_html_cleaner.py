@@ -41,3 +41,46 @@ def test_decodes_entities_and_collapses_whitespace():
 
 def test_empty_input():
     assert clean_html("") == ""
+
+
+def test_empty_table_cells_hold_their_column():
+    # Real shape of a use table row: symbols only in some district columns.
+    html = (
+        "<table><tr><th>Use</th><th>R1</th><th>C1</th><th>M1</th></tr>"
+        "<tr><td>Antique Shop</td><td></td><td>P</td><td></td></tr></table>"
+    )
+    out = clean_html(html)
+    row = [line for line in out.split("\n") if "Antique Shop" in line][0]
+    # Three district columns after the use name, with P in the middle one.
+    assert [c.strip() for c in row.split("|")][:4] == ["Antique Shop", "", "P", ""]
+
+
+def test_symbol_images_resolve_to_their_filename_stem():
+    html = (
+        "<table><tr><td>Townhouses</td>"
+        '<td><img data-image-filename="np.png" src="/x/np.png"></td>'
+        '<td><img data-image-filename="P.png"></td>'
+        '<td><img alt="CU" src="/x/blank.gif"></td></tr></table>'
+    )
+    out = clean_html(html)
+    assert [c.strip() for c in out.split("|")][:4] == ["Townhouses", "np", "P", "CU"]
+
+
+def test_cell_wrapped_in_block_tags_stays_on_its_row():
+    # Municode wraps cell text in <p>; that must not split the row.
+    html = (
+        "<table><tr><td><p>Antique Shop</p></td><td><p></p></td>"
+        "<td><p>P</p></td></tr>"
+        "<tr><td><p>Apparel Shop</p></td><td><p>P</p></td><td><p></p></td></tr></table>"
+    )
+    rows = [line for line in clean_html(html).split("\n") if line.strip()]
+    assert [[c.strip() for c in r.split("|")][:3] for r in rows] == [
+        ["Antique Shop", "", "P"],
+        ["Apparel Shop", "P", ""],
+    ]
+
+
+def test_non_symbol_images_are_still_dropped():
+    html = '<p>Intent.<img src="/assets/city-seal-large.png" alt="City of Example seal"></p>'
+    out = clean_html(html)
+    assert out == "Intent."

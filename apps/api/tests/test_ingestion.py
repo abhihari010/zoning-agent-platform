@@ -6,6 +6,7 @@ import pytest
 from app.ingestion import (
     MIN_CHUNK_CHARS,
     _apply_header_stamp,
+    _chunk_text,
     _split_markdown_by_sections,
     build_source_chunks,
 )
@@ -247,3 +248,29 @@ def test_header_stamp_token_count_computed_from_stamped_text() -> None:
     # token_count reflects the stamped text, not the pre-stamp body.
     assert chunk.token_count == len(chunk.chunk_text.split())
     assert chunk.token_count > len(full_text.split())
+
+
+def test_chunking_keeps_use_table_rows_on_their_own_lines():
+    """A use table's row -> district mapping only survives if lines do.
+
+    Flattening newlines runs every row into its neighbours, so a chunk reads
+    ``... | P | Antique Shop | | P ...`` and no district can be attributed to
+    any use.  See services/ingestion/scraper/html_cleaner.py for the matching
+    fix on the scrape side.
+    """
+    header = "PRINCIPAL USE | R1 | C1 | M1"
+    rows = [f"Use Number {i} | | P | " for i in range(80)]
+    chunks = _chunk_text("\n".join([header, *rows]), max_chars=300)
+
+    assert len(chunks) > 1, "fixture should be big enough to split"
+    assert all(len(c) <= 300 for c in chunks)
+    # Every row is intact on a line of its own, in some chunk.
+    lines = [line for chunk in chunks for line in chunk.split("\n")]
+    for i in range(80):
+        assert f"Use Number {i} | | P |" in lines
+
+
+def test_chunking_wraps_a_single_over_long_line():
+    chunks = _chunk_text(" ".join(["word"] * 400), max_chars=100)
+    assert chunks and all(len(c) <= 100 for c in chunks)
+    assert " ".join(chunks).split() == ["word"] * 400
