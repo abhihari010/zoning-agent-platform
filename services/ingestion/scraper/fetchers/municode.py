@@ -730,4 +730,10 @@ def _parse_us_date(value: str) -> str | None:
 def _iso_date(value: object) -> str | None:
     if not isinstance(value, str) or not value:
         return None
-    return value.split("T", 1)[0]
+    date = value.split("T", 1)[0]
+    # Municode serves .NET's DateTime.MinValue when it has no publish date.
+    # Laundering that into a real effective_date puts "0001-01-01" on every
+    # source in the pack (hampton-va is full of them).
+    if date.startswith("0001-01-01"):
+        return None
+    return date
