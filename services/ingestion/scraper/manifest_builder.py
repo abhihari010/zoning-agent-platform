@@ -129,6 +129,7 @@ def build_manifest(
     zoning_map_url: str | None = None,
     coverage_status: str = "source_indexed",
     effective_date: str | None = None,
+    effective_date_source: str | None = None,
     provenance: dict[str, Any] | None = None,
     base_manifest: dict[str, Any] | None = None,
     county_fips: str | None = None,
@@ -186,7 +187,11 @@ def build_manifest(
     resolved_jurisdiction_id = str(jurisdiction["jurisdiction_id"])
     retrieved_at = datetime.now(timezone.utc).date().isoformat()
     fallback_effective = effective_date or retrieved_at
-    fallback_source = "parsed_from_document" if effective_date else "retrieval_date"
+    if not effective_date:
+        fallback_source = "retrieval_date"
+    else:
+        # An operator-supplied date is not one we parsed out of the document.
+        fallback_source = effective_date_source or "parsed_from_document"
 
     used_ids: set[str] = set()
     sources = [

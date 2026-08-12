@@ -196,6 +196,9 @@ def run(args: argparse.Namespace) -> int:
         official_source_urls=args.url or None,
         coverage_status=args.coverage_status,
         effective_date=result.effective_date or args.effective_date,
+        effective_date_source=(
+            None if result.effective_date else "operator_supplied" if args.effective_date else None
+        ),
         provenance=provenance,
         county_fips=args.county_fips,
         place_fips=args.place_fips,
