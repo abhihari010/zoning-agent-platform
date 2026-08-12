@@ -24,6 +24,16 @@ def test_parse_client_id():
     assert parse_client_id(load_fixture("municode_client.json")) == 8130
 
 
+def test_parse_client_id_from_state_listing():
+    listing = [
+        {"ClientName": "Brentwood", "ClientID": 12055},
+        {"ClientName": "Nolensville", "ClientID": 20633},
+    ]
+    assert parse_client_id(listing, "nolensville") == 20633
+    with pytest.raises(ValueError, match="No Municode client named 'Nolensvill'"):
+        parse_client_id(listing, "Nolensvill")
+
+
 def test_parse_code_product_id():
     assert parse_code_product_id(load_fixture("municode_clientcontent.json")) == 10159
 

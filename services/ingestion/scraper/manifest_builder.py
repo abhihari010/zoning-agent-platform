@@ -54,6 +54,17 @@ def _excerpt(text: str) -> str:
     return normalized[:_EXCERPT_MAX]
 
 
+def _collapse_keeping_lines(text: str) -> str:
+    """Collapse runs of spaces within each line, but keep the line breaks.
+
+    ``" ".join(text.split())`` also eats newlines, which runs every row of a
+    use table into its neighbours — so a ``|``-delimited grid still can't be
+    read column-wise.  Excerpts stay single-line; ``full_text`` does not.
+    """
+    lines = (" ".join(line.split()) for line in text.split("\n"))
+    return "\n".join(line for line in lines if line)
+
+
 def _make_source_id(jurisdiction_id: str, record: SectionRecord, used: set[str]) -> str:
     ref_slug = slugify(record.section_ref) or slugify(record.heading) or "section"
     base = f"{jurisdiction_id}-{ref_slug}"
@@ -76,7 +87,7 @@ def section_to_source(
     fallback_date_source: str = "unknown",
 ) -> dict[str, Any]:
     """Convert one SectionRecord into a manifest source dict."""
-    full_text = " ".join(record.text.split())[:_FULL_TEXT_MAX]
+    full_text = _collapse_keeping_lines(record.text)[:_FULL_TEXT_MAX]
     effective = record.effective_date or fallback_effective_date
     metadata: dict[str, Any] = {
         "verification_status": "scraped",

@@ -71,25 +71,46 @@ def _extract_excerpt(body: str) -> str:
     return normalized[:500]
 
 
-def _chunk_text(text: str, max_chars: int = DEFAULT_CHUNK_MAX_CHARS) -> list[str]:
-    normalized = " ".join(text.split())
-    if len(normalized) <= max_chars:
-        return [normalized] if normalized else []
-
-    chunks: list[str] = []
-    words = normalized.split()
+def _wrap_line(line: str, max_chars: int) -> list[str]:
+    """Greedily word-wrap one line that is itself longer than ``max_chars``."""
+    parts: list[str] = []
     current: list[str] = []
-
-    for word in words:
-        candidate = " ".join([*current, word])
-        if current and len(candidate) > max_chars:
-            chunks.append(" ".join(current))
+    for word in line.split():
+        if current and len(" ".join([*current, word])) > max_chars:
+            parts.append(" ".join(current))
             current = [word]
         else:
             current.append(word)
-
     if current:
-        chunks.append(" ".join(current))
+        parts.append(" ".join(current))
+    return parts
+
+
+def _chunk_text(text: str, max_chars: int = DEFAULT_CHUNK_MAX_CHARS) -> list[str]:
+    # Line breaks are load-bearing: one row of a use table is one line, and
+    # flattening them runs every row into its neighbours, which destroys the
+    # use -> district mapping the row encodes.  Collapse spaces within a line,
+    # never across lines.
+    normalized = "\n".join(
+        " ".join(line.split()) for line in text.split("\n") if line.strip()
+    )
+    if not normalized:
+        return []
+    if len(normalized) <= max_chars:
+        return [normalized]
+
+    chunks: list[str] = []
+    current = ""
+    for line in normalized.split("\n"):
+        for piece in _wrap_line(line, max_chars):
+            candidate = f"{current}\n{piece}" if current else piece
+            if current and len(candidate) > max_chars:
+                chunks.append(current)
+                current = piece
+            else:
+                current = candidate
+    if current:
+        chunks.append(current)
     return chunks
 
 
