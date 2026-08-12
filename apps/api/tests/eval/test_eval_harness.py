@@ -414,3 +414,23 @@ def test_abstention_passes_on_low_confidence(tmp_path: Path) -> None:
     )
     assert scorecard.abstention_correctness == 1.0
     assert scorecard.gates_passed
+
+
+def test_section_ref_normalization_absorbs_marker_and_trailing_period():
+    """Datasets and freshly scraped packs disagree on the trailing period.
+
+    Eight datasets assert refs like "Sec. 24-3305." while a rescraped pack
+    emits "Sec. 24-3305"; without normalizing both away, promoting any
+    rescraped pack silently drops required_citation_recall to 0.000.
+    """
+    from tests.eval.runner import _normalize_section_ref
+
+    variants = ["24-3305", "Sec. 24-3305", "SEC. 24-3305.", "§ 24-3305.", "Section 24-3305."]
+    assert len({_normalize_section_ref(v) for v in variants}) == 1
+
+    # Interior dots are part of the number and must survive.
+    assert _normalize_section_ref("Sec. 4.3.9.") == "4.3.9"
+    assert _normalize_section_ref("4.3.9") == "4.3.9"
+    # Distinct sections stay distinct.
+    assert _normalize_section_ref("24-3305.") != _normalize_section_ref("24-3306.")
+    assert _normalize_section_ref(None) == ""

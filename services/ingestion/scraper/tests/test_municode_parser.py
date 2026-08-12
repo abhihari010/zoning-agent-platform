@@ -311,3 +311,19 @@ def test_find_zoning_node_in_volumes_prefers_chapter_over_charter_section():
     )
     assert node_id == "CORO1979_CH36.2ZO"
     assert heading == "Chapter 36.2 - ZONING"
+
+
+def test_parse_job_treats_dotnet_min_date_as_no_date():
+    """Municode serves DateTime.MinValue when it has no publish date.
+
+    Laundering it through puts "0001-01-01" on every source in the pack, which
+    then displays as the ordinance's effective date.
+    """
+    from services.ingestion.scraper.fetchers.municode import parse_job
+
+    job_id, effective = parse_job({"Id": 7, "PublishDate": "0001-01-01T00:00:00"})
+    assert job_id == 7
+    assert effective is None
+
+    _, real = parse_job({"Id": 7, "PublishDate": "2025-06-10T00:00:00"})
+    assert real == "2025-06-10"

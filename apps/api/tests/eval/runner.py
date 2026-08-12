@@ -97,17 +97,20 @@ def _citations_valid(
 def _normalize_section_ref(ref: str | None) -> str:
     """Canonicalize a section_ref for robust string matching.
 
-    Strips a leading section marker (``Sec.`` / ``Section`` / ``§``), collapses
-    internal whitespace, and case-folds, so that harmless format drift
-    (``"10-24"`` vs ``"Sec. 10-24"`` vs ``"SEC. 10-24"``) does not silently zero
-    the required-citation gate. This is *test-harness* robustness only —
+    Strips a leading section marker (``Sec.`` / ``Section`` / ``§``) and any
+    trailing period, collapses internal whitespace, and case-folds, so that
+    harmless format drift (``"10-24"`` vs ``"Sec. 10-24"`` vs ``"SEC. 10-24"``
+    vs ``"Sec. 10-24."``) does not silently zero the required-citation gate.
+    The trailing period matters in practice: eight datasets assert refs like
+    ``"Sec. 24-3305."`` while a freshly scraped pack emits ``"Sec. 24-3305"``,
+    so without this a rescrape would drop their recall to 0.000. This is *test-harness* robustness only —
     production retrieval is semantic and never string-matches ``section_ref``.
     Returns ``""`` for falsy input so empty refs never match.
     """
     if not ref:
         return ""
     s = re.sub(r"^\s*(?:§+|sec(?:tion)?\.?)\s*", "", ref.strip(), flags=re.IGNORECASE)
-    return re.sub(r"\s+", " ", s).strip().casefold()
+    return re.sub(r"\s+", " ", s).strip().rstrip(".").casefold()
 
 
 def _corpus_section_refs(source_store: Any, jurisdiction_id: str) -> set[str]:

@@ -195,7 +195,7 @@ def run(args: argparse.Namespace) -> int:
         jurisdiction_id=args.jurisdiction_id,
         official_source_urls=args.url or None,
         coverage_status=args.coverage_status,
-        effective_date=result.effective_date,
+        effective_date=result.effective_date or args.effective_date,
         provenance=provenance,
         county_fips=args.county_fips,
         place_fips=args.place_fips,
@@ -298,6 +298,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--place-fips", default=None, help="5-digit Census place FIPS code.")
     parser.add_argument("--county-name", default=None, help="County name (sets county_name without deriving parent_jurisdiction_id).")
     parser.add_argument("--delay", type=float, default=1.0, help="Min seconds between requests.")
+    parser.add_argument(
+        "--effective-date",
+        default=None,
+        help=(
+            "ISO date to use when the source publishes none. On a rescrape, pass the "
+            "existing pack's effective_date: a publisher dropping the date does not "
+            "mean the ordinance stopped being in effect."
+        ),
+    )
     parser.add_argument(
         "--max-sections",
         type=int,
