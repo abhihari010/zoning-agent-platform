@@ -130,7 +130,15 @@ def _corpus_section_refs(source_store: Any, jurisdiction_id: str) -> set[str]:
 
     def _belongs(obj: Any) -> bool:
         jid = getattr(obj, "jurisdiction_id", None)
-        return jid is None or jid == jurisdiction_id
+        # "*" is the corpus's explicit global-scope marker (see
+        # ingestion.py, which stamps jurisdiction_scope="global" for it):
+        # statewide references like the VDH food-establishment guidance apply
+        # to every jurisdiction and are legitimately retrievable for any city.
+        # Excluding them here made a perfectly real citation count as a
+        # hallucinated section_ref, so any retrieval change that surfaced a
+        # global source into the top-k failed the =0.0 gate for a corpus that
+        # contains exactly the ref being cited.
+        return jid is None or jid == "*" or jid == jurisdiction_id
 
     refs: set[str] = set()
     for src in source_store.list_sources():
