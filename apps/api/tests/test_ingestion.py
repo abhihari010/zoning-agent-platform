@@ -274,3 +274,72 @@ def test_chunking_wraps_a_single_over_long_line():
     chunks = _chunk_text(" ".join(["word"] * 400), max_chars=100)
     assert chunks and all(len(c) <= 100 for c in chunks)
     assert " ".join(chunks).split() == ["word"] * 400
+
+
+def test_every_table_chunk_carries_its_header_row():
+    """Rows are meaningless without the header naming their columns.
+
+    Only the first chunk of a split table used to contain the header, so later
+    chunks were a grid of P/blank cells with no way to tell which district any
+    column belonged to.
+    """
+    header = "PRINCIPAL USE | R1 | C1 | M1"
+    rows = [f"Use Number {i} | | P | " for i in range(80)]
+    chunks = _chunk_text("\n".join([header, *rows]), max_chars=300)
+
+    assert len(chunks) > 1, "fixture should be big enough to split"
+    assert all(len(c) <= 300 for c in chunks)
+    for chunk in chunks:
+        assert chunk.split("\n")[0] == header
+    # The header is a heading, not a data row: it is never duplicated inside a
+    # chunk, and no row is lost to the re-seeding.
+    for chunk in chunks:
+        assert chunk.count(header) == 1
+    lines = [line for chunk in chunks for line in chunk.split("\n")]
+    for i in range(80):
+        assert f"Use Number {i} | | P |" in lines
+
+
+def test_table_header_reseeding_follows_the_nearest_band():
+    """Codes that restate the header per band must attribute rows to their own.
+
+    clarksville's 3.4 repeats its 27-column header for each use category; using
+    the section's first header for every row would mislabel every later band.
+    """
+    first = "USE | AG | R1"
+    second = "USE | C1 | M2"
+    text = "\n".join(
+        [first, *[f"Alpha {i} | P | " for i in range(40)],
+         "Prose paragraph breaking the run.",
+         second, *[f"Beta {i} | | P" for i in range(40)]]
+    )
+    chunks = _chunk_text(text, max_chars=200)
+    # A chunk may straddle the boundary and legitimately hold both headers; the
+    # invariant is that whichever rows a chunk contains, their own header
+    # travels with them.
+    for chunk in chunks:
+        if "Alpha " in chunk:
+            assert first in chunk
+        if "Beta " in chunk:
+            assert second in chunk
+
+
+def test_source_text_hash_changes_when_only_line_structure_differs():
+    """Staleness detection keys on this hash, so it must see line structure.
+
+    Hashing the flattened text made a re-chunk invisible to the auto-reindex:
+    existing chunks kept matching and were never rebuilt.
+    """
+    def hash_of(text: str) -> str:
+        entry = SourceRegistryEntry(
+            source_id="t-1",
+            title="Sec. 1 - Table.",
+            excerpt="excerpt text",
+            full_text=text,
+            section_ref="Sec. 1",
+            jurisdiction_id="t",
+            url="https://example.com",
+        )
+        return build_source_chunks([entry])[0].source_text_hash
+
+    assert hash_of("A | P | \nB | | P") != hash_of("A | P | B | | P")

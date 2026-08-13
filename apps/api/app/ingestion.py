@@ -86,27 +86,68 @@ def _wrap_line(line: str, max_chars: int) -> list[str]:
     return parts
 
 
+def _table_header_by_line(lines: list[str]) -> list[str | None]:
+    """Map each table row to the header row that gives its columns meaning.
+
+    A "table line" carries at least two ``|`` delimiters.  The first line of a
+    contiguous run of table lines is that run's header; every later line in the
+    run maps back to it.  Non-table lines, and the header itself, map to
+    ``None``.
+
+    Runs are tracked per band, so an ordinance that repeats its header part-way
+    through a long use table (clarksville's ``3.4`` restates the 27-column
+    header for each of its use categories) attributes each row to the header
+    actually above it rather than to the first header in the section.
+    """
+    headers: list[str | None] = []
+    run_header: str | None = None
+    for line in lines:
+        if line.count("|") >= 2:
+            if run_header is None:
+                # This line opens the run, so it *is* the header.
+                headers.append(None)
+                run_header = line
+            else:
+                headers.append(run_header)
+        else:
+            headers.append(None)
+            run_header = None
+    return headers
+
+
 def _chunk_text(text: str, max_chars: int = DEFAULT_CHUNK_MAX_CHARS) -> list[str]:
     # Line breaks are load-bearing: one row of a use table is one line, and
     # flattening them runs every row into its neighbours, which destroys the
     # use -> district mapping the row encodes.  Collapse spaces within a line,
     # never across lines.
-    normalized = "\n".join(
-        " ".join(line.split()) for line in text.split("\n") if line.strip()
-    )
-    if not normalized:
+    lines = [" ".join(line.split()) for line in text.split("\n") if line.strip()]
+    if not lines:
         return []
+    normalized = "\n".join(lines)
     if len(normalized) <= max_chars:
         return [normalized]
 
+    # A use table splits across several chunks, but only the first one contains
+    # the header row.  Every later chunk is then a grid of P/CU/blank cells with
+    # nothing naming the columns, so the district a cell belongs to is
+    # unrecoverable -- the same loss of district attribution the scraper fix
+    # addressed, reintroduced at chunk boundaries.  Re-seed each new chunk with
+    # the header of the table run it continues.
+    headers = _table_header_by_line(lines)
+
     chunks: list[str] = []
     current = ""
-    for line in normalized.split("\n"):
+    for line, header in zip(lines, headers):
         for piece in _wrap_line(line, max_chars):
             candidate = f"{current}\n{piece}" if current else piece
             if current and len(candidate) > max_chars:
                 chunks.append(current)
-                current = piece
+                # Seed only when the header still leaves room for the row, so a
+                # pathologically wide header cannot starve the chunk.
+                if header and len(header) + 1 + len(piece) <= max_chars:
+                    current = f"{header}\n{piece}"
+                else:
+                    current = piece
             else:
                 current = candidate
     if current:
@@ -167,7 +208,17 @@ def build_source_chunks(sources: list[SourceRegistryEntry]) -> list[SourceChunk]
 
     for source in sorted(sources, key=lambda item: item.source_id):
         raw_text = source.full_text or source.excerpt
-        source_text = " ".join(raw_text.split())
+        # Keep line breaks: chunking is line-aware because one use-table row is
+        # one line.  Collapsing them here (the previous " ".join(split())) fed
+        # _chunk_text a single line, which silently disabled both its row
+        # handling and the header re-seeding below for every non-markdown
+        # source -- i.e. for every scraped source pack.  The hash is taken over
+        # the same text we chunk so that changing this actually marks existing
+        # chunks stale; hashing the flattened form would leave them looking
+        # current forever.
+        source_text = "\n".join(
+            " ".join(line.split()) for line in raw_text.split("\n") if line.strip()
+        )
         source_text_hash = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
         source_version = source.source_version or source_text_hash[:16]
 
