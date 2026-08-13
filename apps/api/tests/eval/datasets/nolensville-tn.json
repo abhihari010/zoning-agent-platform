@@ -1,0 +1,158 @@
+[
+  {
+    "id": "nolensville-tn-sfr-cd3",
+    "address": "1200 Sunnybrook Drive, Nolensville, TN 37135",
+    "project_description": "Build a new detached single-family home on a vacant lot in an established low-density neighborhood where houses are the predominant building type.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-sfr-cd2l",
+    "address": "8500 Clovercroft Road, Nolensville, TN 37135",
+    "project_description": "Build a new single-family farmhouse on a large vacant parcel in a sparsely settled, primarily agricultural rural area on the edge of town.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-townhomes-cd4",
+    "address": "300 Stonebrook Boulevard, Nolensville, TN 37135",
+    "project_description": "Build a row of attached townhouse dwellings in a walkable neighborhood center with a mix of building types near local shops and offices.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-restaurant-cd4c",
+    "address": "7180 Nolensville Road, Nolensville, TN 37135",
+    "project_description": "Open a full-service restaurant with indoor dining in an existing storefront along a mixed-use corridor that serves both pedestrians and drivers.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-medical-office-oi",
+    "address": "200 Bridgestone Boulevard, Nolensville, TN 37135",
+    "project_description": "Lease and fit out a medical office suite for a physician practice in an office-industrial business park.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-bed-breakfast-cd4hv",
+    "address": "110 King Street, Nolensville, TN 37135",
+    "project_description": "Open a small bed and breakfast with guest rooms inside a historic home in the town's historic village district.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-group-home",
+    "address": "615 Rocky Fork Road, Nolensville, TN 37135",
+    "project_description": "Establish a group home providing supportive housing for persons with disabilities in an established residential neighborhood.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9", "8.5.16"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-comm-tower",
+    "address": "1400 Rocky Springs Road, Nolensville, TN 37135",
+    "project_description": "Install a new wireless communications tower on a large rural parcel to improve cellular coverage in the area.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9", "8.5.16"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-car-wash",
+    "address": "500 Firestone Parkway, Nolensville, TN 37135",
+    "project_description": "Build a new automatic car wash facility with vacuum stations along a busy commercial corridor.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-landfill",
+    "address": "1900 Old Burkitt Road, Nolensville, TN 37135",
+    "project_description": "Develop a new municipal solid waste landfill on a large rural parcel at the edge of town.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-heavy-industrial",
+    "address": "50 Heil Quaker Boulevard, Nolensville, TN 37135",
+    "project_description": "Construct a heavy industrial manufacturing plant with large-scale processing equipment in the town's office-industrial business park.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["4.3.9"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nolensville-tn-abstain-data-center",
+    "address": "1 Corporate Place, Nolensville, TN 37135",
+    "project_description": "Construct a large hyperscale data center campus with server buildings, backup diesel generators, and on-site electrical substations.",
+    "jurisdiction_id": "nolensville-tn",
+    "expect": {
+      "decision_in": ["unknown"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [],
+      "min_confidence": 0.0,
+      "should_abstain": true
+    }
+  }
+]

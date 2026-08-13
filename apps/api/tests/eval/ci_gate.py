@@ -185,6 +185,20 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # Manufacturing:", "Convenience Store:"), so all 4/4 conditional scenarios'
     # "5.1" ref land. Live vector recall is the quality signal.
     "clarksville-tn": 0.30,
+    # 2026-08-12: nolensville-tn 0.769 (a form-based SmartCode: every scenario's
+    # primary ref is 4.3.9 Uses, ONE section holding all three master use tables
+    # — Table 4.3.9.A-1 Principal Uses plus the "D." limited-use-standards prose
+    # for every PL/CU use — for all eleven Character/Civic Districts, so its
+    # keyword vocabulary is broad but not diluted per scenario and "4.3.9" lands
+    # for 11/12 scenarios; the lone table miss is the medical-office scenario,
+    # where that vocabulary competes with dozens of other unrelated use rows.
+    # The two conditional-use scenarios (group home, communications tower) also
+    # require the companion Board-of-Zoning-Appeals procedural section 8.5.16,
+    # a short cross-cutting reference whose keyword vocabulary (permits,
+    # variances) doesn't overlap the scenario's use-specific terms — same
+    # supporting-ref miss pattern as springfield's A-802/A-1306. Live vector
+    # recall is the quality signal.
+    "nolensville-tn": 0.65,
 }
 # chesapeake-va: intentionally absent, so recall is reported but NOT enforced.
 # It held 0.200 while the SIC use tables were flattened to "P P P P P P". After
