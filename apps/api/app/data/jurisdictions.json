@@ -894,8 +894,8 @@
     "county_fips": null,
     "place_fips": null,
     "jurisdiction_type": "municipality",
-    "coverage_status": "source_indexed",
-    "supported": false,
+    "coverage_status": "public_supported",
+    "supported": true,
     "match_strategy": "locality",
     "locality_names": [
       "Clarksville"
@@ -950,8 +950,8 @@
     "county_fips": null,
     "place_fips": null,
     "jurisdiction_type": "municipality",
-    "coverage_status": "source_indexed",
-    "supported": false,
+    "coverage_status": "public_supported",
+    "supported": true,
     "match_strategy": "locality",
     "locality_names": [
       "Nolensville"
