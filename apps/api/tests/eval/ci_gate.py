@@ -209,7 +209,9 @@ CI_RECALL_FLOORS: dict[str, float] = {
 # columns are blank again), but ~15-20% of every table chunk is now "|"
 # delimiters, and keyword scoring normalizes by length — so the tables rank
 # BELOW their own prose neighbours (a farmers-market query retrieves § 10-601
-# "Description." instead of the § 10-602 table). Measured 0.000 on 2026-08-12.
+# "Description." instead of the § 10-602 table). Measured 0.000 on 2026-08-12,
+# recovering to 0.100 once every table chunk carried its header row. Still too
+# low to floor meaningfully, so the entry stays out.
 # Nothing was lost to cause this: 0 sources removed, 0 sources shrank, +97
 # sources gained. A floor here would be vacuous, so there is none; the three
 # universal gates (citation_validity 1.0, hallucinated 0.0, abstention 1.0)
