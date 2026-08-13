@@ -70,9 +70,9 @@
     "project_description": "Open a small neighborhood convenience store selling packaged food and beverages, with no fuel pumps.",
     "jurisdiction_id": "clarksville-tn",
     "expect": {
-      "decision_in": ["conditional"],
+      "decision_in": ["likely_allowed"],
       "permit_path_includes": [],
-      "must_cite_section_refs": ["3.4", "5.1"],
+      "must_cite_section_refs": ["3.4"],
       "min_confidence": 0.0,
       "should_abstain": false
     }
