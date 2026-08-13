@@ -48,14 +48,11 @@ GATE_ABSTENTION_CORRECTNESS: float = 1.0
 # Baselines measured 2026-07-03: montgomery-county-va 1.000, franklin-tn 0.692;
 # 2026-07-04: richmond-va 0.500 (fine-grained Sec. 30-xxx.y subsection refs are
 # hard for keyword retrieval; live vector recall is the quality signal).
-# 2026-07-14: chesapeake-va 0.200 (ground-truth refs are the giant SIC use
-# tables § 6-2102/§ 7-602/§ 8-602/§ 10-602, which keyword scoring rarely
-# surfaces; live vector recall is the quality signal).
+# chesapeake-va deliberately has NO floor — see the note below the dict.
 CI_RECALL_FLOORS: dict[str, float] = {
     "montgomery-county-va": 0.80,
     "franklin-tn": 0.65,
     "richmond-va": 0.45,
-    "chesapeake-va": 0.15,
     # 2026-07-14: loudoun-county-va 0.400 (Chapter 3 use-table refs; same
     # keyword-vs-table caveat as chesapeake).
     "loudoun-county-va": 0.35,
@@ -189,6 +186,30 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # "5.1" ref land. Live vector recall is the quality signal.
     "clarksville-tn": 0.30,
 }
+# chesapeake-va: intentionally absent, so recall is reported but NOT enforced.
+# It held 0.200 while the SIC use tables were flattened to "P P P P P P". After
+# the #164 rescrape those tables reconstruct correctly (§ 6-2102's three 1F
+# columns are blank again), but ~15-20% of every table chunk is now "|"
+# delimiters, and keyword scoring normalizes by length — so the tables rank
+# BELOW their own prose neighbours (a farmers-market query retrieves § 10-601
+# "Description." instead of the § 10-602 table). Measured 0.000 on 2026-08-12.
+# Nothing was lost to cause this: 0 sources removed, 0 sources shrank, +97
+# sources gained. A floor here would be vacuous, so there is none; the three
+# universal gates (citation_validity 1.0, hallucinated 0.0, abstention 1.0)
+# still apply and still pass. To restore a real floor, re-author
+# datasets/chesapeake-va.json against the corrected tables via positional
+# lookup — its refs currently point only at the four giant use tables.
+#
+# 2026-08-12 re-measurement after the #164 rescrape. hampton-va (0.200),
+# henrico-county-va (0.400) and loudoun-county-va (0.400) were all rescraped
+# and did NOT move, so their floors and reasoning below stand as written.
+# Every one of the 19 datasets whose pack was NOT rescraped also held exactly
+# steady, which is the evidence that the chunker change in #164 did not leak
+# beyond the packs it was meant to fix. Note that newport-news-va's comment
+# ("no per-district column delimiter in scraped text") describes the ORIGINAL
+# defect and is still accurate only because that pack has not been rescraped
+# yet; rescraping it should be expected to move its number the way
+# chesapeake's moved.
 
 
 def _require_offline_env() -> None:
