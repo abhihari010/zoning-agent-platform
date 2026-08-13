@@ -55,4 +55,3 @@ apps/api/*.htm
 apps/api/*.xml
 apps/api/*.js
 **/.impeccable/
-scripts/va_breadth_cities.json

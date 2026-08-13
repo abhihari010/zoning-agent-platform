@@ -1,0 +1,194 @@
+[
+  {
+    "city": "Virginia Beach",
+    "state": "VA",
+    "jurisdiction_id": "virginia-beach-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/virginia_beach — zoning in Appendix A (nodeId=CO_APXAZOOR)"
+  },
+  {
+    "city": "Norfolk",
+    "state": "VA",
+    "jurisdiction_id": "norfolk-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/norfolk — zoning in ZOOR (separate code within Code of Ordinances)"
+  },
+  {
+    "city": "Chesapeake",
+    "state": "VA",
+    "jurisdiction_id": "chesapeake-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/chesapeake — zoning at /codes/zoning (separate code slug) and Appendix A of Code of Ordinances"
+  },
+  {
+    "city": "Richmond",
+    "state": "VA",
+    "jurisdiction_id": "richmond-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/richmond — zoning in Ch. 30 (nodeId=CH30ZO). Note: Richmond County (separate county entity) is on amlegal; this entry is the City only."
+  },
+  {
+    "city": "Newport News",
+    "state": "VA",
+    "jurisdiction_id": "newport-news-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/newport_news — zoning in Ch. 45 (nodeId=CD_ORD_CH45ZOOR)"
+  },
+  {
+    "city": "Alexandria",
+    "state": "VA",
+    "jurisdiction_id": "alexandria-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/alexandria — zoning as standalone code at /codes/zoning (separate code slug, codified through Ord. 5593 June 2025)"
+  },
+  {
+    "city": "Hampton",
+    "state": "VA",
+    "jurisdiction_id": "hampton-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/hampton — zoning at /codes/zoning (separate code slug)"
+  },
+  {
+    "city": "Portsmouth",
+    "state": "VA",
+    "jurisdiction_id": "portsmouth-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/portsmouth — zoning in Ch. 40.1 and Ch. 40.2 of Code of Ordinances"
+  },
+  {
+    "city": "Suffolk",
+    "state": "VA",
+    "jurisdiction_id": "suffolk-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/suffolk — zoning in Ch. 98 of Code of Ordinances; also has a separate Unified Development Ordinance at /codes/unified_development_ordinance"
+  },
+  {
+    "city": "Lynchburg",
+    "state": "VA",
+    "jurisdiction_id": "lynchburg-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/lynchburg — zoning in Ch. 35.2 (nodeId=CH35.2ZOOR), codified through Ord. O-25-021 March 2025"
+  },
+  {
+    "city": "Charlottesville",
+    "state": "VA",
+    "jurisdiction_id": "charlottesville-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/charlottesville — zoning in Ch. 34 (nodeId=CO_CH34ZO), codified through Ord. O-26-036 March 2026"
+  },
+  {
+    "city": "Danville",
+    "state": "VA",
+    "jurisdiction_id": "danville-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/danville — zoning at /codes/zoning (separate code slug). Adopted new Unified Development Code effective Jan 1 2026."
+  },
+  {
+    "city": "Manassas",
+    "state": "VA",
+    "jurisdiction_id": "manassas-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/manassas — zoning in Ch. 130 (nodeId=PTIICOOR_CH130ZO), codified through Ord. O-2025-933 July 2025"
+  },
+  {
+    "city": "Winchester",
+    "state": "VA",
+    "jurisdiction_id": "winchester-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/winchester — zoning at /codes/zoning_and_subdivision_ordinance (separate code slug, nodeId=ZOOR)"
+  },
+  {
+    "city": "Salem",
+    "state": "VA",
+    "jurisdiction_id": "salem-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/salem — zoning in Ch. 106 (nodeId=PTIICO_CH106ZO)"
+  },
+  {
+    "city": "Fredericksburg",
+    "state": "VA",
+    "jurisdiction_id": "fredericksburg-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "ecode360",
+    "code_id": "FR3526",
+    "coverage_status": "source_indexed",
+    "_note": "ECODE360 TARGET — Verified: ecode360.com/FR3526 (City of Fredericksburg, VA). Zoning in Ch. 72 Unified Development Ordinance (e.g. nodeId=29088644, form-based regs at 36716400). NOTE: batch_scrape.py _entry_to_namespace does not map code_id from JSON — fetcher auto-resolves via /ajax/code/info when code_id=None; code_id documented here for human reference."
+  },
+  {
+    "city": "Staunton",
+    "state": "VA",
+    "jurisdiction_id": "staunton-va",
+    "jurisdiction_type": "independent_city",
+    "fetcher": "ecode360",
+    "code_id": "ST4660",
+    "coverage_status": "source_indexed",
+    "_note": "ECODE360 TARGET — Verified: ecode360.com/ST4660 (City of Staunton, VA — legislation through 01-08-2026). Zoning in Title 18. NOTE: batch_scrape.py _entry_to_namespace does not map code_id from JSON — fetcher auto-resolves via /ajax/code/info; code_id documented here for human reference."
+  },
+  {
+    "city": "Loudoun County",
+    "state": "VA",
+    "jurisdiction_id": "loudoun-county-va",
+    "jurisdiction_type": "county",
+    "fetcher": "encodeplus",
+    "regs_slug": "loudouncounty-va-zo",
+    "coverage_status": "source_indexed",
+    "_note": "ENCODEPLUS TARGET — Verified: online.encodeplus.com/regs/loudouncounty-va-zo (the current standalone Zoning Ordinance; 977 sections). This entry previously said fetcher=amlegal with client_slug=loudouncounty / code_slug=loudounco_va, which is WRONG: that route yields ~11 sources dated 1998/2008 — the older pre-2023 codified planning/zoning chapters, a completely different document. IMPORTANT: enCodePlus publishes no effective date for this regulation, so a bare scrape stamps today as retrieval_date; pass --effective-date (the committed pack carries 2026-07-03). batch_scrape.py _entry_to_namespace does not thread effective_date, so date-sensitive rescrapes must run run_scrape.py directly."
+  },
+  {
+    "city": "Prince William County",
+    "state": "VA",
+    "jurisdiction_id": "prince-william-county-va",
+    "jurisdiction_type": "county",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/prince_william_county — zoning in Ch. 32 (nodeId=CH32ZO). Municode updates lag ~4 months; recent amendments on county zoning text amendments page."
+  },
+  {
+    "city": "Henrico County",
+    "state": "VA",
+    "jurisdiction_id": "henrico-county-va",
+    "jurisdiction_type": "county",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/henrico_county — zoning in Ch. 24 (nodeId=CD_ORD_CH24ZO), codified through Ord. 1342 June 2025"
+  },
+  {
+    "city": "Albemarle County",
+    "state": "VA",
+    "jurisdiction_id": "albemarle-county-va",
+    "jurisdiction_type": "county",
+    "fetcher": "municode",
+    "coverage_status": "source_indexed",
+    "_note": "Verified: library.municode.com/va/albemarle_county — zoning in Ch. 18 (nodeId=CH18ZO)"
+  }
+]
