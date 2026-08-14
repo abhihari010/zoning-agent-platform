@@ -42,7 +42,11 @@ from app.models import (
     UsageSummaryResponse,
 )
 from app.orchestrator import PipelineTraceRecorder
-from app.rag.vector_store import get_vector_index_status, sync_vector_index
+from app.rag.vector_store import (
+    VectorIndexSyncResult,
+    get_vector_index_status,
+    sync_vector_index,
+)
 from app.settings import get_settings
 from app.auth import AuthContext, get_request_auth, require_user
 from app.services import analyze_project, ensure_seed_sources, normalize_address, suggest_addresses
@@ -50,6 +54,11 @@ from app.startup import readiness_health
 from app.storage import store
 
 router = APIRouter(prefix="/api/v1")
+
+# Sources per reindex page. 500 keeps one page's sources + chunks well under
+# ~15 MB of heap, so the reindex peak is set by the page rather than by the
+# corpus size and stops growing as more cities are added.
+REINDEX_SOURCE_PAGE_SIZE = 500
 
 
 def require_admin_access(
@@ -484,33 +493,71 @@ def reindex_sources(
 ) -> ReindexResponse:
     settings = get_settings()
     ensure_seed_sources()
-    sources = store.list_sources()
-    chunks = build_source_chunks(sources)
-    store.replace_source_chunks(chunks)
-    vector_result = sync_vector_index(
-        chunks, get_embedding_provider(settings), settings, full_rebuild=full_rebuild
-    )
+    embedding_provider = get_embedding_provider(settings)
+
+    # Walk the corpus a page at a time. Loading every source and materializing
+    # every chunk at once costs ~194 MB of Python heap at current corpus size
+    # (~93 MB of sources plus ~101 MB of chunks, both resident simultaneously),
+    # which is most of a 512 MB instance before the embedding batches are even
+    # allocated. Only the chunk *ids* have to survive across pages -- ~5 MB --
+    # because they are all the two end-of-run prunes need.
+    source_count = store.get_source_count()
+    all_chunk_ids: set[str] = set()
+    chunk_count = 0
+    vector_result: VectorIndexSyncResult | None = None
+    vector_warnings: list[str] = []
+
+    for offset in range(0, source_count, REINDEX_SOURCE_PAGE_SIZE):
+        page = store.list_sources(limit=REINDEX_SOURCE_PAGE_SIZE, offset=offset)
+        if not page:
+            break
+        page_chunks = build_source_chunks(page)
+        store.upsert_source_chunks(page_chunks)
+        # full_rebuild wipes the collection, so it may only run on the first
+        # page -- otherwise page N would erase pages 0..N-1.
+        page_vectors = sync_vector_index(
+            page_chunks,
+            embedding_provider,
+            settings,
+            full_rebuild=full_rebuild and offset == 0,
+            prune=False,
+        )
+        vector_warnings.extend(page_vectors.warnings)
+        vector_result = page_vectors
+        all_chunk_ids.update(chunk.chunk_id for chunk in page_chunks)
+        chunk_count += len(page_chunks)
+        del page, page_chunks
+
+    # Both prunes run once, after every page is durably written, so a chunk
+    # belonging to a later page is never mistaken for a stale one.
+    store.prune_source_chunks(all_chunk_ids)
+    if vector_result is not None:
+        vector_result = sync_vector_index(
+            [], embedding_provider, settings, prune=True, prune_keep_ids=all_chunk_ids
+        )
+        vector_warnings.extend(vector_result.warnings)
+
     invalidate_source_dependent_caches()
     store.audit(
         "source.reindex.completed",
         "source-registry",
         {
-            "source_count": len(sources),
-            "chunk_count": len(chunks),
-            "vector_provider": vector_result.provider,
-            "vector_count": vector_result.count,
-            "vector_index_ready": vector_result.ready,
-            "vector_warnings": vector_result.warnings,
+            "source_count": source_count,
+            "chunk_count": chunk_count,
+            "vector_provider": vector_result.provider if vector_result else "none",
+            "vector_count": vector_result.count if vector_result else 0,
+            "vector_index_ready": vector_result.ready if vector_result else False,
+            "vector_warnings": vector_warnings,
         },
     )
     return ReindexResponse(
         status="completed",
-        source_count=len(sources),
-        chunk_count=len(chunks),
-        vector_provider=vector_result.provider,
-        vector_count=vector_result.count,
-        vector_index_ready=vector_result.ready,
-        vector_warnings=vector_result.warnings,
+        source_count=source_count,
+        chunk_count=chunk_count,
+        vector_provider=vector_result.provider if vector_result else "none",
+        vector_count=vector_result.count if vector_result else 0,
+        vector_index_ready=vector_result.ready if vector_result else False,
+        vector_warnings=vector_warnings,
     )
 
 

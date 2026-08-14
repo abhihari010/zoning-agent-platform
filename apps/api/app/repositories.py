@@ -120,7 +120,9 @@ class StoreRepository(Protocol):
 
     def upsert_source(self, source: SourceRegistryEntry) -> SourceRegistryEntry: ...
 
-    def list_sources(self) -> list[SourceRegistryEntry]: ...
+    def list_sources(
+        self, *, limit: int | None = None, offset: int = 0
+    ) -> list[SourceRegistryEntry]: ...
 
     def list_source_summaries(
         self, *, limit: int | None = None, offset: int = 0
@@ -131,6 +133,10 @@ class StoreRepository(Protocol):
     def get_source_count(self) -> int: ...
 
     def replace_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]: ...
+
+    def upsert_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]: ...
+
+    def prune_source_chunks(self, keep_chunk_ids: set[str]) -> int: ...
 
     def list_source_chunks(self) -> list[SourceChunk]: ...
 
@@ -906,12 +912,24 @@ class SQLAlchemyStore:
         self.audit("source.upserted", source.source_id)
         return source
 
-    def list_sources(self) -> list[SourceRegistryEntry]:
+    def list_sources(
+        self, *, limit: int | None = None, offset: int = 0
+    ) -> list[SourceRegistryEntry]:
+        """Every source, or one page of them.
+
+        ``limit``/``offset`` page in SQL (same shape as ``list_source_summaries``)
+        so a reindex can walk the corpus a page at a time instead of holding
+        every source's ``full_text`` in memory at once. The ordering is stable,
+        which is what makes paging safe to iterate.
+        """
         try:
             with self.engine.connect() as connection:
-                rows = connection.execute(
-                    select(sources.c.payload_json).order_by(sources.c.source_id.asc())
-                ).all()
+                query = select(sources.c.payload_json).order_by(sources.c.source_id.asc())
+                if offset:
+                    query = query.offset(offset)
+                if limit is not None:
+                    query = query.limit(limit)
+                rows = connection.execute(query).all()
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not list sources: {exc}") from exc
 
@@ -1011,6 +1029,47 @@ class SQLAlchemyStore:
         )
 
     def replace_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]:
+        """Upsert ``chunks`` and drop everything else. Whole-corpus call.
+
+        Requires every chunk in memory at once. A paged reindex should call
+        ``upsert_source_chunks`` per page and ``prune_source_chunks`` once at
+        the end instead, which needs only the chunk *ids* to be retained.
+        """
+        self.upsert_source_chunks(chunks)
+        self.prune_source_chunks({chunk.chunk_id for chunk in chunks})
+        self.audit("source.chunks.reindexed", f"{len(chunks)} chunks")
+        return chunks
+
+    def prune_source_chunks(self, keep_chunk_ids: set[str]) -> int:
+        """Delete chunks whose id is not in ``keep_chunk_ids``; return the count.
+
+        Split out of ``replace_source_chunks`` so a paged reindex can defer the
+        prune until every page has been upserted. Only the id set has to survive
+        across pages (~5 MB for a 34k-chunk corpus, against ~194 MB for the
+        chunk objects themselves).
+        """
+        with _REINDEX_LOCK:
+            try:
+                with self.engine.begin() as connection:
+                    # Chunked so the id list never becomes one oversized statement.
+                    stale = [
+                        existing
+                        for (existing,) in connection.execute(select(source_chunks.c.chunk_id))
+                        if existing not in keep_chunk_ids
+                    ]
+                    for start in range(0, len(stale), _CHUNK_INSERT_BATCH):
+                        connection.execute(
+                            delete(source_chunks).where(
+                                source_chunks.c.chunk_id.in_(
+                                    stale[start : start + _CHUNK_INSERT_BATCH]
+                                )
+                            )
+                        )
+            except SQLAlchemyError as exc:
+                raise DatabaseStorageError(f"Could not prune source chunks: {exc}") from exc
+        return len(stale)
+
+    def upsert_source_chunks(self, chunks: list[SourceChunk]) -> list[SourceChunk]:
         now = datetime.now(timezone.utc)
 
         def row(chunk: SourceChunk) -> dict:
@@ -1047,27 +1106,9 @@ class SQLAlchemyStore:
                     for start in range(0, len(chunks), _CHUNK_INSERT_BATCH):
                         batch = [row(c) for c in chunks[start : start + _CHUNK_INSERT_BATCH]]
                         connection.execute(self._chunk_upsert_statement(), batch)
-
-                    # Drop rows whose source or section no longer exists. Chunked so the
-                    # id list never becomes one oversized statement.
-                    keep = {chunk.chunk_id for chunk in chunks}
-                    stale = [
-                        existing
-                        for (existing,) in connection.execute(select(source_chunks.c.chunk_id))
-                        if existing not in keep
-                    ]
-                    for start in range(0, len(stale), _CHUNK_INSERT_BATCH):
-                        connection.execute(
-                            delete(source_chunks).where(
-                                source_chunks.c.chunk_id.in_(
-                                    stale[start : start + _CHUNK_INSERT_BATCH]
-                                )
-                            )
-                        )
             except SQLAlchemyError as exc:
                 raise DatabaseStorageError(f"Could not replace source chunks: {exc}") from exc
 
-        self.audit("source.chunks.reindexed", f"{len(chunks)} chunks")
         return chunks
 
     def list_source_chunks(self) -> list[SourceChunk]:
