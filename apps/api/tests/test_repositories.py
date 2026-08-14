@@ -207,3 +207,74 @@ def test_repository_round_trips_current_storage_operations(tmp_path, case_name: 
     assert repository.get_project(second_project.project_id) is None
     assert repository.list_projects("user-1") == []
     assert repository.get_user("user-1").disabled_at is not None
+
+
+def _source(n: int) -> SourceRegistryEntry:
+    return SourceRegistryEntry(
+        source_id=f"paged-src-{n:03d}",
+        title=f"Sec. {n} - Paged Source.",
+        excerpt="Excerpt long enough to satisfy the minimum length rule.",
+        full_text=(
+            f"USE | R1 | C1\nRow {n} A | P | \nRow {n} B | | P\n"
+            "Prose tail with enough characters to make a useful chunk for indexing."
+        ),
+        section_ref=f"Sec. {n}",
+        jurisdiction_id="blacksburg-va",
+        source_type="zoning_ordinance",
+    )
+
+
+def test_paged_reindex_matches_whole_corpus_reindex(tmp_path) -> None:
+    """A paged reindex must be behaviour-preserving.
+
+    The reindex route walks sources a page at a time so the whole corpus is
+    never resident at once, upserting per page and pruning once at the end.
+    That is only safe if it lands the same chunk set as the whole-corpus path
+    AND the deferred prune does not delete a later page's chunks.
+    """
+    from app.ingestion import build_source_chunks
+
+    entries = [_source(i) for i in range(25)]
+
+    whole = SQLAlchemyStore(tmp_path / "whole.sqlite3")
+    whole.reset()
+    for entry in entries:
+        whole.upsert_source(entry)
+    expected = whole.replace_source_chunks(build_source_chunks(whole.list_sources()))
+
+    paged = SQLAlchemyStore(tmp_path / "paged.sqlite3")
+    paged.reset()
+    for entry in entries:
+        paged.upsert_source(entry)
+
+    page_size = 10
+    seen: set[str] = set()
+    total = paged.get_source_count()
+    assert total == 25
+    for offset in range(0, total, page_size):
+        page = paged.list_sources(limit=page_size, offset=offset)
+        assert page, "paging must not yield an empty page inside range"
+        page_chunks = build_source_chunks(page)
+        paged.upsert_source_chunks(page_chunks)
+        seen.update(c.chunk_id for c in page_chunks)
+    paged.prune_source_chunks(seen)
+
+    assert {c.chunk_id for c in expected} == seen
+    assert {c.chunk_id for c in paged.list_source_chunks()} == {c.chunk_id for c in expected}
+    by_id = {c.chunk_id: c.chunk_text for c in paged.list_source_chunks()}
+    assert all(by_id[c.chunk_id] == c.chunk_text for c in expected)
+
+
+def test_list_sources_paging_covers_every_source_exactly_once(tmp_path) -> None:
+    repository = SQLAlchemyStore(tmp_path / "paging.sqlite3")
+    repository.reset()
+    for i in range(25):
+        repository.upsert_source(_source(i))
+
+    collected: list[str] = []
+    for offset in range(0, 25, 7):
+        collected.extend(s.source_id for s in repository.list_sources(limit=7, offset=offset))
+
+    assert collected == [s.source_id for s in repository.list_sources()]
+    assert len(collected) == len(set(collected)) == 25
+    assert repository.list_sources(limit=7, offset=25) == []

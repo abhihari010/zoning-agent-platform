@@ -326,6 +326,8 @@ def sync_vector_index(
     settings: Settings | None = None,
     *,
     full_rebuild: bool = False,
+    prune: bool = True,
+    prune_keep_ids: set[str] | None = None,
 ) -> VectorIndexSyncResult:
     """Reconcile Qdrant with ``chunks``, embedding only what is missing.
 
@@ -415,7 +417,16 @@ def sync_vector_index(
     # treat the result as "nothing done" with count=0 for clarity.
     # Otherwise return the real count reflecting durable progress.
     try:
-        store.delete_missing_chunk_ids({chunk.chunk_id for chunk in chunks})
+        # A paged reindex passes prune=False for each page (the other pages'
+        # ids are not in `chunks`, so pruning per page would delete work the
+        # run is still doing) and makes one final call with prune_keep_ids set
+        # to every id in the corpus.
+        if prune:
+            store.delete_missing_chunk_ids(
+                prune_keep_ids
+                if prune_keep_ids is not None
+                else {chunk.chunk_id for chunk in chunks}
+            )
         count = store.count()
     except Exception as exc:
         warnings.append(f"Post-sync cleanup failed: {exc}")
