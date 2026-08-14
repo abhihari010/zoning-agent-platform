@@ -48,7 +48,6 @@ GATE_ABSTENTION_CORRECTNESS: float = 1.0
 # Baselines measured 2026-07-03: montgomery-county-va 1.000, franklin-tn 0.692;
 # 2026-07-04: richmond-va 0.500 (fine-grained Sec. 30-xxx.y subsection refs are
 # hard for keyword retrieval; live vector recall is the quality signal).
-# chesapeake-va deliberately has NO floor — see the note below the dict.
 CI_RECALL_FLOORS: dict[str, float] = {
     "montgomery-county-va": 0.80,
     "franklin-tn": 0.65,
@@ -201,23 +200,54 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # variances) doesn't overlap the scenario's use-specific terms — same
     # supporting-ref miss pattern as springfield's A-802/A-1306. Live vector
     # recall is the quality signal.
+    # 2026-08-14: re-measured at 0.692 (one "4.3.9" hit fewer, 10/12 instead of
+    # 11/12). The 0.769 above predates #169, which re-seeded a table's header row
+    # into each of its chunks and so shifted this pack's keyword weighting; the
+    # floor was set below both numbers and still holds. Every other one of the 26
+    # datasets held its documented value exactly in that same run.
     "nolensville-tn": 0.65,
+    # 2026-08-14: chesapeake-va 0.400, re-authored to co-cite each use table's
+    # legend section (§ 6-2101, § 7-601, § 8-601, § 10-601 — "Key of symbols
+    # used in tables"). That is a correctness fix, not a scoring one: the
+    # tables' columns are headed "1F"/"2F"/"B-2"/"M1"/"A1", and ONLY the legend
+    # says "1F ... includes ... R-10s" or "M1 | M-1 light industrial district",
+    # so a citation to § 6-2102 alone does not let a reader confirm the parcel's
+    # district maps to the column that was read. Each legend also carries the
+    # numbered "Special conditions pertaining to specific uses" list that gives a
+    # "C" cell its meaning, which the two CUP scenarios depend on. The legends
+    # are prose and keyword-reachable (8/10 land), while the tables stay
+    # keyword-hard for the pipe-dilution reason in the note below, so recall went
+    # 0.100 -> 0.400 with the corpus untouched. Live vector recall is the quality
+    # signal.
+    "chesapeake-va": 0.30,
 }
-# chesapeake-va: intentionally absent, so recall is reported but NOT enforced.
-# It held 0.200 while the SIC use tables were flattened to "P P P P P P". After
-# the #164 rescrape those tables reconstruct correctly (§ 6-2102's three 1F
-# columns are blank again), but ~15-20% of every table chunk is now "|"
-# delimiters, and keyword scoring normalizes by length — so the tables rank
-# BELOW their own prose neighbours (a farmers-market query retrieves § 10-601
-# "Description." instead of the § 10-602 table). Measured 0.000 on 2026-08-12,
-# recovering to 0.100 once every table chunk carried its header row. Still too
-# low to floor meaningfully, so the entry stays out.
-# Nothing was lost to cause this: 0 sources removed, 0 sources shrank, +97
-# sources gained. A floor here would be vacuous, so there is none; the three
-# universal gates (citation_validity 1.0, hallucinated 0.0, abstention 1.0)
-# still apply and still pass. To restore a real floor, re-author
-# datasets/chesapeake-va.json against the corrected tables via positional
-# lookup — its refs currently point only at the four giant use tables.
+# chesapeake-va's use tables themselves stay keyword-hard, which is why the
+# floor above rests on the legend sections rather than the tables. The table
+# refs held 0.200 while the SIC tables were flattened to "P P P P P P". After
+# the #164 rescrape they reconstruct correctly (§ 6-2102's three 1F columns are
+# blank again), but ~15-20% of every table chunk is now "|" delimiters, and
+# keyword scoring normalizes by length — so a table ranks BELOW its own prose
+# neighbour (a farmers-market query retrieves § 10-601 "Description." instead of
+# the § 10-602 table). Measured 0.000 on 2026-08-12, recovering to 0.100 once
+# every table chunk carried its header row (#169). Nothing was lost to cause
+# this: 0 sources removed, 0 sources shrank, +97 sources gained.
+#
+# Why the per-district sections cannot carry recall here, unlike
+# fredericksburg/manassas/salem: nothing in this pack says which district a
+# district section belongs to. All 578 breadcrumbs stop at two levels ("Zoning >
+# ARTICLE 7. - BUSINESS DISTRICTS"), the Municode node IDs carry no division
+# segment either (ZO_ART6REDI_S6-1301DE), and the titles are bare
+# "Description." / "Development standards." — so every one of these sections
+# classifies to districts=['unknown'], and B-1's § 7-301, B-2's § 7-401 and
+# B-5's § 7-501 are mutually indistinguishable to the retriever, which returns
+# all three for any business query. Contrast brentwood-tn, same ws1 scraper,
+# where Municode does expose division nodes and breadcrumbs reach depth 4
+# ("... > DIVISION 2. - AR AGRICULTURAL/RESIDENTIAL ESTATE"). Whether
+# chesapeake's division headings are present inside the article chunk-group
+# payload and dropped by parse_content_sections (which keeps only docs whose
+# heading parses to a section ref) is UNVERIFIED here — confirming it needs a
+# re-fetch. If they are there, recovering them is the real upgrade path for
+# this city and for any other pack with this shape.
 #
 # 2026-08-12 re-measurement after the #164 rescrape. hampton-va (0.200),
 # henrico-county-va (0.400) and loudoun-county-va (0.400) were all rescraped
