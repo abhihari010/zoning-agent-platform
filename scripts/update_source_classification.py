@@ -9,6 +9,11 @@ Safe to run multiple times: the import-time idempotency guard in ingestion.py
 prevents overwriting sources that already carry real tags, and ``set_payload``
 is a PUT-style operation that can be applied repeatedly.
 
+Only sources whose tags actually differ from the database are rewritten. Each
+``upsert_source`` is its own transaction plus an audit row, so rewriting the
+whole corpus is ~19k round trips to a remote Postgres and tends to lose the
+connection partway. Pass ``--jurisdiction`` to narrow the scan further.
+
 Run from ``apps/api`` with PRODUCTION env vars set::
 
     cd apps/api
@@ -19,12 +24,17 @@ Run from ``apps/api`` with PRODUCTION env vars set::
     $env:EMBEDDING_PROVIDER="gemini"   # required by QdrantVectorStore init
     $env:VECTOR_PROVIDER="qdrant"
     $env:RAG_PROVIDER="hybrid_local"
-    .venv\Scripts\python.exe ..\scripts\update_source_classification.py --dry-run
+    $env:PYTHONPATH="."                # so `app` resolves to THIS checkout
+    python ..\..\scripts\update_source_classification.py --dry-run --jurisdiction chesapeake-va
     # review output, then re-run without --dry-run
 
+``scripts/`` lives at the repo root, so from ``apps/api`` the path is
+``..\..\scripts\`` (two levels), not ``..\scripts\``.
+
 Flags:
-    --dry-run   Print the (section_ref → districts / uses) mapping and a count
-                reconciliation; do NOT write to Postgres or Qdrant.
+    --dry-run       Print the sources whose tags would change, old -> new; do
+                    NOT write to Postgres or Qdrant.
+    --jurisdiction  Comma-separated jurisdiction_ids to limit the run to.
 """
 from __future__ import annotations
 
@@ -52,7 +62,16 @@ def main() -> int:
         action="store_true",
         help="Print the classification mapping; do not write to Postgres or Qdrant.",
     )
+    parser.add_argument(
+        "--jurisdiction",
+        default="",
+        help=(
+            "Comma-separated jurisdiction_ids to limit the run to (e.g. "
+            "'chesapeake-va'). Default: every pack."
+        ),
+    )
     args = parser.parse_args()
+    only = {j.strip() for j in args.jurisdiction.split(",") if j.strip()}
 
     settings = get_settings()
     _log(
@@ -67,35 +86,59 @@ def main() -> int:
 
     # Step 1: import packs — classifier enriches tags during this call.
     entries = import_source_packs()
-    _log(f"classified {len(entries)} source-pack sources.")
+    if only:
+        entries = [e for e in entries if e.jurisdiction_id in only]
+    _log(f"classified {len(entries)} source-pack sources" + (f" in {sorted(only)}." if only else "."))
+    if not entries:
+        _log("ERROR: no sources matched --jurisdiction; check the id.")
+        return 2
+
+    # Only sources whose tags actually MOVED are rewritten. Every upsert_source is
+    # its own transaction plus an audit row -- ~2 round trips each -- so rewriting
+    # all 9641 sources means ~19k round trips to a remote Postgres, which is what
+    # made the whole-corpus run drop its connection partway through. A tag change
+    # typically moves a handful of sources; the rest are identical rewrites.
+    # One query loads the stored side.
+    stored = {s.source_id: s for s in store.list_sources()}
+    changed = [
+        e
+        for e in entries
+        if (lambda s: s is None or s.districts != e.districts or s.uses != e.uses)(
+            stored.get(e.source_id)
+        )
+    ]
+    _log(f"{len(changed)}/{len(entries)} sources have tags differing from the database.")
 
     if args.dry_run:
-        _log("\n--- DRY RUN: classification mapping (section_ref → districts / uses) ---")
-        changed = 0
-        for entry in sorted(entries, key=lambda e: e.section_ref or ""):
-            default_districts = entry.districts == ["unknown"]
-            default_uses = entry.uses == ["general"]
-            if not default_districts or not default_uses:
-                _log(
-                    f"  {entry.section_ref or entry.source_id:<30}  "
-                    f"districts={entry.districts}  uses={entry.uses}"
-                )
-                changed += 1
-        _log(
-            f"\n{changed}/{len(entries)} sources have non-default district/use tags (dry run — no writes)."
-        )
+        _log("\n--- DRY RUN: sources whose tags would change (section_ref -> districts / uses) ---")
+        for entry in sorted(changed, key=lambda e: e.section_ref or ""):
+            was = stored.get(entry.source_id)
+            _log(
+                f"  {entry.section_ref or entry.source_id:<30}  "
+                f"districts={entry.districts}  uses={entry.uses}"
+                + (f"   (was districts={was.districts} uses={was.uses})" if was else "   (new)")
+            )
+        _log(f"\n{len(changed)} source(s) would be rewritten (dry run — no writes).")
+        return 0
+
+    if not changed:
+        _log("Nothing to do — the database already matches the packs.")
         return 0
 
     # Step 2: persist classified tags to Postgres (districts_csv / uses_csv columns).
-    for entry in entries:
+    for entry in changed:
         store.upsert_source(entry)
-    _log(f"upserted {len(entries)} sources to Postgres.")
+    _log(f"upserted {len(changed)} sources to Postgres.")
 
-    # Step 3: rebuild source chunks so SQL districts_csv / uses_csv reflect new tags.
-    sources = store.list_sources()
-    chunks = build_source_chunks(sources)
-    store.replace_source_chunks(chunks)
-    _log(f"replaced chunk rows for {len(sources)} sources ({len(chunks)} chunks).")
+    # Step 3: rebuild chunk rows for the changed sources only, so SQL
+    # districts_csv / uses_csv reflect the new tags. A tag change never alters a
+    # chunk_id (it is derived from source_id/section_ref/index/text hash), so
+    # there are no stale chunks to prune and upsert is enough -- replacing the
+    # whole corpus here would rewrite all 34k chunk rows over the wire to fix a
+    # handful.
+    chunks = build_source_chunks(changed)
+    store.upsert_source_chunks(chunks)
+    _log(f"upserted chunk rows for {len(changed)} sources ({len(chunks)} chunks).")
 
     # Step 4: update Qdrant payloads only — no embedding calls.
     payloads: dict[str, dict[str, Any]] = {
