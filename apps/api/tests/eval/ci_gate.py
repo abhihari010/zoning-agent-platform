@@ -51,7 +51,10 @@ GATE_ABSTENTION_CORRECTNESS: float = 1.0
 CI_RECALL_FLOORS: dict[str, float] = {
     "montgomery-county-va": 0.80,
     "franklin-tn": 0.65,
-    "richmond-va": 0.45,
+    # 2026-08-17: richmond-va 0.700 (was 0.500) — same cause as hampton-va, the
+    # SQL path now applies the Qdrant path's reserves, so the fine-grained
+    # Sec. 30-xxx.y subsection holding the number survives the per-section cap.
+    "richmond-va": 0.60,
     # 2026-07-14: loudoun-county-va 0.400 (Chapter 3 use-table refs; same
     # keyword-vs-table caveat as chesapeake).
     "loudoun-county-va": 0.35,
@@ -80,7 +83,12 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # diluted the same way chesapeake's SIC use tables are; the per-district
     # dimensional sections (Sec. 4-44, 5-16, 6-3, 7-4, ...) are keyword-
     # friendly; live vector recall is the quality signal).
-    "hampton-va": 0.15,
+    # 2026-08-17: 0.400 after the SQL path started applying the same reserves as
+    # the Qdrant path (see the note below the dict). Sec. 3-3's vocabulary is
+    # still diluted; what changed is that _ensure_dimensional_rows now keeps the
+    # number-bearing chunk of the per-district sections, which this dataset's
+    # refs lean on. No pack or dataset change.
+    "hampton-va": 0.30,
     # 2026-07-17: henrico-county-va 0.400 (weak-label pack: only ~35 of 442
     # sources classify to a real district after the rules fix, so most refs
     # point at Article 4 accessory-use sections whose district is "unknown" —
@@ -219,18 +227,56 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # keyword-hard for the pipe-dilution reason in the note below, so recall went
     # 0.100 -> 0.400 with the corpus untouched. Live vector recall is the quality
     # signal.
-    "chesapeake-va": 0.30,
+    #
+    # 2026-08-17: chesapeake-va 0.850. The tables were never unreachable — the
+    # mechanism built to reach them simply never ran here. _ensure_use_table_rows
+    # reserves a retrieval slot for chunks tagged ``principal_uses``, and this
+    # pack tagged nothing, so all seven "Table of permitted and conditional uses"
+    # sections competed on raw token overlap and lost. Tagging them in
+    # classification_rules.json (as ``["general", "principal_uses"]`` — dropping
+    # "general" would exclude them from list_source_chunks_filtered's use filter
+    # before scoring ever happens) puts the table in all 10 non-abstain
+    # scenarios, 0.400 -> 0.850. Same run also fixed the SQL path to apply that
+    # reserve at all; see the note below.
+    "chesapeake-va": 0.75,
 }
-# chesapeake-va's use tables themselves stay keyword-hard, which is why the
-# floor above rests on the legend sections rather than the tables. The table
-# refs held 0.200 while the SIC tables were flattened to "P P P P P P". After
-# the #164 rescrape they reconstruct correctly (§ 6-2102's three 1F columns are
-# blank again), but ~15-20% of every table chunk is now "|" delimiters, and
-# keyword scoring normalizes by length — so a table ranks BELOW its own prose
-# neighbour (a farmers-market query retrieves § 10-601 "Description." instead of
-# the § 10-602 table). Measured 0.000 on 2026-08-12, recovering to 0.100 once
-# every table chunk carried its header row (#169). Nothing was lost to cause
-# this: 0 sources removed, 0 sources shrank, +97 sources gained.
+# chesapeake-va's use tables rank poorly on keyword score alone, which is why
+# they need a reserved slot rather than a better query. The table refs held
+# 0.200 while the SIC tables were flattened to "P P P P P P". After the #164
+# rescrape they reconstruct correctly (§ 6-2102's three 1F columns are blank
+# again), but a reconstructed table scores WORSE: a use matrix is mostly
+# repeated "P"/"C"/"|" symbols, so its unique-token vocabulary per byte is a
+# fraction of the prose around it, and _score_chunk's overlap term is a set
+# intersection — breadth of vocabulary, not density of evidence. A table ranks
+# below its own prose neighbour (a farmers-market query retrieved § 10-601
+# "Description." instead of the § 10-602 table). Measured 0.000 on 2026-08-12,
+# recovering to 0.100 once every table chunk carried its header row (#169).
+# Nothing was lost to cause this: 0 sources removed, 0 shrank, +97 gained.
+#
+# 2026-08-17 correction: an earlier version of this note said keyword scoring
+# "normalizes by length". It does not — _score_chunk adds
+# |query ∩ chunk| / |query|, with no chunk-length term at all. The losing
+# margins were tiny (measured 0.05-0.26, i.e. 1-5 query tokens, against a
+# constant +4.0 from the district and use terms), which is why a reserved slot
+# fixes this and query tuning would not.
+#
+# 2026-08-17: the SQL keyword path applied only _diversify_ranked, so
+# _ensure_use_table_rows and _ensure_dimensional_rows — both pure functions of
+# the ranked list, both live in the Qdrant path — never ran for it. That branch
+# is not test-only: it serves any deployment without a vector store and every
+# _fallback_to_sql degradation in prod, so the permitted-use table was dropped
+# precisely when retrieval was already degraded. Wiring both calls in moved
+# three datasets and no others (chesapeake 0.400 -> 0.850 with the tagging
+# above, hampton 0.200 -> 0.400, richmond 0.500 -> 0.700; the other 23 held
+# exactly). Guarded by tests/test_sql_use_table_reserve.py.
+#
+# Still open, and NOT fixed here: 25 of the 27 packs tag no source
+# ``principal_uses`` at all, so _ensure_use_table_rows is inert for them in
+# BOTH paths, prod vector retrieval included. Only franklin-tn and (as of this
+# change) chesapeake-va carry the marker — and franklin-tn tags its table
+# ``["principal_uses"]`` without "general", which the use filter in
+# list_source_chunks_filtered drops before scoring. Tagging the rest is a
+# per-city data job: each pack needs its own use-table sections identified.
 #
 # Why the per-district sections cannot carry recall here, unlike
 # fredericksburg/manassas/salem: nothing in this pack says which district a
@@ -242,12 +288,16 @@ CI_RECALL_FLOORS: dict[str, float] = {
 # B-5's § 7-501 are mutually indistinguishable to the retriever, which returns
 # all three for any business query. Contrast brentwood-tn, same ws1 scraper,
 # where Municode does expose division nodes and breadcrumbs reach depth 4
-# ("... > DIVISION 2. - AR AGRICULTURAL/RESIDENTIAL ESTATE"). Whether
-# chesapeake's division headings are present inside the article chunk-group
-# payload and dropped by parse_content_sections (which keeps only docs whose
-# heading parses to a section ref) is UNVERIFIED here — confirming it needs a
-# re-fetch. If they are there, recovering them is the real upgrade path for
-# this city and for any other pack with this shape.
+# ("... > DIVISION 2. - AR AGRICULTURAL/RESIDENTIAL ESTATE").
+#
+# 2026-08-17: that hypothesis is now settled — chesapeake's division headings
+# are NOT being dropped by parse_content_sections, because they do not exist.
+# Across the cached scrape (216 content payloads, 4,194 docs) there are 0
+# DIVISION-titled docs, and across 782 TOC nodes there are 0 structural DIVISION
+# nodes (the 4 apparent matches are section titles containing "subdivision").
+# Chesapeake's Municode hierarchy genuinely is Zoning > Article > Section. So
+# there is nothing to recover by re-fetching, and the district sections stay
+# mutually indistinguishable. The use tables carry this city's recall instead.
 #
 # 2026-08-12 re-measurement after the #164 rescrape. hampton-va (0.200),
 # henrico-county-va (0.400) and loudoun-county-va (0.400) were all rescraped

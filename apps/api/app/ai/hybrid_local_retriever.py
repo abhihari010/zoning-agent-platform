@@ -262,6 +262,16 @@ class HybridLocalRetrievalProvider:
         ranked = [(score, chunk) for score, chunk in sorted(scored, key=lambda item: item[0], reverse=True) if score > 0]
 
         top = _diversify_ranked(ranked)
+        # Same permitted-use-table and dimensional reservations the Qdrant path
+        # applies. This branch is not test-only: it also serves any deployment
+        # without a vector store and every _fallback_to_sql degradation in prod,
+        # which previously lost the use table -- the primary evidence for a use
+        # decision -- exactly when retrieval was already degraded. Both helpers
+        # are pure functions of ``ranked``, so they need no vector hits. (The
+        # third reserve, _ensure_district_definitions, is keyed on the district
+        # query's vector hits and has no SQL analogue, so it stays Qdrant-only.)
+        top = _ensure_use_table_rows(top, ranked)
+        top = _ensure_dimensional_rows(top, ranked, request)
         return RetrievalProviderResult(
             citations=[
                 SourceCitation(
