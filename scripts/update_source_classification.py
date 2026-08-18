@@ -35,6 +35,10 @@ Flags:
     --dry-run       Print the sources whose tags would change, old -> new; do
                     NOT write to Postgres or Qdrant.
     --jurisdiction  Comma-separated jurisdiction_ids to limit the run to.
+    --force         Rewrite matched sources even when their tags already match.
+                    The delta is computed from the sources table alone, so a run
+                    interrupted during step 2 leaves chunks and Qdrant stale while
+                    the delta reads clean; --force is how you finish that job.
 """
 from __future__ import annotations
 
@@ -70,6 +74,14 @@ def main() -> int:
             "'chesapeake-va'). Default: every pack."
         ),
     )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help=(
+            "Rewrite every matched source even if its tags already match Postgres. "
+            "Use with --jurisdiction to recover from a run that died partway."
+        ),
+    )
     args = parser.parse_args()
     only = {j.strip() for j in args.jurisdiction.split(",") if j.strip()}
 
@@ -99,15 +111,30 @@ def main() -> int:
     # made the whole-corpus run drop its connection partway through. A tag change
     # typically moves a handful of sources; the rest are identical rewrites.
     # One query loads the stored side.
+    #
+    # The delta only reads the *sources* table, but steps 3 and 4 write chunks and
+    # Qdrant. A run that dies inside step 2 therefore leaves sources updated and
+    # Qdrant stale, and re-running would report "nothing to do" and skip the repair
+    # -- so --force exists to finish the job.
     stored = {s.source_id: s for s in store.list_sources()}
     changed = [
         e
         for e in entries
-        if (lambda s: s is None or s.districts != e.districts or s.uses != e.uses)(
+        if args.force
+        or (lambda s: s is None or s.districts != e.districts or s.uses != e.uses)(
             stored.get(e.source_id)
         )
     ]
-    _log(f"{len(changed)}/{len(entries)} sources have tags differing from the database.")
+    if args.force:
+        _log(f"--force: rewriting all {len(changed)} matched sources regardless of current tags.")
+    else:
+        _log(f"{len(changed)}/{len(entries)} sources have tags differing from the database.")
+        if not changed:
+            _log(
+                "NOTE: matching sources do NOT prove chunks and Qdrant are in sync -- a run "
+                "that died inside step 2 leaves exactly this state. Re-run with --force "
+                "--jurisdiction <id> to push chunks and Qdrant payloads through."
+            )
 
     if args.dry_run:
         _log("\n--- DRY RUN: sources whose tags would change (section_ref -> districts / uses) ---")
