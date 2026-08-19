@@ -98,3 +98,39 @@ def test_use_table_would_not_survive_ranking_alone() -> None:
     )
     survivors = {chunk.section_ref for _, chunk in _diversify_ranked(ranked)}
     assert "Sec. 7-602" not in survivors
+
+
+def test_shipped_packs_never_tag_principal_uses_without_general() -> None:
+    """A ``principal_uses`` marker is inert unless the chunk also carries ``general``.
+
+    ``list_source_chunks_filtered`` keeps a chunk only when its ``uses_csv``
+    matches the inferred use *or* the ``general`` wildcard, so a marker-only tag
+    drops the use table from the candidate set before ``_score_chunk`` -- and so
+    before ``_ensure_use_table_rows`` can reserve a slot for it. Measured on
+    chesapeake-va at 0.350, below its 0.400 untagged baseline. Same reasoning for
+    ``districts``: a table tagged only with raw zone codes fails the district
+    filter, which passes ``unknown``/``*`` or the requested category.
+    """
+    from app.ingestion import import_source_packs
+
+    offenders = [
+        (entry.jurisdiction_id, entry.section_ref, entry.uses, entry.districts)
+        for entry in import_source_packs()
+        if "principal_uses" in entry.uses
+        and (
+            "general" not in entry.uses
+            or not {"unknown", "*"}.intersection(entry.districts)
+            and not _DISTRICT_CATEGORIES.intersection(entry.districts)
+        )
+    ]
+    assert offenders == []
+
+
+# The coarse district vocabulary a request can carry (app/district_mapping.py).
+_DISTRICT_CATEGORIES = {
+    "residential-low-density",
+    "commercial-employment",
+    "industrial-zone",
+    "agricultural",
+    "mixed-use-core",
+}

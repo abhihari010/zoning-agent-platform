@@ -50,14 +50,25 @@ GATE_ABSTENTION_CORRECTNESS: float = 1.0
 # hard for keyword retrieval; live vector recall is the quality signal).
 CI_RECALL_FLOORS: dict[str, float] = {
     "montgomery-county-va": 0.80,
-    "franklin-tn": 0.65,
+    # 2026-08-18 (#173): franklin-tn 0.769 -> 0.923. The pack tagged its
+    # 5.1.3 use matrix ``["principal_uses"]`` with no
+    # "general" AND with raw zone codes (AG, ER, R1, ...) for districts, so
+    # list_source_chunks_filtered dropped it on BOTH filters -- the use filter
+    # wants the inferred use or "general", the district filter wants the
+    # requested category, "unknown" or "*", and raw codes are neither. Adding
+    # "general" and "unknown" makes the matrix a retrieval candidate at all.
+    "franklin-tn": 0.82,
     # 2026-08-17: richmond-va 0.700 (was 0.500) — same cause as hampton-va, the
     # SQL path now applies the Qdrant path's reserves, so the fine-grained
     # Sec. 30-xxx.y subsection holding the number survives the per-section cap.
     "richmond-va": 0.60,
     # 2026-07-14: loudoun-county-va 0.400 (Chapter 3 use-table refs; same
     # keyword-vs-table caveat as chesapeake).
-    "loudoun-county-va": 0.35,
+    # 2026-08-18 (#173): loudoun-county-va 0.400 -> 1.000. The five 3.02.x
+    # Use Table rules already targeted exactly the right
+    # sections and carried their district families; they only lacked the
+    # principal_uses marker, so _ensure_use_table_rows never reserved a slot.
+    "loudoun-county-va": 0.90,
     # 2026-07-14: prince-william-county-va 0.700 (prose per-district
     # "Uses permitted by right" lists — keyword-friendly).
     "prince-william-county-va": 0.60,
@@ -137,7 +148,11 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # the dimensional table at 31-407 — so table-derived refs are
     # keyword-hard; same caveat as chesapeake/newport-news, live vector
     # recall is the quality signal).
-    "suffolk-va": 0.50,
+    # 2026-08-18 (#173): suffolk-va 0.600 -> 0.800. SEC. 31-406 is the
+    # all-district 22-column Use Matrix and this dataset
+    # requires it in 3 of 12 scenarios; a reserved slot lands it. The remaining
+    # misses are Article 7 supplemental refs, unaffected by this change.
+    "suffolk-va": 0.70,
     # 2026-07-19: danville-va 0.500 (Chapter 41 gives each district its own
     # ARTICLE 3.X, but the citable sections are lettered stubs — "B. -
     # Permitted Uses." — whose titles carry no district or use vocabulary,
@@ -149,7 +164,11 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # districts of a family, so table-derived refs are keyword-hard; same
     # caveat as suffolk/chesapeake, live vector recall is the quality
     # signal).
-    "norfolk-va": 0.50,
+    # 2026-08-18 (#173): norfolk-va 0.600 -> 1.000. The four group use tables
+    # (3.2.12/3.3.9/3.4.11/3.5.7) already had
+    # title_contains rules carrying their district family, so tagging was a
+    # one-field edit per rule.
+    "norfolk-va": 0.90,
     # 2026-07-20: alexandria-va 0.800 (human-authored article_contains rules
     # over 2-level "Zoning" breadcrumbs, with numeric-prefix title_contains
     # overrides inside Article IV — each district's uses live in its own
@@ -194,7 +213,13 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # ("Bed and Breakfast:", "Veterinary Clinic: (Central Business District
     # CBD)", "Custom Manufacturing:"), so all 3/3 conditional scenarios' "5.1"
     # ref land. Live vector recall is the quality signal.
-    "clarksville-tn": 0.15,
+    # 2026-08-18 (#173): clarksville-tn 0.286 -> 1.000. Largest move in the
+    # rollout. 3.4 LAND USE TABLES is a single ~33k-char
+    # section covering ~440 uses across 27 districts, so it loses on token
+    # overlap almost everywhere -- exactly the case a reserved slot is for.
+    # This pack had no classification_rules.json at all; the new file holds
+    # one rule and every other source still falls through to unknown/general.
+    "clarksville-tn": 0.90,
     # 2026-08-12: nolensville-tn 0.769 (a form-based SmartCode: every scenario's
     # primary ref is 4.3.9 Uses, ONE section holding all three master use tables
     # — Table 4.3.9.A-1 Principal Uses plus the "D." limited-use-standards prose
@@ -213,7 +238,10 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # into each of its chunks and so shifted this pack's keyword weighting; the
     # floor was set below both numbers and still holds. Every other one of the 26
     # datasets held its documented value exactly in that same run.
-    "nolensville-tn": 0.65,
+    # 2026-08-18 (#173): nolensville-tn 0.692 -> 0.846. 4.3.9 Uses holds all
+    # three master use tables for all eleven Character
+    # Districts. Same new-rules-file shape as clarksville-tn.
+    "nolensville-tn": 0.75,
     # 2026-08-14: chesapeake-va 0.400, re-authored to co-cite each use table's
     # legend section (§ 6-2101, § 7-601, § 8-601, § 10-601 — "Key of symbols
     # used in tables"). That is a correctness fix, not a scoring one: the
