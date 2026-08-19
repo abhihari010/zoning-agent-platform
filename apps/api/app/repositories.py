@@ -154,6 +154,8 @@ class StoreRepository(Protocol):
 
     def get_source_chunk_count(self) -> int: ...
 
+    def get_source_chunk_tags(self) -> dict[str, set[tuple[str, str]]]: ...
+
     def source_chunk_fingerprint(self) -> str: ...
 
     def get_latest_audit_timestamp(self, stage: str) -> datetime | None: ...
@@ -1223,6 +1225,38 @@ class SQLAlchemyStore:
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not count source chunks: {exc}") from exc
         return int(count)
+
+    def get_source_chunk_tags(self) -> dict[str, set[tuple[str, str]]]:
+        """Map source_id -> the distinct (districts_csv, uses_csv) its chunks carry.
+
+        A retag writes sources, then chunk rows, then Qdrant payloads as three
+        separate steps. A run that dies between them leaves the sources table
+        already correct while the chunk rows still carry the old tags, so a
+        delta computed from sources alone reports "nothing to do" and skips the
+        repair -- the corpus then looks retagged while retrieval still filters
+        on the old tags. This is what makes that state visible.
+
+        DISTINCT collapses each source to (almost always) a single row, so this
+        stays a ~9k-row read of two short strings rather than a corpus load;
+        payload_json (the full chunk text) is never touched.
+        """
+        tags: dict[str, set[tuple[str, str]]] = {}
+        try:
+            with self.engine.connect() as connection:
+                result = connection.execute(
+                    select(
+                        source_chunks.c.source_id,
+                        source_chunks.c.districts_csv,
+                        source_chunks.c.uses_csv,
+                    ).distinct()
+                )
+                for row in result:
+                    tags.setdefault(row.source_id, set()).add(
+                        (row.districts_csv or "", row.uses_csv or "")
+                    )
+        except SQLAlchemyError as exc:
+            raise DatabaseStorageError(f"Could not load source chunk tags: {exc}") from exc
+        return tags
 
     def source_chunk_fingerprint(self) -> str:
         """Return a content hash of the chunk corpus for cache-versioning.
