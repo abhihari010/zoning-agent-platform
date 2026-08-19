@@ -36,9 +36,10 @@ Flags:
                     NOT write to Postgres or Qdrant.
     --jurisdiction  Comma-separated jurisdiction_ids to limit the run to.
     --force         Rewrite matched sources even when their tags already match.
-                    The delta is computed from the sources table alone, so a run
-                    interrupted during step 2 leaves chunks and Qdrant stale while
-                    the delta reads clean; --force is how you finish that job.
+                    The delta covers both SQL tables (sources and chunk rows), so
+                    an interrupted run now repairs itself on the next plain run.
+                    Qdrant payloads cannot be diffed from SQL, so --force is still
+                    how you finish a run that died during step 4.
 """
 from __future__ import annotations
 
@@ -48,6 +49,9 @@ from typing import Any
 
 from app.ingestion import build_source_chunks, import_source_packs
 from app.rag.vector_store import QdrantVectorStore
+# The chunk CSV format is the retrieval filter's contract, not a display
+# detail -- rebuilding it here by hand would silently drift from the writer.
+from app.repositories import _make_filter_csv
 from app.services import ensure_seed_sources
 from app.settings import get_settings
 from app.storage import store
@@ -112,28 +116,41 @@ def main() -> int:
     # typically moves a handful of sources; the rest are identical rewrites.
     # One query loads the stored side.
     #
-    # The delta only reads the *sources* table, but steps 3 and 4 write chunks and
-    # Qdrant. A run that dies inside step 2 therefore leaves sources updated and
-    # Qdrant stale, and re-running would report "nothing to do" and skip the repair
-    # -- so --force exists to finish the job.
+    # The delta reads the sources table AND the tags actually stored on the chunk
+    # rows, because steps 2, 3 and 4 are separate writes: a run that dies between
+    # them leaves sources correct while chunks and Qdrant still carry the old tags.
+    # A sources-only delta reports "nothing to do" on exactly that corpus, so the
+    # damage survives every subsequent run -- which is how a full batch of packs
+    # sat tagged-but-inert in production. Comparing chunks makes the repair
+    # self-healing; --force remains for the Qdrant-only gap, which no SQL query
+    # can see.
     stored = {s.source_id: s for s in store.list_sources()}
-    changed = [
-        e
-        for e in entries
-        if args.force
-        or (lambda s: s is None or s.districts != e.districts or s.uses != e.uses)(
-            stored.get(e.source_id)
-        )
-    ]
+    chunk_tags = store.get_source_chunk_tags()
+
+    def _needs_rewrite(entry: Any) -> bool:
+        source = stored.get(entry.source_id)
+        if source is None or source.districts != entry.districts or source.uses != entry.uses:
+            return True
+        # build_source_chunks copies the source's tags onto every chunk it emits,
+        # so all chunk rows for a current source must carry exactly these CSVs.
+        # A source with no chunk rows at all is a reindex job (its text was never
+        # embedded), not a retag job -- leave it to reindex_prod.py.
+        expected = (_make_filter_csv(entry.districts), _make_filter_csv(entry.uses))
+        return chunk_tags.get(entry.source_id, {expected}) != {expected}
+
+    changed = [e for e in entries if args.force or _needs_rewrite(e)]
     if args.force:
         _log(f"--force: rewriting all {len(changed)} matched sources regardless of current tags.")
     else:
-        _log(f"{len(changed)}/{len(entries)} sources have tags differing from the database.")
+        _log(
+            f"{len(changed)}/{len(entries)} sources have tags differing from the "
+            "database (sources table or chunk rows)."
+        )
         if not changed:
             _log(
-                "NOTE: matching sources do NOT prove chunks and Qdrant are in sync -- a run "
-                "that died inside step 2 leaves exactly this state. Re-run with --force "
-                "--jurisdiction <id> to push chunks and Qdrant payloads through."
+                "NOTE: SQL is in sync (sources AND chunk rows). Qdrant payloads are not "
+                "checked -- if a previous run died during step 4, re-run with --force "
+                "--jurisdiction <id> to push the payloads through."
             )
 
     if args.dry_run:

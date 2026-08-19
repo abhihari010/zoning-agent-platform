@@ -278,3 +278,42 @@ def test_list_sources_paging_covers_every_source_exactly_once(tmp_path) -> None:
     assert collected == [s.source_id for s in repository.list_sources()]
     assert len(collected) == len(set(collected)) == 25
     assert repository.list_sources(limit=7, offset=25) == []
+
+
+def test_chunk_tags_expose_a_retag_that_stopped_after_the_sources_write(tmp_path) -> None:
+    """The retag delta must be able to see sources-updated-but-chunks-stale.
+
+    update_source_classification.py writes sources, then chunk rows, then Qdrant
+    payloads. When it died between the first two, a delta computed from the
+    sources table alone read perfectly clean while retrieval still filtered on
+    the old tags -- so the damage survived every later run. get_source_chunk_tags
+    is what makes that state visible, which is only true if it reports what the
+    CHUNKS carry, never what the source says.
+    """
+    from app.ingestion import build_source_chunks
+    from app.repositories import _make_filter_csv
+
+    repository = SQLAlchemyStore(tmp_path / "retag.sqlite3")
+    repository.reset()
+
+    entry = _source(1)
+    repository.upsert_source(entry)
+    repository.upsert_source_chunks(build_source_chunks([entry]))
+
+    stale = (_make_filter_csv(entry.districts), _make_filter_csv(entry.uses))
+    assert repository.get_source_chunk_tags() == {entry.source_id: {stale}}
+
+    # Step 2 only: the source now claims the new tags, the chunks still hold the old.
+    retagged = entry.model_copy(
+        update={"districts": ["commercial-employment"], "uses": ["general", "principal_uses"]}
+    )
+    repository.upsert_source(retagged)
+
+    fresh = (_make_filter_csv(retagged.districts), _make_filter_csv(retagged.uses))
+    assert repository.get_source_chunk_tags() == {entry.source_id: {stale}}, (
+        "chunk tags must not follow the sources table -- that blindness is the bug"
+    )
+
+    # Step 3 lands: the corpus is genuinely in sync and the delta goes quiet.
+    repository.upsert_source_chunks(build_source_chunks([retagged]))
+    assert repository.get_source_chunk_tags() == {entry.source_id: {fresh}}
