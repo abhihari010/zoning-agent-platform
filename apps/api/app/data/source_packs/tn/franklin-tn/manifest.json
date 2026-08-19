@@ -608,9 +608,11 @@
         "RC12",
         "GO",
         "LI",
-        "HI"
+        "HI",
+        "unknown"
       ],
       "uses": [
+        "general",
         "principal_uses"
       ],
       "source_type": "zoning_ordinance",

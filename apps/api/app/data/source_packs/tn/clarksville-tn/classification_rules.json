@@ -1,0 +1,16 @@
+{
+  "schema_version": "source-classification-rules/v1",
+  "_notes": "Human-authored 2026-08-18 (#173). 2026-08-18 (#173): tagged the permitted-use table section(s) [\"general\", \"principal_uses\"] so _ensure_use_table_rows reserves a retrieval slot for them. \"principal_uses\" alone would exclude the chunk from list_source_chunks_filtered's use filter before scoring.",
+  "rules": [
+    {
+      "title_contains": "land use tables",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    }
+  ]
+}
