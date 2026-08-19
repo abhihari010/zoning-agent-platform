@@ -61,7 +61,15 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # 2026-08-17: richmond-va 0.700 (was 0.500) — same cause as hampton-va, the
     # SQL path now applies the Qdrant path's reserves, so the fine-grained
     # Sec. 30-xxx.y subsection holding the number survives the per-section cap.
-    "richmond-va": 0.60,
+    # 2026-08-18 (#173): richmond-va 0.700 -> 0.800. Each division's own
+    # "Permitted principal uses." / "Permitted principal and accessory uses." /
+    # "Principal uses permitted by conditional use permit." sections now carry
+    # the principal_uses marker, via title-qualified clones of the 32 division
+    # rules (the clones duplicate their original's districts, so no section
+    # reclassifies). Narrowing the clone title to "permitted principal", which
+    # drops the conditional-use-permit sections, measured the same 0.800, so the
+    # broader fragment is kept -- it covers a required ref family for free.
+    "richmond-va": 0.70,
     # 2026-07-14: loudoun-county-va 0.400 (Chapter 3 use-table refs; same
     # keyword-vs-table caveat as chesapeake).
     # 2026-08-18 (#173): loudoun-county-va 0.400 -> 1.000. The five 3.02.x
@@ -78,7 +86,15 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # 2026-07-17: winchester-va 0.700 (prose per-article use regulations;
     # zoning/subdivision packs share bare N-N section numbering, which
     # dilutes keyword scoring for the shortest refs).
-    "winchester-va": 0.60,
+    # 2026-08-18 (#173): winchester-va 0.700 -> 0.800, tagging each district
+    # article's own "Sec. N-1. - Use regulations." section via title-qualified
+    # clones of the 12 division rules. NOTE for whoever revisits this dataset:
+    # two of its three required refs, "Sec. 8-1" (x4) and "Sec. 3-1" (x3),
+    # resolve to the SUBDIVISION ordinance ("Exceptions.", "Administrator."),
+    # not to the zoning "Use regulations." sections -- the bare N-N collision
+    # noted above. Recall here can be satisfied by the wrong document; the
+    # dataset, not the pack, is what needs fixing.
+    "winchester-va": 0.70,
     # 2026-07-17: virginia-beach-va 1.000 (each article has ONE use chart,
     # so the per-district use vocabulary concentrates in the target section).
     "virginia-beach-va": 0.85,
@@ -87,7 +103,14 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # column delimiter in scraped text, so table-derived refs are keyword-hard;
     # the per-district dimensional/general sections are keyword-friendly and
     # carry most of the recall — live vector recall is the quality signal).
-    "newport-news-va": 0.35,
+    # 2026-08-18 (#173): newport-news-va 0.455 -> 0.818, tagging ONLY
+    # Sec. 45-402 "Summary of uses by district" -- the all-district table this
+    # dataset requires in 4 of 12 scenarios. Also tagging the 19 per-district
+    # "Permitted uses." sections measured 0.455 -- completely flat. Those carry
+    # an exact district match (+2.0 in _score_chunk) against the summary table's
+    # "unknown" (+1.2), so they took both reserved slots and crowded out the one
+    # table the scenarios actually cite. Same lesson as danville-va above.
+    "newport-news-va": 0.72,
     # 2026-07-17: hampton-va 0.200 (most conditional/restricted refs point at
     # Sec. 3-3 "Additional standards on uses", a single very long section
     # covering dozens of unrelated use types — its keyword vocabulary is
@@ -158,7 +181,15 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # Permitted Uses." — whose titles carry no district or use vocabulary,
     # so keyword scoring leans entirely on body text and misses the
     # special-use lists; live vector recall is the quality signal).
-    "danville-va": 0.40,
+    # 2026-08-18 (#173): danville-va 0.500 -> 0.700, tagging each ARTICLE 3.X's
+    # "B. - Permitted Uses." section. Tagging the sibling "C. - Uses Permitted by
+    # Special Use Permit." sections TOO measured 0.500 -- flat, no gain at all.
+    # _ensure_use_table_rows reserves only 2 slots and fills them from the
+    # highest-ranked marked chunks, so marking twice as many sections just makes
+    # them compete; danville's titles carry no district vocabulary, so the pair
+    # that wins is often the wrong district's. Tag the fewest sections that ARE
+    # the use listing, not every section whose title mentions permitted uses.
+    "danville-va": 0.60,
     # 2026-07-19: norfolk-va 0.600 (the 2018 ordinance concentrates uses in
     # four group tables — 3.2.12/3.3.9/3.4.11/3.5.7 — shared by all
     # districts of a family, so table-derived refs are keyword-hard; same
