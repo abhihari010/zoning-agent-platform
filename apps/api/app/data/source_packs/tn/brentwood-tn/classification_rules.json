@@ -1,0 +1,153 @@
+{
+  "schema_version": "source-classification-rules/v1",
+  "_notes": "Human-authored 2026-08-19 (#173). This pack had no rules file. These rules deliberately cover ONLY each ARTICLE III division's \"Uses permitted.\" section, not the whole division: the goal is the principal_uses marker for _ensure_use_table_rows, and district-labelling the rest of the pack is a separate, larger change. The title fragment is \"- uses permitted.\" with the Municode dash so it excludes the sibling \"Temporary uses permitted.\" and \"Special uses permitted.\" sections -- the reserve holds only 2 slots, so tagging those too would just make them compete. Districts follow the established category mapping: SI-1..SI-4 service-institution -> commercial-employment (the lynchburg IN-1/IN-2 institutional precedent), C-3 service-warehouse -> commercial-employment + industrial-zone, C-4 town centre -> commercial-employment + mixed-use-core. DIVISION 1 (generally), 14 (hillside protection), 15 (flood hazard) and 16 (special-restrictions overlay) are left unmapped per the overlay precedent.",
+  "rules": [
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 2. - AR AGRICULTURAL/ RESIDENTIAL ESTATE",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "agricultural",
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 3. - R-1 LARGE LOT RESIDENTIAL",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 4. - R-2 SUBURBAN RESIDENTIAL",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 5. - OSRD OPEN SPACE RESIDENTIAL DEVELOPMENT",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 6. - C-1 COMMERCIAL OFFICE",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 7. - C-2 COMMERCIAL RETAIL",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 8. - C-3 COMMERCIAL SERVICE-WAREHOUSE",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "commercial-employment",
+        "industrial-zone"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 9. - C-4 COMMERCIAL TOWN CENTER",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "commercial-employment",
+        "mixed-use-core"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 10. - SI-1 SERVICE INSTITUTION (RELIGIOUS)",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 11. - SI-2 SERVICE INSTITUTION (EDUCATIONAL)",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 12. - SI-3 SERVICE INSTITUTION (CULTURAL, RECREATIONAL AND GOVERNMENTAL)",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "ARTICLE III. - DISTRICT REGULATIONS",
+      "division_contains": "DIVISION 13. - SI-4 SERVICE INSTITUTION (RETIREMENT/ASSISTED CARE)",
+      "title_contains": "- uses permitted.",
+      "districts": [
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    }
+  ]
+}

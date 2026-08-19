@@ -79,9 +79,16 @@ CI_RECALL_FLOORS: dict[str, float] = {
     "loudoun-county-va": 0.90,
     # 2026-07-14: prince-william-county-va 0.700 (prose per-district
     # "Uses permitted by right" lists — keyword-friendly).
-    "prince-william-county-va": 0.60,
+    # 2026-08-19 (#173): prince-william-county-va 0.700 -> 0.900, tagging each
+    # part/division's "Uses permitted by right." section via title-qualified
+    # clones of the 15 district rules.
+    "prince-william-county-va": 0.80,
     # 2026-07-17: albemarle-county-va 0.900 (prose per-district "By right"
     # lists; only the R-1 home-occupation ref is keyword-hard).
+    # 2026-08-19 (#173): albemarle-county-va tagged ("- by right." and
+    # "permitted primary and accessory uses" per district) but measured FLAT at
+    # 0.900. Its required use refs already landed; the residual miss is the R-1
+    # home-occupation ref noted above, which is not a use table. Floor unchanged.
     "albemarle-county-va": 0.80,
     # 2026-07-17: winchester-va 0.700 (prose per-article use regulations;
     # zoning/subdivision packs share bare N-N section numbering, which
@@ -205,6 +212,14 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # overrides inside Article IV — each district's uses live in its own
     # keyword-dense Sec. 3-3xx/4-xxxx section, so the refs are what the
     # retriever ranks first; the misses are Article-VII supplemental refs).
+    # 2026-08-19 (#173): alexandria-va tagged (each zone's "- permitted uses." and
+    # "- special uses." sections, 67 in total) but measured FLAT at 0.800. Kept
+    # anyway: the tagging is semantically right and the reserve is what prod's
+    # vector path relies on, which this offline gate cannot observe. Floor
+    # unchanged. NOTE: the clones are interleaved before their OWN originals, not
+    # hoisted -- this pack mixes article-only and title-keyed rules for ARTICLE IV,
+    # and hoisting let a generic clone out-rank the more specific 4-14 rule,
+    # silently reclassifying 4-1404 from mixed-use-core to commercial-employment.
     "alexandria-va": 0.70,
     # 2026-08-02: brentwood-tn 0.538 (Chapter 78 gives each district its own
     # DIVISION under ARTICLE III with a clean Municode breadcrumb, but every
@@ -216,7 +231,17 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # vocabulary caveat as danville-va. The other miss is Sec. 78-14, a
     # cross-cutting Article I lot-standards section. Live vector recall is the
     # quality signal.
-    "brentwood-tn": 0.45,
+    # 2026-08-19 (#173): brentwood-tn 0.538 -> 0.615. This pack had no
+    # classification_rules.json at all; the new file covers ONLY each ARTICLE III
+    # division's "Uses permitted." section, so the district-labelling of the rest
+    # of the pack stays a separate, larger change. The title fragment keeps the
+    # Municode dash ("- uses permitted.") so the sibling "Temporary uses
+    # permitted." / "Special uses permitted." sections stay untagged and do not
+    # compete for the two reserved slots. The gain is smaller than the other packs
+    # because the titles-carry-no-district problem documented above is unchanged:
+    # the reserve now guarantees A "Uses permitted." section survives, but not
+    # that it is the right division's.
+    "brentwood-tn": 0.51,
     # 2026-08-09: springfield-tn 0.600 (Appendix A gives each district ONE
     # all-in-one section whose title carries the district label — "A-504. R40
     # Low Density Residential Districts.", "A-603. CC Core Commercial
