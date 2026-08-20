@@ -141,6 +141,13 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # district's own dimensional/purpose section from the "Zoning Districts"
     # article — human-authored title-level rules per district, so the refs
     # are the same short, keyword-dense sections the retriever ranks first).
+    # 2026-08-20 (#173): tagged 72-40.2 "Use Table." and its companion 72-40.1
+    # "Explanation of Use Table." (the legend that maps a column head to a real
+    # district — same co-citation reason as chesapeake-va below). The pack's
+    # existing "use table" rule already targeted both and already carried the
+    # four-district family, so this was a one-field edit and nothing
+    # reclassifies. Measured FLAT at 1.000, which is the ceiling; the marker is
+    # for the prod vector path, which this offline gate cannot observe.
     "fredericksburg-va": 0.85,
     # 2026-07-18: lynchburg-va 1.000 (all 10 non-abstain scenarios cite a
     # district's own use-standards/development-standards section from the
@@ -154,12 +161,18 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # district, same one-section-per-district shape as fredericksburg-va, so
     # the refs are the same short, keyword-dense sections the retriever
     # ranks first).
+    # 2026-08-20 (#173): tagged Sec. 130-241 "Use tables." — one section, all
+    # districts, the shape a reserved slot exists for. One-field edit to the
+    # existing rule; measured FLAT at 1.000 (ceiling). See fredericksburg-va.
     "manassas-va": 0.85,
     # 2026-07-18: portsmouth-va 1.000 (all 10 non-abstain scenarios cite a
     # whole-category district section from the "Zoning Districts" article —
     # human-authored title_contains rules per category, one citable chunk
     # per district family, so the refs are the same short, keyword-dense
     # sections the retriever ranks first).
+    # 2026-08-20 (#173): tagged Sec. 40.2-216 "Use Table." — one section, all
+    # districts. One-field edit to the existing rule; measured FLAT at 1.000
+    # (ceiling). See fredericksburg-va.
     "portsmouth-va": 0.85,
     # 2026-07-18: salem-va 1.000 (all 10 non-abstain scenarios cite a
     # district's own numeric-prefix section cluster from the "DISTRICT
@@ -354,13 +367,37 @@ CI_RECALL_FLOORS: dict[str, float] = {
 # above, hampton 0.200 -> 0.400, richmond 0.500 -> 0.700; the other 23 held
 # exactly). Guarded by tests/test_sql_use_table_reserve.py.
 #
-# Still open, and NOT fixed here: 25 of the 27 packs tag no source
-# ``principal_uses`` at all, so _ensure_use_table_rows is inert for them in
-# BOTH paths, prod vector retrieval included. Only franklin-tn and (as of this
-# change) chesapeake-va carry the marker — and franklin-tn tags its table
-# ``["principal_uses"]`` without "general", which the use filter in
-# list_source_chunks_filtered drops before scoring. Tagging the rest is a
-# per-city data job: each pack needs its own use-table sections identified.
+# The above was written when only franklin-tn and chesapeake-va carried the
+# marker and 25 packs left _ensure_use_table_rows inert in BOTH paths, prod
+# vector retrieval included.
+#
+# 2026-08-20 (#173): the rollout is COMPLETE. 19 of the 31 packs now tag their
+# use listing. The remaining 12 are documented no-ops — surveyed section title
+# by section title, not assumed:
+#
+#   * No all-district use table exists. blacksburg-va (23 sections),
+#     christiansburg-va (16), lynchburg-va (6), salem-va (14), staunton-va (27),
+#     virginia-beach-va (18) and springfield-tn (one all-in-one section per
+#     district) hold their uses as PER-DISTRICT prose. _ensure_use_table_rows
+#     reserves exactly 2 slots and fills them from the highest-ranked marked
+#     chunks, so marking 6-27 sibling sections only makes them compete, and the
+#     pair that wins is often the wrong district's. That is measured, not
+#     predicted: see danville-va and newport-news-va above, where tagging the
+#     siblings scored flat (0.500 and 0.455) against tagging the one real table.
+#     Six of these seven already sit at 1.000 offline, so the only movement
+#     available to them is downward.
+#   * Nothing use-shaped to tag. goodlettsville-tn has 0 sections whose title
+#     names a use listing. montgomery-county-va's only candidate,
+#     "Sec 10-5 Lot Use Regulations", is lot-and-yard frontage rules rather than
+#     a use table — a title-pattern false positive; its actual listings are the
+#     per-district Sec. 10-21..10-32 sections, i.e. the first case above.
+#   * Stub packs. roanoke-va and roanoke-county-va hold 5 sources each and are
+#     outside the launch set.
+#
+# The rule that generalizes: tag the fewest sections that ARE the use listing.
+# A pack earns the marker when ONE section covers every district — clarksville-tn
+# 0.286 -> 1.000, loudoun-county-va 0.400 -> 1.000, newport-news-va, norfolk-va,
+# suffolk-va. A pack that splits its uses per district does not.
 #
 # Why the per-district sections cannot carry recall here, unlike
 # fredericksburg/manassas/salem: nothing in this pack says which district a
