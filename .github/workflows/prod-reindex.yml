@@ -30,6 +30,10 @@ on:
         description: "Only run the payload retag (classification_rules.json-only change; skips reindex entirely)."
         type: boolean
         default: false
+      force_jurisdictions:
+        description: "Comma-separated jurisdiction_ids to retag with --force (pushes Qdrant payloads, which no SQL delta can see). Leave blank to let a push derive them from the diff."
+        type: string
+        default: ""
   push:
     branches:
       - main
@@ -78,6 +82,10 @@ jobs:
       - name: Checkout
         if: steps.guard.outputs.configured == 'true'
         uses: actions/checkout@v4
+        with:
+          # The "Resolve changed jurisdictions" step diffs against
+          # github.event.before, which the default depth-1 checkout does not have.
+          fetch-depth: 0
 
       - name: Set up Python
         if: steps.guard.outputs.configured == 'true'
@@ -103,6 +111,30 @@ jobs:
           fi
           python ../../scripts/reindex_prod.py $args
 
+      # Which jurisdictions' packs actually changed in this push. The retag step
+      # below needs this because the reindex step above has already imported the
+      # packs and upserted sources AND chunk rows -- so by the time the retag
+      # runs, its delta (which can only see SQL) reports "nothing to do" and
+      # skips step 4 entirely, leaving the QDRANT PAYLOADS on the old tags. That
+      # is not hypothetical: it is exactly what happened to #181 on 2026-08-20,
+      # where four newly-marked use-table sections stayed uses=['general'] in
+      # Qdrant while both SQL tables were correct. --force is the only way to
+      # push payloads, and scoping it to the changed packs keeps it to seconds
+      # instead of a 47-minute whole-corpus rewrite.
+      - name: Resolve changed jurisdictions
+        if: steps.guard.outputs.configured == 'true'
+        id: changed
+        run: |
+          if [ -n "${{ inputs.force_jurisdictions }}" ]; then
+            ids="${{ inputs.force_jurisdictions }}"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            ids=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} --                     'apps/api/app/data/source_packs/**' 2>/dev/null                   | cut -d/ -f7 | sort -u | paste -sd, - || true)
+          else
+            ids=""
+          fi
+          echo "ids=$ids" >> "$GITHUB_OUTPUT"
+          echo "changed jurisdictions: ${ids:-<none>}"
+
       - name: Retag district/use payloads (dry run)
         if: steps.guard.outputs.configured == 'true'
         working-directory: apps/api
@@ -111,7 +143,13 @@ jobs:
       - name: Retag district/use payloads (apply)
         if: steps.guard.outputs.configured == 'true'
         working-directory: apps/api
-        run: python ../../scripts/update_source_classification.py
+        run: |
+          ids="${{ steps.changed.outputs.ids }}"
+          if [ -n "$ids" ]; then
+            python ../../scripts/update_source_classification.py --force --jurisdiction "$ids"
+          else
+            python ../../scripts/update_source_classification.py
+          fi
 
       - name: Verify public coverage endpoint
         if: steps.guard.outputs.configured == 'true'
