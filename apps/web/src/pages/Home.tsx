@@ -51,6 +51,11 @@ export function Home() {
   const heroRef = useRef<HTMLElement>(null);
   const { publicSupportedCoverage } = useCoverage();
   const liveCount = publicSupportedCoverage.length;
+  // ponytail: derive the states from coverage -- this badge said "Virginia"
+  // while three TN jurisdictions were already live.
+  const liveStates = [
+    ...new Set(publicSupportedCoverage.map((item) => item.state).filter(Boolean)),
+  ].sort();
 
   // GSAP scroll-scrub layer — reserved for effects Framer can't cleanly do:
   // hero parallax, staggered feature slide-in, and the scale-up preview. All
@@ -142,8 +147,8 @@ export function Home() {
                     Live
                   </span>
                   {liveCount > 0
-                    ? `${liveCount} Virginia jurisdictions`
-                    : "Virginia jurisdictions"}
+                    ? `${liveCount} jurisdictions · ${liveStates.join(", ")}`
+                    : "Jurisdictions"}
                   <span className="text-dusk-faint transition-transform duration-fast ease-out group-hover:translate-x-0.5">
                     →
                   </span>
