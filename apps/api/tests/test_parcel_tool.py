@@ -13,9 +13,9 @@ def test_lookup_fixture_address() -> None:
         "blacksburg-va",
     )
 
-    assert result.parcel_id == "PARCEL-001"
+    assert result.parcel_id == "150029"
     assert result.zoning_district == "mixed-use-core"
-    assert result.method == "fixture"
+    assert result.method == "gis_verified"
     assert result.confidence >= 0.9
 
 

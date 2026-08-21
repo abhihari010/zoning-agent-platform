@@ -330,6 +330,27 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # most basic question here can get the wrong district's use list; that
     # needs a finer district vocabulary, not more tagging.
     "christiansburg-va": 0.85,
+    # 2026-08-21 (#194): blacksburg-va 0.556 -> 0.722, a NEW dataset. It was
+    # the last public_supported city outside the gate (406 sources, no floor).
+    # Same defect christiansburg had: the pack district-tagged every ARTICLE
+    # III division but marked nothing. ARTICLE IV is literally one section per
+    # use type ("Garden center.", "Hotel/motel.", "Two-family dwellings."), all
+    # district-unknown, so its RESIDENTIAL and COMMERCIAL USES divisions are
+    # the use_standards family -- they hold what qualifies a use that the
+    # district Permitted-uses section only lists. Tagging them recovered
+    # Sec. 4201, 4241 and 4526. Tagging only one division measured worse
+    # (commercial alone 0.611), so both earn their place.
+    # The five remaining misses are the coarse-district-vocabulary ceiling,
+    # not a tagging gap. Sec. 3042 (R-4 lot area) loses to the other five
+    # residential divisions' site-development sections and to R-4's own 14.5k-
+    # char Sec. 3043; Sec. 3144 (DC occupancy) loses to the other mixed-use-core
+    # divisions -- every one of them takes the same +2.0 exact-district bonus.
+    # Sec. 4553/4528.2/4541 lose because the use_standards reserve is one slot
+    # and short-circuits on PRESENCE: a longer, chattier sibling (Sec. 4231
+    # Townhouse, Sec. 4521 Clinic, Sec. 4531 Kennel) already sits in top on
+    # token overlap, which is normalized by query length and so favours long
+    # chunks. More tagging cannot fix either; a finer district vocabulary can.
+    "blacksburg-va": 0.64,
     # 2026-08-12: clarksville-tn 0.286, re-authored against the corrected
     # corpus (PRs #164/#165 fixed the use-table blank-cell defect; Chapter 3
     # now reconstructs 5 real 27-column district tables instead of 0). The
