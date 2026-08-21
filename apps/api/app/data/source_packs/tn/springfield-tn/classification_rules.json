@@ -1,0 +1,251 @@
+{
+  "schema_version": "source-classification-rules/v1",
+  "_notes": "Human-authored 2026-08-21. This pack had NO rules file, so every source classified unknown/general and _ensure_use_table_rows never fired for springfield at all. Appendix A gives each district ONE all-in-one section whose title carries the district label (\"A-506. - RS20 Low Density Residential Single-Family Districts.\"), so the principal_uses marker goes on the numbered district sections of Chapters A-5/A-6/A-7 and nothing else -- the Statement of Purpose sections (A-501/A-601/A-701) carry no use list and would only compete for the two reserved slots. In Chapter A-8 SUPPLEMENTARY DISTRICT REGULATIONS only the \"Development Standards for ...\" dwelling family (A-802 multi-family, A-803 semi-detached, A-804 attached) is tagged use_standards. Tagging the whole chapter was measured and is WORSE than nothing: the reserve holds one slot and short-circuits as soon as any tagged chunk is already in the results, so A-806 \"Bulk, Density, Area\" won the slot on density vocabulary and kept A-802 out. The three dwelling-standards sections tie with each other on district and use, which is the #191 criterion, so token overlap alone picks the right one. A-502 and A-608 are the same shape inside the district chapters. Districts follow the coarse six-category vocabulary, so every residential district maps to residential-low-density; CC Core Commercial also carries mixed-use-core and MRO also carries residential-low-density. Chapters A-9 floodplain, A-10 special districts/overlays and A-13..A-15 administration are left unmapped per the overlay and procedural precedents. A-1306 Conditional Use Permits is the one section tagged out of the otherwise-unmapped administration chapters: a church in a residential district is allowed only as a conditional use, so A-1306 is what qualifies the answer, the same shape as the accessory/additional-standards sections in #191 rather than the procedural sections left untagged there. It shares the single use_standards slot with the dwelling-standards family and was measured not to cannibalise it -- A-802 and A-804 still land on the apartments and townhomes scenarios. Not fixed and not fixable by tagging: the CLS/CC/MPO commercial scenarios (A-602/A-603/A-607). All six commercial districts recite the same Chapter A-3 activity names, and with the parcel district unknown every chunk takes the same district bonus, so ranking is pure token overlap and the long residential sections win on incidental \"general\" and \"square feet\" matches. That needs district resolution, which springfield has no parcel fixtures for.",
+  "rules": [
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-502",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general",
+        "use_standards"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-503",
+      "districts": [
+        "agricultural",
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-504",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-505",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-506",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-507",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-508",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-509",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-510",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-511",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-5 - RESIDENTIAL DISTRICT REGULATIONS",
+      "title_contains": "a-512",
+      "districts": [
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-6 - COMMERCIAL DISTRICT REGULATIONS",
+      "title_contains": "a-608",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general",
+        "use_standards"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-6 - COMMERCIAL DISTRICT REGULATIONS",
+      "title_contains": "a-602",
+      "districts": [
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-6 - COMMERCIAL DISTRICT REGULATIONS",
+      "title_contains": "a-603",
+      "districts": [
+        "mixed-use-core",
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-6 - COMMERCIAL DISTRICT REGULATIONS",
+      "title_contains": "a-604",
+      "districts": [
+        "commercial-employment",
+        "residential-low-density"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-6 - COMMERCIAL DISTRICT REGULATIONS",
+      "title_contains": "a-605",
+      "districts": [
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-6 - COMMERCIAL DISTRICT REGULATIONS",
+      "title_contains": "a-606",
+      "districts": [
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-6 - COMMERCIAL DISTRICT REGULATIONS",
+      "title_contains": "a-607",
+      "districts": [
+        "commercial-employment"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-7 - INDUSTRIAL DISTRICT REGULATIONS",
+      "title_contains": "a-702",
+      "districts": [
+        "industrial-zone"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-7 - INDUSTRIAL DISTRICT REGULATIONS",
+      "title_contains": "a-703",
+      "districts": [
+        "industrial-zone"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-8 - SUPPLEMENTARY DISTRICT REGULATIONS",
+      "title_contains": "development standards for",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general",
+        "use_standards"
+      ]
+    },
+    {
+      "article_contains": "Chapter A-13 - ADMINISTRATION AND ENFORCEMENT",
+      "title_contains": "conditional use permits",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general",
+        "use_standards"
+      ]
+    }
+  ]
+}
