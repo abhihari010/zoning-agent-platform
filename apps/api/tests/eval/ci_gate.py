@@ -270,6 +270,18 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # because the titles-carry-no-district problem documented above is unchanged:
     # the reserve now guarantees A "Uses permitted." section survives, but not
     # that it is the right division's.
+    # 2026-08-21: brentwood-tn stays 0.615 — measured, not skipped. Tagging
+    # ARTICLE I "IN GENERAL" use_standards (with the definitions/purpose
+    # boilerplate shadowed out) and tagging "- uses prohibited." both measure
+    # exactly flat, so neither shipped. The reserve is working: it reaches
+    # Sec. 78-19 "Single-family residences" (3.381) ahead of the required
+    # Sec. 78-14 "Minimum site requirements for residential lots" (3.333) on
+    # the sfr-r1 query, which is a defensible citation the dataset does not
+    # credit. All four remaining misses need to know WHICH division applies
+    # (R-1 vs R-2 vs SI-1), and brentwood has no parcel fixtures, so every
+    # scenario runs district=unknown and the identical sibling titles are
+    # genuinely indistinguishable. That is a district-resolution problem, not
+    # a tagging one; see the note above springfield-tn for the same ceiling.
     "brentwood-tn": 0.51,
     # 2026-08-09: springfield-tn 0.600 (Appendix A gives each district ONE
     # all-in-one section whose title carries the district label — "A-504. R40
@@ -284,7 +296,23 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # remaining misses are the supporting refs A-802 and A-1306, cross-cutting
     # sections whose vocabulary is diluted across every district that points
     # at them. Live vector recall is the quality signal.
-    "springfield-tn": 0.50,
+    # 2026-08-21: springfield-tn 0.600 -> 0.800. This pack had NO
+    # classification_rules.json at all, so every source classified
+    # unknown/general and neither use reserve could ever fire for it. The new
+    # file tags the numbered district sections of Chapters A-5/A-6/A-7
+    # principal_uses, the "Development Standards for ..." dwelling family in
+    # A-8 use_standards, and A-1306 Conditional Use Permits (a church is
+    # allowed only as a conditional use, so A-1306 is what qualifies the
+    # answer). Tagging the WHOLE of Chapter A-8 was measured and is worse than
+    # tagging none of it: the use_standards reserve holds one slot and
+    # short-circuits as soon as any tagged chunk is already present, so A-806
+    # "Bulk, Density, Area" won the slot on density vocabulary and kept A-802
+    # out. The three remaining misses (A-602/A-603/A-607) are not fixable by
+    # tagging: all six commercial districts recite the same Chapter A-3
+    # activity names, and with the parcel district unknown every chunk takes
+    # the same district bonus, so ranking is pure token overlap and the long
+    # residential sections win on incidental "general"/"square feet" matches.
+    "springfield-tn": 0.72,
     # 2026-08-12: clarksville-tn 0.286, re-authored against the corrected
     # corpus (PRs #164/#165 fixed the use-table blank-cell defect; Chapter 3
     # now reconstructs 5 real 27-column district tables instead of 0). The
