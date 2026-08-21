@@ -1,0 +1,217 @@
+[
+  {
+    "id": "blacksburg-va-r4-single-family",
+    "address": "810 Ellett Rd, Blacksburg, VA 24060",
+    "project_description": "Build a new single-family detached dwelling on a vacant lot in the R-4 Low Density Residential District.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3041"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-r4-accessory-apartment",
+    "address": "810 Ellett Rd, Blacksburg, VA 24060",
+    "project_description": "Add an accessory apartment above the detached garage of my single-family home in the R-4 Low Density Residential District, kept clearly secondary to the primary dwelling.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3041",
+        "Sec. 4201"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-r4-minimum-lot-area",
+    "address": "810 Ellett Rd, Blacksburg, VA 24060",
+    "project_description": "Subdivide my R-4 Low Density Residential District property and need to know the minimum lot area and lot frontage required for a new lot.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3042"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-dc-general-restaurant",
+    "address": "250 S Main St, Blacksburg, VA 24060",
+    "project_description": "Open a general restaurant with open air sidewalk dining in an existing storefront in the DC Downtown Commercial District.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3141",
+        "Sec. 4553"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-dc-maximum-occupancy",
+    "address": "250 S Main St, Blacksburg, VA 24060",
+    "project_description": "Rent an upper-floor apartment in the DC Downtown Commercial District to five unrelated students and need to know the maximum dwelling unit occupancy allowed.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3144"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-dc-maximum-height",
+    "address": "250 S Main St, Blacksburg, VA 24060",
+    "project_description": "Redevelop a Main Street parcel in the DC Downtown Commercial District and need to know the maximum structure height allowed.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3142"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-gc-garden-center",
+    "address": "3705 S Main St, Blacksburg, VA 24060",
+    "project_description": "Open a garden center with outdoor plant display on a commercial lot in the GC General Commercial District.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3151",
+        "Sec. 4526"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-gc-hotel",
+    "address": "3705 S Main St, Blacksburg, VA 24060",
+    "project_description": "Build a hotel on a vacant commercial parcel in the GC General Commercial District.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3151",
+        "Sec. 4528.2"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-o-two-family-dwelling",
+    "address": "646 Jennelle Rd, Blacksburg, VA 24060",
+    "project_description": "Build a two-family dwelling on a lot in the O Office District.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3181",
+        "Sec. 4241"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-o-maximum-lot-coverage",
+    "address": "646 Jennelle Rd, Blacksburg, VA 24060",
+    "project_description": "Expand an existing building in the O Office District and need to know the maximum lot coverage and floor area ratio permitted.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3182"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-in-warehousing-distribution",
+    "address": "760 Jennelle Rd, Blacksburg, VA 24060",
+    "project_description": "Open a warehousing and distribution facility in an existing building in the IN Industrial District.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3201"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "blacksburg-va-in-mini-warehouse",
+    "address": "760 Jennelle Rd, Blacksburg, VA 24060",
+    "project_description": "Build a mini-warehouse self-storage facility in the IN Industrial District, which is allowed there only by conditional use permit.",
+    "jurisdiction_id": "blacksburg-va",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 3201",
+        "Sec. 4541"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]

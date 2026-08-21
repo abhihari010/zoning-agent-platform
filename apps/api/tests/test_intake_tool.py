@@ -37,8 +37,8 @@ def test_intake_tool_populates_location_confidence_fields() -> None:
     assert result.jurisdiction_confidence == 1.0
     assert result.jurisdiction_method == "explicit"
     assert result.district_confidence >= 0.9
-    assert result.district_method == "fixture"
-    assert result.parcel_id == "PARCEL-001"
+    assert result.district_method == "gis_verified"
+    assert result.parcel_id == "150029"
     assert context.district == "mixed-use-core"
 
 
