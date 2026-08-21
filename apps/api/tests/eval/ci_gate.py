@@ -313,6 +313,23 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # the same district bonus, so ranking is pure token overlap and the long
     # residential sections win on incidental "general"/"square feet" matches.
     "springfield-tn": 0.72,
+    # 2026-08-21 (#194): christiansburg-va 0.786 -> 0.929, a NEW dataset. It
+    # and blacksburg-va were live public_supported with no dataset at all, so
+    # the gate covered 26 of 28 live cities and nothing measured these two.
+    # Its rules district-tagged every article but marked nothing
+    # principal_uses; because the coarse six-category district vocabulary maps
+    # R-1A/R-1/R-2/R-3/R-MS all to residential-low-density, every residential
+    # article took the same +2.0 exact-district bonus and R-1's own Sec. 42-93
+    # lost to its siblings. Tagging each article's "- Permitted uses." section
+    # plus ARTICLE XXII (urban agriculture / homestay / portable storage
+    # containers) use_standards fixed all but one scenario.
+    # The one miss left, r1-single-family, is that same coarse-vocabulary
+    # ceiling: every residential article lists "single-family dwellings", the
+    # principal_uses reserve short-circuits on presence once any two are in
+    # top, and R-3/R-MS win the slots on token overlap. Real users asking the
+    # most basic question here can get the wrong district's use list; that
+    # needs a finer district vocabulary, not more tagging.
+    "christiansburg-va": 0.85,
     # 2026-08-12: clarksville-tn 0.286, re-authored against the corrected
     # corpus (PRs #164/#165 fixed the use-table blank-cell defect; Chapter 3
     # now reconstructs 5 real 27-column district tables instead of 0). The
