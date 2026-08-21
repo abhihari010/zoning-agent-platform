@@ -225,6 +225,58 @@ def test_qdrant_store_upserts_queries_and_deletes() -> None:
     assert store.count() == 0
 
 
+def test_payload_tags_expose_a_retag_whose_sql_is_already_current() -> None:
+    """The retag delta must be able to see SQL-current-but-payloads-stale.
+
+    update_source_classification.py writes sources, then chunk rows, then Qdrant
+    payloads, and the reindex workflow runs reindex_prod.py *first* -- which makes
+    both SQL tables current on its own. A delta computed from SQL alone is then
+    guaranteed to report "nothing to do" while retrieval still filters on the old
+    payload tags, which is precisely how a tag-only change shipped to production
+    behind a green run. get_source_chunk_tags is what makes that state visible,
+    which is only true if it reports what the POINTS carry.
+    """
+    store = _make_store()
+    source = SourceRegistryEntry(
+        source_id="coffee-rule",
+        title="Coffee Rule",
+        excerpt="Coffee shops are reviewed as food service uses.",
+        section_ref="Sec 3",
+        jurisdiction_id="blacksburg-va",
+        districts=["mixed-use-core"],
+        uses=["general"],
+        source_type="zoning_ordinance",
+    )
+    chunks = build_source_chunks([source])
+    store.upsert_chunks(chunks, [[0.1, 0.2, 0.3] for _ in chunks])
+
+    stale = (("mixed-use-core",), ("general",))
+    assert store.get_source_chunk_tags() == {"coffee-rule": {stale}}
+
+    # The pack gains a marker. A tag change never moves a chunk_id, so the points
+    # stay put and only their payloads are wrong -- invisible from SQL.
+    retagged = source.model_copy(update={"uses": ["general", "principal_uses"]})
+    fresh = (("mixed-use-core",), ("general", "principal_uses"))
+    assert store.get_source_chunk_tags() == {"coffee-rule": {stale}}, (
+        "payload tags must not follow the packs -- that blindness is the bug"
+    )
+
+    # The payload write lands: the corpus is genuinely in sync and the delta quiets.
+    retagged_chunks = build_source_chunks([retagged])
+    assert [c.chunk_id for c in retagged_chunks] == [c.chunk_id for c in chunks]
+    updated, skipped = store.update_chunk_payloads(
+        {c.chunk_id: {"districts": c.districts, "uses": c.uses} for c in retagged_chunks}
+    )
+    assert (updated, skipped) == (len(chunks), 0)
+    assert store.get_source_chunk_tags() == {"coffee-rule": {fresh}}
+
+
+def test_payload_tags_are_empty_when_the_collection_does_not_exist() -> None:
+    # "Nothing indexed" must not read as "everything is stale" -- those sources are
+    # a reindex job, not a retag job.
+    assert _make_store().get_source_chunk_tags() == {}
+
+
 def test_qdrant_store_creates_payload_indexes_for_filtered_fields() -> None:
     fake_client = FakeQdrantClient()
     store = _make_store(fake_client)

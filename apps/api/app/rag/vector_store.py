@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import uuid
 from dataclasses import dataclass, field
+from collections.abc import Iterator
 from typing import Any
 
 from app.ai.interfaces import EmbeddingProvider, EmbeddingProviderRequest
@@ -206,25 +207,56 @@ class QdrantVectorStore:
             return set()
         return set(self._scroll_all_chunk_ids())
 
+    def get_source_chunk_tags(self) -> dict[str, set[tuple[tuple[str, ...], tuple[str, ...]]]]:
+        """Map source_id -> the distinct (districts, uses) tags its points carry.
+
+        The SQL twin of this (``SQLAlchemyStore.get_source_chunk_tags``) makes a
+        retag that died between its writes visible, but it cannot see the last of
+        those writes: payloads live only here. A corpus whose sources and chunk
+        rows are both current can still be filtering on the old tags in the vector
+        path -- which is exactly what shipped to production once, silently, behind
+        a green run. This closes that blind spot.
+
+        Payload-only, no vectors: a full scroll of a 34k-point collection is ~1.6s,
+        cheap enough to run unconditionally, which is the point -- the delta has to
+        be right when nobody thought to pass --force.
+
+        A collection that does not exist yet means "nothing indexed" and returns
+        empty, so callers treat those sources as pending a reindex rather than as
+        stale. Every other failure raises, as in ``existing_chunk_ids``.
+        """
+        if not self._get_client().collection_exists(self.collection_name):
+            return {}
+        tags: dict[str, set[tuple[tuple[str, ...], tuple[str, ...]]]] = {}
+        for payload in self._scroll_payloads(["source_id", "districts", "uses"]):
+            tags.setdefault(payload.get("source_id") or "", set()).add(
+                (tuple(payload.get("districts") or ()), tuple(payload.get("uses") or ()))
+            )
+        return tags
+
     def _scroll_all_chunk_ids(self) -> list[str]:
+        return [
+            payload["chunk_id"]
+            for payload in self._scroll_payloads(["chunk_id"])
+            if payload.get("chunk_id")
+        ]
+
+    def _scroll_payloads(self, fields: list[str]) -> Iterator[dict[str, Any]]:
         client = self._get_client()
-        chunk_ids: list[str] = []
         offset = None
         while True:
             records, next_offset = client.scroll(
                 collection_name=self.collection_name,
-                with_payload=["chunk_id"],
+                with_payload=fields,
                 with_vectors=False,
                 limit=1000,
                 offset=offset,
             )
             for record in records:
-                if record.payload and "chunk_id" in record.payload:
-                    chunk_ids.append(record.payload["chunk_id"])
+                yield record.payload or {}
             if next_offset is None:
                 break
             offset = next_offset
-        return chunk_ids
 
     def query(
         self,
