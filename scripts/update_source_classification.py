@@ -33,13 +33,15 @@ Run from ``apps/api`` with PRODUCTION env vars set::
 
 Flags:
     --dry-run       Print the sources whose tags would change, old -> new; do
-                    NOT write to Postgres or Qdrant.
+                    NOT write to Postgres or Qdrant. It reads Qdrant payloads, so
+                    it does tell a payload-stale corpus from a clean one.
     --jurisdiction  Comma-separated jurisdiction_ids to limit the run to.
     --force         Rewrite matched sources even when their tags already match.
-                    The delta covers both SQL tables (sources and chunk rows), so
-                    an interrupted run now repairs itself on the next plain run.
-                    Qdrant payloads cannot be diffed from SQL, so --force is still
-                    how you finish a run that died during step 4.
+                    The delta covers all three writes (sources, chunk rows and
+                    Qdrant payloads), so an interrupted run -- or one whose SQL was
+                    already made current by reindex_prod.py -- repairs itself on the
+                    next plain run. --force remains the escape hatch when you want
+                    to rewrite regardless of what the delta thinks.
 """
 from __future__ import annotations
 
@@ -116,16 +118,20 @@ def main() -> int:
     # typically moves a handful of sources; the rest are identical rewrites.
     # One query loads the stored side.
     #
-    # The delta reads the sources table AND the tags actually stored on the chunk
-    # rows, because steps 2, 3 and 4 are separate writes: a run that dies between
-    # them leaves sources correct while chunks and Qdrant still carry the old tags.
-    # A sources-only delta reports "nothing to do" on exactly that corpus, so the
-    # damage survives every subsequent run -- which is how a full batch of packs
-    # sat tagged-but-inert in production. Comparing chunks makes the repair
-    # self-healing; --force remains for the Qdrant-only gap, which no SQL query
-    # can see.
+    # The delta reads all three destinations, because steps 2, 3 and 4 are separate
+    # writes: sources, chunk rows, Qdrant payloads. Any subset of them can be
+    # current while the rest carry the old tags, and the delta exists to police
+    # exactly that. Checking only SQL is not enough -- the reindex workflow runs
+    # reindex_prod.py first, which makes BOTH SQL tables current, so a SQL-only
+    # delta is *guaranteed* to report clean there while the payloads retrieval
+    # actually filters on stay stale. That shipped to production behind a green
+    # run. The Qdrant scroll is payload-only (~1.6s for 34k points), cheap enough
+    # to run unconditionally, which is the whole value: being correct when nobody
+    # thought to pass --force.
     stored = {s.source_id: s for s in store.list_sources()}
     chunk_tags = store.get_source_chunk_tags()
+    vector_store = QdrantVectorStore(settings=settings)
+    payload_tags = vector_store.get_source_chunk_tags()
 
     def _needs_rewrite(entry: Any) -> bool:
         source = stored.get(entry.source_id)
@@ -133,10 +139,17 @@ def main() -> int:
             return True
         # build_source_chunks copies the source's tags onto every chunk it emits,
         # so all chunk rows for a current source must carry exactly these CSVs.
-        # A source with no chunk rows at all is a reindex job (its text was never
-        # embedded), not a retag job -- leave it to reindex_prod.py.
-        expected = (_make_filter_csv(entry.districts), _make_filter_csv(entry.uses))
-        return chunk_tags.get(entry.source_id, {expected}) != {expected}
+        # A source with no chunk rows / no points at all is a reindex job (its text
+        # was never embedded), not a retag job -- leave it to reindex_prod.py.
+        expected_csv = (_make_filter_csv(entry.districts), _make_filter_csv(entry.uses))
+        if chunk_tags.get(entry.source_id, {expected_csv}) != {expected_csv}:
+            return True
+        # Payloads store the same tags as lists, minus empties (see _chunk_metadata).
+        expected_payload = (
+            tuple(d for d in entry.districts if d),
+            tuple(u for u in entry.uses if u),
+        )
+        return payload_tags.get(entry.source_id, {expected_payload}) != {expected_payload}
 
     changed = [e for e in entries if args.force or _needs_rewrite(e)]
     if args.force:
@@ -144,23 +157,28 @@ def main() -> int:
     else:
         _log(
             f"{len(changed)}/{len(entries)} sources have tags differing from the "
-            "database (sources table or chunk rows)."
+            "database (sources table, chunk rows or Qdrant payloads)."
         )
         if not changed:
-            _log(
-                "NOTE: SQL is in sync (sources AND chunk rows). Qdrant payloads are not "
-                "checked -- if a previous run died during step 4, re-run with --force "
-                "--jurisdiction <id> to push the payloads through."
-            )
+            _log("NOTE: sources, chunk rows AND Qdrant payloads are all in sync.")
 
     if args.dry_run:
         _log("\n--- DRY RUN: sources whose tags would change (section_ref -> districts / uses) ---")
         for entry in sorted(changed, key=lambda e: e.section_ref or ""):
             was = stored.get(entry.source_id)
+            # Say so explicitly when SQL already matches: otherwise the line reads
+            # "districts=X (was districts=X)" and looks like a no-op, when what is
+            # actually stale is the Qdrant payload.
+            reason = (
+                "   (was districts={} uses={})".format(was.districts, was.uses)
+                if was and (was.districts != entry.districts or was.uses != entry.uses)
+                else "   (new)"
+                if not was
+                else "   (SQL matches; chunk rows or Qdrant payloads are stale)"
+            )
             _log(
                 f"  {entry.section_ref or entry.source_id:<30}  "
-                f"districts={entry.districts}  uses={entry.uses}"
-                + (f"   (was districts={was.districts} uses={was.uses})" if was else "   (new)")
+                f"districts={entry.districts}  uses={entry.uses}" + reason
             )
         _log(f"\n{len(changed)} source(s) would be rewritten (dry run — no writes).")
         return 0
@@ -192,7 +210,6 @@ def main() -> int:
         }
         for chunk in chunks
     }
-    vector_store = QdrantVectorStore(settings=settings)
     updated, skipped = vector_store.update_chunk_payloads(payloads)
     _log(f"updated {updated} Qdrant point payloads (no re-embedding).")
     if skipped:
