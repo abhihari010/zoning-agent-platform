@@ -271,6 +271,7 @@ class HybridLocalRetrievalProvider:
         # third reserve, _ensure_district_definitions, is keyed on the district
         # query's vector hits and has no SQL analogue, so it stays Qdrant-only.)
         top = _ensure_use_table_rows(top, ranked)
+        top = _ensure_use_table_rows(top, ranked, marker="use_standards", reserve=1)
         top = _ensure_dimensional_rows(top, ranked, request)
         return RetrievalProviderResult(
             citations=[
@@ -413,6 +414,9 @@ class HybridLocalRetrievalProvider:
         # is the primary evidence for the decision but shares a section_ref with
         # the chapter narrative, so the per-section diversify cap can drop it.
         top = _ensure_use_table_rows(top, ranked)
+        # Guarantee the accessory / additional-standards section that qualifies the
+        # use survives too: it is what separates "allowed" from "allowed, but".
+        top = _ensure_use_table_rows(top, ranked, marker="use_standards", reserve=1)
         # Guarantee a number-bearing chunk survives for a dimensional question
         # (minimum lot area, setback, height, ...). The target district section is
         # retrieved, but the chunk holding the literal measurement sentence often
@@ -517,6 +521,7 @@ def _ensure_use_table_rows(
     top: list[tuple[float, "SourceChunk"]],
     ranked: list[tuple[float, "SourceChunk"]],
     *,
+    marker: str = "principal_uses",
     reserve: int = 2,
 ) -> list[tuple[float, "SourceChunk"]]:
     """Guarantee the permitted-use table row(s) for the inferred use are present.
@@ -529,8 +534,17 @@ def _ensure_use_table_rows(
     does not permit it in the identified district at all. Reserve up to ``reserve``
     slots for the highest-ranked permitted-use-table chunks (tagged via the
     ingestion-level ``principal_uses`` use marker). Generic across jurisdictions.
+
+    ``marker`` also serves the second evidence class, ``use_standards``: the
+    accessory / supplemental / additional-standards sections that decide whether a
+    use is merely conditional or outright restricted. Those lose ranking to the
+    base-district sections (an exact district match scores +2.0 against their
+    "unknown" +1.2), so an answer came back "likely_allowed" with the section that
+    qualifies it never in the excerpts. Its reserve is deliberately smaller: one
+    scenario needs one standards section, and every sibling in the family ties on
+    district and use, so token overlap alone picks the topical one.
     """
-    present = sum(1 for _, chunk in top if "principal_uses" in chunk.uses)
+    present = sum(1 for _, chunk in top if marker in chunk.uses)
     need = reserve - present
     if need <= 0:
         return top
@@ -539,7 +553,7 @@ def _ensure_use_table_rows(
     for score, chunk in ranked:
         if need <= 0:
             break
-        if "principal_uses" not in chunk.uses or chunk.chunk_id in existing:
+        if marker not in chunk.uses or chunk.chunk_id in existing:
             continue
         augmented.append((score, chunk))
         existing.add(chunk.chunk_id)
