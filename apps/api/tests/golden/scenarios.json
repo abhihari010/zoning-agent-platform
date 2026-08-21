@@ -2384,5 +2384,254 @@
         "norfolk-va"
       ]
     }
+  },
+  {
+    "id": "brentwood-tn-public-supported-r1-residential",
+    "project_description": "Build a new detached single-family home with two employees, posted operating hours, and interior renovation only, on a vacant two-acre estate lot in the R-1 low density residential district, consistent with the district's permitted detached single-family residence use.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "brentwood-tn",
+    "jurisdiction_name": "Brentwood, TN",
+    "normalized_address": "1500 Murray Ln, Brentwood, TN 37027",
+    "sources": [
+      {
+        "source_id": "brentwood-tn-sec-78-142",
+        "title": "Sec. 78-142. - Uses permitted.",
+        "excerpt": "The following uses are permitted within the R-1 zoning districts: (1) General farming activities such as the raising of trees, field and plant crops, breeding and keeping of domestic animals and similar agricultural uses, provided the minimum lot size is three acres. (2) Detached single-family residences, subject to the limitations established in section 78-19 of this Code. (3) Designated open space including leisure facilities within a planned residential subdivision subject to the standards and limitations specified in section 78-150. (4) Accessory buildings customarily incidental to the above uses, subject to the standards and limitations specified in sections 78-22 and 78-148. (5) Home",
+        "section_ref": "Sec. 78-142",
+        "jurisdiction_id": "brentwood-tn",
+        "url": "https://library.municode.com/tn/brentwood/codes/code_of_ordinances?nodeId=PTIICOOR_CH78ZO_ARTIIIDIRE_DIV3LALORE_S78-142USPE",
+        "effective_date": "2026-02-23",
+        "districts": [
+          "residential-low-density"
+        ],
+        "uses": [
+          "general",
+          "principal_uses"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "blacksburg-va",
+        "chesapeake-va",
+        "danville-va",
+        "fredericksburg-va",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "newport-news-va",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "salem-va",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "brentwood-tn-public-supported-tc-restaurant",
+    "project_description": "Open a sit-down restaurant with six employees, posted operating hours, and interior renovation of an existing ground-floor storefront, in the C-4 town center mixed-use district, consistent with the district's permitted restaurant use.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "brentwood-tn",
+    "jurisdiction_name": "Brentwood, TN",
+    "normalized_address": "5211 Maryland Way, Brentwood, TN 37027",
+    "sources": [
+      {
+        "source_id": "brentwood-tn-sec-78-252",
+        "title": "Sec. 78-252. - Uses permitted.",
+        "excerpt": "The following uses are permitted in the C-4 commercial town center district: (1) General retail uses such as general merchandising, variety shops, clothing, dry goods, hardware, furniture, appliances, gift and specialty stores, antique shops, grocery and drug stores, dry cleaners, bookstores, florists, tailoring, shoe and watch repair, music and electronic retailers, sporting goods, and other similar uses. (2) Hotels, provided that the rental and occupancy of hotel units shall be limited to a nightly or weekly basis; and further provided that hotels shall have an inside lobby supervised at all hours of operation, with public access to the building after dark being restricted to the lobby",
+        "section_ref": "Sec. 78-252",
+        "jurisdiction_id": "brentwood-tn",
+        "url": "https://library.municode.com/tn/brentwood/codes/code_of_ordinances?nodeId=PTIICOOR_CH78ZO_ARTIIIDIRE_DIV9COTOCE_S78-252USPE",
+        "effective_date": "2026-02-23",
+        "districts": [
+          "commercial-employment",
+          "mixed-use-core"
+        ],
+        "uses": [
+          "general",
+          "principal_uses"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "blacksburg-va",
+        "chesapeake-va",
+        "danville-va",
+        "fredericksburg-va",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "newport-news-va",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "salem-va",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "springfield-tn-public-supported-rs20-residential",
+    "project_description": "Build a new single-family detached house with two employees, posted operating hours, and interior renovation only, on a vacant lot in the RS20 low density residential single-family district, consistent with the district's permitted single-family detached dwelling use.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "springfield-tn",
+    "jurisdiction_name": "Springfield, TN",
+    "normalized_address": "805 Mooreland Drive, Springfield, TN 37172",
+    "sources": [
+      {
+        "source_id": "springfield-tn-a-506",
+        "title": "A-506. - RS20 Low Density Residential Single-Family Districts.",
+        "excerpt": "These districts are designed to provide suitable areas for low density residential development characterized by an open appearance. Generally, the residential development will consist of single-family detached dwellings and accessory structures. These districts also include community facilities, public utilities, and open uses which serve specifically the residents of these districts, or which are benefited by an open residential environment without creating objectionable or undesirable influences upon residential developments. Further it is the intent of this ordinance that these districts be located so that the provision of appropriate urban services will be physically and economically",
+        "section_ref": "A-506",
+        "jurisdiction_id": "springfield-tn",
+        "url": "https://library.municode.com/tn/springfield/codes/code_of_ordinances?nodeId=APXASPZOOR_CHA-5REDIRE_A-506RSLODERESIMIDI",
+        "effective_date": "2026-05-19",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "danville-va",
+        "fredericksburg-va",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "newport-news-va",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "salem-va",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "springfield-tn-public-supported-cc-retail",
+    "project_description": "Open a general retail clothing and gift store with four employees, posted operating hours, and interior renovation of a vacant downtown storefront, in the CC core commercial district, consistent with the district's wide range of permitted retail uses.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "springfield-tn",
+    "jurisdiction_name": "Springfield, TN",
+    "normalized_address": "500 South Main Street, Springfield, TN 37172",
+    "sources": [
+      {
+        "source_id": "springfield-tn-a-603",
+        "title": "A-603. - CC Core Commercial Districts.",
+        "excerpt": "This district is designed to provide for a wide range of retail, office, amusement, and service uses normally found in a central business district. High intensity of use is permitted in this district, and increased building bulk is provided as a means of encouraging such development. To further promote this sort of development, off-street parking to support community facility activities and commercial activities is not required. Residential uses are also permitted. A. Principal Permitted Uses and Structures Within the Core Commercial District as shown on the Official Zoning Map, the following activities, as described in Chapter A-3 are permitted: Residential Activities Permanent Dwelling,",
+        "section_ref": "A-603",
+        "jurisdiction_id": "springfield-tn",
+        "url": "https://library.municode.com/tn/springfield/codes/code_of_ordinances?nodeId=APXASPZOOR_CHA-6CODIRE_A-603CCCOCODI",
+        "effective_date": "2026-05-19",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "danville-va",
+        "fredericksburg-va",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "newport-news-va",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "salem-va",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
   }
 ]
