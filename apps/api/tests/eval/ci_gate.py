@@ -129,14 +129,30 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # still diluted; what changed is that _ensure_dimensional_rows now keeps the
     # number-bearing chunk of the per-district sections, which this dataset's
     # refs lean on. No pack or dataset change.
-    "hampton-va": 0.30,
+    # 2026-08-21 (#190): hampton-va 0.400 -> 0.800. Sec. 3-3 "Additional standards
+    # on uses" now carries the use_standards marker, so the standards reserve keeps
+    # the one chunk of that very long section which matches the query (kennel,
+    # short-term rental, container storage) instead of losing all of them to the
+    # district sections, which outrank it 2.0 to 1.2 on the district match alone.
+    # The two remaining misses (Sec. 4-44 lot area, Sec. 5-16 density) are
+    # dimensional refs behind use-phrased questions, so _ensure_dimensional_rows
+    # never fires -- a different mechanism, not this one.
+    "hampton-va": 0.72,
     # 2026-07-17: henrico-county-va 0.400 (weak-label pack: only ~35 of 442
     # sources classify to a real district after the rules fix, so most refs
     # point at Article 4 accessory-use sections whose district is "unknown" —
     # they resolve fine by keyword since each section covers one narrow use,
     # but the district-scoped base-district refs are a minority of the
     # dataset; live vector recall is the quality signal).
-    "henrico-county-va": 0.35,
+    # 2026-08-21 (#190): henrico-county-va 0.400 -> 0.700, same marker applied to
+    # the Sec. 24-44xx accessory-use standards. Every sibling in that family ties
+    # on district ("unknown") and use ("general"), so token overlap alone picks the
+    # topical one -- which is why this pack rewards the marker where a per-district
+    # family would not. reserve=2 measured identical (0.700), so the reserve stays
+    # at 1. The three misses want two accessory sections whose vocabulary is
+    # crowded by their siblings, and Sec. 24-3503 (PD master plan), which is a
+    # procedural section, not a use standard, and is deliberately untagged.
+    "henrico-county-va": 0.62,
     # 2026-07-18: fredericksburg-va 1.000 (all 10 non-abstain scenarios cite a
     # district's own dimensional/purpose section from the "Zoning Districts"
     # article — human-authored title-level rules per district, so the refs
