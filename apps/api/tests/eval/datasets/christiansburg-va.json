@@ -1,0 +1,213 @@
+[
+  {
+    "id": "christiansburg-va-a-single-family",
+    "address": "1865 Akers St SW, Christiansburg, VA 24073",
+    "project_description": "Build a new single-family dwelling on a vacant parcel in the A Agricultural District, occupied by one family plus one unrelated individual.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-33."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-a-poultry-confinement",
+    "address": "1865 Akers St SW, Christiansburg, VA 24073",
+    "project_description": "Put up a confinement poultry house for roughly 800 fowl on my land in the A Agricultural District, well above the 100-fowl enclosure threshold.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-33."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-a-minimum-lot-area",
+    "address": "1865 Akers St SW, Christiansburg, VA 24073",
+    "project_description": "Subdivide part of my A Agricultural District parcel and need to know the minimum lot area required for each permitted use.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-34."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-r1-single-family",
+    "address": "510 Canterbury St SW, Christiansburg, VA 24073",
+    "project_description": "Build a new single-family detached dwelling on a vacant lot in the R-1 Single-Family Residential District.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-93."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-r1-major-home-occupation",
+    "address": "510 Canterbury St SW, Christiansburg, VA 24073",
+    "project_description": "Operate a major home occupation out of my house in the R-1 Single-Family Residential District, larger than a minor home occupation allows.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-93."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-r1-homestay",
+    "address": "510 Canterbury St SW, Christiansburg, VA 24073",
+    "project_description": "Rent out a spare bedroom in my primary residence in the R-1 district as a short-term homestay listing for travellers.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-664.",
+        "Sec. 42-93."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-r1-backyard-chickens",
+    "address": "510 Canterbury St SW, Christiansburg, VA 24073",
+    "project_description": "Keep six backyard chicken hens and two beehive stands at my single-family residence in the R-1 district.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-663."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-mu1-two-family",
+    "address": "70 Nursery Ln NE, Christiansburg, VA 24073",
+    "project_description": "Build a two-family dwelling in the MU-1 Mixed Use Residential-Limited Business District, each unit housing a family plus up to two unrelated individuals.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-218."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-mu1-limited-business-site-plan",
+    "address": "70 Nursery Ln NE, Christiansburg, VA 24073",
+    "project_description": "Convert the ground floor of a building in the MU-1 Mixed Use district to a limited business use, and need to know what plans and site plan review are required before a building permit is issued.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-218.",
+        "Sec. 42-219."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-b3-general-retail",
+    "address": "1380 Mud Pike Rd NW, Christiansburg, VA 24073",
+    "project_description": "Open a general retail store in an existing commercial building in the B-3 General Business District.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-336."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-i2-brewery",
+    "address": "135 Technology Dr SE, Christiansburg, VA 24073",
+    "project_description": "Open a production brewery in an existing industrial building in the I-2 General Industrial District.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-397."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "christiansburg-va-i2-front-yard-greenspace",
+    "address": "135 Technology Dr SE, Christiansburg, VA 24073",
+    "project_description": "Redevelop a site in the I-2 General Industrial District and need to know the minimum front yard greenspace or landscaped area required.",
+    "jurisdiction_id": "christiansburg-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Sec. 42-398."
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]
