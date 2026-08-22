@@ -1,0 +1,102 @@
+{
+  "_notes": [
+    "Runtime zoning-district lookup. Each entry points at a jurisdiction's own published",
+    "GIS layer -- the only place zoning actually lives, since it is a per-municipality legal",
+    "designation and no global geocoder (Google included) carries it.",
+    "",
+    "district_categories maps the layer's raw zoning code to the coarse vocabulary the source",
+    "packs are tagged with. Every mapping below is derived from that city's own ordinance",
+    "articles/divisions, not guessed: e.g. blacksburg 'DC' -> mixed-use-core because",
+    "'DIVISION 14. - DOWNTOWN COMMERCIAL DISTRICT' is what classification_rules.json maps",
+    "DOWNTOWN to. A code that is absent from this map yields a parcel id but no district,",
+    "which is the same position we are in today -- never a guess.",
+    "",
+    "jurisdiction_value guards against a geocode landing on a neighbouring parcel outside the",
+    "town limits: a shared county layer serves several jurisdictions, so a row whose",
+    "jurisdiction_field does not match is discarded rather than answered with."
+  ],
+  "jurisdictions": {
+    "blacksburg-va": {
+      "provider": "arcgis",
+      "url": "https://maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1",
+      "attribution": "Montgomery County, VA public parcel service",
+      "zoning_field": "ZONING",
+      "parcel_id_field": "PARCEL_ID",
+      "jurisdiction_field": "JURISDICTI",
+      "jurisdiction_value": "BLACKSBURG",
+      "district_categories": {
+        "RR-1": "residential-low-density",
+        "RR-2": "residential-low-density",
+        "R2": "residential-low-density",
+        "R-4": "residential-low-density",
+        "R-5": "residential-low-density",
+        "OTR": "residential-low-density",
+        "RM-27": "residential-low-density",
+        "RM-48": "residential-low-density",
+        "PR": "residential-low-density",
+        "PMH": "residential-low-density",
+        "DC": "mixed-use-core",
+        "MXD": "mixed-use-core",
+        "GC": "commercial-employment",
+        "PC": "commercial-employment",
+        "O": "commercial-employment",
+        "R&D": "commercial-employment",
+        "IN": "industrial-zone",
+        "A1": "agricultural"
+      }
+    },
+    "christiansburg-va": {
+      "provider": "arcgis",
+      "url": "https://maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1",
+      "attribution": "Montgomery County, VA public parcel service",
+      "zoning_field": "ZONING",
+      "parcel_id_field": "PARCEL_ID",
+      "jurisdiction_field": "JURISDICTI",
+      "jurisdiction_value": "CHRISTIANSBURG",
+      "district_categories": {
+        "A": "agricultural",
+        "R-1A": "residential-low-density",
+        "R1": "residential-low-density",
+        "R2": "residential-low-density",
+        "R3": "residential-low-density",
+        "MU-1": "mixed-use-core",
+        "MU-2": "mixed-use-core",
+        "B1": "commercial-employment",
+        "B2": "commercial-employment",
+        "B3": "commercial-employment",
+        "I1": "industrial-zone",
+        "I2": "industrial-zone"
+      }
+    },
+    "montgomery-county-va": {
+      "provider": "arcgis",
+      "url": "https://maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1",
+      "attribution": "Montgomery County, VA public parcel service",
+      "zoning_field": "ZONING",
+      "parcel_id_field": "PARCEL_ID",
+      "jurisdiction_field": "JURISDICTI",
+      "jurisdiction_value": "MONTGOMERY",
+      "district_categories": {
+        "A1": "agricultural",
+        "RR": "residential-low-density",
+        "RRC": "residential-low-density",
+        "R1": "residential-low-density",
+        "R2": "residential-low-density",
+        "R3": "residential-low-density",
+        "R3C": "residential-low-density",
+        "RM1": "residential-low-density",
+        "PMR": "residential-low-density",
+        "PUDRES": "residential-low-density",
+        "TND-I": "mixed-use-core",
+        "CB": "commercial-employment",
+        "GB": "commercial-employment",
+        "C1": "commercial-employment",
+        "O": "commercial-employment",
+        "PUDCOM": "commercial-employment",
+        "M1": "industrial-zone",
+        "ML": "industrial-zone",
+        "PIN": "industrial-zone"
+      }
+    }
+  }
+}

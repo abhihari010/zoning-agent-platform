@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from app.models import ParcelResult
+from app.tools import parcel_gis
 
 
 PARCEL_FIXTURES_PATH = Path(__file__).resolve().parents[1] / "data" / "parcel_fixtures.json"
@@ -30,6 +31,34 @@ class ParcelTool:
                 confidence=float(fixture.get("confidence", 0.9)),
                 method=str(fixture.get("method", "fixture")),
                 warnings=[],
+            )
+
+        gis = parcel_gis.lookup(jurisdiction_id, lat, lng)
+        if gis is not None:
+            attribution = f" ({gis.attribution})" if gis.attribution else ""
+            if gis.district:
+                return ParcelResult(
+                    parcel_id=gis.parcel_id,
+                    zoning_district=gis.district,
+                    zoning_code=gis.zoning_code,
+                    overlays=[],
+                    confidence=0.9,
+                    method="gis_lookup",
+                    warnings=[],
+                )
+            # The parcel is real but its code is not mapped to a category yet, so the
+            # district stays unresolved rather than being guessed at.
+            return ParcelResult(
+                parcel_id=gis.parcel_id,
+                zoning_district=None,
+                zoning_code=gis.zoning_code,
+                overlays=[],
+                confidence=0.0,
+                method="gis_unmapped_district",
+                warnings=[
+                    f"Parcel is zoned {gis.zoning_code}{attribution}, "
+                    "which is not yet mapped to a district category.",
+                ],
             )
 
         district = _keyword_district(address)
