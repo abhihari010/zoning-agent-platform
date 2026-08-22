@@ -89,6 +89,7 @@ Key invariant: if retrieval returns no citations, the orchestrator must return `
 - Follow `AGENT.md`: tie branches/PRs to GitHub issue numbers, keep changes small, and check open issues / latest handoff in `docs/` (especially `docs/PROJECT-STATUS.md` and `docs/single-orchestrator-architecture.md`) before starting new work.
 - When adding a new provider, register it in `app/ai/registry.py` and cover it with `tests/test_ai_providers.py`-style tests; existing tests assume the deterministic path is the default.
 - When adding a jurisdiction, extend `data/source_registry.json` and the jurisdiction/district mappings — do not add Blacksburg-style hard-coded checks.
+- `data/parcel_gis_sources.json` holds the per-jurisdiction GIS layer that resolves a real address's zoning district at request time (`tools/parcel_gis.py`). Its `district_categories` must be derived from that city's own ordinance articles, never guessed; an unmapped code yields no district rather than a wrong one.
 - When changing API shapes, update both `apps/api/app/models.py` and `packages/shared-schema/src/index.ts`, and check `apps/web/src/api.ts` callers.
 
 ## gstack

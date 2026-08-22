@@ -69,6 +69,8 @@ class Settings:
     database_path: Path
     google_maps_api_key: str
     google_maps_timeout_seconds: float
+    parcel_gis_enabled: bool
+    parcel_gis_timeout_seconds: float
     openai_api_key: str
     openai_model: str
     openai_base_url: str
@@ -186,6 +188,8 @@ def get_settings() -> Settings:
         database_path=Path(database_path) if database_path else DEFAULT_DB_PATH,
         google_maps_api_key=_env("GOOGLE_MAPS_API_KEY"),
         google_maps_timeout_seconds=float(_env("GOOGLE_MAPS_TIMEOUT_SECONDS", "8")),
+        parcel_gis_enabled=_env_bool("PARCEL_GIS_ENABLED", True),
+        parcel_gis_timeout_seconds=float(_env("PARCEL_GIS_TIMEOUT_SECONDS", "6")),
         openai_api_key=_env("OPENAI_API_KEY"),
         openai_model=_env("OPENAI_MODEL", "gpt-4o-mini"),
         openai_base_url=_env("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/"),

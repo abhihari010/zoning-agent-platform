@@ -35,6 +35,7 @@ Exit codes: 0 all gates pass; 1 a gate failed; 2 unsafe/misconfigured env.
 """
 from __future__ import annotations
 
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -524,6 +525,8 @@ def _require_offline_env() -> None:
 
     s = get_settings()
     problems: list[str] = []
+    if s.parcel_gis_enabled:
+        problems.append("PARCEL_GIS_ENABLED must be false (the gate must not call a live GIS)")
     if s.ai_provider != "deterministic":
         problems.append(f"AI_PROVIDER must be 'deterministic' (got {s.ai_provider!r})")
     if s.rag_provider != "hybrid_local":
@@ -562,6 +565,10 @@ def _bootstrap_corpus() -> None:
 
 
 def main() -> int:
+    # The gate measures retrieval over the committed packs and must not depend on a
+    # third party being up, so the runtime GIS lookup is forced off here rather than
+    # left to the caller's environment.
+    os.environ["PARCEL_GIS_ENABLED"] = "false"
     _require_offline_env()
     _bootstrap_corpus()
 
