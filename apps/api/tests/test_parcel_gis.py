@@ -212,9 +212,13 @@ def test_parcel_tool_does_not_guess_a_district_for_an_unmapped_code(monkeypatch)
 
 def test_configured_layers_have_the_fields_the_query_needs():
     for jurisdiction_id, config in parcel_gis.load_gis_sources().items():
-        assert config.get("provider", "arcgis") == "arcgis", jurisdiction_id
+        provider = config.get("provider", "arcgis")
+        assert provider in ("arcgis", "arcgis_layer_per_district"), jurisdiction_id
         assert config.get("url", "").startswith("https://"), jurisdiction_id
         assert config.get("zoning_field"), jurisdiction_id
+        if provider == "arcgis_layer_per_district":
+            # Without the id -> name map there is nothing to read the code from.
+            assert config.get("layers"), jurisdiction_id
         # The guard only runs when both halves are present, so a lone one is a silent
         # hole: a shared county layer would answer with a neighbouring town's zoning.
         assert bool(config.get("jurisdiction_field")) == bool(config.get("jurisdiction_value")), jurisdiction_id
@@ -280,3 +284,33 @@ def test_intake_carries_the_jurisdictions_own_zoning_code_into_the_report(monkey
 
     assert context.zoning_code == "DC"
     assert context.district == "mixed-use-core"
+
+
+def test_layer_per_district_service_reads_the_district_from_the_layer_name(monkeypatch):
+    # Springfield, TN draws each district as its own layer instead of storing a code
+    # column, so the answer is whichever layer contains the point.
+    captured: dict = {}
+    _stub_get(
+        monkeypatch,
+        {"layers": [{"id": 12, "features": [{"attributes": {"OBJECTID": 1}}]},
+                    {"id": 21, "features": []}]},
+        capture=captured,
+    )
+
+    result = parcel_gis.lookup("springfield-tn", 36.509, -86.885)
+
+    assert result is not None
+    assert result.zoning_code == "R10"
+    assert result.district == "residential-low-density"
+    # One request for the whole service, not one per district.
+    assert "layerDefs" in captured["params"]
+
+
+def test_layer_per_district_declines_when_two_layers_claim_the_point(monkeypatch):
+    _stub_get(
+        monkeypatch,
+        {"layers": [{"id": 12, "features": [{"attributes": {"OBJECTID": 1}}]},
+                    {"id": 11, "features": [{"attributes": {"OBJECTID": 2}}]}]},
+    )
+
+    assert parcel_gis.lookup("springfield-tn", 36.509, -86.885) is None

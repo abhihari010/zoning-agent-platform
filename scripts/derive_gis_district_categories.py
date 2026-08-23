@@ -5,15 +5,22 @@ Retrieval scores against the coarse vocabulary the source packs are tagged with,
 each code needs a category -- and per CLAUDE.md that category must come from the
 city's own ordinance, never from a guess about what the letters mean.
 
-Three sources of evidence are used, in order, and each mapping records the sentence
+Six sources of evidence are used, in order, and each mapping records the sentence
 it came from:
 
 1. the layer's own published district name (`ZONE_DESC`, `DistrictName`, ...),
-2. an ordinance heading that *defines* the district ("ARTICLE 8 - HIGHWAY COMMERCIAL
+2. the ordinance's own "Zoning Districts Established" table, which lists every code
+   under a group heading ("INDUSTRIAL ZONING DISTRICTS  IL Light Industrial"),
+3. an ordinance heading that *defines* the district ("ARTICLE 8 - HIGHWAY COMMERCIAL
    DISTRICT-B-2"), where "defines" means the code leads the heading or sits directly
    against the word DISTRICT/ZONE -- a cross-reference like "Commercial structures in
    R-1, R-2 and R-3 Districts" is not a definition and is rejected,
-3. the ordinance naming the district inline ("R-1 Low density residential district").
+4. the ordinance naming the district inline ("R-1 Low density residential district"),
+5. the label the city prints on its own map legend, unless a sibling in the same
+   numbered family already says otherwise,
+6. a numbered family whose settled members are unanimous (M-1 industrial => M-2, M-3),
+   and Virginia's conditional-zoning "C" suffix, which is the same district with
+   proffers attached.
 
 Free prose is deliberately NOT read: a purpose statement that mentions "mixed-use
 buildings" is not the district's name, and reading those was the only thing that
@@ -86,6 +93,11 @@ def normalize(code: str) -> str:
     return "".join(ch for ch in code.upper() if ch.isalnum())
 
 
+def _family_stem(code: str) -> str:
+    """The letters before the first digit: M-1, M-2 and M-3 share the stem "M"."""
+    return re.match(r"[A-Z]*", normalize(code)).group(0)
+
+
 def family(text: str) -> str | None:
     """The one land-use family this text names, or None if it names none or several."""
     upper = text.upper()
@@ -147,6 +159,50 @@ def inline_names(blob: str, code: str) -> dict[str, str]:
     return found
 
 
+ESTABLISHED = re.compile(r"districts?\s+established|establishment\s+of\s+.{0,20}districts?", re.I)
+GROUP_HEADER = re.compile(r"[A-Z][A-Z0-9 ()/&-]{5,60}?(?:SUB-DISTRICTS?|DISTRICTS?|ZONES?)\b")
+
+
+def established_table(sources: list[dict], codes: list[str]) -> dict[str, tuple[str, str]]:
+    """Code -> (family, quote) from the ordinance's "Zoning Districts Established" table.
+
+    Nearly every modern ordinance opens with one table listing every district under a
+    group heading:
+
+        RESIDENTIAL ZONING DISTRICTS  NR Neighborhood Residential  GR General Residential
+        INDUSTRIAL ZONING DISTRICTS   IL Light Industrial          IN Industrial
+
+    The district's own name is preferred; the group heading it sits under is the
+    fallback, which is what carries codes like Portsmouth's T4 ("General Urban" says
+    nothing on its own, but it is listed under DOWNTOWN (D1) SUB-DISTRICTS).
+    """
+    found: dict[str, tuple[str, str]] = {}
+    for source in sources:
+        if not ESTABLISHED.search(str(source.get("title") or "")):
+            continue
+        text = source.get("full_text") or ""
+        headers = [(m.start(), m.group(0)) for m in GROUP_HEADER.finditer(text)]
+        for code in codes:
+            if code in found:
+                continue
+            # Layer values get decorated: "HLB(HIST.LTD.BUS.)" is the table's "HLB".
+            token = re.split(r"[(\s/]", code.strip())[0]
+            if not token:
+                continue
+            match = re.search(r"(?<![A-Za-z0-9])" + re.escape(token) + r"(?![A-Za-z0-9-])", text)
+            if not match:
+                continue
+            name = text[match.end(): match.end() + 60]
+            heading = ""
+            for start, value in headers:
+                if start < match.start():
+                    heading = value
+            hit = family(name) or family(heading)
+            if hit:
+                found[code] = (hit, f"{token} {name.strip()[:40]}".strip())
+    return found
+
+
 def arcgis(url: str, params: dict[str, str], timeout: float = 90) -> dict:
     response = httpx.get(url.rstrip("/") + "/query", params=params, timeout=timeout)
     response.raise_for_status()
@@ -176,11 +232,39 @@ def distinct(url: str, *fields: str) -> list[dict]:
     return []
 
 
-def pack_headings_and_body(jurisdiction_id: str) -> tuple[set[str], str]:
+def symbology(url: str) -> tuple[str, dict[str, str]]:
+    """The renderer's field, and normalized value -> the label the city prints for it.
+
+    A zoning layer is nearly always drawn with a unique-value renderer, and the label
+    on each symbol is the city grouping its own codes ("Commercial", "Residential Low",
+    "CH - COMMERCIAL HIGHWAY"). It is deliberately consulted only after the ordinance:
+    some cities file manufacturing districts under a "Business" swatch, and the
+    ordinance heading is the authority when the two disagree.
+    """
+    try:
+        renderer = (httpx.get(url, params={"f": "json"}, timeout=30).json()
+                    .get("drawingInfo") or {}).get("renderer") or {}
+    except Exception:  # noqa: BLE001 - symbology is a bonus, never a requirement
+        return "", {}
+    labels: dict[str, str] = {}
+    for info in renderer.get("uniqueValueInfos") or []:
+        value = str(info.get("value") or "").strip()
+        label = str(info.get("label") or "").strip()
+        if not value or not label or label == value:
+            continue
+        labels[normalize(value)] = label
+        # Some layers key the renderer on "B1,Central Business District" while the data
+        # column holds a bare "B1", so the leading token is an alias for the same symbol.
+        labels.setdefault(normalize(re.split(r"[,;|]", value)[0]), label)
+    return str(renderer.get("field1") or ""), labels
+
+
+def pack_sources(jurisdiction_id: str) -> list[dict]:
     manifest = next(PACKS.glob(f"*/{jurisdiction_id}/manifest.json"), None)
-    if manifest is None:
-        return set(), ""
-    sources = json.loads(manifest.read_text(encoding="utf-8"))["sources"]
+    return json.loads(manifest.read_text(encoding="utf-8"))["sources"] if manifest else []
+
+
+def pack_headings_and_body(sources: list[dict]) -> tuple[set[str], str]:
     headings: set[str] = set()
     for source in sources:
         breadcrumb = (source.get("metadata") or {}).get("breadcrumb") or []
@@ -191,6 +275,11 @@ def pack_headings_and_body(jurisdiction_id: str) -> tuple[set[str], str]:
 
 
 def derive(jurisdiction_id: str, config: dict) -> tuple[dict[str, str], dict[str, str], list[str]]:
+    if config.get("provider") == "arcgis_layer_per_district":
+        # The layer names ARE the codes; there is no column to enumerate.
+        codes = {str(name): "" for name in (config.get("layers") or {}).values()}
+        return _derive_from_codes(jurisdiction_id, config, codes)
+
     zoning_field = config["zoning_field"]
     name_field = NAME_FIELDS.get(jurisdiction_id, "")
     fields = [zoning_field] + ([name_field] if name_field and name_field != zoning_field else [])
@@ -201,7 +290,15 @@ def derive(jurisdiction_id: str, config: dict) -> tuple[dict[str, str], dict[str
         if code:
             codes.setdefault(code, str(row.get(name_field) or "").strip() if name_field else "")
 
-    headings, body = pack_headings_and_body(jurisdiction_id)
+    return _derive_from_codes(jurisdiction_id, config, codes)
+
+
+def _derive_from_codes(
+    jurisdiction_id: str, config: dict, codes: dict[str, str]
+) -> tuple[dict[str, str], dict[str, str], list[str]]:
+    zoning_field = str(config.get("zoning_field") or "")
+    sources = pack_sources(jurisdiction_id)
+    headings, body = pack_headings_and_body(sources)
     categories: dict[str, str] = {}
     evidence: dict[str, str] = {}
 
@@ -211,7 +308,12 @@ def derive(jurisdiction_id: str, config: dict) -> tuple[dict[str, str], dict[str
             categories[code] = hit
             evidence[code] = f"layer district name: {published_name}"
 
-    for code in codes:                                                # 2. a defining heading
+    for code, (hit, quote) in established_table(sources, list(codes)).items():   # 2. the ordinance's own districts-established table
+        if code not in categories:
+            categories[code] = hit
+            evidence[code] = f"ordinance districts-established table: {quote}"
+
+    for code in codes:                                                # 3. a defining heading
         if code in categories:
             continue
         matched = {(family(h), h) for h in headings if defines(h, code)}
@@ -220,7 +322,7 @@ def derive(jurisdiction_id: str, config: dict) -> tuple[dict[str, str], dict[str
             categories[code] = next(iter(matched))[0]
             evidence[code] = "ordinance heading: " + sorted(h for _, h in matched)[0]
 
-    for code in codes:                                                # 3. named inline
+    for code in codes:                                                # 4. named inline
         if code in categories:
             continue
         found = inline_names(body, code)
@@ -228,7 +330,51 @@ def derive(jurisdiction_id: str, config: dict) -> tuple[dict[str, str], dict[str
             categories[code], quote = next(iter(found.items()))
             evidence[code] = f"ordinance text: {quote}"
 
-    by_normalized = {normalize(c): c for c in categories}             # 4. conditional variants
+    legend_field, legend = symbology(config["url"])
+    # A layer can colour itself by a broader column than the one it stores the code in
+    # (norfolk draws by TYPE, stores ZONE), so translate through the data.
+    through: dict[str, str] = {}
+    if legend and legend_field and legend_field != zoning_field:
+        for row in distinct(config["url"], zoning_field, legend_field):
+            code = str(row.get(zoning_field) or "").strip()
+            if code:
+                through[code] = normalize(str(row.get(legend_field) or ""))
+    # M-1/M-2/M-3 are one numbered family in every ordinance that uses them, so what the
+    # ordinance said about one of them overrules a legend swatch that disagrees. Hampton
+    # draws its manufacturing districts under a "Business" colour; taking that at face
+    # value would file a foundry under commercial.
+    siblings: dict[str, set[str]] = defaultdict(set)
+    for code, value in categories.items():
+        siblings[_family_stem(code)].add(value)
+    for code in codes:                                                 # 5. the city's own map legend
+        label = legend.get(through.get(code, normalize(code)))
+        if code in categories or not label:
+            continue
+        hit = family(label)
+        settled = siblings.get(_family_stem(code)) or set()
+        if hit and settled and hit not in settled:
+            continue
+        if hit:
+            categories[code] = hit
+            evidence[code] = f"map symbology label: {label}"
+
+    settled_by_stem: dict[str, set[str]] = defaultdict(set)            # 6. unanimous siblings
+    example: dict[str, str] = {}
+    for code, value in categories.items():
+        settled_by_stem[_family_stem(code)].add(value)
+        example.setdefault(_family_stem(code), code)
+    for code in codes:
+        stem = _family_stem(code)
+        # Only when every sibling the evidence settled agrees. Richmond's B-1..B-3 are
+        # commercial while B-4..B-7 are its central business core, so stem "B" is split
+        # there and nothing is inherited -- which is the point of requiring unanimity.
+        if code in categories or len(settled_by_stem.get(stem) or ()) != 1 or not stem:
+            continue
+        kin = example[stem]
+        categories[code] = categories[kin]
+        evidence[code] = f"same numbered family as {kin} ({evidence[kin]})"
+
+    by_normalized = {normalize(c): c for c in categories}             # 7. conditional variants
     for code in codes:
         # Virginia proffers conditions onto a base district and suffixes its code with C.
         # It is the same district, so it takes the same category.

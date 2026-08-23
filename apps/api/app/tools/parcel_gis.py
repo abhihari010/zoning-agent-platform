@@ -86,10 +86,13 @@ def _lookup_cached(
     timeout_seconds: float,
 ) -> ParcelGisResult | None:
     config = load_gis_sources().get(jurisdiction_id) or {}
-    if str(config.get("provider", "arcgis")) != "arcgis":
+    provider = str(config.get("provider", "arcgis"))
+    if provider not in ("arcgis", "arcgis_layer_per_district"):
         return None
 
     try:
+        if provider == "arcgis_layer_per_district":
+            return _lookup_layer_per_district(config, lat, lng, timeout_seconds)
         attributes = _query_arcgis(config, lat, lng, timeout_seconds)
     except Exception:  # noqa: BLE001 - an upstream outage must not fail the request
         logger.warning("Parcel GIS lookup failed for %s", jurisdiction_id, exc_info=True)
@@ -124,6 +127,58 @@ def _lookup_cached(
         parcel_id=parcel_id or None,
         zoning_code=zoning_code,
         district=district,
+        attribution=str(config.get("attribution", "")).strip(),
+    )
+
+
+def _lookup_layer_per_district(
+    config: dict[str, Any],
+    lat: float,
+    lng: float,
+    timeout_seconds: float,
+) -> ParcelGisResult | None:
+    """Resolve against a service that publishes one layer per zoning district.
+
+    Springfield, TN draws each district as its own layer rather than storing the code
+    in a column, so the layer's NAME is the code and the answer is whichever layer
+    contains the point. ArcGIS answers all of them in a single request via layerDefs,
+    so this still costs one round trip.
+    """
+
+    layers = config.get("layers")
+    if not isinstance(layers, dict) or not layers:
+        return None
+    layer_ids = sorted(int(layer_id) for layer_id in layers)
+    params = {
+        "geometry": json.dumps({"x": lng, "y": lat, "spatialReference": {"wkid": 4326}}),
+        "geometryType": "esriGeometryPoint",
+        "inSR": "4326",
+        "spatialRel": "esriSpatialRelIntersects",
+        "layerDefs": json.dumps([{"layerId": i, "outFields": "OBJECTID"} for i in layer_ids]),
+        "returnGeometry": "false",
+        "f": "json",
+    }
+    response = httpx.get(str(config.get("url", "")).rstrip("/") + "/query",
+                         params=params, timeout=timeout_seconds)
+    response.raise_for_status()
+    payload = response.json()
+    if isinstance(payload, dict) and payload.get("error"):
+        raise ValueError(f"ArcGIS query returned an error: {payload['error']}")
+
+    hits = [str(layer.get("id")) for layer in (payload.get("layers") or []) if layer.get("features")]
+    # Overlapping planned-development layers can both answer; without a single winner
+    # the honest result is no district rather than an arbitrary pick.
+    if len(hits) != 1:
+        return None
+
+    zoning_code = str(layers.get(hits[0]) or "").strip()
+    if not zoning_code:
+        return None
+    categories = config.get("district_categories")
+    return ParcelGisResult(
+        parcel_id=None,
+        zoning_code=zoning_code,
+        district=_match_category(zoning_code, categories) if isinstance(categories, dict) else None,
         attribution=str(config.get("attribution", "")).strip(),
     )
 
