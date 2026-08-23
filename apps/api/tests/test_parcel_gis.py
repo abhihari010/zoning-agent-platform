@@ -5,6 +5,7 @@ import json
 import httpx
 import pytest
 
+from app.models import ParcelResult
 from app.tools import parcel_gis
 from app.tools.parcel_tool import ParcelTool
 
@@ -209,6 +210,33 @@ def test_parcel_tool_does_not_guess_a_district_for_an_unmapped_code(monkeypatch)
     assert result.warnings and "UNIV" in result.warnings[0]
 
 
+def test_configured_layers_have_the_fields_the_query_needs():
+    for jurisdiction_id, config in parcel_gis.load_gis_sources().items():
+        provider = config.get("provider", "arcgis")
+        assert provider in ("arcgis", "arcgis_layer_per_district"), jurisdiction_id
+        assert config.get("url", "").startswith("https://"), jurisdiction_id
+        assert config.get("zoning_field"), jurisdiction_id
+        if provider == "arcgis_layer_per_district":
+            # Without the id -> name map there is nothing to read the code from.
+            assert config.get("layers"), jurisdiction_id
+        # The guard only runs when both halves are present, so a lone one is a silent
+        # hole: a shared county layer would answer with a neighbouring town's zoning.
+        assert bool(config.get("jurisdiction_field")) == bool(config.get("jurisdiction_value")), jurisdiction_id
+
+
+def test_every_derived_district_category_records_its_evidence():
+    # "Derived from the city's own ordinance, never guessed" is only checkable if the
+    # sentence behind each mapping is committed alongside it.
+    evidence_path = parcel_gis.GIS_SOURCES_PATH.with_name("parcel_gis_district_evidence.json")
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    for jurisdiction_id, config in parcel_gis.load_gis_sources().items():
+        if config.get("curated"):
+            continue
+        recorded = evidence.get(jurisdiction_id, {})
+        missing = sorted(set(config["district_categories"]) - set(recorded))
+        assert not missing, f"{jurisdiction_id}: {missing}"
+
+
 def test_configured_district_categories_use_the_known_vocabulary():
     known = {
         "residential-low-density",
@@ -225,3 +253,64 @@ def test_configured_district_categories_use_the_known_vocabulary():
         assert categories, f"{jurisdiction_id} has no district categories"
         for code, district in categories.items():
             assert district in known, f"{jurisdiction_id}:{code} -> {district}"
+
+
+def test_intake_carries_the_jurisdictions_own_zoning_code_into_the_report(monkeypatch):
+    # The point of the lookup is that a report can say "your parcel is zoned R-4" rather
+    # than only the coarse bucket, so the code has to survive intake and reach the
+    # trust indicators the frontend renders.
+    _stub_get(monkeypatch, _arcgis_payload(ZONING="DC", PARCEL_ID="150029", JURISDICTI="BLACKSBURG"))
+
+    from app.orchestrator.pipeline_context import PipelineContext
+    from app.tools.intake_tool import IntakeTool
+
+    context = PipelineContext(
+        project_description="Open a small bakery in an existing storefront.",
+        combined_description="Open a small bakery in an existing storefront.",
+        raw_address="250 S Main St, Blacksburg, VA",
+        district="unknown",
+        jurisdiction_id="blacksburg-va",
+    )
+    resolved = ParcelResult(
+        parcel_id="150029",
+        zoning_district="mixed-use-core",
+        zoning_code="DC",
+        confidence=0.9,
+        method="gis_lookup",
+    )
+    monkeypatch.setattr(ParcelTool, "lookup", lambda *args, **kwargs: resolved)
+
+    IntakeTool().extract(context)
+
+    assert context.zoning_code == "DC"
+    assert context.district == "mixed-use-core"
+
+
+def test_layer_per_district_service_reads_the_district_from_the_layer_name(monkeypatch):
+    # Springfield, TN draws each district as its own layer instead of storing a code
+    # column, so the answer is whichever layer contains the point.
+    captured: dict = {}
+    _stub_get(
+        monkeypatch,
+        {"layers": [{"id": 12, "features": [{"attributes": {"OBJECTID": 1}}]},
+                    {"id": 21, "features": []}]},
+        capture=captured,
+    )
+
+    result = parcel_gis.lookup("springfield-tn", 36.509, -86.885)
+
+    assert result is not None
+    assert result.zoning_code == "R10"
+    assert result.district == "residential-low-density"
+    # One request for the whole service, not one per district.
+    assert "layerDefs" in captured["params"]
+
+
+def test_layer_per_district_declines_when_two_layers_claim_the_point(monkeypatch):
+    _stub_get(
+        monkeypatch,
+        {"layers": [{"id": 12, "features": [{"attributes": {"OBJECTID": 1}}]},
+                    {"id": 11, "features": [{"attributes": {"OBJECTID": 2}}]}]},
+    )
+
+    assert parcel_gis.lookup("springfield-tn", 36.509, -86.885) is None

@@ -39,3 +39,4 @@ class PipelineContext(BaseModel):
     district_confidence: float = 0.0
     district_method: str = "unknown"
     parcel_id: str | None = None
+    zoning_code: str | None = None

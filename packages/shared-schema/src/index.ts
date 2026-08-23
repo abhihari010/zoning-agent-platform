@@ -54,6 +54,8 @@ export interface TrustIndicators {
   jurisdictionSupported?: boolean | null;
   jurisdictionName?: string | null;
   zoningDistrict: string;
+  /** The jurisdiction's own code for the parcel's district ("R-4", "DC"), when the GIS lookup resolved one. */
+  zoningCode?: string | null;
   districtConfidence: number;
   districtSource: string;
   sourceCount: number;

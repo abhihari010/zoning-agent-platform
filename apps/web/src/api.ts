@@ -599,6 +599,7 @@ export function parseAnalysisPayload(payload: any): AnalyzeResponse {
             payload.trust_indicators.jurisdiction_supported,
           jurisdictionName: payload.trust_indicators.jurisdiction_name,
           zoningDistrict: payload.trust_indicators.zoning_district,
+          zoningCode: payload.trust_indicators.zoning_code,
           districtConfidence: payload.trust_indicators.district_confidence,
           districtSource: payload.trust_indicators.district_source,
           sourceCount: payload.trust_indicators.source_count,
