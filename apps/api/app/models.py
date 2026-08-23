@@ -350,6 +350,7 @@ class TrustIndicators(BaseModel):
     jurisdiction_supported: bool | None = None
     jurisdiction_name: str | None = None
     zoning_district: str
+    zoning_code: str | None = None
     district_confidence: float = Field(default=0.0, ge=0, le=1)
     district_source: str = "unknown"
     source_count: int = 0

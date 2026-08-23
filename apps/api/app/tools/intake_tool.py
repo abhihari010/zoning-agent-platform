@@ -81,6 +81,7 @@ class IntakeTool:
         context.district_confidence = parcel_result.confidence
         context.district_method = parcel_result.method
         context.parcel_id = parcel_result.parcel_id
+        context.zoning_code = parcel_result.zoning_code
         if parcel_result.zoning_district:
             context.district = parcel_result.zoning_district
 

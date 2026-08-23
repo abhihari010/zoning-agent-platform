@@ -521,6 +521,7 @@ class ZoningOrchestrator:
             jurisdiction_supported=context.jurisdiction_supported,
             jurisdiction_name=context.jurisdiction_name,
             zoning_district=context.district,
+            zoning_code=context.zoning_code,
             district_confidence=context.district_confidence,
             district_source=context.district_method,
             source_count=source_count,

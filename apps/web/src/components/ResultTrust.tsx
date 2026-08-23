@@ -65,12 +65,19 @@ export function TrustIndicatorBar({ result }: { result: AnalyzeResponse }) {
         note={trust?.jurisdictionSupported === false ? "Not supported yet" : "Coverage checked"}
         ready={jurisdictionReady}
       />
+      {/* Show the jurisdiction's own code when we have it -- "R-4" is what a reader
+          recognises from their zoning map; the coarse category moves to the note. */}
       <TrustCell
         label="District"
-        value={trust?.zoningDistrict ?? "Unknown"}
+        value={trust?.zoningCode ?? trust?.zoningDistrict ?? "Unknown"}
         note={
           trust
-            ? `${percent(trust.districtConfidence)} via ${trust.districtSource}`
+            ? [
+                trust.zoningCode ? trust.zoningDistrict : null,
+                `${percent(trust.districtConfidence)} via ${trust.districtSource}`,
+              ]
+                .filter(Boolean)
+                .join(" · ")
             : "No signal"
         }
         ready={districtReady}
