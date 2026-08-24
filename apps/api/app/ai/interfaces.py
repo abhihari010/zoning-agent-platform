@@ -35,6 +35,10 @@ class RetrievalProviderRequest:
     inferred_use: str
     project_description: str = ""
     jurisdiction_id: str | None = None
+    # The jurisdiction's own code for the parcel ("R-1"), when the GIS lookup resolved
+    # one. `district` stays the coarse family, so this only ever refines the ranking --
+    # it can never exclude a section that would have matched without it.
+    district_code: str | None = None
 
     @property
     def query(self) -> str:

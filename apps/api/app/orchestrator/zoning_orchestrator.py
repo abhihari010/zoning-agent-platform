@@ -54,6 +54,7 @@ class ZoningOrchestrator:
         district: str,
         district_confidence: float = 0.0,
         district_method: str = "unknown",
+        zoning_code: str | None = None,
         jurisdiction_id: str | None = None,
         jurisdiction_name: str | None = None,
         normalized_address: str | None = None,
@@ -77,6 +78,7 @@ class ZoningOrchestrator:
             district=district,
             district_confidence=district_confidence,
             district_method=district_method,
+            zoning_code=zoning_code,
             location_already_resolved=normalized_address is not None,
             jurisdiction_id=jurisdiction_id,
             jurisdiction_name=jurisdiction_name,
@@ -181,6 +183,9 @@ class ZoningOrchestrator:
                     inferred_use=intake.inferred_use,
                     project_description=context.combined_description,
                     jurisdiction_id=jurisdiction_id,
+                    # Only meaningful alongside a trusted district, and it is a pure
+                    # tie-break, so an unrecognised code costs nothing.
+                    district_code=context.zoning_code if effective_district != "unknown" else None,
                 )
             )
             citations = retrieval_result.citations

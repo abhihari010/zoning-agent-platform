@@ -661,6 +661,18 @@ def _tokens(text: str) -> set[str]:
     return set(TOKEN_PATTERN.findall(text.lower()))
 
 
+def _fold(code: str) -> str:
+    """Fold separators so a GIS ``R1`` matches an ordinance ``R-1``, but not ``RM1``."""
+    return "".join(ch for ch in code.upper() if ch.isalnum())
+
+
+def _code_matches(district_code: str | None, districts: list[str]) -> bool:
+    if not district_code:
+        return False
+    wanted = _fold(district_code)
+    return any(_fold(d) == wanted for d in districts)
+
+
 def _score_chunk(
     chunk: SourceChunk,
     request: RetrievalProviderRequest,
@@ -678,6 +690,11 @@ def _score_chunk(
     # still receives enough credit to preserve recall for unclassified sections.
     if request.district == "unknown":
         score += 1.0
+    elif _code_matches(request.district_code, chunk.districts):
+        # The coarse family lumps every R district together, so an R-1 question boosts
+        # R-2 through R-73 just as hard. The section for the parcel's actual district
+        # outranks its family siblings by the full width of the token-overlap term.
+        score += 3.0
     elif request.district in chunk.districts or "*" in chunk.districts:
         score += 2.0
     elif "unknown" in chunk.districts:
@@ -702,6 +719,7 @@ def _build_retrieval_cache_key(request: RetrievalProviderRequest, source_index_v
         {
             "jurisdiction_id": request.jurisdiction_id,
             "district": request.district,
+            "district_code": request.district_code,
             "inferred_use": request.inferred_use,
             "query": request.query,
             "source_index_version": source_index_version,

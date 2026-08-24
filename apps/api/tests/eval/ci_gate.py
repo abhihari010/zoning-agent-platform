@@ -70,7 +70,10 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # reclassifies). Narrowing the clone title to "permitted principal", which
     # drops the conditional-use-permit sections, measured the same 0.800, so the
     # broader fragment is kept -- it covers a required ref family for free.
-    "richmond-va": 0.70,
+    # 2026-08-23 (#201): district-code ranking. Sections now carry their own code
+    # alongside the coarse family, so a question about one district stops boosting
+    # every sibling in the same family. richmond-va 0.800 -> 1.000.
+    "richmond-va": 0.95,
     # 2026-07-14: loudoun-county-va 0.400 (Chapter 3 use-table refs; same
     # keyword-vs-table caveat as chesapeake).
     # 2026-08-18 (#173): loudoun-county-va 0.400 -> 1.000. The five 3.02.x
@@ -102,7 +105,10 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # not to the zoning "Use regulations." sections -- the bare N-N collision
     # noted above. Recall here can be satisfied by the wrong document; the
     # dataset, not the pack, is what needs fixing.
-    "winchester-va": 0.70,
+    # 2026-08-23 (#201): district-code ranking. Sections now carry their own code
+    # alongside the coarse family, so a question about one district stops boosting
+    # every sibling in the same family. winchester-va 0.800 -> 1.000.
+    "winchester-va": 0.95,
     # 2026-07-17: virginia-beach-va 1.000 (each article has ONE use chart,
     # so the per-district use vocabulary concentrates in the target section).
     "virginia-beach-va": 0.85,
@@ -138,7 +144,10 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # The two remaining misses (Sec. 4-44 lot area, Sec. 5-16 density) are
     # dimensional refs behind use-phrased questions, so _ensure_dimensional_rows
     # never fires -- a different mechanism, not this one.
-    "hampton-va": 0.72,
+    # 2026-08-23 (#201): district-code ranking. Sections now carry their own code
+    # alongside the coarse family, so a question about one district stops boosting
+    # every sibling in the same family. hampton-va 0.800 -> 0.900.
+    "hampton-va": 0.85,
     # 2026-07-17: henrico-county-va 0.400 (weak-label pack: only ~35 of 442
     # sources classify to a real district after the rules fix, so most refs
     # point at Article 4 accessory-use sections whose district is "unknown" —
@@ -226,7 +235,10 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # them compete; danville's titles carry no district vocabulary, so the pair
     # that wins is often the wrong district's. Tag the fewest sections that ARE
     # the use listing, not every section whose title mentions permitted uses.
-    "danville-va": 0.60,
+    # 2026-08-23 (#201): district-code ranking. Sections now carry their own code
+    # alongside the coarse family, so a question about one district stops boosting
+    # every sibling in the same family. danville-va 0.700 -> 1.000.
+    "danville-va": 0.95,
     # 2026-07-19: norfolk-va 0.600 (the 2018 ordinance concentrates uses in
     # four group tables — 3.2.12/3.3.9/3.4.11/3.5.7 — shared by all
     # districts of a family, so table-derived refs are keyword-hard; same
@@ -330,7 +342,10 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # top, and R-3/R-MS win the slots on token overlap. Real users asking the
     # most basic question here can get the wrong district's use list; that
     # needs a finer district vocabulary, not more tagging.
-    "christiansburg-va": 0.85,
+    # 2026-08-23 (#201): district-code ranking. Sections now carry their own code
+    # alongside the coarse family, so a question about one district stops boosting
+    # every sibling in the same family. christiansburg-va 0.929 -> 1.000.
+    "christiansburg-va": 0.95,
     # 2026-08-21 (#194): blacksburg-va 0.556 -> 0.722, a NEW dataset. It was
     # the last public_supported city outside the gate (406 sources, no floor).
     # Same defect christiansburg had: the pack district-tagged every ARTICLE
@@ -351,7 +366,10 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # Townhouse, Sec. 4521 Clinic, Sec. 4531 Kennel) already sits in top on
     # token overlap, which is normalized by query length and so favours long
     # chunks. More tagging cannot fix either; a finer district vocabulary can.
-    "blacksburg-va": 0.64,
+    # 2026-08-23 (#201): district-code ranking. Sections now carry their own code
+    # alongside the coarse family, so a question about one district stops boosting
+    # every sibling in the same family. blacksburg-va 0.722 -> 0.778.
+    "blacksburg-va": 0.72,
     # 2026-08-12: clarksville-tn 0.286, re-authored against the corrected
     # corpus (PRs #164/#165 fixed the use-table blank-cell defect; Chapter 3
     # now reconstructs 5 real 27-column district tables instead of 0). The

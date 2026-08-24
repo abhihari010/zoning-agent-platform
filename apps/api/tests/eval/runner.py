@@ -271,6 +271,7 @@ def run_eval(
             district=parcel.zoning_district or "unknown",
             district_confidence=parcel.confidence,
             district_method=parcel.method,
+            zoning_code=parcel.zoning_code,
             jurisdiction_id=scenario.jurisdiction_id,
             normalized_address=scenario.address,
             bypass_support_gate=True,   # eval gate measures pre-promotion cities

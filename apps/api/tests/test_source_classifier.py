@@ -69,7 +69,9 @@ def test_classify_article_iii_residential_r4_maps_to_residential_low_density() -
         },
     )
 
-    assert districts == ["unknown", "residential-low-density"]
+    # The family is preserved; the division's own code rides alongside it so an R-4
+    # question can outrank the other R districts.
+    assert districts == ["unknown", "residential-low-density", "R-4"]
     assert uses == ["general"]
 
 
@@ -91,7 +93,7 @@ def test_classify_article_iii_otr_maps_to_residential_low_density() -> None:
         },
     )
 
-    assert districts == ["unknown", "residential-low-density"]
+    assert districts == ["unknown", "residential-low-density", "OTR"]
     assert uses == ["general"]
 
 
