@@ -7,7 +7,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='BLACKSBURG', ZONING='DC') cross-verified by Town of Blacksburg Town Zoning layer (services1.arcgis.com/rAuQoDGA22NtJdmg/.../TownZoningLayers/FeatureServer/8) spatial intersect at lat:37.227601 lon:-80.411731 returning Zoning='DC  Downtown Commercial'"
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='BLACKSBURG', ZONING='DC') cross-verified by Town of Blacksburg Town Zoning layer (services1.arcgis.com/rAuQoDGA22NtJdmg/.../TownZoningLayers/FeatureServer/8) spatial intersect at lat:37.227601 lon:-80.411731 returning Zoning='DC  Downtown Commercial'",
+    "zoning_code": "DC"
   },
   {
     "address_pattern": "810 ellett rd",
@@ -17,7 +18,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='BLACKSBURG', ZONING='R-4') cross-verified by Town of Blacksburg Town Zoning layer (services1.arcgis.com/rAuQoDGA22NtJdmg/.../TownZoningLayers/FeatureServer/8) spatial intersect at lat:37.200563 lon:-80.396117 returning Zoning='R-4  Low Density Residential'"
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='BLACKSBURG', ZONING='R-4') cross-verified by Town of Blacksburg Town Zoning layer (services1.arcgis.com/rAuQoDGA22NtJdmg/.../TownZoningLayers/FeatureServer/8) spatial intersect at lat:37.200563 lon:-80.396117 returning Zoning='R-4  Low Density Residential'",
+    "zoning_code": "R-4"
   },
   {
     "address_pattern": "3705 s main st",
@@ -27,7 +29,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='BLACKSBURG', ZONING='GC') cross-verified by Town of Blacksburg Town Zoning layer (services1.arcgis.com/rAuQoDGA22NtJdmg/.../TownZoningLayers/FeatureServer/8) spatial intersect at lat:37.184783 lon:-80.407891 returning Zoning='GC  General Commercial'"
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='BLACKSBURG', ZONING='GC') cross-verified by Town of Blacksburg Town Zoning layer (services1.arcgis.com/rAuQoDGA22NtJdmg/.../TownZoningLayers/FeatureServer/8) spatial intersect at lat:37.184783 lon:-80.407891 returning Zoning='GC  General Commercial'",
+    "zoning_code": "GC"
   },
   {
     "address_pattern": "646 jennelle rd",
@@ -37,7 +40,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='BLACKSBURG', ZONING='O') cross-verified by Town of Blacksburg Town Zoning layer (services1.arcgis.com/rAuQoDGA22NtJdmg/.../TownZoningLayers/FeatureServer/8) spatial intersect at lat:37.184594 lon:-80.397163 returning Zoning='O  Office'"
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='BLACKSBURG', ZONING='O') cross-verified by Town of Blacksburg Town Zoning layer (services1.arcgis.com/rAuQoDGA22NtJdmg/.../TownZoningLayers/FeatureServer/8) spatial intersect at lat:37.184594 lon:-80.397163 returning Zoning='O  Office'",
+    "zoning_code": "O"
   },
   {
     "address_pattern": "760 jennelle rd",
@@ -47,7 +51,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='BLACKSBURG', ZONING='IN') cross-verified by Town of Blacksburg Town Zoning layer (services1.arcgis.com/rAuQoDGA22NtJdmg/.../TownZoningLayers/FeatureServer/8) spatial intersect at lat:37.187354 lon:-80.392969 returning Zoning='IN  Industrial'"
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='BLACKSBURG', ZONING='IN') cross-verified by Town of Blacksburg Town Zoning layer (services1.arcgis.com/rAuQoDGA22NtJdmg/.../TownZoningLayers/FeatureServer/8) spatial intersect at lat:37.187354 lon:-80.392969 returning Zoning='IN  Industrial'",
+    "zoning_code": "IN"
   },
   {
     "address_pattern": "1865 akers st sw",
@@ -57,7 +62,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='A') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.11034989 lon:-80.38830444 returning Zoning_Classification='A'"
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='A') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.11034989 lon:-80.38830444 returning Zoning_Classification='A'",
+    "zoning_code": "A"
   },
   {
     "address_pattern": "510 canterbury st sw",
@@ -67,7 +73,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='R1') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.11107165 lon:-80.4066032 returning Zoning_Classification='R-1'"
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='R1') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.11107165 lon:-80.4066032 returning Zoning_Classification='R-1'",
+    "zoning_code": "R1"
   },
   {
     "address_pattern": "70 nursery ln ne",
@@ -77,7 +84,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='MU-1') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.139124 lon:-80.340835 returning Zoning_Classification='MU-1'"
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='MU-1') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.139124 lon:-80.340835 returning Zoning_Classification='MU-1'",
+    "zoning_code": "MU-1"
   },
   {
     "address_pattern": "1380 mud pike rd nw",
@@ -97,7 +105,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='I2') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.115511 lon:-80.37622925 returning Zoning_Classification='I-2'"
+    "source": "Montgomery County VA Parcel DB (maps.montva.com/server/rest/services/Land/Parcels_Public/MapServer/1, JURISDICTI='CHRISTIANSBURG', ZONING='I2') cross-verified by Town of Christiansburg GeoWeb Zoning Polygon Layer (services.arcgis.com/hK4vGUcrLZsYhZjD/.../FeatureServer/46) spatial intersect at lat:37.115511 lon:-80.37622925 returning Zoning_Classification='I-2'",
+    "zoning_code": "I2"
   },
   {
     "address_pattern": "3419 hawthorne ave",
@@ -107,7 +116,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Richmond 'Zoning Districts' feature layer (services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/ZoningDistricts/FeatureServer/0, owner richard.morton_cor) spatial intersect at lat:37.580671 lon:-77.444475 returning Name='R-1'; point inside R-1 polygon reverse-geocoded via ArcGIS World Geocoder; round-trip re-intersect confirmed R-1 (verified 2026-07-04)"
+    "source": "City of Richmond 'Zoning Districts' feature layer (services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/ZoningDistricts/FeatureServer/0, owner richard.morton_cor) spatial intersect at lat:37.580671 lon:-77.444475 returning Name='R-1'; point inside R-1 polygon reverse-geocoded via ArcGIS World Geocoder; round-trip re-intersect confirmed R-1 (verified 2026-07-04)",
+    "zoning_code": "R-1"
   },
   {
     "address_pattern": "1403 chestnut st",
@@ -117,7 +127,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Richmond 'Zoning Districts' feature layer (services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/ZoningDistricts/FeatureServer/0, owner richard.morton_cor) spatial intersect at lat:37.559011 lon:-77.424803 returning Name='B-1'; point inside B-1 polygon reverse-geocoded via ArcGIS World Geocoder; round-trip re-intersect confirmed B-1 (verified 2026-07-04)"
+    "source": "City of Richmond 'Zoning Districts' feature layer (services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/ZoningDistricts/FeatureServer/0, owner richard.morton_cor) spatial intersect at lat:37.559011 lon:-77.424803 returning Name='B-1'; point inside B-1 polygon reverse-geocoded via ArcGIS World Geocoder; round-trip re-intersect confirmed B-1 (verified 2026-07-04)",
+    "zoning_code": "B-1"
   },
   {
     "address_pattern": "1311 richmond hwy",
@@ -127,7 +138,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Richmond 'Zoning Districts' feature layer (services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/ZoningDistricts/FeatureServer/0, owner richard.morton_cor) spatial intersect at lat:37.502388 lon:-77.44618 returning Name='B-3'; point inside B-3 polygon reverse-geocoded via ArcGIS World Geocoder; round-trip re-intersect confirmed B-3 (verified 2026-07-04)"
+    "source": "City of Richmond 'Zoning Districts' feature layer (services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/ZoningDistricts/FeatureServer/0, owner richard.morton_cor) spatial intersect at lat:37.502388 lon:-77.44618 returning Name='B-3'; point inside B-3 polygon reverse-geocoded via ArcGIS World Geocoder; round-trip re-intersect confirmed B-3 (verified 2026-07-04)",
+    "zoning_code": "B-3"
   },
   {
     "address_pattern": "2701 commerce rd",
@@ -137,7 +149,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Richmond 'Zoning Districts' feature layer (services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/ZoningDistricts/FeatureServer/0, owner richard.morton_cor) spatial intersect at lat:37.487116 lon:-77.432568 returning Name='M-1'; address geocoded via US Census onelineaddress; spatial intersect returned M-1 (verified 2026-07-04)"
+    "source": "City of Richmond 'Zoning Districts' feature layer (services1.arcgis.com/k3vhq11XkBNeeOfM/arcgis/rest/services/ZoningDistricts/FeatureServer/0, owner richard.morton_cor) spatial intersect at lat:37.487116 lon:-77.432568 returning Name='M-1'; address geocoded via US Census onelineaddress; spatial intersect returned M-1 (verified 2026-07-04)",
+    "zoning_code": "M-1"
   },
   {
     "address_pattern": "1400 bandock st",
@@ -147,7 +160,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org) spatial intersect at lat:36.787818 lon:-76.336667 returning CLASS='R-10'; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-10 (verified 2026-07-14)"
+    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org) spatial intersect at lat:36.787818 lon:-76.336667 returning CLASS='R-10'; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-10 (verified 2026-07-14)",
+    "zoning_code": "R-10"
   },
   {
     "address_pattern": "621 battlefield blvd n",
@@ -157,7 +171,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org) spatial intersect at lat:36.739776 lon:-76.242242 returning CLASS='B-2'; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B-2 (verified 2026-07-14)"
+    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org) spatial intersect at lat:36.739776 lon:-76.242242 returning CLASS='B-2'; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B-2 (verified 2026-07-14)",
+    "zoning_code": "B-2"
   },
   {
     "address_pattern": "3529 kentucky trl",
@@ -167,7 +182,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org): parcel with situs address contained in A-1 polygon (Parcels layer MapServer/15 esriSpatialRelContains); address geocoded via US Census onelineaddress at lat:36.747914 lon:-76.377120; re-intersect confirmed A-1 (verified 2026-07-14)"
+    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org): parcel with situs address contained in A-1 polygon (Parcels layer MapServer/15 esriSpatialRelContains); address geocoded via US Census onelineaddress at lat:36.747914 lon:-76.377120; re-intersect confirmed A-1 (verified 2026-07-14)",
+    "zoning_code": "A-1"
   },
   {
     "address_pattern": "1015 seaboard ave",
@@ -177,7 +193,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org) spatial intersect at lat:36.818648 lon:-76.271315 returning CLASS='M-1'; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-14)"
+    "source": "City of Chesapeake 'Zoning' layer (gis.cityofchesapeake.net/mapping/rest/services/OpenData/OpenData/MapServer/26, chesva AGOL org) spatial intersect at lat:36.818648 lon:-76.271315 returning CLASS='M-1'; address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-14)",
+    "zoning_code": "M-1"
   },
   {
     "address_pattern": "42611 harlow meadows ter",
@@ -187,7 +204,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:38.936569 lon:-77.527987 returning ZO_ZONE='R8' (1993 legacy Single Family Residential, ord section 2.02.05.03); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R8 (verified 2026-07-14)"
+    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:38.936569 lon:-77.527987 returning ZO_ZONE='R8' (1993 legacy Single Family Residential, ord section 2.02.05.03); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R8 (verified 2026-07-14)",
+    "zoning_code": "R8"
   },
   {
     "address_pattern": "25284 pleasant valley",
@@ -197,7 +215,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:38.917576 lon:-77.470997 returning ZO_ZONE='GB' (1993 legacy General Business, ord section 2.02.05.12); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed GB (verified 2026-07-14)"
+    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:38.917576 lon:-77.470997 returning ZO_ZONE='GB' (1993 legacy General Business, ord section 2.02.05.12); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed GB (verified 2026-07-14)",
+    "zoning_code": "GB"
   },
   {
     "address_pattern": "40661 hurley ln",
@@ -207,7 +226,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:39.167394 lon:-77.593847 returning ZO_ZONE='AR1' (Agricultural Rural-1, ord section 2.04.01); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed AR1 (verified 2026-07-14)"
+    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:39.167394 lon:-77.593847 returning ZO_ZONE='AR1' (Agricultural Rural-1, ord section 2.04.01); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed AR1 (verified 2026-07-14)",
+    "zoning_code": "AR1"
   },
   {
     "address_pattern": "45532 dulles plz",
@@ -217,7 +237,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:38.977767 lon:-77.425471 returning ZO_ZONE='IP' (Industrial Park, ord section 2.06); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed IP (verified 2026-07-14)"
+    "source": "Loudoun County GIS 'Zoning' layer (logis.loudoun.gov/gis/rest/services/COL/Zoning/MapServer/3) spatial intersect at lat:38.977767 lon:-77.425471 returning ZO_ZONE='IP' (Industrial Park, ord section 2.06); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed IP (verified 2026-07-14)",
+    "zoning_code": "IP"
   },
   {
     "address_pattern": "3020 jenny ln",
@@ -227,7 +248,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.663547 lon:-77.306066 returning ZoningDistrict='R-4' (Suburban Residential, ord Part 303); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-4 (verified 2026-07-14)"
+    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.663547 lon:-77.306066 returning ZoningDistrict='R-4' (Suburban Residential, ord Part 303); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-4 (verified 2026-07-14)",
+    "zoning_code": "R-4"
   },
   {
     "address_pattern": "14141 daves store ln",
@@ -237,7 +259,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.798204 lon:-77.612539 returning ZoningDistrict='B-1' (General Business, ord Part 401); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B-1 (verified 2026-07-14)"
+    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.798204 lon:-77.612539 returning ZoningDistrict='B-1' (General Business, ord Part 401); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B-1 (verified 2026-07-14)",
+    "zoning_code": "B-1"
   },
   {
     "address_pattern": "14872 shelter ln",
@@ -247,7 +270,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.870645 lon:-77.632784 returning ZoningDistrict='A-1' (Agricultural, ord Part 301); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed A-1 (verified 2026-07-14)"
+    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.870645 lon:-77.632784 returning ZoningDistrict='A-1' (Agricultural, ord Part 301); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed A-1 (verified 2026-07-14)",
+    "zoning_code": "A-1"
   },
   {
     "address_pattern": "11609 hayden rd",
@@ -257,7 +281,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.770601 lon:-77.539792 returning ZoningDistrict='M-2' (Light Industrial, ord Part 403); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-2 (verified 2026-07-14)"
+    "source": "Prince William County 'Zoning Districts' layer (gisweb.pwcva.gov/arcgis/rest/services/Planning/Zoning/MapServer/5) spatial intersect at lat:38.770601 lon:-77.539792 returning ZoningDistrict='M-2' (Light Industrial, ord Part 403); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-2 (verified 2026-07-14)",
+    "zoning_code": "M-2"
   },
   {
     "address_pattern": "130 darden blvd",
@@ -267,7 +292,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.051539 lon:-78.514398 returning Zoning='R1 Residential' (ord Sec. 13); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R1 (verified 2026-07-17)"
+    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.051539 lon:-78.514398 returning Zoning='R1 Residential' (ord Sec. 13); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R1 (verified 2026-07-17)",
+    "zoning_code": "R1 Residential"
   },
   {
     "address_pattern": "1839 broadway st",
@@ -277,7 +303,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.020206 lon:-78.457323 returning Zoning='C1 Commercial' (ord Sec. 22); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed C1 (verified 2026-07-17)"
+    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.020206 lon:-78.457323 returning Zoning='C1 Commercial' (ord Sec. 22); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed C1 (verified 2026-07-17)",
+    "zoning_code": "C1 Commercial"
   },
   {
     "address_pattern": "3215 middle mtn rd",
@@ -287,7 +314,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.124349 lon:-78.732401 returning Zoning='Rural Areas' (ord Sec. 10); address sampled from county Addresses layer inside the RA polygon, geocoded via US Census onelineaddress; round-trip re-intersect confirmed Rural Areas (verified 2026-07-17)"
+    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.124349 lon:-78.732401 returning Zoning='Rural Areas' (ord Sec. 10); address sampled from county Addresses layer inside the RA polygon, geocoded via US Census onelineaddress; round-trip re-intersect confirmed Rural Areas (verified 2026-07-17)",
+    "zoning_code": "Rural Areas"
   },
   {
     "address_pattern": "744 moores creek ln",
@@ -297,7 +325,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.017112 lon:-78.462525 returning Zoning='Light Industry' (ord Sec. 27, uses per Sec. 26.2 table); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed Light Industry (verified 2026-07-17)"
+    "source": "Albemarle County 'Zoning Classifications' layer (services2.arcgis.com/khVz7mitcPJHUnlM/arcgis/rest/services/Zoning_Classifications/FeatureServer/0) spatial intersect at lat:38.017112 lon:-78.462525 returning Zoning='Light Industry' (ord Sec. 27, uses per Sec. 26.2 table); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed Light Industry (verified 2026-07-17)",
+    "zoning_code": "Light Industry"
   },
   {
     "address_pattern": "2307 stoneridge rd",
@@ -307,7 +336,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Winchester 'Zoning' layer (gis.winchesterva.gov/arcgis/rest/services/Winchester/Zoning/MapServer/0) spatial intersect at lat:39.162679 lon:-78.193121 returning MZONE='LR' (Low Density Residential, ord Article 3); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed LR (verified 2026-07-17)"
+    "source": "City of Winchester 'Zoning' layer (gis.winchesterva.gov/arcgis/rest/services/Winchester/Zoning/MapServer/0) spatial intersect at lat:39.162679 lon:-78.193121 returning MZONE='LR' (Low Density Residential, ord Article 3); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed LR (verified 2026-07-17)",
+    "zoning_code": "LR"
   },
   {
     "address_pattern": "1104 conway st",
@@ -317,7 +347,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Winchester 'Zoning' layer (gis.winchesterva.gov/arcgis/rest/services/Winchester/Zoning/MapServer/0) spatial intersect at lat:39.186802 lon:-78.142569 returning MZONE='B2' (Highway Commercial, ord Article 8); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B2 (verified 2026-07-17)"
+    "source": "City of Winchester 'Zoning' layer (gis.winchesterva.gov/arcgis/rest/services/Winchester/Zoning/MapServer/0) spatial intersect at lat:39.186802 lon:-78.142569 returning MZONE='B2' (Highway Commercial, ord Article 8); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B2 (verified 2026-07-17)",
+    "zoning_code": "B2"
   },
   {
     "address_pattern": "144 bruce dr",
@@ -327,7 +358,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Winchester 'Zoning' layer (gis.winchesterva.gov/arcgis/rest/services/Winchester/Zoning/MapServer/0) spatial intersect at lat:39.150446 lon:-78.175928 returning MZONE='M1' (Limited Industrial, ord Article 11); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M1 (verified 2026-07-17)"
+    "source": "City of Winchester 'Zoning' layer (gis.winchesterva.gov/arcgis/rest/services/Winchester/Zoning/MapServer/0) spatial intersect at lat:39.150446 lon:-78.175928 returning MZONE='M1' (Limited Industrial, ord Article 11); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M1 (verified 2026-07-17)",
+    "zoning_code": "M1"
   },
   {
     "address_pattern": "873 daimler dr",
@@ -337,7 +369,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Virginia Beach 'Residential Address Points' ZONING='R7.5' cross-checked against the city 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) at lat:36.783296 lon:-75.981180 returning DESCRIPTION='Residential Single-Family' (ord Article 5); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed (verified 2026-07-17)"
+    "source": "Virginia Beach 'Residential Address Points' ZONING='R7.5' cross-checked against the city 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) at lat:36.783296 lon:-75.981180 returning DESCRIPTION='Residential Single-Family' (ord Article 5); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed (verified 2026-07-17)",
+    "zoning_code": "Residential Single-Family"
   },
   {
     "address_pattern": "1152 virginia beach blvd",
@@ -347,7 +380,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Virginia Beach 'Residential Address Points' ZONING='B2' cross-checked against the city 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) at lat:36.841985 lon:-75.997320 returning DESCRIPTION='Business' (ord Article 9); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed (verified 2026-07-17)"
+    "source": "Virginia Beach 'Residential Address Points' ZONING='B2' cross-checked against the city 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) at lat:36.841985 lon:-75.997320 returning DESCRIPTION='Business' (ord Article 9); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed (verified 2026-07-17)",
+    "zoning_code": "Business"
   },
   {
     "address_pattern": "6540 blackwater rd",
@@ -357,7 +391,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Virginia Beach 'Residential Address Points' ZONING='AG2' cross-checked against the city 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) at lat:36.558343 lon:-76.073795 returning DESCRIPTION='Agricultural' (ord Article 4); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed (verified 2026-07-17)"
+    "source": "Virginia Beach 'Residential Address Points' ZONING='AG2' cross-checked against the city 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) at lat:36.558343 lon:-76.073795 returning DESCRIPTION='Agricultural' (ord Article 4); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed (verified 2026-07-17)",
+    "zoning_code": "Agricultural"
   },
   {
     "address_pattern": "461 santiago rd",
@@ -367,7 +402,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Virginia Beach 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) spatial intersect at lat:36.919786 lon:-76.001841 returning DESCRIPTION='Industrial' (ord Article 10); address reverse-geocoded from an Industrial polygon interior point, then geocoded via US Census onelineaddress; round-trip re-intersect confirmed Industrial (verified 2026-07-17)"
+    "source": "Virginia Beach 'Zoning' category layer (services2.arcgis.com/CyVvlIiUfRBmMQuu/arcgis/rest/services/Zoning/FeatureServer/1) spatial intersect at lat:36.919786 lon:-76.001841 returning DESCRIPTION='Industrial' (ord Article 10); address reverse-geocoded from an Industrial polygon interior point, then geocoded via US Census onelineaddress; round-trip re-intersect confirmed Industrial (verified 2026-07-17)",
+    "zoning_code": "Industrial"
   },
   {
     "address_pattern": "100 hopkins st",
@@ -387,7 +423,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Newport News 'Zoning' layer (maps.nnva.gov/gis/rest/services/Operational/Zoning/MapServer/0) spatial intersect at lat:37.068997 lon:-76.494042 returning ZONECLASS='R9' (Mixed Use District, ord Article XIV); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R9 (verified 2026-07-17)"
+    "source": "Newport News 'Zoning' layer (maps.nnva.gov/gis/rest/services/Operational/Zoning/MapServer/0) spatial intersect at lat:37.068997 lon:-76.494042 returning ZONECLASS='R9' (Mixed Use District, ord Article XIV); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R9 (verified 2026-07-17)",
+    "zoning_code": "R9"
   },
   {
     "address_pattern": "12465 warwick blvd",
@@ -407,7 +444,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Newport News 'Zoning' layer (maps.nnva.gov/gis/rest/services/Operational/Zoning/MapServer/0) spatial intersect at lat:37.099557 lon:-76.494464 returning ZONECLASS='M1' (Light Industrial District, ord Article XXV); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M1 (verified 2026-07-17)"
+    "source": "Newport News 'Zoning' layer (maps.nnva.gov/gis/rest/services/Operational/Zoning/MapServer/0) spatial intersect at lat:37.099557 lon:-76.494464 returning ZONECLASS='M1' (Light Industrial District, ord Article XXV); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M1 (verified 2026-07-17)",
+    "zoning_code": "M1"
   },
   {
     "address_pattern": "10 oldenburg ln",
@@ -417,7 +455,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:37.070401 lon:-76.290349 returning ZONE_='R-22' (One Family Residential District, ord Chapter 4); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-22 (verified 2026-07-17)"
+    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:37.070401 lon:-76.290349 returning ZONE_='R-22' (One Family Residential District, ord Chapter 4); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-22 (verified 2026-07-17)",
+    "zoning_code": "R-22"
   },
   {
     "address_pattern": "162 westview dr",
@@ -427,7 +466,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:37.081761 lon:-76.441878 returning ZONE_='R-M' (Multiple Residential District, ord Chapter 5); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-M (verified 2026-07-17)"
+    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:37.081761 lon:-76.441878 returning ZONE_='R-M' (Multiple Residential District, ord Chapter 5); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-M (verified 2026-07-17)",
+    "zoning_code": "R-M"
   },
   {
     "address_pattern": "1809 kecoughtan rd",
@@ -437,7 +477,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:36.999810 lon:-76.384161 returning ZONE_='C-1' (Neighborhood Commercial District, ord Chapter 6); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed C-1 (verified 2026-07-17)"
+    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:36.999810 lon:-76.384161 returning ZONE_='C-1' (Neighborhood Commercial District, ord Chapter 6); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed C-1 (verified 2026-07-17)",
+    "zoning_code": "C-1"
   },
   {
     "address_pattern": "8 shuttle ct",
@@ -447,7 +488,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:37.101465 lon:-76.395449 returning ZONE_='M-1' (Limited Manufacturing District, ord Chapter 7); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-17)"
+    "source": "Hampton 'Hampton_Zoning' layer (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Hampton_Zoning/FeatureServer/0, owner dewberry_user, HRA Regional Asset Explorer) spatial intersect at lat:37.101465 lon:-76.395449 returning ZONE_='M-1' (Limited Manufacturing District, ord Chapter 7); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-17)",
+    "zoning_code": "M-1"
   },
   {
     "address_pattern": "202 sleepy hollow rd",
@@ -457,7 +499,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) joined against 'Master_Address_Points' layer (portal.henrico.gov/mapping/rest/services/Layers/Master_Address_Points/MapServer/0) spatial intersect at lat:37.577496 lon:-77.581127 returning ZONE_LABEL='R-1' (R-1 One-Family Residence District, ord Sec. 24-3305); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-1 (verified 2026-07-17)"
+    "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) joined against 'Master_Address_Points' layer (portal.henrico.gov/mapping/rest/services/Layers/Master_Address_Points/MapServer/0) spatial intersect at lat:37.577496 lon:-77.581127 returning ZONE_LABEL='R-1' (R-1 One-Family Residence District, ord Sec. 24-3305); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed R-1 (verified 2026-07-17)",
+    "zoning_code": "R-1"
   },
   {
     "address_pattern": "3715 mechanicsville",
@@ -467,7 +510,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) joined against 'Master_Address_Points' layer spatial intersect at lat:37.576285 lon:-77.396379 returning ZONE_LABEL='B-2' (B-2 Business District, ord Sec. 24-3409); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B-2 (verified 2026-07-17)"
+    "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) joined against 'Master_Address_Points' layer spatial intersect at lat:37.576285 lon:-77.396379 returning ZONE_LABEL='B-2' (B-2 Business District, ord Sec. 24-3409); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed B-2 (verified 2026-07-17)",
+    "zoning_code": "B-2"
   },
   {
     "address_pattern": "9851 brook rd",
@@ -477,7 +521,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) joined against 'Master_Address_Points' layer spatial intersect at lat:37.668059 lon:-77.460723 returning ZONE_LABEL='M-1' (M-1 Light Industrial District, ord Sec. 24-3411); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-17)"
+    "source": "Henrico County 'Zoning' layer (portal.henrico.gov/mapping/rest/services/Layers/Zoning/MapServer/0, henrico.maps.arcgis.com org LxWK4CxNTBBlLshT) joined against 'Master_Address_Points' layer spatial intersect at lat:37.668059 lon:-77.460723 returning ZONE_LABEL='M-1' (M-1 Light Industrial District, ord Sec. 24-3411); address geocoded via US Census onelineaddress; round-trip re-intersect confirmed M-1 (verified 2026-07-17)",
+    "zoning_code": "M-1"
   },
   {
     "address_pattern": "1601 willow lawn dr",
@@ -497,7 +542,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at parcel-point lat:38.30827 lon:-77.52553 (from the city's 'Addresses' layer) returning ZONING='R2'; cross-checked against the 'Addresses' layer's own Zoning attribute='R2 - RESIDENTIAL 2' for the same parcel (ord Sec. 72-31.2, R-2 Residential District) (verified 2026-07-18)"
+    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at parcel-point lat:38.30827 lon:-77.52553 (from the city's 'Addresses' layer) returning ZONING='R2'; cross-checked against the 'Addresses' layer's own Zoning attribute='R2 - RESIDENTIAL 2' for the same parcel (ord Sec. 72-31.2, R-2 Residential District) (verified 2026-07-18)",
+    "zoning_code": "R2"
   },
   {
     "address_pattern": "3300 plank rd",
@@ -507,7 +553,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at address-geocoded (US Census onelineaddress) lat:38.29538 lon:-77.51667 returning ZONING='CH'; cross-checked against the 'Addresses' layer's own Zoning attribute='CH - COMMERCIAL-HIGHWAY' for the same parcel (ord Sec. 72-32.4, Commercial-Highway District) (verified 2026-07-18)"
+    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at address-geocoded (US Census onelineaddress) lat:38.29538 lon:-77.51667 returning ZONING='CH'; cross-checked against the 'Addresses' layer's own Zoning attribute='CH - COMMERCIAL-HIGHWAY' for the same parcel (ord Sec. 72-32.4, Commercial-Highway District) (verified 2026-07-18)",
+    "zoning_code": "CH"
   },
   {
     "address_pattern": "480 central rd",
@@ -517,7 +564,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at parcel-point lat:38.28313 lon:-77.47208 (from the city's 'Addresses' layer) returning ZONING='I2'; cross-checked against the 'Addresses' layer's own Zoning attribute='I2 - GENERAL INDUSTRIAL' for the same parcel (ord Sec. 72-32.6, General Industrial District) (verified 2026-07-18)"
+    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at parcel-point lat:38.28313 lon:-77.47208 (from the city's 'Addresses' layer) returning ZONING='I2'; cross-checked against the 'Addresses' layer's own Zoning attribute='I2 - GENERAL INDUSTRIAL' for the same parcel (ord Sec. 72-32.6, General Industrial District) (verified 2026-07-18)",
+    "zoning_code": "I2"
   },
   {
     "address_pattern": "1220 spur ln",
@@ -527,7 +575,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at parcel-point lat:38.28805 lon:-77.47719 (from the city's 'Addresses' layer) returning ZONING='PD-MU'; cross-checked against the 'Addresses' layer's own Zoning attribute='PDMU - PLND DEV-MIXED USE' for the same parcel (ord Sec. 72-33.3, Planned Development-Mixed-Use District) (verified 2026-07-18)"
+    "source": "City of Fredericksburg 'Zoning' layer (services2.arcgis.com/Cp5mSUK6iwpkVD8N/arcgis/rest/services/Zoning/FeatureServer/0, org FredericksburgVA_GIS) point-intersect at parcel-point lat:38.28805 lon:-77.47719 (from the city's 'Addresses' layer) returning ZONING='PD-MU'; cross-checked against the 'Addresses' layer's own Zoning attribute='PDMU - PLND DEV-MIXED USE' for the same parcel (ord Sec. 72-33.3, Planned Development-Mixed-Use District) (verified 2026-07-18)",
+    "zoning_code": "PD-MU"
   },
   {
     "address_pattern": "215 coffee rd",
@@ -577,7 +626,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.767492966033 lon:-77.474706838921 returning FULL_ADDRESS='8600 FORT DR', ZONING='R1', GPIN_NUM='7796-54-0624', USE_CODE='101' MODEL_DESC='ANTIETAM' (single-family detached, Signal Hill/Fort Dr subdivision); address forward-geocoded via US Census onelineaddress to '8600 FORT DR, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 56.6m); cross-checked against the 9 neighboring parcels within the same 60m buffer, all ZONING='R1' with single-family MODEL_DESC values (SHILOH, WILLIAMSBURG, ANTIETAM), confirming a coherent single-family neighborhood rather than a boundary parcel (ord Sec. 130-262, R-1 Low Density, Single-Family Residential District) (verified 2026-07-18); the older manassasgis.manassasva.gov/arcgis21 GIS host referenced in public search results is unreachable from this environment (connection refused), so gis.manassasva.gov/server2 -- the host actually backing the city's live parcel/zoning lookup tools -- was used"
+    "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.767492966033 lon:-77.474706838921 returning FULL_ADDRESS='8600 FORT DR', ZONING='R1', GPIN_NUM='7796-54-0624', USE_CODE='101' MODEL_DESC='ANTIETAM' (single-family detached, Signal Hill/Fort Dr subdivision); address forward-geocoded via US Census onelineaddress to '8600 FORT DR, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 56.6m); cross-checked against the 9 neighboring parcels within the same 60m buffer, all ZONING='R1' with single-family MODEL_DESC values (SHILOH, WILLIAMSBURG, ANTIETAM), confirming a coherent single-family neighborhood rather than a boundary parcel (ord Sec. 130-262, R-1 Low Density, Single-Family Residential District) (verified 2026-07-18); the older manassasgis.manassasva.gov/arcgis21 GIS host referenced in public search results is unreachable from this environment (connection refused), so gis.manassasva.gov/server2 -- the host actually backing the city's live parcel/zoning lookup tools -- was used",
+    "zoning_code": "R1"
   },
   {
     "address_pattern": "10023 dumfries rd",
@@ -587,7 +637,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.738332161665 lon:-77.472185738721 returning FULL_ADDRESS='10023 DUMFRIES RD', ZONING='B4', GPIN_NUM='7795-63-3054', USE_CODE='210' MODEL_DESC='DAYCARE'; address forward-geocoded via US Census onelineaddress to '10023 DUMFRIES RD, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 69.5m); cross-checked against the neighboring Dumfries Rd corridor parcels within the same 60m buffer -- 10024 DUMFRIES RD ZONING='B4' (WELLINGTON CENT retail center), 10233 DUMFRIES RD ZONING='B4', 10217 DUMFRIES RD ZONING='B2' (neighborhood commercial) -- confirming a general commercial corridor consistent with the B-4 purpose text's 'wide array of retail, office, service, and institutional uses' serving 'local and regional patrons' (ord Sec. 130-305, B-4 General Commercial District) (verified 2026-07-18)"
+    "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.738332161665 lon:-77.472185738721 returning FULL_ADDRESS='10023 DUMFRIES RD', ZONING='B4', GPIN_NUM='7795-63-3054', USE_CODE='210' MODEL_DESC='DAYCARE'; address forward-geocoded via US Census onelineaddress to '10023 DUMFRIES RD, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 69.5m); cross-checked against the neighboring Dumfries Rd corridor parcels within the same 60m buffer -- 10024 DUMFRIES RD ZONING='B4' (WELLINGTON CENT retail center), 10233 DUMFRIES RD ZONING='B4', 10217 DUMFRIES RD ZONING='B2' (neighborhood commercial) -- confirming a general commercial corridor consistent with the B-4 purpose text's 'wide array of retail, office, service, and institutional uses' serving 'local and regional patrons' (ord Sec. 130-305, B-4 General Commercial District) (verified 2026-07-18)",
+    "zoning_code": "B4"
   },
   {
     "address_pattern": "10001 dean dr",
@@ -607,7 +658,8 @@
     "overlays": [],
     "confidence": 0.85,
     "method": "gis_verified",
-    "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.752763 lon:-77.466891 returning FULL_ADDRESS='8912 QUARRY RD', ZONING='B3', GPIN_NUM='7795-78-4290', USE_CODE='915R' MODEL_DESC='2STY FRAME' (Old Town Manassas, one block off Main St); address forward-geocoded via US Census onelineaddress to '8912 QUARRY RD, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 36.4m); cross-checked against neighboring parcels in the same buffer -- adjacent B-3.5 (city center planned, also mapped mixed-use-core) parcels on Quarry Rd/Fairview Ave, plus R-2-S residential parcels one block over on Centreville Rd, consistent with B-3's purpose text describing 'an attractive and successful mixed-use historic downtown with pedestrian-oriented retail, commercial, and institutional uses along with residential uses'; B-3 is a human judgment-call mapping to mixed-use-core (see classification_rules.json _notes) rather than a vocabulary term the ordinance names directly, hence confidence 0.85 not 0.9 (ord Sec. 130-303, B-3 City Center Commercial (Old Town) District) (verified 2026-07-18)"
+    "source": "City of Manassas parcel/zoning attribute service (gis.manassasva.gov/server2/rest/services/Web_ParcelUnit_Standard/Web_Parcel_Standard/FeatureServer/1, field ZONING) point-in-polygon test (60m buffer, esriSpatialRelIntersects) at address-point lat:38.752763 lon:-77.466891 returning FULL_ADDRESS='8912 QUARRY RD', ZONING='B3', GPIN_NUM='7795-78-4290', USE_CODE='915R' MODEL_DESC='2STY FRAME' (Old Town Manassas, one block off Main St); address forward-geocoded via US Census onelineaddress to '8912 QUARRY RD, MANASSAS, VA, 20110' (distance from the city's own parcel centroid: 36.4m); cross-checked against neighboring parcels in the same buffer -- adjacent B-3.5 (city center planned, also mapped mixed-use-core) parcels on Quarry Rd/Fairview Ave, plus R-2-S residential parcels one block over on Centreville Rd, consistent with B-3's purpose text describing 'an attractive and successful mixed-use historic downtown with pedestrian-oriented retail, commercial, and institutional uses along with residential uses'; B-3 is a human judgment-call mapping to mixed-use-core (see classification_rules.json _notes) rather than a vocabulary term the ordinance names directly, hence confidence 0.85 not 0.9 (ord Sec. 130-303, B-3 City Center Commercial (Old Town) District) (verified 2026-07-18)",
+    "zoning_code": "B3"
   },
   {
     "address_pattern": "2820 fairway forest dr",
@@ -617,7 +669,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Salem Zoning attribute service (services7.arcgis.com/RL8aZgZHmJOdyNXk/arcgis/rest/services/Zoning/FeatureServer/0, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '2820 FAIRWAY FOREST DR, SALEM, VA, 24153' (lon:-80.048566009662 lat:37.253687985766), returning ZONING='RSF' (Residential Single Family District); independently cross-checked against the City's own Address_points layer (services7.arcgis.com/.../Address_points/FeatureServer/4, FULLADDR='2820 FAIRWAY FOREST DR', same coordinate exactly) and its TaxParcels tax-assessor layer (services7.arcgis.com/.../TaxParcels/FeatureServer/5), same point returning FullAddress='2820 FAIRWAY FOREST DR', zoning='RSF', tax_map_number='317-3-5', property_use='Residential Improved' (Fairway Forest neighborhood off Keagy Rd, adjoining the Hidden Valley Country Club), consistent with the ordinance's RSF purpose text ('most residential neighborhoods in Salem are comprised primarily of single family dwellings on relatively small lots... future residential development will be \"infill development\"') (ord Sec. 106-202.1, RSF Residential Single Family District, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-18)"
+    "source": "City of Salem Zoning attribute service (services7.arcgis.com/RL8aZgZHmJOdyNXk/arcgis/rest/services/Zoning/FeatureServer/0, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '2820 FAIRWAY FOREST DR, SALEM, VA, 24153' (lon:-80.048566009662 lat:37.253687985766), returning ZONING='RSF' (Residential Single Family District); independently cross-checked against the City's own Address_points layer (services7.arcgis.com/.../Address_points/FeatureServer/4, FULLADDR='2820 FAIRWAY FOREST DR', same coordinate exactly) and its TaxParcels tax-assessor layer (services7.arcgis.com/.../TaxParcels/FeatureServer/5), same point returning FullAddress='2820 FAIRWAY FOREST DR', zoning='RSF', tax_map_number='317-3-5', property_use='Residential Improved' (Fairway Forest neighborhood off Keagy Rd, adjoining the Hidden Valley Country Club), consistent with the ordinance's RSF purpose text ('most residential neighborhoods in Salem are comprised primarily of single family dwellings on relatively small lots... future residential development will be \"infill development\"') (ord Sec. 106-202.1, RSF Residential Single Family District, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-18)",
+    "zoning_code": "RSF"
   },
   {
     "address_pattern": "103 richfield ave",
@@ -637,7 +690,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Salem Zoning attribute service (services7.arcgis.com/RL8aZgZHmJOdyNXk/arcgis/rest/services/Zoning/FeatureServer/0, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '140 SHERATON DR, SALEM, VA, 24153' (lon:-80.032399444106 lat:37.321326268001), returning ZONING='HBD' (Highway Business District); independently cross-checked against the City's own Address_points layer (FULLADDR='140 SHERATON DR' confirmed present in the same HBD polygon) and its TaxParcels tax-assessor layer, same point returning FullAddress='140 SHERATON DR', zoning='HBD', tax_map_number='4-1-2.2', property_use='Hotel/Motel', property_desc='Hotel', class_code='Commercial/Industrial' (a hotel fronting Electric Rd/Rte 419 near the I-81 interchange), consistent with the ordinance's HBD purpose text ('a wide variety of commercial and service uses that are typically found along or near major transportation arterials... more intensive commercial uses not appropriate for the Downtown (DBD) or Residential (RB) Districts') (ord Sec. 106-214.1, HBD Highway Business District, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-18)"
+    "source": "City of Salem Zoning attribute service (services7.arcgis.com/RL8aZgZHmJOdyNXk/arcgis/rest/services/Zoning/FeatureServer/0, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '140 SHERATON DR, SALEM, VA, 24153' (lon:-80.032399444106 lat:37.321326268001), returning ZONING='HBD' (Highway Business District); independently cross-checked against the City's own Address_points layer (FULLADDR='140 SHERATON DR' confirmed present in the same HBD polygon) and its TaxParcels tax-assessor layer, same point returning FullAddress='140 SHERATON DR', zoning='HBD', tax_map_number='4-1-2.2', property_use='Hotel/Motel', property_desc='Hotel', class_code='Commercial/Industrial' (a hotel fronting Electric Rd/Rte 419 near the I-81 interchange), consistent with the ordinance's HBD purpose text ('a wide variety of commercial and service uses that are typically found along or near major transportation arterials... more intensive commercial uses not appropriate for the Downtown (DBD) or Residential (RB) Districts') (ord Sec. 106-214.1, HBD Highway Business District, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-18)",
+    "zoning_code": "HBD"
   },
   {
     "address_pattern": "525 branch dr",
@@ -647,7 +701,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Salem Zoning attribute service (services7.arcgis.com/RL8aZgZHmJOdyNXk/arcgis/rest/services/Zoning/FeatureServer/0, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '525 BRANCH DR, SALEM, VA, 24153' (lon:-80.03108583717 lat:37.305048394796), returning ZONING='LM' (Light Manufacturing District); independently cross-checked against the City's own Address_points layer (FULLADDR='525 BRANCH DR' confirmed present in the same LM polygon) and its TaxParcels tax-assessor layer, same point returning FullAddress='525 BRANCH DR', zoning='LM', tax_map_number='51-3-2', property_use='Commercial Warehouse', property_desc='Warehouse', class_code='Commercial/Industrial' (Branch Dr industrial park off Kessler Mill Rd), consistent with the ordinance's LM purpose text ('a wide variety of industrial and warehouse uses and activities that occur primarily within enclosed structures, with minimal or no environmental impacts associated with smoke, odor, and noise') (ord Sec. 106-218.1, LM Light Manufacturing District, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-18)"
+    "source": "City of Salem Zoning attribute service (services7.arcgis.com/RL8aZgZHmJOdyNXk/arcgis/rest/services/Zoning/FeatureServer/0, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '525 BRANCH DR, SALEM, VA, 24153' (lon:-80.03108583717 lat:37.305048394796), returning ZONING='LM' (Light Manufacturing District); independently cross-checked against the City's own Address_points layer (FULLADDR='525 BRANCH DR' confirmed present in the same LM polygon) and its TaxParcels tax-assessor layer, same point returning FullAddress='525 BRANCH DR', zoning='LM', tax_map_number='51-3-2', property_use='Commercial Warehouse', property_desc='Warehouse', class_code='Commercial/Industrial' (Branch Dr industrial park off Kessler Mill Rd), consistent with the ordinance's LM purpose text ('a wide variety of industrial and warehouse uses and activities that occur primarily within enclosed structures, with minimal or no environmental impacts associated with smoke, odor, and noise') (ord Sec. 106-218.1, LM Light Manufacturing District, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-18)",
+    "zoning_code": "LM"
   },
   {
     "address_pattern": "3005 carney st",
@@ -657,7 +712,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '3005 CARNEY ST, PORTSMOUTH, VA, 23703' (lon:-76.372573146773 lat:36.842614887), returning ZONING='NR' (Neighborhood Residential); independently cross-checked against the City's own tax-assessor Parcels_new layer (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/Parcels_new/FeatureServer/0), same point returning SITE_ADDRE='3001 CARNEY ST' (adjoining parcel), ZONING='NR', MPN='767-180', NEIGHBORHD='GREEN ACRES', TYPE_PROP='RESIDENTIAL' -- a coherent single-family Green Acres neighborhood consistent with the ordinance's NR purpose text ('accommodate single-family detached residential dwellings at low densities') (ord Sec. 40.2-202(B), Neighborhood Residential (NR) District, within the whole-category 'Residential Zoning Districts' section) (verified 2026-07-18)"
+    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '3005 CARNEY ST, PORTSMOUTH, VA, 23703' (lon:-76.372573146773 lat:36.842614887), returning ZONING='NR' (Neighborhood Residential); independently cross-checked against the City's own tax-assessor Parcels_new layer (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/Parcels_new/FeatureServer/0), same point returning SITE_ADDRE='3001 CARNEY ST' (adjoining parcel), ZONING='NR', MPN='767-180', NEIGHBORHD='GREEN ACRES', TYPE_PROP='RESIDENTIAL' -- a coherent single-family Green Acres neighborhood consistent with the ordinance's NR purpose text ('accommodate single-family detached residential dwellings at low densities') (ord Sec. 40.2-202(B), Neighborhood Residential (NR) District, within the whole-category 'Residential Zoning Districts' section) (verified 2026-07-18)",
+    "zoning_code": "NR"
   },
   {
     "address_pattern": "704 airline blvd",
@@ -667,7 +723,8 @@
     "overlays": [],
     "confidence": 0.85,
     "method": "gis_verified",
-    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '704 AIRLINE BLVD, PORTSMOUTH, VA, 23707' (lon:-76.341112595924 lat:36.832776976779), returning ZONING='GMU' (General Mixed-Use); independently cross-checked against the City's tax-assessor Parcels_new layer, same point returning SITE_ADDRE='704 AIRLINE BL' (exact match), ZONING='GMU', MPN='300-411', NEIGHBORHD='WESTHAVEN PARK', TYPE_PROP='COMMERCIAL'; GMU is a human judgment-call mapping to mixed-use-core rather than commercial-employment (see classification_rules.json _notes: GMU's own purpose text reads 'encourage the formation and continuance of a compatible mixed-use environment that includes residential, commercial, and institutional uses', same test manassas-va used for its B-3), hence confidence 0.85 not 0.9 (ord Sec. 40.2-203(C), General Mixed-Use (GMU) District, within the whole-category 'Commercial Zoning Districts' section) (verified 2026-07-18)"
+    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '704 AIRLINE BLVD, PORTSMOUTH, VA, 23707' (lon:-76.341112595924 lat:36.832776976779), returning ZONING='GMU' (General Mixed-Use); independently cross-checked against the City's tax-assessor Parcels_new layer, same point returning SITE_ADDRE='704 AIRLINE BL' (exact match), ZONING='GMU', MPN='300-411', NEIGHBORHD='WESTHAVEN PARK', TYPE_PROP='COMMERCIAL'; GMU is a human judgment-call mapping to mixed-use-core rather than commercial-employment (see classification_rules.json _notes: GMU's own purpose text reads 'encourage the formation and continuance of a compatible mixed-use environment that includes residential, commercial, and institutional uses', same test manassas-va used for its B-3), hence confidence 0.85 not 0.9 (ord Sec. 40.2-203(C), General Mixed-Use (GMU) District, within the whole-category 'Commercial Zoning Districts' section) (verified 2026-07-18)",
+    "zoning_code": "GMU"
   },
   {
     "address_pattern": "3307 harding st",
@@ -677,7 +734,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '3307 HARDING ST, PORTSMOUTH, VA, 23703' (lon:-76.346642909136 lat:36.864162431414), returning ZONING='IL' (Light Industrial); independently cross-checked against the City's tax-assessor Parcels_new layer, same point returning SITE_ADDRE='3340 WEST NORFOLK RD' (adjoining parcel, same West Norfolk industrial block), ZONING='IL', MPN='701-260', NEIGHBORHD='WEST NORFOLK', TYPE_PROP='INDUSTRIAL', consistent with the ordinance's IL purpose text ('light manufacturing, assembly, fabrication, processing, distribution, storage... small-scale... minimal exterior movement') (ord Sec. 40.2-204(B), Light Industrial (IL) District, within the whole-category 'Industrial Zoning Districts' section) (verified 2026-07-18)"
+    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '3307 HARDING ST, PORTSMOUTH, VA, 23703' (lon:-76.346642909136 lat:36.864162431414), returning ZONING='IL' (Light Industrial); independently cross-checked against the City's tax-assessor Parcels_new layer, same point returning SITE_ADDRE='3340 WEST NORFOLK RD' (adjoining parcel, same West Norfolk industrial block), ZONING='IL', MPN='701-260', NEIGHBORHD='WEST NORFOLK', TYPE_PROP='INDUSTRIAL', consistent with the ordinance's IL purpose text ('light manufacturing, assembly, fabrication, processing, distribution, storage... small-scale... minimal exterior movement') (ord Sec. 40.2-204(B), Light Industrial (IL) District, within the whole-category 'Industrial Zoning Districts' section) (verified 2026-07-18)",
+    "zoning_code": "IL"
   },
   {
     "address_pattern": "531 king st",
@@ -687,7 +745,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '531 KING ST, PORTSMOUTH, VA, 23704' (lon:-76.302820954988 lat:36.834427482527), returning ZONING='T4' (Downtown D1, T4 Sub-District General Urban); independently cross-checked against the City's tax-assessor Parcels_new layer, same point returning SITE_ADDRE='517 KING ST' (adjoining parcel, same King St downtown block), ZONING='T4', MPN='13-351', NEIGHBORHD='DOWNTOWN', TYPE_PROP='COMMERCIAL', consistent with the ordinance's T4 description ('contains a mix of uses, but maintains a predominantly residential urban fabric... nearest to the Olde Towne Historic District, represent[ing] moderately intense urbanism in the downtown') (ord Sec. 40.2-207(B)(1)(b), T4 Sub-District (General Urban), within the whole-category 'Downtown D1 District and Sub-Districts' section) (verified 2026-07-18)"
+    "source": "City of Portsmouth zoning attribute service (services1.arcgis.com/nGsguNiHLn7MU4R4/arcgis/rest/services/PlanningDevelopment/FeatureServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '531 KING ST, PORTSMOUTH, VA, 23704' (lon:-76.302820954988 lat:36.834427482527), returning ZONING='T4' (Downtown D1, T4 Sub-District General Urban); independently cross-checked against the City's tax-assessor Parcels_new layer, same point returning SITE_ADDRE='517 KING ST' (adjoining parcel, same King St downtown block), ZONING='T4', MPN='13-351', NEIGHBORHD='DOWNTOWN', TYPE_PROP='COMMERCIAL', consistent with the ordinance's T4 description ('contains a mix of uses, but maintains a predominantly residential urban fabric... nearest to the Olde Towne Historic District, represent[ing] moderately intense urbanism in the downtown') (ord Sec. 40.2-207(B)(1)(b), T4 Sub-District (General Urban), within the whole-category 'Downtown D1 District and Sub-Districts' section) (verified 2026-07-18)",
+    "zoning_code": "T4"
   },
   {
     "address_pattern": "1020 blackburn st",
@@ -697,7 +756,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '1020 BLACKBURN ST, STAUNTON, VA, 24401' (lon:-79.084470925821 lat:38.137115916455), returning LABEL_FLD='R-2' (Low density residential district, SCC 18.15.010 classification table); independently cross-checked against the City's 911 AddressPoints layer (same org, AddressPoints/FeatureServer/0, point for 1020 BLACKBURN ST inside the same R-2 polygon) and its Tax_Parcels assessor layer (Tax_Parcels/FeatureServer/0), the address point's parcel returning MAP_INFO='1020 BLACKBURN ST' (exact match), ZONING='R2', PARCEL_IDA='582', USE_CODE='RESIDENTIAL LAND (LOW DENSITY)', NEIGHBORHO='VISTA HTS' -- a single-family Vista Heights block consistent with the ordinance's R-2 chapter ('single-family residential development with low to moderate population densities') (SCC Ch. 18.25, \u00a7 18.25.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)"
+    "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '1020 BLACKBURN ST, STAUNTON, VA, 24401' (lon:-79.084470925821 lat:38.137115916455), returning LABEL_FLD='R-2' (Low density residential district, SCC 18.15.010 classification table); independently cross-checked against the City's 911 AddressPoints layer (same org, AddressPoints/FeatureServer/0, point for 1020 BLACKBURN ST inside the same R-2 polygon) and its Tax_Parcels assessor layer (Tax_Parcels/FeatureServer/0), the address point's parcel returning MAP_INFO='1020 BLACKBURN ST' (exact match), ZONING='R2', PARCEL_IDA='582', USE_CODE='RESIDENTIAL LAND (LOW DENSITY)', NEIGHBORHO='VISTA HTS' -- a single-family Vista Heights block consistent with the ordinance's R-2 chapter ('single-family residential development with low to moderate population densities') (SCC Ch. 18.25, \u00a7 18.25.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)",
+    "zoning_code": "R-2"
   },
   {
     "address_pattern": "1 lawyers row",
@@ -717,7 +777,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '200 NATIONAL AVE, STAUNTON, VA, 24401' (lon:-79.049449152587 lat:38.141174013921), returning LABEL_FLD='I-1' (Light industrial district); independently cross-checked against the City's 911 AddressPoints layer (same org, point for 200 NATIONAL AVE inside an I-1 polygon of the same National Ave industrial corridor -- Census interpolates ~0.5 km along the street from the address point, both points landing in I-1) and its Tax_Parcels assessor layer at the address point, returning MAP_INFO='200 NATIONAL AVE' (exact match), ZONING='I1', PARCEL_IDA='11500', USE_CODE='GENERAL COMMERCIAL', NEIGHBORHO='SMART&BYERS', consistent with the ordinance's I-1 chapter ('light manufacturing or wholesaling... do not directly adversely affect nearby residential and business uses'; \u00a7 18.75.020(2) bars residential use) (SCC Ch. 18.75, \u00a7 18.75.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)"
+    "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '200 NATIONAL AVE, STAUNTON, VA, 24401' (lon:-79.049449152587 lat:38.141174013921), returning LABEL_FLD='I-1' (Light industrial district); independently cross-checked against the City's 911 AddressPoints layer (same org, point for 200 NATIONAL AVE inside an I-1 polygon of the same National Ave industrial corridor -- Census interpolates ~0.5 km along the street from the address point, both points landing in I-1) and its Tax_Parcels assessor layer at the address point, returning MAP_INFO='200 NATIONAL AVE' (exact match), ZONING='I1', PARCEL_IDA='11500', USE_CODE='GENERAL COMMERCIAL', NEIGHBORHO='SMART&BYERS', consistent with the ordinance's I-1 chapter ('light manufacturing or wholesaling... do not directly adversely affect nearby residential and business uses'; \u00a7 18.75.020(2) bars residential use) (SCC Ch. 18.75, \u00a7 18.75.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)",
+    "zoning_code": "I-1"
   },
   {
     "address_pattern": "508 w frederick st",
@@ -727,7 +788,8 @@
     "overlays": [],
     "confidence": 0.85,
     "method": "gis_verified",
-    "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '508 W FREDERICK ST, STAUNTON, VA, 24401' (lon:-79.078026879092 lat:38.150021656949), returning LABEL_FLD='B-3' (Planned business district); independently cross-checked against the City's 911 AddressPoints layer (same org, point for 508 W FREDERICK ST inside the same B-3 polygon) and its Tax_Parcels assessor layer, same parcel returning MAP_INFO='508 W FREDERICK ST' (exact match), ZONING='B3', PARCEL_IDA='1616', NEIGHBORHO='NEW TOWN'; B-3 maps to commercial-employment (see classification_rules.json _notes: B-1's use list but every use only on planning-commission-plus-council review per \u00a7 18.65.020, no by-right residential), hence confidence 0.85 not 0.9 (SCC Ch. 18.65, \u00a7 18.65.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)"
+    "source": "City of Staunton Zoning layer (services.arcgis.com/bp3MWUdz4OBPF6xz/arcgis/rest/services/Zoning/FeatureServer/0, field LABEL_FLD) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '508 W FREDERICK ST, STAUNTON, VA, 24401' (lon:-79.078026879092 lat:38.150021656949), returning LABEL_FLD='B-3' (Planned business district); independently cross-checked against the City's 911 AddressPoints layer (same org, point for 508 W FREDERICK ST inside the same B-3 polygon) and its Tax_Parcels assessor layer, same parcel returning MAP_INFO='508 W FREDERICK ST' (exact match), ZONING='B3', PARCEL_IDA='1616', NEIGHBORHO='NEW TOWN'; B-3 maps to commercial-employment (see classification_rules.json _notes: B-1's use list but every use only on planning-commission-plus-council review per \u00a7 18.65.020, no by-right residential), hence confidence 0.85 not 0.9 (SCC Ch. 18.65, \u00a7 18.65.010 General description, within the numeric-prefix-keyed 'DISTRICT REGULATIONS' article) (verified 2026-07-19)",
+    "zoning_code": "B-3"
   },
   {
     "address_pattern": "608 sunset ave",
@@ -737,7 +799,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE -- same org as the hampton-va layer; its CODE roster matches Suffolk UDO SEC. 31-402's district table exactly; data last edited 2025-09) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '608 SUNSET AVE, SUFFOLK, VA, 23434' (lon:-76.571921110177 lat:36.727542372258), returning CODE='RM' (Residential Medium Density); independently cross-checked against the VGIN statewide Virginia Address Points layer (vginmaps.vdem.virginia.gov/arcgis/rest/services/VA_Base_Layers/VA_Address_Points/FeatureServer/0, FULLADDR='608 SUNSET AVE' point inside the same RM polygon); Table 406-1 lists 'Dwelling, single-family detached' as P (permitted) in RM, consistent with a residential block off downtown (SEC. 31-403 RM purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)"
+    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE -- same org as the hampton-va layer; its CODE roster matches Suffolk UDO SEC. 31-402's district table exactly; data last edited 2025-09) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '608 SUNSET AVE, SUFFOLK, VA, 23434' (lon:-76.571921110177 lat:36.727542372258), returning CODE='RM' (Residential Medium Density); independently cross-checked against the VGIN statewide Virginia Address Points layer (vginmaps.vdem.virginia.gov/arcgis/rest/services/VA_Base_Layers/VA_Address_Points/FeatureServer/0, FULLADDR='608 SUNSET AVE' point inside the same RM polygon); Table 406-1 lists 'Dwelling, single-family detached' as P (permitted) in RM, consistent with a residential block off downtown (SEC. 31-403 RM purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)",
+    "zoning_code": "RM"
   },
   {
     "address_pattern": "821 w washington st",
@@ -747,7 +810,8 @@
     "overlays": [],
     "confidence": 0.85,
     "method": "gis_verified",
-    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '821 W WASHINGTON ST, SUFFOLK, VA, 23434' (lon:-76.596626791683 lat:36.730475631934), returning CODE='CBD' (Central Business District); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='821 W WASHINGTON ST' point inside the same CBD polygon); CBD is a human judgment-call mapping to mixed-use-core (SEC. 31-403 purpose text: 'concentrated downtown civic retail, service, office, residential and other uses... promotes the long-term vitality of this economic and residential mixed use center'), hence confidence 0.85 not 0.9 (SEC. 31-403 CBD purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)"
+    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '821 W WASHINGTON ST, SUFFOLK, VA, 23434' (lon:-76.596626791683 lat:36.730475631934), returning CODE='CBD' (Central Business District); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='821 W WASHINGTON ST' point inside the same CBD polygon); CBD is a human judgment-call mapping to mixed-use-core (SEC. 31-403 purpose text: 'concentrated downtown civic retail, service, office, residential and other uses... promotes the long-term vitality of this economic and residential mixed use center'), hence confidence 0.85 not 0.9 (SEC. 31-403 CBD purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)",
+    "zoning_code": "CBD"
   },
   {
     "address_pattern": "3468 pruden blvd",
@@ -757,7 +821,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '3468 PRUDEN BLVD, SUFFOLK, VA, 23434' (lon:-76.621704320511 lat:36.778265696317), returning CODE='B-2' (General Commercial District); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='3468 PRUDEN BLVD' point inside the same B-2 polygon), a Pruden Blvd/US-460 highway-commercial corridor parcel consistent with the B-2 purpose statement (SEC. 31-403 B-2 purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)"
+    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '3468 PRUDEN BLVD, SUFFOLK, VA, 23434' (lon:-76.621704320511 lat:36.778265696317), returning CODE='B-2' (General Commercial District); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='3468 PRUDEN BLVD' point inside the same B-2 polygon), a Pruden Blvd/US-460 highway-commercial corridor parcel consistent with the B-2 purpose statement (SEC. 31-403 B-2 purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)",
+    "zoning_code": "B-2"
   },
   {
     "address_pattern": "719 carolina rd",
@@ -767,7 +832,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '719 CAROLINA RD, SUFFOLK, VA, 23434' (lon:-76.595157304849 lat:36.707609505798), returning CODE='M-1' (Light Industrial District); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='719 CAROLINA RD' point inside the same M-1 polygon), a Carolina Rd industrial corridor parcel south of downtown; Table 406-1 lists warehouse/freight storage as P and dwellings as not permitted in M-1 (SEC. 31-403 M-1 purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)"
+    "source": "Zoning_Suffolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/11, field CODE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '719 CAROLINA RD, SUFFOLK, VA, 23434' (lon:-76.595157304849 lat:36.707609505798), returning CODE='M-1' (Light Industrial District); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='719 CAROLINA RD' point inside the same M-1 polygon), a Carolina Rd industrial corridor parcel south of downtown; Table 406-1 lists warehouse/freight storage as P and dwellings as not permitted in M-1 (SEC. 31-403 M-1 purpose statement, SEC. 31-406 Use Matrix) (verified 2026-07-19)",
+    "zoning_code": "M-1"
   },
   {
     "address_pattern": "206 piney rd",
@@ -777,7 +843,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '206 PINEY RD, DANVILLE, VA, 24541' (lon:-79.394686985246 lat:36.543448970916), returning ZONE='SR' (ZONE_DESC='Suburban Residential', Chapter 41 Article 3.C S-R district); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='206 PINEY RD' returning ZONING='SR' and ACCOUNT='76210' (exact address match); single-family use consistent with Article 3.C.B permitted uses (verified 2026-07-19)"
+    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '206 PINEY RD, DANVILLE, VA, 24541' (lon:-79.394686985246 lat:36.543448970916), returning ZONE='SR' (ZONE_DESC='Suburban Residential', Chapter 41 Article 3.C S-R district); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='206 PINEY RD' returning ZONING='SR' and ACCOUNT='76210' (exact address match); single-family use consistent with Article 3.C.B permitted uses (verified 2026-07-19)",
+    "zoning_code": "SR"
   },
   {
     "address_pattern": "413 jefferson st",
@@ -787,7 +854,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '413 JEFFERSON ST, DANVILLE, VA, 24541' (lon:-79.394226766714 lat:36.581713483026), returning ZONE='CBC' (ZONE_DESC='Central Business Commercial', Chapter 41 Article 3.K CB-C district, mapped to mixed-use-core per this pack's classification_rules -- downtown district with by-right residential above first-floor commercial, 3.K.B item 22); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='413 JEFFERSON ST' returning ZONING='CBC' and ACCOUNT='24125' (exact address match) (verified 2026-07-19)"
+    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '413 JEFFERSON ST, DANVILLE, VA, 24541' (lon:-79.394226766714 lat:36.581713483026), returning ZONE='CBC' (ZONE_DESC='Central Business Commercial', Chapter 41 Article 3.K CB-C district, mapped to mixed-use-core per this pack's classification_rules -- downtown district with by-right residential above first-floor commercial, 3.K.B item 22); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='413 JEFFERSON ST' returning ZONING='CBC' and ACCOUNT='24125' (exact address match) (verified 2026-07-19)",
+    "zoning_code": "CBC"
   },
   {
     "address_pattern": "855 luna lake rd",
@@ -797,7 +865,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '855 LUNA LAKE RD, DANVILLE, VA, 24541' (lon:-79.425801155842 lat:36.548436818325), returning ZONE='HRC' (ZONE_DESC='Highway Retail Commercial', Chapter 41 Article 3.M HR-C district); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='855 LUNA LAKE RD' returning ZONING='HRC' and ACCOUNT='75611' (exact address match) (verified 2026-07-19)"
+    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '855 LUNA LAKE RD, DANVILLE, VA, 24541' (lon:-79.425801155842 lat:36.548436818325), returning ZONE='HRC' (ZONE_DESC='Highway Retail Commercial', Chapter 41 Article 3.M HR-C district); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='855 LUNA LAKE RD' returning ZONING='HRC' and ACCOUNT='75611' (exact address match) (verified 2026-07-19)",
+    "zoning_code": "HRC"
   },
   {
     "address_pattern": "501 pruitt rd",
@@ -807,7 +876,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '501 PRUITT RD, DANVILLE, VA, 24541' (lon:-79.451777020854 lat:36.542541681146), returning ZONE='IM' (ZONE_DESC='Industrial Manufacturing', Chapter 41 Article 3.Q M-I district); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='501 PRUITT RD' returning ZONING='IM' and ACCOUNT='75371' (exact address match); 3.Q.D expressly prohibits new residential uses in M-I (verified 2026-07-19)"
+    "source": "City of Danville Zoning layer (gis.danvilleva.gov/server/rest/services/WebLoGIStics/Main_WL/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '501 PRUITT RD, DANVILLE, VA, 24541' (lon:-79.451777020854 lat:36.542541681146), returning ZONE='IM' (ZONE_DESC='Industrial Manufacturing', Chapter 41 Article 3.Q M-I district); independently cross-checked against the city's assessor Parcels layer (Explorer/Main/MapServer/2), the parcel with ADDRESS='501 PRUITT RD' returning ZONING='IM' and ACCOUNT='75371' (exact address match); 3.Q.D expressly prohibits new residential uses in M-I (verified 2026-07-19)",
+    "zoning_code": "IM"
   },
   {
     "address_pattern": "921 quail st",
@@ -817,7 +887,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '921 QUAIL ST, NORFOLK, VA, 23513' (lon:-76.248480201116 lat:36.894928717624), returning ZONE='SF-6' (Single Family 6 district, ordinance section 3.2.5); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='921 SOUTH QUAIL ST' point inside the same SF-6 polygon; Census normalizes the street name to plain QUAIL ST), a Norview-area single-family block; Table 3.2.12 lists 'Dwelling, single-family detached' as P in the SF districts (verified 2026-07-19)"
+    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '921 QUAIL ST, NORFOLK, VA, 23513' (lon:-76.248480201116 lat:36.894928717624), returning ZONE='SF-6' (Single Family 6 district, ordinance section 3.2.5); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='921 SOUTH QUAIL ST' point inside the same SF-6 polygon; Census normalizes the street name to plain QUAIL ST), a Norview-area single-family block; Table 3.2.12 lists 'Dwelling, single-family detached' as P in the SF districts (verified 2026-07-19)",
+    "zoning_code": "SF-6"
   },
   {
     "address_pattern": "810 union st",
@@ -827,7 +898,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '810 UNION ST, NORFOLK, VA, 23510' (lon:-76.287113976767 lat:36.844469217893), returning ZONE='D-BC' (Downtown - Business Center district, ordinance section 3.4.6, mapped to mixed-use-core per this pack's classification_rules); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='810 UNION ST' point inside the same D-BC polygon), a downtown civic-center block; Table 3.4.11 lists Restaurant P/C and Hotel P in all downtown base districts (verified 2026-07-19)"
+    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '810 UNION ST, NORFOLK, VA, 23510' (lon:-76.287113976767 lat:36.844469217893), returning ZONE='D-BC' (Downtown - Business Center district, ordinance section 3.4.6, mapped to mixed-use-core per this pack's classification_rules); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='810 UNION ST' point inside the same D-BC polygon), a downtown civic-center block; Table 3.4.11 lists Restaurant P/C and Hotel P in all downtown base districts (verified 2026-07-19)",
+    "zoning_code": "D-BC"
   },
   {
     "address_pattern": "5560 iowa ave",
@@ -837,7 +909,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '5560 IOWA AVE, NORFOLK, VA, 23513' (lon:-76.221480720672 lat:36.889376236725), returning ZONE='C-C' (Community Commercial district, ordinance section 3.3.4); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='5560 IOWA AVE' point inside the same C-C polygon), a Norview commercial-corridor parcel; Table 3.3.9 lists Restaurant P/C across the commercial base districts (verified 2026-07-19)"
+    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '5560 IOWA AVE, NORFOLK, VA, 23513' (lon:-76.221480720672 lat:36.889376236725), returning ZONE='C-C' (Community Commercial district, ordinance section 3.3.4); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='5560 IOWA AVE' point inside the same C-C polygon), a Norview commercial-corridor parcel; Table 3.3.9 lists Restaurant P/C across the commercial base districts (verified 2026-07-19)",
+    "zoning_code": "C-C"
   },
   {
     "address_pattern": "602 ford dr",
@@ -847,7 +920,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '602 FORD DR, NORFOLK, VA, 23523' (lon:-76.250516629324 lat:36.834706495487), returning ZONE='I-G' (Industrial - General district, ordinance section 3.5.4); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='602 FORD DR' point inside the same I-G polygon), a Berkley/Ford plant industrial tract; Table 3.5.7 lists Warehouse P/C in I-G and marks Visitor Accommodation Uses as not permitted in the industrial base districts (verified 2026-07-19)"
+    "source": "Zoning_Norfolk layer of the regional Hampton Roads Locality_Zones service (services.arcgis.com/ex1Az95h0eiponPK/arcgis/rest/services/Locality_Zones/FeatureServer/7, field ZONE) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '602 FORD DR, NORFOLK, VA, 23523' (lon:-76.250516629324 lat:36.834706495487), returning ZONE='I-G' (Industrial - General district, ordinance section 3.5.4); independently cross-checked against the VGIN statewide Virginia Address Points layer (FULLADDR='602 FORD DR' point inside the same I-G polygon), a Berkley/Ford plant industrial tract; Table 3.5.7 lists Warehouse P/C in I-G and marks Visitor Accommodation Uses as not permitted in the industrial base districts (verified 2026-07-19)",
+    "zoning_code": "I-G"
   },
   {
     "address_pattern": "2906 pierpont st",
@@ -857,7 +931,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '2906 PIERPONT ST, ALEXANDRIA, VA, 22302' (lon:-77.073820593889 lat:38.83093033043), returning ZONING='R8' (R-8 residential zone, ordinance Sec. 3-300); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='2906 PIERPONT ST' returning ZONING='R 8', PID_GIS='023.01-04', ACCOUNTNO='50686400' (exact address match); single-unit dwellings permitted per 3-302(A) (verified 2026-07-19)"
+    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '2906 PIERPONT ST, ALEXANDRIA, VA, 22302' (lon:-77.073820593889 lat:38.83093033043), returning ZONING='R8' (R-8 residential zone, ordinance Sec. 3-300); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='2906 PIERPONT ST' returning ZONING='R 8', PID_GIS='023.01-04', ACCOUNTNO='50686400' (exact address match); single-unit dwellings permitted per 3-302(A) (verified 2026-07-19)",
+    "zoning_code": "R8"
   },
   {
     "address_pattern": "6035 ricketts walk",
@@ -867,7 +942,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '6035 RICKETTS WALK, ALEXANDRIA, VA, 22312' (lon:-77.136430205245 lat:38.817543478892), returning ZONING='CRMU/M' (CRMU-M commercial residential mixed use medium zone, ordinance Sec. 5-200, Article V mixed use -> mixed-use-core per this pack's classification_rules); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='6035 RICKETTS WALK' returning PID_GIS='047.01-03-04', ACCOUNTNO='50635010' (exact address match) (verified 2026-07-19)"
+    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '6035 RICKETTS WALK, ALEXANDRIA, VA, 22312' (lon:-77.136430205245 lat:38.817543478892), returning ZONING='CRMU/M' (CRMU-M commercial residential mixed use medium zone, ordinance Sec. 5-200, Article V mixed use -> mixed-use-core per this pack's classification_rules); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='6035 RICKETTS WALK' returning PID_GIS='047.01-03-04', ACCOUNTNO='50635010' (exact address match) (verified 2026-07-19)",
+    "zoning_code": "CRMU/M"
   },
   {
     "address_pattern": "1049 w glebe rd",
@@ -877,7 +953,8 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '1049 W GLEBE RD, ALEXANDRIA, VA, 22305' (lon:-77.076062378502 lat:38.842781996559), returning ZONING='CG' (CG commercial general zone, ordinance Sec. 4-400); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='1049 W GLEBE RD' returning PID_GIS='006.01-01-08', ACCOUNTNO='50055010' (exact address match) (verified 2026-07-19)"
+    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '1049 W GLEBE RD, ALEXANDRIA, VA, 22305' (lon:-77.076062378502 lat:38.842781996559), returning ZONING='CG' (CG commercial general zone, ordinance Sec. 4-400); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='1049 W GLEBE RD' returning PID_GIS='006.01-01-08', ACCOUNTNO='50055010' (exact address match) (verified 2026-07-19)",
+    "zoning_code": "CG"
   },
   {
     "address_pattern": "5190 dawes ave",
@@ -887,6 +964,7 @@
     "overlays": [],
     "confidence": 0.9,
     "method": "gis_verified",
-    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '5190 DAWES AVE, ALEXANDRIA, VA, 22311' (lon:-77.118487413453 lat:38.84016238515), returning ZONING='I' (I industrial zone, ordinance Sec. 4-1200); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='5190 DAWES AVE' returning PID_GIS='002.04-01-30', ACCOUNTNO='44080000' (exact address match); machine shops and manufacturing permitted per 4-1202 (verified 2026-07-19)"
+    "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '5190 DAWES AVE, ALEXANDRIA, VA, 22311' (lon:-77.118487413453 lat:38.84016238515), returning ZONING='I' (I industrial zone, ordinance Sec. 4-1200); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='5190 DAWES AVE' returning PID_GIS='002.04-01-30', ACCOUNTNO='44080000' (exact address match); machine shops and manufacturing permitted per 4-1202 (verified 2026-07-19)",
+    "zoning_code": "I"
   }
 ]

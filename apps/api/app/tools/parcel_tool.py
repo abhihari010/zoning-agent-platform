@@ -27,6 +27,7 @@ class ParcelTool:
             return ParcelResult(
                 parcel_id=fixture.get("parcel_id"),
                 zoning_district=fixture.get("zoning_district"),
+                zoning_code=fixture.get("zoning_code"),
                 overlays=list(fixture.get("overlays") or []),
                 confidence=float(fixture.get("confidence", 0.9)),
                 method=str(fixture.get("method", "fixture")),
