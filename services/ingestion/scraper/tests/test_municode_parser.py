@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from services.ingestion.scraper.fetchers.municode import (
     DeepLinker,
+    MunicodeFetcher,
     _as_dict,
     _section_ref_from_title,
     _slugify_product,
@@ -327,3 +330,42 @@ def test_parse_job_treats_dotnet_min_date_as_no_date():
 
     _, real = parse_job({"Id": 7, "PublishDate": "2025-06-10T00:00:00"})
     assert real == "2025-06-10"
+
+
+def test_collect_sections_prefers_the_deepest_breadcrumb(monkeypatch):
+    # A parent chunk group's CodesContent can return its whole subtree, so the
+    # same section arrives twice: once under the shallow ARTICLE breadcrumb and
+    # once under the DIVISION one.  Dedupe is first-wins, so without a
+    # deepest-first ordering the DIVISION level is silently lost -- which
+    # unhooks every `division_contains` classification rule for the pack.
+    fetcher = MunicodeFetcher(request_delay=0)
+    content = json.dumps(
+        {"Docs": [{"Id": "SEC3020", "Title": "Sec. 3020. - Permitted uses.",
+                   "Content": "<p>Single-family dwellings are permitted.</p>"}]}
+    )
+    monkeypatch.setattr(
+        MunicodeFetcher,
+        "_find_chunk_group_nodes",
+        lambda *a, **k: [
+            ("ARTIII", ["APPENDIX A", "ARTICLE III. - DISTRICT STANDARDS"]),
+            ("DIV2", ["APPENDIX A", "ARTICLE III. - DISTRICT STANDARDS",
+                      "DIVISION 2. - RURAL RESIDENTIAL 1"]),
+        ],
+    )
+
+    class _StubClient:
+        def get_text(self, url, cache_suffix=None):
+            return content
+
+    records = fetcher._collect_sections(
+        client=_StubClient(),
+        job_id=1,
+        product_id=2,
+        zoning_node_id="ROOT",
+        zoning_heading="APPENDIX A",
+        deep_link=DeepLinker(state="VA", city_slug="blacksburg"),
+        effective_date="2026-01-01",
+    )
+
+    assert len(records) == 1
+    assert records[0].breadcrumb[-1] == "DIVISION 2. - RURAL RESIDENTIAL 1"
