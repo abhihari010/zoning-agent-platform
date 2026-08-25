@@ -1064,3 +1064,73 @@ def test_burst_limit_prefix_matches_analyze_path(monkeypatch):
 
     fourth_response = client.post(f"/api/v1/projects/{uuid4()}/analyze", json=payload)
     assert fourth_response.status_code == 429
+
+
+def test_zoning_code_survives_intake_to_analyze(monkeypatch):
+    """The parcel's own code must reach the orchestrator, not just the coarse family.
+
+    #200 resolves it from GIS and #202 ranks retrieval by it, but both were inert on
+    the real API path: intake dropped it and analyze had nothing to forward.
+    """
+    _enable_auth(monkeypatch)
+    monkeypatch.setenv("GOOGLE_MAPS_API_KEY", "demo-key")
+    client = TestClient(app)
+
+    from app import services
+
+    def fake_normalize(_: str):
+        return services.AddressNormalizationResult(
+            normalized_address="3419 Hawthorne Ave, Richmond, VA",
+            district="residential-low-density",
+            district_confidence=0.9,
+            district_method="gis_lookup",
+            zoning_code="R-1",
+            place_id=None,
+            latitude=37.5,
+            longitude=-77.4,
+            is_valid=True,
+            warnings=[],
+            jurisdiction_id="richmond-va",
+            jurisdiction_name="Richmond, VA",
+            coverage_status="public_supported",
+        )
+
+    monkeypatch.setattr("app.routers.api.normalize_address", fake_normalize)
+
+    intake = client.post(
+        "/api/v1/projects/intake",
+        headers=_auth_headers("user-1"),
+        json={
+            "session_id": str(uuid4()),
+            "project_description": "Add a detached accessory building in the rear yard.",
+            "address": "3419 hawthorne ave, Richmond, VA",
+        },
+    )
+    assert intake.status_code == 200, intake.text
+    project_id = intake.json()["project_id"]
+
+    seen: dict[str, object] = {}
+
+    def fake_analyze_project(**kwargs):
+        seen.update(kwargs)
+        return AnalyzeResult(
+            status="success",
+            trace_id="trace-zc",
+            feasibility=Feasibility(decision="conditional", confidence=0.9, summary="Review required."),
+            checklist=Checklist(steps=[], permits=[], documents=[], departments=[]),
+            citations=[],
+            disclaimers=[],
+            follow_up_questions=[],
+            warnings=[],
+        )
+
+    monkeypatch.setattr("app.routers.api.analyze_project", fake_analyze_project)
+
+    response = client.post(
+        f"/api/v1/projects/{project_id}/analyze",
+        headers=_auth_headers("user-1"),
+        json={"project_id": project_id, "clarification_answers": {}},
+    )
+
+    assert response.status_code == 200, response.text
+    assert seen["zoning_code"] == "R-1"
