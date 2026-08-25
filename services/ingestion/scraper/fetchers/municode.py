@@ -603,6 +603,13 @@ class MunicodeFetcher:
                 client, job_id, product_id, zoning_node_id, [zoning_heading]
             )
 
+        # A parent node's CodesContent can return its whole subtree, not just its
+        # direct leaf children, and `records.setdefault` below is first-wins. Walk
+        # order is parent-before-child, so without this the shallow breadcrumb wins
+        # and the DIVISION level is lost -- which silently unhooks every
+        # `division_contains` classification rule for that pack.
+        chunk_group_nodes.sort(key=lambda node: -len(node[1]))
+
         for node_id, breadcrumb in chunk_group_nodes:
             content_raw = client.get_text(
                 f"{API_BASE}/CodesContent?jobId={job_id}&nodeId={node_id}&productId={product_id}",
