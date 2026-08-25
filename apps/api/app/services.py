@@ -51,6 +51,7 @@ class AddressNormalizationResult:
     district_confidence: float = 0.0
     district_method: str = "unknown"
     parcel_id: str | None = None
+    zoning_code: str | None = None
 
 
 def _slugify(text: str) -> str:
@@ -255,6 +256,7 @@ def normalize_address(address: str) -> AddressNormalizationResult:
         district=district,
         district_confidence=district_confidence,
         district_method=district_method,
+        zoning_code=parcel.zoning_code,
         place_id=address_result.place_id,
         latitude=address_result.lat,
         longitude=address_result.lng,
@@ -410,6 +412,7 @@ def analyze_project(
     district: str,
     district_confidence: float = 0.0,
     district_method: str = "unknown",
+    zoning_code: str | None = None,
     jurisdiction_id: str | None = None,
     jurisdiction_name: str | None = None,
     normalized_address: str | None = None,
@@ -424,6 +427,7 @@ def analyze_project(
         district=district,
         district_confidence=district_confidence,
         district_method=district_method,
+        zoning_code=zoning_code,
         jurisdiction_id=jurisdiction_id,
         jurisdiction_name=jurisdiction_name,
         normalized_address=normalized_address,

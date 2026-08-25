@@ -444,6 +444,7 @@ class ProjectRecord(BaseModel):
     district: str
     district_confidence: float = Field(default=0.0, ge=0, le=1)
     district_method: str = "unknown"
+    zoning_code: str | None = None
     jurisdiction_id: str | None = None
     jurisdiction_name: str | None = None
     place_id: str | None = None
