@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import shutil
 from pathlib import Path
 
@@ -796,3 +797,48 @@ def test_analysis_system_prompt_forbids_restriction_from_silence() -> None:
     assert "NEVER evidence" in ANALYSIS_SYSTEM_PROMPT
     assert "never 'restricted'" in ANALYSIS_SYSTEM_PROMPT
     assert "mobile or itinerant" in ANALYSIS_SYSTEM_PROMPT
+
+
+def test_failover_logs_the_http_response_body(caplog: pytest.LogCaptureFixture) -> None:
+    """A 404's status line does not say WHICH model is gone -- the body does."""
+
+    import httpx
+
+    from app.ai.failover_provider import FailoverAnalysisProvider
+
+    class _HttpBoomProvider:
+        name = "groq"
+
+        def generate_analysis(self, request: AnalysisProviderRequest) -> AnalysisProviderResult:
+            response = httpx.Response(
+                404,
+                request=httpx.Request("POST", "https://api.groq.com/openai/v1/chat/completions"),
+                json={"error": {"message": "The model `llama-3.3-70b-versatile` does not exist"}},
+            )
+            raise httpx.HTTPStatusError("Client error '404 Not Found'", request=response.request, response=response)
+
+    request = AnalysisProviderRequest(
+        project_description="x", district="unknown", citation_excerpts=[], missing_fields=[]
+    )
+
+    with caplog.at_level(logging.WARNING, logger="app.ai.failover_provider"):
+        result = FailoverAnalysisProvider([_HttpBoomProvider(), _OkProvider("cerebras")]).generate_analysis(request)
+
+    assert result.summary == "cerebras ok"
+    assert "llama-3.3-70b-versatile" in caplog.text
+
+
+def test_failover_detail_survives_a_body_that_cannot_be_read() -> None:
+    """Logging must never mask the failure it is reporting."""
+
+    from app.ai.failover_provider import _error_detail
+
+    class _Unreadable:
+        @property
+        def text(self) -> str:
+            raise RuntimeError("response not read")
+
+    exc = RuntimeError("boom")
+    exc.response = _Unreadable()  # type: ignore[attr-defined]
+
+    assert _error_detail(exc) == "boom"
