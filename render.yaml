@@ -78,9 +78,15 @@ services:
       # Safe to deploy before the keys below are pasted in the dashboard --
       # _build_named_analysis_provider returns None for a fallback with no API
       # key and the registry skips it, leaving plain Groq rather than a broken
-      # chain. Both fallbacks are free-tier llama-3.3-70b, so no provider spend,
-      # and all three share ANALYSIS_SYSTEM_PROMPT so failing over does not
+      # chain. All three share ANALYSIS_SYSTEM_PROMPT so failing over does not
       # change how the model is asked to reason.
+      #
+      # Pick the model per leg, not once for the chain. Every leg used to run
+      # llama-3.3-70b; when that generation was retired all three returned
+      # model_not_found on the same day and every determination silently
+      # degraded to deterministic_feasibility(). Groq and Cerebras still share
+      # gpt-oss-120b -- OpenRouter is the leg that differs, and it is paid, so
+      # the chain is no longer free once it reaches leg 3.
       - key: AI_PROVIDER_FALLBACKS
         value: cerebras,openrouter
       - key: CEREBRAS_API_KEY
