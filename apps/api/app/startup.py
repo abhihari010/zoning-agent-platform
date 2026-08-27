@@ -29,8 +29,8 @@ def prepare_source_index_for_startup() -> StartupReadiness:
     global _LAST_STARTUP_READINESS
     settings = get_settings()
     if not settings.startup_reindex_enabled:
-        vector_status = get_vector_index_status(settings)
         source_count, chunk_count = _safe_source_counts()
+        vector_status = get_vector_index_status(settings, expected_chunk_count=chunk_count)
         _LAST_STARTUP_READINESS = StartupReadiness(
             status="skipped",
             source_count=source_count,
@@ -75,8 +75,8 @@ def prepare_source_index_for_startup() -> StartupReadiness:
         return _LAST_STARTUP_READINESS
     except Exception as exc:
         _safe_audit("source.startup_reindex.failed", "source-registry", {"error": str(exc)})
-        vector_status = get_vector_index_status(settings)
         source_count, chunk_count = _safe_source_counts()
+        vector_status = get_vector_index_status(settings, expected_chunk_count=chunk_count)
         _LAST_STARTUP_READINESS = StartupReadiness(
             status="warning",
             source_count=source_count,
@@ -93,6 +93,7 @@ def prepare_source_index_for_startup() -> StartupReadiness:
 def liveness_health() -> dict[str, object]:
     readiness = _LAST_STARTUP_READINESS
     source_count, chunk_count = _safe_source_counts()
+    live_vector = get_vector_index_status(expected_chunk_count=chunk_count)
     if readiness:
         return {
             "status": "ok" if readiness.source_index_ready else readiness.status,
@@ -100,12 +101,14 @@ def liveness_health() -> dict[str, object]:
             "source_index_ready": readiness.source_index_ready,
             "source_count": source_count or readiness.source_count,
             "chunk_count": chunk_count or readiness.chunk_count,
-            "vector_provider": readiness.vector_provider,
-            "vector_index_ready": readiness.vector_index_ready,
-            "vector_count": readiness.vector_count,
-            "warnings": readiness.warnings,
+            "vector_provider": live_vector.provider,
+            # Recomputed, not served from the boot snapshot: the index can be
+            # gutted long after startup and a cached "ready" would never notice.
+            "vector_index_ready": live_vector.ready,
+            "vector_count": live_vector.count,
+            "warnings": [*readiness.warnings, *live_vector.warnings],
         }
-    vector_status = get_vector_index_status()
+    vector_status = get_vector_index_status(expected_chunk_count=chunk_count)
     return {
         "status": "ok" if chunk_count > 0 else "warning",
         "checked_at": datetime.now(timezone.utc).isoformat(),
@@ -122,7 +125,7 @@ def liveness_health() -> dict[str, object]:
 def readiness_health() -> dict[str, object]:
     try:
         readiness = ensure_source_index_ready()
-        vector_status = get_vector_index_status()
+        vector_status = get_vector_index_status(expected_chunk_count=readiness.chunk_count)
         warnings = [*readiness.warnings, *vector_status.warnings]
         return {
             "status": "ok" if readiness.index_ready else "warning",
@@ -135,8 +138,8 @@ def readiness_health() -> dict[str, object]:
             "warnings": warnings,
         }
     except Exception as exc:
-        vector_status = get_vector_index_status()
         source_count, chunk_count = _safe_source_counts()
+        vector_status = get_vector_index_status(expected_chunk_count=chunk_count)
         return {
             "status": "warning",
             "source_index_ready": False,

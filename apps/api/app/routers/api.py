@@ -444,7 +444,7 @@ def ingestion_status() -> SourceIndexStatusResponse:
     # memory (it's hit alongside /ingestion/sources on the admin page).
     source_summaries = store.list_source_summaries()
     source_count = store.get_source_count()
-    vector_status = get_vector_index_status(settings)
+    vector_status = get_vector_index_status(settings, expected_chunk_count=readiness.chunk_count)
     return SourceIndexStatusResponse(
         source_count=source_count,
         chunk_count=readiness.chunk_count,

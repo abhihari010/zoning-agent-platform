@@ -14,10 +14,32 @@ jobs:
     steps:
       # --max-time 90 + retries still cover a cold start (~50s spin-up) for the
       # case where the schedule did drop enough runs to let the instance sleep.
+      # `curl -f` only fails on a non-2xx status, and /health answers 200 even
+      # when its body says the corpus is unserveable -- deliberately, because
+      # Render's healthCheckPath is /health and a non-200 restarts the service.
+      # So the body has to be asserted here or nothing ever alerts: prod served
+      # a 31-point vector index against 34,573 chunks and this cron stayed green
+      # the whole time (#217).
       - name: API /health
-        run: >
-          curl -fsS --retry 3 --retry-delay 20 --retry-all-errors --max-time 90
-          https://zoning-agent-api.onrender.com/health
+        run: |
+          curl -fsS --retry 3 --retry-delay 20 --retry-all-errors --max-time 90 \
+            https://zoning-agent-api.onrender.com/health -o health.json
+          cat health.json
+          python -c "
+          import json, sys
+          h = json.load(open('health.json'))
+          problems = []
+          if not h.get('source_index_ready'):
+              problems.append('source_index_ready is false')
+          if h.get('vector_provider') != 'none' and not h.get('vector_index_ready'):
+              problems.append(
+                  f\"vector_index_ready is false ({h.get('vector_count')} vectors \"
+                  f\"/ {h.get('chunk_count')} chunks)\"
+              )
+          if problems:
+              sys.exit('unhealthy: ' + '; '.join(problems))
+          print('healthy')
+          "
       - name: Web
         run: >
           curl -fsS --retry 3 --retry-delay 10 --retry-all-errors --max-time 30

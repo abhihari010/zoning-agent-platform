@@ -504,7 +504,13 @@ class ZoningOrchestrator:
         from app.storage import store
 
         settings = get_settings()
-        vector_status = get_vector_index_status(settings)
+        # A partial index should lower displayed trust, not read as fully ready.
+        vector_status = get_vector_index_status(
+            settings,
+            expected_chunk_count=(
+                source_readiness.chunk_count if source_readiness is not None else None
+            ),
+        )
         source_count = source_readiness.source_count if source_readiness is not None else 0
         source_index_ready = source_readiness.index_ready if source_readiness is not None else False
         vector_readiness = (
