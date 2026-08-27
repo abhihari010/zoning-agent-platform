@@ -166,7 +166,11 @@ class OpenAIAnalysisProvider:
                             "true, set decision to 'unknown', and stop. Otherwise set "
                             "unlisted_use_determination to false and continue.\n\n"
                             "STEP 1 — Identify the proposed principal use and the zoning district "
-                            "from the project_description. If the 'district' field is 'unknown', "
+                            "from the project_description. If a 'district_code' field is present, "
+                            "it is the jurisdiction's own code for this parcel, read from its "
+                            "official zoning map — it IS the identified district; use it verbatim "
+                            "and do NOT require it to be defined in the excerpts before "
+                            "proceeding. If the 'district' field is 'unknown', "
                             "infer the district from the description: a named district (e.g. "
                             "'Downtown District', 'Neighborhood Commercial', 'the R3 district') or "
                             "a phrase like 'residential subdivision' or 'commercial corridor'. Map "
@@ -210,6 +214,14 @@ class OpenAIAnalysisProvider:
                                 "district": request.district,
                                 "citation_excerpts": request.citation_excerpts,
                                 "missing_fields": request.missing_fields,
+                                # Duplicated from openai_compatible.build_analysis_messages:
+                                # that module imports _post_with_retry from here, so importing
+                                # it back would be a cycle. Collapsing the two is its own change.
+                                **(
+                                    {"district_code": request.district_code}
+                                    if request.district_code
+                                    else {}
+                                ),
                             }
                         ),
                     },

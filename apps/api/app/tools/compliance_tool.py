@@ -61,6 +61,11 @@ class ComplianceTool:
                     missing_fields=missing_details,
                     chunks=evidence_chunks,
                     inferred_use=context.intake.inferred_use if context.intake else "general",
+                    # `district` is already the analysis-gated district: the orchestrator
+                    # passes "unknown" via district_override when it does not trust the
+                    # guess. Suppressing the code with it keeps the prompt from being
+                    # handed a certainty the pipeline decided it does not have.
+                    district_code=context.zoning_code if district != "unknown" else None,
                 )
             )
         except Exception as exc:

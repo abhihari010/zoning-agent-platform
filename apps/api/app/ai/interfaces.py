@@ -17,6 +17,11 @@ class AnalysisProviderRequest:
     missing_fields: list[str]
     chunks: list["SourceChunk"] = field(default_factory=list)
     inferred_use: str = "general"
+    # The jurisdiction's own code for the parcel ("R-1"), when the GIS lookup resolved
+    # one. `district` is the coarse family ("residential-zone") -- our vocabulary, which
+    # appears in no ordinance, so a model told to reason only from the excerpts cannot
+    # match it to anything. The code is the name the excerpts actually use.
+    district_code: str | None = None
 
 
 @dataclass(frozen=True)

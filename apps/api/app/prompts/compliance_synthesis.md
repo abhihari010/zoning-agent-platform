@@ -12,6 +12,7 @@ Analyze zoning compliance based ONLY on the provided evidence chunks.
 ## Input
 - Project: {project_description}
 - District: {district}
+- District code (the jurisdiction's own code for this parcel; when present it IS the identified district — use it verbatim and do not require it to be defined in the evidence): {district_code}
 - Use: {inferred_use}
 - Evidence chunks: {chunks_json}
 

@@ -48,6 +48,14 @@ ANALYSIS_SYSTEM_PROMPT = (
     "excerpts regulate only fixed premises. "
     "Otherwise set unlisted_use_determination to false and continue.\n\n"
     "STEP 1 — IDENTIFY the proposed principal use and the zoning district. If "
+    "a 'district_code' field is present, it is the jurisdiction's own code for "
+    "this parcel, read from its official zoning map — it IS the identified "
+    "district. Use it verbatim, do not re-derive it, and do NOT require it to "
+    "be defined in the excerpts before proceeding; classify the use against it "
+    "directly in STEP 2. The 'district' field is a coarse internal category "
+    "(e.g. 'industrial-zone', 'residential-zone') that appears in no ordinance, "
+    "so never treat its absence from the excerpts as a reason you cannot "
+    "decide. If "
     "the 'district' field is 'unknown', infer the district from the "
     "project_description (a named district, or a phrase such as 'residential "
     "subdivision' or 'commercial corridor'), mapping it to a district code "
@@ -126,19 +134,19 @@ _UNLISTED_USE_WARNING = (
 
 
 def build_analysis_messages(request: AnalysisProviderRequest) -> list[dict[str, str]]:
+    payload: dict[str, Any] = {
+        "project_description": request.project_description,
+        "district": request.district,
+        "citation_excerpts": request.citation_excerpts,
+        "missing_fields": request.missing_fields,
+    }
+    # Omitted rather than sent as null so the prompt's "if district_code is present"
+    # branch keys off the field existing at all.
+    if request.district_code:
+        payload["district_code"] = request.district_code
     return [
         {"role": "system", "content": ANALYSIS_SYSTEM_PROMPT},
-        {
-            "role": "user",
-            "content": json.dumps(
-                {
-                    "project_description": request.project_description,
-                    "district": request.district,
-                    "citation_excerpts": request.citation_excerpts,
-                    "missing_fields": request.missing_fields,
-                }
-            ),
-        },
+        {"role": "user", "content": json.dumps(payload)},
     ]
 
 
