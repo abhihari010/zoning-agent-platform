@@ -319,7 +319,24 @@ class QdrantVectorStore:
             return 0
 
 
-def get_vector_index_status(settings: Settings | None = None) -> VectorIndexStatus:
+# Below this share of the SQL chunk count the vector index is not answering queries
+# any more, it is answering a fraction of them. 0.9 leaves room for the handful of
+# chunks an incremental embed legitimately lags on without calling a gutted index ready.
+VECTOR_COVERAGE_FLOOR = 0.9
+
+
+def get_vector_index_status(
+    settings: Settings | None = None,
+    expected_chunk_count: int | None = None,
+) -> VectorIndexStatus:
+    """Status of the vector index, judged against the corpus it is meant to cover.
+
+    ``expected_chunk_count`` is the SQL chunk count. Without it ``ready`` can only mean
+    "not empty", which is how prod served a 31-point index against 34,573 chunks while
+    reporting healthy: retrieval returned one irrelevant citation per query and no check
+    disagreed. Pass it wherever the caller already knows it.
+    """
+
     resolved = settings or get_settings()
     if resolved.vector_provider == "none":
         return VectorIndexStatus(
@@ -342,11 +359,29 @@ def get_vector_index_status(settings: Settings | None = None) -> VectorIndexStat
             warnings=[str(exc)],
         )
 
-    warnings = [] if count > 0 else ["Qdrant vector collection is empty."]
+    if count <= 0:
+        return VectorIndexStatus(
+            provider=resolved.vector_provider,
+            collection=resolved.qdrant_collection,
+            ready=False,
+            count=0,
+            warnings=["Qdrant vector collection is empty."],
+        )
+
+    warnings: list[str] = []
+    ready = True
+    if expected_chunk_count and expected_chunk_count > 0:
+        floor = expected_chunk_count * VECTOR_COVERAGE_FLOOR
+        if count < floor:
+            ready = False
+            warnings.append(
+                f"Qdrant vector collection holds {count} of {expected_chunk_count} chunks "
+                f"({count / expected_chunk_count:.1%}); retrieval is running on a partial index."
+            )
     return VectorIndexStatus(
         provider=resolved.vector_provider,
         collection=resolved.qdrant_collection,
-        ready=count > 0,
+        ready=ready,
         count=count,
         warnings=warnings,
     )

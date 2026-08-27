@@ -590,7 +590,7 @@ def test_build_qdrant_filter_district_produces_should_with_unknown() -> None:
 
 
 from app.ai.interfaces import EmbeddingProviderResult
-from app.settings import Settings
+from app.settings import Settings, get_settings
 
 
 def _make_settings(batch_size: int = 2) -> Settings:
@@ -783,3 +783,52 @@ def test_existing_chunk_ids_raises_when_qdrant_cannot_be_reached() -> None:
         client=FakeQdrantClient(),
     )
     assert empty.existing_chunk_ids() == set()
+
+
+# ---------------------------------------------------------------------------
+# #217: readiness has to mean "covers the corpus", not "not empty"
+# ---------------------------------------------------------------------------
+
+
+def _status_with_count(monkeypatch: pytest.MonkeyPatch, count: int, expected: int | None):
+    from app.rag import vector_store as vs
+
+    import dataclasses
+
+    monkeypatch.setattr(vs.QdrantVectorStore, "count", lambda self: count)
+    settings = dataclasses.replace(
+        get_settings(),
+        vector_provider="qdrant",  # type: ignore[arg-type]
+        qdrant_url="http://fake-qdrant:6333",
+        qdrant_collection="test",
+    )
+    return vs.get_vector_index_status(settings, expected_chunk_count=expected)
+
+
+def test_vector_index_is_not_ready_when_it_covers_a_fraction_of_the_corpus(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The prod incident exactly: 31 points against 34,573 chunks reported healthy.
+    status = _status_with_count(monkeypatch, 31, 34_573)
+
+    assert status.ready is False
+    assert status.count == 31
+    assert "34573" in " ".join(status.warnings).replace(",", "")
+
+
+def test_vector_index_is_ready_when_a_few_chunks_lag_behind(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # An incremental embed legitimately trails by a little; that is not an outage.
+    status = _status_with_count(monkeypatch, 990, 1_000)
+
+    assert status.ready is True
+    assert status.warnings == []
+
+
+def test_vector_index_readiness_falls_back_to_non_empty_without_an_expected_count(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Callers that do not know the chunk count keep the old behaviour.
+    assert _status_with_count(monkeypatch, 31, None).ready is True
+    assert _status_with_count(monkeypatch, 0, None).ready is False

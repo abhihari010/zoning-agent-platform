@@ -28,7 +28,7 @@ def test_startup_readiness_fails_soft_when_database_is_unavailable(monkeypatch) 
     monkeypatch.setattr(
         startup,
         "get_vector_index_status",
-        lambda _settings=None: VectorIndexStatus(
+        lambda _settings=None, **_kwargs: VectorIndexStatus(
             provider="none",
             collection=None,
             ready=False,
@@ -56,7 +56,7 @@ def test_health_readiness_fails_soft_when_database_is_unavailable(monkeypatch) -
     monkeypatch.setattr(
         startup,
         "get_vector_index_status",
-        lambda _settings=None: VectorIndexStatus(
+        lambda _settings=None, **_kwargs: VectorIndexStatus(
             provider="none",
             collection=None,
             ready=False,
