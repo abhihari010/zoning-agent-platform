@@ -41,8 +41,11 @@ services:
       # lifespan startup long enough for Render's port scan to time out.
       - key: STARTUP_REINDEX_ENABLED
         value: "false"
+      # The live frontend serves from zoningreview.vercel.app; the older
+      # zoning-agent-platform origin redirects there but stays allowed so the
+      # alias keeps working (settings.py also requires it).
       - key: CORS_ALLOW_ORIGINS
-        value: https://zoning-agent-platform.vercel.app
+        value: https://zoningreview.vercel.app,https://zoning-agent-platform.vercel.app
       - key: BURST_LLM_LIMIT_PER_MIN
         value: "8"
       - key: DAILY_ANALYSIS_LIMIT_FREE
