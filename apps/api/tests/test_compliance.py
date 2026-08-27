@@ -179,6 +179,7 @@ def test_prompt_renderer_loads_templates() -> None:
         "compliance_synthesis.md",
         project_description="Open a bakery.",
         district="mixed-use-core",
+        district_code="MXC-1",
         inferred_use="food_service",
         chunks_json="[]",
         compliance_schema_json="{}",
@@ -186,6 +187,7 @@ def test_prompt_renderer_loads_templates() -> None:
 
     assert "Open a bakery." in rendered
     assert "mixed-use-core" in rendered
+    assert "MXC-1" in rendered
 
 
 def test_compliance_schema_is_valid_json() -> None:
@@ -193,3 +195,52 @@ def test_compliance_schema_is_valid_json() -> None:
 
     assert "feasibility" in payload
     assert "findings" in payload
+
+
+class _CapturingProvider:
+    """Records the request the tool built instead of calling a model."""
+
+    name = "capture"
+
+    def __init__(self) -> None:
+        self.request: AnalysisProviderRequest | None = None
+
+    def generate_analysis(self, request: AnalysisProviderRequest) -> AnalysisProviderResult:
+        self.request = request
+        return AnalysisProviderResult(decision="likely_allowed", summary="ok")
+
+
+def _analyze_with(provider: _CapturingProvider, *, district_override: str | None) -> None:
+    ComplianceTool().analyze(
+        PipelineContext(
+            project_description="Open a bakery.",
+            combined_description="Open a bakery.",
+            district="mixed-use-core",
+            zoning_code="MXC-1",
+        ),
+        provider,
+        [_citation()],
+        [_chunk()],
+        district_override=district_override,
+    )
+
+
+def test_analysis_request_carries_the_parcel_district_code() -> None:
+    provider = _CapturingProvider()
+
+    _analyze_with(provider, district_override=None)
+
+    assert provider.request is not None
+    assert provider.request.district_code == "MXC-1"
+
+
+def test_analysis_request_drops_the_code_when_the_district_is_suppressed() -> None:
+    # The orchestrator passes district_override="unknown" when it does not trust the
+    # district guess. Sending the code anyway would hand the model a certainty the
+    # pipeline explicitly decided it does not have.
+    provider = _CapturingProvider()
+
+    _analyze_with(provider, district_override="unknown")
+
+    assert provider.request is not None
+    assert provider.request.district_code is None

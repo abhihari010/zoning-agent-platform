@@ -49,6 +49,7 @@ class LocalModelAnalysisProvider:
             "compliance_synthesis.md",
             project_description=request.project_description,
             district=request.district,
+            district_code=request.district_code or "unknown",
             inferred_use=request.inferred_use,
             chunks_json=chunks_json,
             compliance_schema_json=COMPLIANCE_SCHEMA_JSON,

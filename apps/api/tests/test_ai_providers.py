@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import shutil
 from pathlib import Path
@@ -842,3 +843,37 @@ def test_failover_detail_survives_a_body_that_cannot_be_read() -> None:
     exc.response = _Unreadable()  # type: ignore[attr-defined]
 
     assert _error_detail(exc) == "boom"
+
+
+def test_analysis_prompt_includes_the_district_code_when_resolved() -> None:
+    from app.ai.openai_compatible import build_analysis_messages
+
+    messages = build_analysis_messages(
+        AnalysisProviderRequest(
+            project_description="Open a machine shop.",
+            district="industrial-zone",
+            citation_excerpts=["Sec. 30-452.1. M-1 permitted uses."],
+            missing_fields=[],
+            district_code="M-1",
+        )
+    )
+
+    assert json.loads(messages[1]["content"])["district_code"] == "M-1"
+    # The prompt has to tell the model the supplied code is authoritative, or it
+    # goes looking for "industrial-zone" in the excerpts and declines to decide.
+    assert "district_code" in messages[0]["content"]
+
+
+def test_analysis_prompt_omits_the_district_code_when_absent() -> None:
+    from app.ai.openai_compatible import build_analysis_messages
+
+    messages = build_analysis_messages(
+        AnalysisProviderRequest(
+            project_description="Open a machine shop.",
+            district="industrial-zone",
+            citation_excerpts=[],
+            missing_fields=[],
+        )
+    )
+
+    assert "district_code" not in json.loads(messages[1]["content"])
