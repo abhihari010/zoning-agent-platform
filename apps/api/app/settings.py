@@ -128,11 +128,11 @@ class Settings:
     ai_provider_fallbacks: tuple[str, ...] = ()
     vector_reindex_batch_size: int = 100
     cerebras_api_key: str = ""
-    cerebras_model: str = "llama-3.3-70b"
+    cerebras_model: str = "gpt-oss-120b"
     cerebras_base_url: str = "https://api.cerebras.ai/v1"
     cerebras_timeout_seconds: float = 20.0
     openrouter_api_key: str = ""
-    openrouter_model: str = "meta-llama/llama-3.3-70b-instruct:free"
+    openrouter_model: str = "meta-llama/llama-3.3-70b-instruct"
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     openrouter_timeout_seconds: float = 20.0
 
@@ -195,7 +195,7 @@ def get_settings() -> Settings:
         openai_base_url=_env("OPENAI_BASE_URL", "https://api.openai.com/v1").rstrip("/"),
         openai_timeout_seconds=float(_env("OPENAI_TIMEOUT_SECONDS", "20")),
         groq_api_key=_env("GROQ_API_KEY"),
-        groq_model=_env("GROQ_MODEL", "llama-3.3-70b-versatile"),
+        groq_model=_env("GROQ_MODEL", "openai/gpt-oss-120b"),
         groq_timeout_seconds=float(_env("GROQ_TIMEOUT_SECONDS", "20")),
         gemini_api_key=_env("GEMINI_API_KEY"),
         gemini_embedding_model=_env("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001"),
@@ -244,11 +244,11 @@ def get_settings() -> Settings:
         ai_provider_fallbacks=_parse_csv(_env("AI_PROVIDER_FALLBACKS").lower()),
         vector_reindex_batch_size=int(_env("VECTOR_REINDEX_BATCH_SIZE", "100")),
         cerebras_api_key=_env("CEREBRAS_API_KEY"),
-        cerebras_model=_env("CEREBRAS_MODEL", "llama-3.3-70b"),
+        cerebras_model=_env("CEREBRAS_MODEL", "gpt-oss-120b"),
         cerebras_base_url=_env("CEREBRAS_BASE_URL", "https://api.cerebras.ai/v1").rstrip("/"),
         cerebras_timeout_seconds=float(_env("CEREBRAS_TIMEOUT_SECONDS", "20")),
         openrouter_api_key=_env("OPENROUTER_API_KEY"),
-        openrouter_model=_env("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct:free"),
+        openrouter_model=_env("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b-instruct"),
         openrouter_base_url=_env("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1").rstrip("/"),
         openrouter_timeout_seconds=float(_env("OPENROUTER_TIMEOUT_SECONDS", "20")),
     )
