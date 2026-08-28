@@ -26,6 +26,10 @@ on:
         description: "Skip the source-pack import phase (only embed/retag what is already in Postgres). Leave off for new cities."
         type: boolean
         default: false
+      batch:
+        description: "Embed via the Gemini Batch API at half price ($0.075 vs $0.15 per 1M tokens). Only worth it for a large re-embed — batch jobs are async and can take hours. Ignored on push runs."
+        type: boolean
+        default: false
       retag_only:
         description: "Only run the payload retag (classification_rules.json-only change; skips reindex entirely)."
         type: boolean
@@ -53,8 +57,11 @@ jobs:
     name: Reindex prod corpus
     runs-on: ubuntu-latest
     # Import phase alone is ~45 min at ~0.4 s/source upsert over the full
-    # corpus; embedding adds more for large packs. Generous ceiling.
-    timeout-minutes: 180
+    # corpus; embedding adds more for large packs. 360 is GitHub's job ceiling,
+    # and --batch needs the headroom: its state file (.batch_reindex) lives on
+    # this ephemeral runner, so a timed-out batch run cannot resume the job it
+    # already paid for -- the rerun resubmits and pays again.
+    timeout-minutes: 360
     env:
       DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
       QDRANT_URL: ${{ secrets.QDRANT_URL }}
@@ -99,7 +106,12 @@ jobs:
         # for its JSON data files (jurisdictions.json, source_packs/**), which a
         # regular install does not package — a plain install turns every
         # data-driven step into a silent no-op ("synced 0 jurisdiction records").
-        run: python -m pip install --upgrade pip && python -m pip install -e "apps/api"
+        #
+        # [batch] pulls google-genai for the half-price Gemini Batch embedding
+        # path. Installed unconditionally rather than behind `inputs.batch` --
+        # one small dep on every run beats a workflow expression that silently
+        # yields an ImportError deep into a dispatched batch run.
+        run: python -m pip install --upgrade pip && python -m pip install -e "apps/api[batch]"
 
       - name: Reindex (import packs + sync jurisdictions + embed new chunks)
         if: steps.guard.outputs.configured == 'true' && inputs.retag_only != true
@@ -107,7 +119,13 @@ jobs:
         run: |
           args=""
           if [ "${{ inputs.skip_import }}" = "true" ]; then
-            args="--skip-import"
+            args="$args --skip-import"
+          fi
+          # Push runs leave this empty on purpose: they embed a handful of new
+          # chunks, where a batch job's hours-long turnaround costs far more
+          # than the pennies it saves. Batch only pays off on a bulk re-embed.
+          if [ "${{ inputs.batch }}" = "true" ]; then
+            args="$args --batch"
           fi
           python ../../scripts/reindex_prod.py $args
 
