@@ -1,0 +1,158 @@
+[
+  {
+    "id": "roanoke-county-va-sfr-r1",
+    "address": "450 Stoneledge Drive, Roanoke, VA 24019",
+    "project_description": "Build a new detached single-family house on a vacant lot in a low density residential subdivision.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-41-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-religious-assembly-r1",
+    "address": "450 Stoneledge Drive, Roanoke, VA 24019",
+    "project_description": "Build a church with a 200-seat sanctuary and a paved parking lot on a parcel in a low density residential subdivision.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-41-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-warehouse-r1",
+    "address": "450 Stoneledge Drive, Roanoke, VA 24019",
+    "project_description": "Build a distribution warehouse with truck loading docks for storing packaged goods on a residential parcel.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-41-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-daycare-center-r1",
+    "address": "450 Stoneledge Drive, Roanoke, VA 24019",
+    "project_description": "Open a licensed day care center for 40 children in a converted house with a fenced play yard in a residential area.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-41-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-sfr-r2",
+    "address": "6815 Cee Street, Roanoke, VA 24019",
+    "project_description": "Construct a detached single-family home on an infill lot in a medium density residential neighborhood.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-42-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-multifamily-r3",
+    "address": "6837 Village Green Drive, Roanoke, VA 24019",
+    "project_description": "Develop a 24-unit multi-family apartment building on a vacant parcel in a medium density multi-family area.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-45-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-agriculture-ag3",
+    "address": "2660 Rutrough Road, Roanoke, VA 24014",
+    "project_description": "Start a working farm raising row crops and hay on a large rural parcel of open farmland and woodland.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-32-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-sfr-ag1",
+    "address": "2750 Gum Springs Road, Salem, VA 24153",
+    "project_description": "Build one detached house for the owner on a wooded rural low density parcel served by a private well.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-33-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-office-av",
+    "address": "3091 Pitzer Road, Roanoke, VA 24014",
+    "project_description": "Fit out a two-person accounting practice in a small existing building in a rural village center.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-36-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-office-c1",
+    "address": "5413 Merriman Road, Roanoke, VA 24018",
+    "project_description": "Lease and occupy a professional office suite for an insurance agency in a low intensity commercial building.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-53-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-restaurant-c1",
+    "address": "5413 Merriman Road, Roanoke, VA 24018",
+    "project_description": "Open a sit-down restaurant with a full kitchen and 60 seats in an existing low intensity commercial storefront.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-53-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-county-va-warehouse-i1",
+    "address": "5145 Starkey Road, Roanoke, VA 24018",
+    "project_description": "Build a warehousing and distribution facility with dock doors and a truck court in a low intensity industrial park.",
+    "jurisdiction_id": "roanoke-county-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 30-61-2"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]
