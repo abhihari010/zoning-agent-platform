@@ -437,6 +437,22 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # scenarios, 0.400 -> 0.850. Same run also fixed the SQL path to apply that
     # reserve at all; see the note below.
     "chesapeake-va": 0.75,
+    # 2026-08-31 (#223): roanoke-va promoted. Baseline 0.400 with the four use
+    # tables untagged; tagging them ``["general", "principal_uses"]`` in the
+    # pack's classification_rules.json took it to 0.867 -- the chesapeake-va
+    # mechanism above, on a pack whose matrices were already correct. The other
+    # 29 datasets held their value to the digit in that same run.
+    "roanoke-va": 0.78,
+    # 2026-08-31 (#223): roanoke-county-va 0.333, promoted at that baseline. Its
+    # ordinance has no use matrix: permission lives in 21 per-district
+    # ``Sec. 30-NN-2 Permitted Uses`` sections whose titles carry no district
+    # vocabulary at all, while the sibling ``Sec. 30-NN-1 Purpose`` next door is
+    # dense descriptive prose -- so the required ref loses the cutoff to its own
+    # neighbour. NOT fixable by the principal_uses reserve: that reserve holds a
+    # small number of slots and #173 measured whole-chapter tagging as flat or
+    # worse, and 21 sections is exactly the broad case it warns about. Live
+    # vector recall is the quality signal here.
+    "roanoke-county-va": 0.25,
 }
 # chesapeake-va's use tables rank poorly on keyword score alone, which is why
 # they need a reserved slot rather than a better query. The table refs held
