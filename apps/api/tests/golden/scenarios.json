@@ -2584,7 +2584,7 @@
   },
   {
     "id": "roanoke-va-public-supported-r7-residential",
-    "project_description": "Build a new detached single-family house on a vacant lot in the R-7 residential single-family district, where the residential use table permits dwellings as of right.",
+    "project_description": "Build a new detached single-family house with two employees on site, posted operating hours, and new construction only, on a vacant lot in the R-7 residential single-family district, where the residential use table permits dwellings as of right.",
     "district": "residential-low-density",
     "jurisdiction_id": "roanoke-va",
     "jurisdiction_name": "Roanoke, VA",
@@ -2650,7 +2650,7 @@
   },
   {
     "id": "roanoke-va-public-supported-d-downtown",
-    "project_description": "Open a funeral home with a chapel and visitation rooms in a vacant storefront in the D downtown district, where the multiple purpose use table permits funeral homes as of right.",
+    "project_description": "Open a funeral home with a chapel and visitation rooms, two employees, posted operating hours, and interior renovation only, in a vacant storefront in the D downtown district, where the multiple purpose use table permits funeral homes as of right.",
     "district": "mixed-use-core",
     "jurisdiction_id": "roanoke-va",
     "jurisdiction_name": "Roanoke, VA",
@@ -2716,7 +2716,7 @@
   },
   {
     "id": "roanoke-county-va-public-supported-r1-residential",
-    "project_description": "Build a new detached single-family house on a vacant lot in the R-1 low density residential district, which permits single-family detached dwellings by right.",
+    "project_description": "Build a new detached single-family house with two employees on site, posted operating hours, and new construction only, on a vacant lot in the R-1 low density residential district, which permits single-family detached dwellings by right.",
     "district": "residential-low-density",
     "jurisdiction_id": "roanoke-county-va",
     "jurisdiction_name": "Roanoke County, VA",
@@ -2782,7 +2782,7 @@
   },
   {
     "id": "roanoke-county-va-public-supported-c1-commercial",
-    "project_description": "Lease a professional office suite for an insurance agency in the C-1 low intensity commercial district, which permits general office by right.",
+    "project_description": "Lease a professional office suite for an insurance agency with two employees, posted operating hours, and interior renovation only, in the C-1 low intensity commercial district, which permits general office by right.",
     "district": "mixed-use-core",
     "jurisdiction_id": "roanoke-county-va",
     "jurisdiction_name": "Roanoke County, VA",
@@ -2853,7 +2853,23 @@
     "jurisdiction_id": "goodlettsville-tn",
     "jurisdiction_name": "Goodlettsville, TN",
     "normalized_address": "105 South Main Street, Goodlettsville, TN 37072",
-    "sources": [],
+    "sources": [
+      {
+        "source_id": "goodlettsville-tn-sec-14-205",
+        "title": "Sec. 14-205. - Residential district regulations.",
+        "excerpt": "(1) Statement of purpose. The residential districts established in this title are designed to promote and protect the health, safety, morals, convenience, order, prosperity, and other aspects of the general welfare. These general goals include, among others, the following more specific purposes: (a) To provide sufficient space in appropriate locations for residential developments to adequately meet the housing needs of the present and expected future population of the urban area, with due allowa",
+        "section_ref": "Sec. 14-205",
+        "jurisdiction_id": "goodlettsville-tn",
+        "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-205REDIRE",
+        "effective_date": "2025-08-14",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
     "expect": {
       "decisions": [
         "unknown"
