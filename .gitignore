@@ -35,6 +35,7 @@ apps/api/tests/golden/traces/
 
 .vercel
 .env*
+!.env.example
 .gstack/
 
 # Local-only progress/scratch tracking — never commit
