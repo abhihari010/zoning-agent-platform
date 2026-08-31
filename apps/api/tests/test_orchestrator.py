@@ -39,8 +39,8 @@ def test_orchestrator_records_location_resolution_events() -> None:
 
 
 def test_orchestrator_source_indexed_jurisdiction_is_served() -> None:
-    """A source_indexed jurisdiction (roanoke-va) must NOT early-exit; it must
-    be served and carry a coverage caveat in the warnings channel."""
+    """A source_indexed jurisdiction (goodlettsville-tn) must NOT early-exit; it
+    must be served and carry a coverage caveat in the warnings channel."""
     events: list[tuple[str, str, dict | None]] = []
 
     def audit(stage: str, project_id: str, details: dict | None = None) -> None:
@@ -49,9 +49,9 @@ def test_orchestrator_source_indexed_jurisdiction_is_served() -> None:
     result = ZoningOrchestrator().analyze_project(
         project_description="Open a small bakery with employees and renovation plans.",
         district="unknown",
-        jurisdiction_id="roanoke-va",
-        jurisdiction_name="Roanoke, VA",
-        normalized_address="215 Church Ave SW, Roanoke, VA 24011",
+        jurisdiction_id="goodlettsville-tn",
+        jurisdiction_name="Goodlettsville, TN",
+        normalized_address="105 S Main St, Goodlettsville, TN 37072",
         project_id="project-2",
         trace_recorder=PipelineTraceRecorder(project_id="project-2", audit=audit),
     )
