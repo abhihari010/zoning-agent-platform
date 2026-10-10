@@ -116,6 +116,24 @@ def test_split_topic_sections_real_topic():
     assert len(bodies[5]) > len(bodies[4])
 
 
+def test_split_topic_sections_table_headings():
+    # Norfolk's 2026-10 re-export moved numbered headings out of <hN> into
+    # one-row tables (``td.AutoNumber_h3``). Each entry must still get its own slice.
+    entries = [
+        e
+        for e in parse_toc_chunk(load_fixture("madcapflare_tocchunk0.js"))
+        if e.href == "/Content/Norfolk-ZO/1_2_Authority.htm"
+    ]
+    page = load_fixture("madcapflare_topic_authority_2026_10.htm")
+    bodies = split_topic_sections(page, entries)
+    assert set(bodies) == {4, 5, 6}
+    assert "Code of Virginia" in bodies[5]
+    assert "1.2.2" not in bodies[5]
+    text = madcapflare.clean_html(madcapflare._HEADING_TAG_RE.sub("", bodies[5], count=1))
+    assert "Code of Virginia" in text
+    assert "General Authority" not in text[:40]  # heading row stripped, like an <hN>
+
+
 def test_split_topic_sections_skips_missing_anchor():
     entries = parse_toc_chunk(load_fixture("madcapflare_tocchunk0.js"))
     authority = [e for e in entries if e.href == "/Content/Norfolk-ZO/1_2_Authority.htm"]
