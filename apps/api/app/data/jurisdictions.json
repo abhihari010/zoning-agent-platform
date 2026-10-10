@@ -863,16 +863,18 @@
     "name": "Brentwood, TN",
     "state": "TN",
     "state_fips": "47",
-    "county_fips": null,
+    "county_fips": "187",
     "place_fips": null,
     "jurisdiction_type": "municipality",
     "coverage_status": "public_supported",
     "supported": true,
-    "match_strategy": "locality",
+    "match_strategy": "locality_and_county",
     "locality_names": [
       "Brentwood"
     ],
-    "county_names": [],
+    "county_names": [
+      "Williamson County"
+    ],
     "state_names": [
       "TN"
     ],
@@ -947,16 +949,18 @@
     "name": "Nolensville, TN",
     "state": "TN",
     "state_fips": "47",
-    "county_fips": null,
+    "county_fips": "187",
     "place_fips": null,
     "jurisdiction_type": "municipality",
     "coverage_status": "public_supported",
     "supported": true,
-    "match_strategy": "locality",
+    "match_strategy": "locality_and_county",
     "locality_names": [
       "Nolensville"
     ],
-    "county_names": [],
+    "county_names": [
+      "Williamson County"
+    ],
     "state_names": [
       "TN"
     ],
@@ -997,5 +1001,150 @@
     },
     "last_verified_at": "2026-08-01",
     "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "nashville-davidson-tn",
+    "name": "Nashville-Davidson County (Metro), TN",
+    "state": "TN",
+    "state_fips": "47",
+    "county_fips": "037",
+    "place_fips": "52006",
+    "jurisdiction_type": "county",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "county",
+    "locality_names": [
+      "Nashville",
+      "Antioch",
+      "Hermitage",
+      "Madison",
+      "Old Hickory",
+      "Joelton",
+      "Whites Creek",
+      "Bellevue",
+      "Donelson"
+    ],
+    "county_names": [
+      "Davidson County"
+    ],
+    "state_names": [
+      "TN",
+      "Tennessee"
+    ],
+    "official_source_urls": [
+      "https://library.municode.com/tn/metro_government_of_nashville_and_davidson_county/codes/code_of_ordinances?nodeId=CD_TIT17ZO",
+      "https://www.nashville.gov/departments/planning",
+      "https://maps.nashville.gov/ParcelViewer/"
+    ],
+    "zoning_map_url": "https://maps.nashville.gov/ParcelViewer/",
+    "planning_contact": {
+      "url": "https://www.nashville.gov/departments/planning"
+    },
+    "last_verified_at": "2026-10-09",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "belle-meade-tn",
+    "name": "Belle Meade, TN",
+    "state": "TN",
+    "state_fips": "47",
+    "county_fips": "037",
+    "place_fips": null,
+    "jurisdiction_type": "municipality",
+    "coverage_status": "unsupported",
+    "supported": false,
+    "match_strategy": "locality",
+    "locality_names": [
+      "Belle Meade"
+    ],
+    "county_names": [
+      "Davidson County"
+    ],
+    "state_names": [
+      "TN",
+      "Tennessee"
+    ],
+    "official_source_urls": [],
+    "zoning_map_url": null,
+    "planning_contact": null,
+    "last_verified_at": "2026-10-09"
+  },
+  {
+    "jurisdiction_id": "berry-hill-tn",
+    "name": "Berry Hill, TN",
+    "state": "TN",
+    "state_fips": "47",
+    "county_fips": "037",
+    "place_fips": null,
+    "jurisdiction_type": "municipality",
+    "coverage_status": "unsupported",
+    "supported": false,
+    "match_strategy": "locality",
+    "locality_names": [
+      "Berry Hill"
+    ],
+    "county_names": [
+      "Davidson County"
+    ],
+    "state_names": [
+      "TN",
+      "Tennessee"
+    ],
+    "official_source_urls": [],
+    "zoning_map_url": null,
+    "planning_contact": null,
+    "last_verified_at": "2026-10-09"
+  },
+  {
+    "jurisdiction_id": "forest-hills-tn",
+    "name": "Forest Hills, TN",
+    "state": "TN",
+    "state_fips": "47",
+    "county_fips": "037",
+    "place_fips": null,
+    "jurisdiction_type": "municipality",
+    "coverage_status": "unsupported",
+    "supported": false,
+    "match_strategy": "locality",
+    "locality_names": [
+      "Forest Hills"
+    ],
+    "county_names": [
+      "Davidson County"
+    ],
+    "state_names": [
+      "TN",
+      "Tennessee"
+    ],
+    "official_source_urls": [],
+    "zoning_map_url": null,
+    "planning_contact": null,
+    "last_verified_at": "2026-10-09"
+  },
+  {
+    "jurisdiction_id": "oak-hill-tn",
+    "name": "Oak Hill, TN",
+    "state": "TN",
+    "state_fips": "47",
+    "county_fips": "037",
+    "place_fips": null,
+    "jurisdiction_type": "municipality",
+    "coverage_status": "unsupported",
+    "supported": false,
+    "match_strategy": "locality",
+    "locality_names": [
+      "Oak Hill"
+    ],
+    "county_names": [
+      "Davidson County"
+    ],
+    "state_names": [
+      "TN",
+      "Tennessee"
+    ],
+    "official_source_urls": [],
+    "zoning_map_url": null,
+    "planning_contact": null,
+    "last_verified_at": "2026-10-09"
   }
 ]

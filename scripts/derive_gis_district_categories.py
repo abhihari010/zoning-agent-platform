@@ -160,7 +160,12 @@ def inline_names(blob: str, code: str) -> dict[str, str]:
 
 
 ESTABLISHED = re.compile(r"districts?\s+established|establishment\s+of\s+.{0,20}districts?", re.I)
-GROUP_HEADER = re.compile(r"[A-Z][A-Z0-9 ()/&-]{5,60}?(?:SUB-DISTRICTS?|DISTRICTS?|ZONES?)\b")
+GROUP_HEADER = re.compile(
+    r"[A-Z][A-Z0-9 ()/&-]{5,60}?(?:SUB-DISTRICTS?|DISTRICTS?|ZONES?)\b"
+    # Outline-style tables head each group in mixed case on its own line, ending in a
+    # colon: Nashville's "Single-Family Districts:" / "Mobile Home Park District: MHP."
+    r"|(?m:^[A-Za-z][A-Za-z /&-]{3,60}?Districts?:)"
+)
 
 
 def established_table(sources: list[dict], codes: list[str]) -> dict[str, tuple[str, str]]:
@@ -192,7 +197,9 @@ def established_table(sources: list[dict], codes: list[str]) -> dict[str, tuple[
             match = re.search(r"(?<![A-Za-z0-9])" + re.escape(token) + r"(?![A-Za-z0-9-])", text)
             if not match:
                 continue
-            name = text[match.end(): match.end() + 60]
+            # A name never runs onto the next line: in an outline-style table that is
+            # the NEXT group's heading ("AG, AR2a.\nB.\nResidential Districts:").
+            name = text[match.end(): match.end() + 60].split("\n", 1)[0]
             heading = ""
             for start, value in headers:
                 if start < match.start():
