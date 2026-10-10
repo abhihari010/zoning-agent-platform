@@ -966,5 +966,126 @@
     "method": "gis_verified",
     "source": "City of Alexandria Zoning layer (maps.alexandriava.gov/arcgis/rest/services/alxZoningWm/MapServer/1, field ZONING) exact point-in-polygon test (no buffer, esriSpatialRelIntersects) at address forward-geocoded via US Census onelineaddress to '5190 DAWES AVE, ALEXANDRIA, VA, 22311' (lon:-77.118487413453 lat:38.84016238515), returning ZONING='I' (I industrial zone, ordinance Sec. 4-1200); independently cross-checked against the city's assessor Parcels layer (alxParcelsWm/MapServer/0), the parcel with ADDRESS_GIS='5190 DAWES AVE' returning PID_GIS='002.04-01-30', ACCOUNTNO='44080000' (exact address match); machine shops and manufacturing permitted per 4-1202 (verified 2026-07-19)",
     "zoning_code": "I"
+  },
+  {
+    "address_pattern": "2128 w richmond hill dr",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "05013001100",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "RS7.5",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.236555 lon:-86.790809 returning ZONE_DESC='RS7.5'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "2902 davis ave",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "07210002600",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R6",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.202439 lon:-86.736688 returning ZONE_DESC='R6'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "201 n 8th st",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "08212002000",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "RM20",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.177529 lon:-86.759675 returning ZONE_DESC='RM20'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "3494 dickerson pike",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "05000013100",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "CS",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.249442 lon:-86.757712 returning ZONE_DESC='CS'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "2101 glen haven dr",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "188100A02100CO",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "MUL",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:35.982316 lon:-86.618889 returning ZONE_DESC='MUL'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "575 hickory hills blvd",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "03100015400",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "OR20",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.282346 lon:-86.797076 returning ZONE_DESC='OR20'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "711 lebanon pike",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "09413005400",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "IWD",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.152403 lon:-86.746972 returning ZONE_DESC='IWD'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "1900 davidson st",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "08400001000",
+    "zoning_district": "agricultural",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "AG",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.191179 lon:-86.699596 returning ZONE_DESC='AG'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "3404 percy priest dr",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "09616021100",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "CL",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.153345 lon:-86.630145 returning ZONE_DESC='CL'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "600 monroe st",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "08209003800",
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "MUN",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.176497 lon:-86.790561 returning ZONE_DESC='MUN'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "3730 production way",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "parcel_id": "06800007100",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "IR",
+    "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.205798 lon:-86.885667 returning ZONE_DESC='IR'; address point from Addressing/AddressPoints/MapServer/0"
   }
 ]

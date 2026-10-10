@@ -2887,5 +2887,147 @@
         "montgomery-county-va"
       ]
     }
+  },
+  {
+    "id": "nashville-davidson-tn-public-supported-rs7-5-residential",
+    "project_description": "Build a new detached single-family house with two employees on site, posted operating hours, and new construction only, on a vacant lot in the RS7.5 single-family residential district, where the district land use table permits single-family dwellings by right.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "jurisdiction_name": "Nashville-Davidson County (Metro), TN",
+    "normalized_address": "2128 West Richmond Hill Drive, Nashville, TN",
+    "sources": [
+      {
+        "source_id": "nashville-davidson-tn-17-08-030",
+        "title": "17.08.030 - District land use tables.",
+        "excerpt": "Key: P—Permitted PC—Permitted w/conditions* SE—Special exception* A—Accessory* O—Overlay * Refer to Chapter 17.16 for standards | AG and AR2a | RS80 through RS3.75-A | R80 through R6-A | RM2 through RM20-A-NS | RM40 through RM100-A-NS | RN1 and RN2 | RL1 through RL3 | MHP | SP** | MUN, MUN-NS, MUN-A, and MUN-A-NS | MUL, MUL-NS, MUL-A, and MUL-A-NS | MUG, MUG-NS, MUG-A, and MUG-A-NS | MUI, MUI-NS, MUI-A, and MUI-A-NS | ON | OL | OG and OG-NS | OR20 through OR40-A-NS | ORI, ORI-NS, ORI-A, and ORI-A-NS | CN, CN-NS, CN-A, and CN-A-NS | CL, CL-NS, CL-A, and CL-A-NS | CS, CS-NS, CS-A, and CS-A-NS | CA and CA-NS | CF and CF-NS | North | South | East | West | Central | SCN and SCN-NS | SCC and SCC-NS | SCR and SCR-NS | IWD | IR | IG | | Single-family | P | P | P | P | P | PC*** | PC*** | | | P | P | P | P | P | | PC | P | P | PC | PC | PC | PC | PC | P | P | | P | P | PC | PC | | | | |",
+        "section_ref": "17.08.030",
+        "jurisdiction_id": "nashville-davidson-tn",
+        "url": "https://library.municode.com/tn/metro_government_of_nashville_and_davidson_county/codes/code_of_ordinances?nodeId=CD_TIT17ZO_CH17.08ZODILAUS_17.08.030DILAUSTA",
+        "effective_date": "2025-12-04",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "alexandria-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "christiansburg-va",
+        "clarksville-tn",
+        "danville-va",
+        "franklin-tn",
+        "fredericksburg-va",
+        "goodlettsville-tn",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "newport-news-va",
+        "nolensville-tn",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "roanoke-county-va",
+        "roanoke-va",
+        "salem-va",
+        "springfield-tn",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-public-supported-cs-restaurant",
+    "project_description": "Open a full-service sit-down restaurant with 15 employees, operating hours of 11am to 10pm, and interior renovation of an existing building in the CS commercial service district, where the district land use table permits full-service restaurants by right.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "jurisdiction_name": "Nashville-Davidson County (Metro), TN",
+    "normalized_address": "3494 Dickerson Pike, Nashville, TN",
+    "sources": [
+      {
+        "source_id": "nashville-davidson-tn-17-08-030",
+        "title": "17.08.030 - District land use tables.",
+        "excerpt": "Key: P—Permitted PC—Permitted w/conditions* SE—Special exception* A—Accessory* O—Overlay * Refer to Chapter 17.16 for standards | AG and AR2a | RS80 through RS3.75-A | R80 through R6-A | RM2 through RM20-A-NS | RM40 through RM100-A-NS | RN1 and RN2 | RL1 through RL3 | MHP | SP** | MUN, MUN-NS, MUN-A, and MUN-A-NS | MUL, MUL-NS, MUL-A, and MUL-A-NS | MUG, MUG-NS, MUG-A, and MUG-A-NS | MUI, MUI-NS, MUI-A, and MUI-A-NS | ON | OL | OG and OG-NS | OR20 through OR40-A-NS | ORI, ORI-NS, ORI-A, and ORI-A-NS | CN, CN-NS, CN-A, and CN-A-NS | CL, CL-NS, CL-A, and CL-A-NS | CS, CS-NS, CS-A, and CS-A-NS | CA and CA-NS | CF and CF-NS | North | South | East | West | Central | SCN and SCN-NS | SCC and SCC-NS | SCR and SCR-NS | IWD | IR | IG | | Restaurant, full-service | | | | | | | | | | PC | P | P | P | | A | A | A | P | PC | P | P | P | P | P | P | P^^ | P | P | P | P | P | P | P | P |",
+        "section_ref": "17.08.030",
+        "jurisdiction_id": "nashville-davidson-tn",
+        "url": "https://library.municode.com/tn/metro_government_of_nashville_and_davidson_county/codes/code_of_ordinances?nodeId=CD_TIT17ZO_CH17.08ZODILAUS_17.08.030DILAUSTA",
+        "effective_date": "2025-12-04",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "alexandria-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "christiansburg-va",
+        "clarksville-tn",
+        "danville-va",
+        "franklin-tn",
+        "fredericksburg-va",
+        "goodlettsville-tn",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "newport-news-va",
+        "nolensville-tn",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "roanoke-county-va",
+        "roanoke-va",
+        "salem-va",
+        "springfield-tn",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
   }
 ]

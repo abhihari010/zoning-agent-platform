@@ -453,6 +453,12 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # worse, and 21 sections is exactly the broad case it warns about. Live
     # vector recall is the quality signal here.
     "roanoke-county-va": 0.25,
+    # 2026-10-09 (#231): nashville-davidson-tn measured 0.143 with the 17.08.030
+    # land use tables untagged -- one ~32k-char matrix that keyword scoring ranks
+    # below its own prose. Tagging it ["general", "principal_uses"] took it to
+    # 0.929 (13 of 14). Every scenario address is verified against Metro's own
+    # zoning layer, and expected decisions come from that table's cells.
+    "nashville-davidson-tn": 0.85,
 }
 # chesapeake-va's use tables rank poorly on keyword score alone, which is why
 # they need a reserved slot rather than a better query. The table refs held
