@@ -1,0 +1,201 @@
+[
+  {
+    "id": "nashville-davidson-tn-rs7-5",
+    "address": "2128 W Richmond Hill Dr, Nashville, TN 37207",
+    "project_description": "Build a new detached single-family home on a vacant residential lot; owner-occupied, no employees, no business hours.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030",
+        "17.12.020"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-r6",
+    "address": "2902 Davis Ave, Nashville, TN 37216",
+    "project_description": "Convert an existing single-family house into a two-family dwelling (duplex) with interior renovation; no business use, no employees.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030",
+        "17.16.030"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-rm20",
+    "address": "201 N 8Th St, Nashville, TN 37206",
+    "project_description": "Construct a 12-unit multi-family apartment building on a vacant lot; residential only, no commercial hours or employees.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-cs",
+    "address": "3494 Dickerson Pike, Nashville, TN 37207",
+    "project_description": "Open a full-service sit-down restaurant in an existing commercial building after interior renovation; open 11am-10pm with 15 employees.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-mul",
+    "address": "2101 Glen Haven Dr, Nolensville, TN 37135",
+    "project_description": "Open a small retail clothing store in an existing storefront with minor renovation; open 10am-7pm with 4 employees.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-or20",
+    "address": "575 Hickory Hills Blvd, Whites Creek, TN 37189",
+    "project_description": "Use an existing building as a general professional office after interior renovation; open 8am-6pm with 10 employees.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-iwd",
+    "address": "711 Lebanon Pike, Nashville, TN 37210",
+    "project_description": "Operate a warehouse for storage and distribution of packaged goods in an existing building; open 6am-6pm with 20 employees, minor renovation.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-ag",
+    "address": "1900 Davidson St, Nashville, TN 37206",
+    "project_description": "Build a new detached single-family home on the lot; owner-occupied, no employees, no business hours.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-cl",
+    "address": "3404 Percy Priest Dr, Nashville, TN 37214",
+    "project_description": "Open a retail hardware store in an existing commercial building after interior renovation; open 8am-8pm with 8 employees.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-mun",
+    "address": "600 Monroe St, Nashville, TN 37208",
+    "project_description": "Convert part of an existing building into a general office after renovation; open 9am-5pm with 3 employees.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030",
+        "17.16.050"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "nashville-davidson-tn-ir",
+    "address": "3730 Production Way, Nashville, TN 37218",
+    "project_description": "Operate a light manufacturing shop assembling electronic components in an existing building; open 7am-5pm with 25 employees, minor renovation.",
+    "jurisdiction_id": "nashville-davidson-tn",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "17.08.030"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]
