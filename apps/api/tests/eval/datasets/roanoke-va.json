@@ -1,0 +1,158 @@
+[
+  {
+    "id": "roanoke-va-sfr-r7",
+    "address": "2151 Berkley Avenue Southwest, Roanoke, VA",
+    "project_description": "Build a new detached single-family home on a vacant lot in an established single-family neighborhood.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-311"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-bnb-r5",
+    "address": "514 Camilla Street Southeast, Roanoke, VA",
+    "project_description": "Convert an existing two-story house into a five-room bed and breakfast with guest parking in a single-family residential area.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-311", "Sec. 36.2-405"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-manufactured-home-r3",
+    "address": "1225 Salem Avenue Southwest, Roanoke, VA",
+    "project_description": "Place a manufactured home on a vacant infill lot in a single-family residential block near downtown.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-311"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-group-living-rm1",
+    "address": "701 Marshall Avenue Southwest, Roanoke, VA 24016",
+    "project_description": "Open a group home providing supported residence for eight adults in an existing house in a mixed-density residential area.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-311"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-group-living-rmf",
+    "address": "1301 Burks Street Southwest, Roanoke, VA",
+    "project_description": "Establish a twelve-resident group living facility in a converted apartment building in a multifamily residential area.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-311"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-hotel-cn",
+    "address": "505 Day Avenue Southwest, Roanoke, VA 24016",
+    "project_description": "Build a 40-room boutique hotel with ground-floor lobby and cafe on a neighborhood commercial parcel.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-315"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-gas-station-cn",
+    "address": "1209 9th Street Southeast, Roanoke, VA 24013",
+    "project_description": "Open a gasoline station with four fuel pumps and a small convenience kiosk on a neighborhood commercial corner lot.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-315", "Sec. 36.2-411"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-auto-repair-cg",
+    "address": "3601 Brandon Avenue Southwest, Roanoke, VA 24018",
+    "project_description": "Open a motor vehicle repair and service garage with three bays in an existing general commercial building.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-315", "Sec. 36.2-419"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-medical-clinic-mx",
+    "address": "1117 2nd Street Southwest, Roanoke, VA",
+    "project_description": "Fit out a medical clinic for a family physician practice in a converted building in a mixed use area.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-315"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-funeral-home-d",
+    "address": "303 Market Street Southeast, Roanoke, VA 24011",
+    "project_description": "Open a funeral home with a chapel and visitation rooms in a vacant downtown storefront building.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["likely_allowed"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-315"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-dwelling-i1",
+    "address": "1824 9th Street Southeast, Roanoke, VA 24013",
+    "project_description": "Convert the upper floor of a light industrial warehouse into four residential loft apartments.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["conditional"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-322"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "roanoke-va-dwelling-ros",
+    "address": "2002 Blue Hills Drive NE, Roanoke, VA 24012",
+    "project_description": "Build a single detached house on a parcel set aside for recreation and open space beside a public park.",
+    "jurisdiction_id": "roanoke-va",
+    "expect": {
+      "decision_in": ["restricted"],
+      "permit_path_includes": [],
+      "must_cite_section_refs": ["Sec. 36.2-315"],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]

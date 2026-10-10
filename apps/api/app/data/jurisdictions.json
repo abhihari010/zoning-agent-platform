@@ -118,8 +118,8 @@
     "county_fips": "770",
     "place_fips": "68000",
     "jurisdiction_type": "independent_city",
-    "coverage_status": "source_indexed",
-    "supported": false,
+    "coverage_status": "public_supported",
+    "supported": true,
     "match_strategy": "locality_and_county",
     "locality_names": [
       "Roanoke"
@@ -144,7 +144,7 @@
       "url": "https://www.roanokeva.gov/2964/Planning-Zoning-Permitting",
       "phone": "540-853-1730"
     },
-    "last_verified_at": "2026-05-25",
+    "last_verified_at": "2026-08-30",
     "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
   },
   {
@@ -154,8 +154,8 @@
     "state_fips": "51",
     "county_fips": "161",
     "jurisdiction_type": "county",
-    "coverage_status": "source_indexed",
-    "supported": false,
+    "coverage_status": "public_supported",
+    "supported": true,
     "match_strategy": "county",
     "locality_names": [
       "Cave Spring",
@@ -185,7 +185,7 @@
       "url": "https://www.roanokecountyva.gov/348/Zoning",
       "phone": "540-772-2068"
     },
-    "last_verified_at": "2026-05-25",
+    "last_verified_at": "2026-08-30",
     "district_mapping_strategy": "source_indexed_until_county_zoning_ordinance_and_map_sources_qa_pass"
   },
   {

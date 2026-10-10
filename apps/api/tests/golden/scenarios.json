@@ -122,58 +122,6 @@
     }
   },
   {
-    "id": "roanoke-source-indexed-served",
-    "project_description": "Open a small cafe with two employees, posted operating hours, and interior renovation plans.",
-    "district": "unknown",
-    "jurisdiction_id": "roanoke-va",
-    "jurisdiction_name": "Roanoke, VA",
-    "normalized_address": "215 Church Ave SW, Roanoke, VA 24011",
-    "sources": [],
-    "expect": {
-      "decisions": [
-        "unknown"
-      ],
-      "statuses": [
-        "low_confidence"
-      ],
-      "min_citations": 1,
-      "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
-      "forbidden_citation_jurisdiction_ids": [
-        "blacksburg-va",
-        "montgomery-county-va"
-      ]
-    }
-  },
-  {
-    "id": "roanoke-county-source-indexed-served",
-    "project_description": "Open a small home bakery with two employees, posted operating hours, and interior renovation plans.",
-    "district": "unknown",
-    "jurisdiction_id": "roanoke-county-va",
-    "jurisdiction_name": "Roanoke County, VA",
-    "normalized_address": "5204 Bernard Dr, Roanoke, VA 24018",
-    "sources": [],
-    "expect": {
-      "decisions": [
-        "unknown"
-      ],
-      "statuses": [
-        "low_confidence"
-      ],
-      "min_citations": 1,
-      "jurisdiction_supported": true,
-      "required_warning_substrings": [
-        "Preliminary coverage"
-      ],
-      "forbidden_citation_jurisdiction_ids": [
-        "blacksburg-va",
-        "montgomery-county-va"
-      ]
-    }
-  },
-  {
     "id": "supported-jurisdiction-no-matching-evidence",
     "project_description": "Open a restaurant with six employees, posted operating hours, and tenant improvement construction.",
     "district": "industrial-zone",
@@ -2631,6 +2579,312 @@
         "suffolk-va",
         "virginia-beach-va",
         "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "roanoke-va-public-supported-r7-residential",
+    "project_description": "Build a new detached single-family house with two employees on site, posted operating hours, and new construction only, on a vacant lot in the R-7 residential single-family district, where the residential use table permits dwellings as of right.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "roanoke-va",
+    "jurisdiction_name": "Roanoke, VA",
+    "normalized_address": "2151 Berkley Avenue Southwest, Roanoke, VA",
+    "sources": [
+      {
+        "source_id": "roanoke-va-sec-36-2-311",
+        "title": "Sec. 36.2-311. - Use table for residential districts.",
+        "excerpt": "District | RA | R-12 | R-7 | R-5 | R-3 | RM-1 | RM-2 | RMF | Supplemental Regulation Section | Residential Uses | Dwellings | P | P | P | P | P | P | P | P | 36.2-409.1 | Dwelling, manufactured home | P | | | | | | | | | Dwelling, mobile home | P | | | | | | | | 36.2-417 | Accommodations and Group Living Uses | Bed and breakfast | P | S | S | S | S | S | S | | 36.2-405 | Group Living | | | | | | S | S | P | | Industrial Uses | Borrow or Fill Site | S | | | | | | | | 36.2-405.1 | Composting Facil",
+        "section_ref": "Sec. 36.2-311",
+        "jurisdiction_id": "roanoke-va",
+        "url": "https://library.municode.com/va/roanoke/codes/code_of_ordinances?nodeId=CORO1979_CH36.2ZO_ART3RESPZODI_DIV1REDI_S36.2-311USTAREDI",
+        "effective_date": "2026-02-17",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "alexandria-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "christiansburg-va",
+        "danville-va",
+        "franklin-tn",
+        "fredericksburg-va",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "newport-news-va",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "salem-va",
+        "springfield-tn",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "roanoke-va-public-supported-d-downtown",
+    "project_description": "Open a funeral home with a chapel and visitation rooms, two employees, posted operating hours, and interior renovation only, in a vacant storefront in the D downtown district, where the multiple purpose use table permits funeral homes as of right.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "roanoke-va",
+    "jurisdiction_name": "Roanoke, VA",
+    "normalized_address": "303 Market Street Southeast, Roanoke, VA 24011",
+    "sources": [
+      {
+        "source_id": "roanoke-va-sec-36-2-315",
+        "title": "Sec. 36.2-315. - Use table for multiple purpose districts.",
+        "excerpt": "District | MX | CN | CG | CLS | D | IN | ROS | UF | UC | Supplemental Regulation Section | Residential Uses | Dwellings | P | P | P | P | P | P | | P | P | 36.2-409.1 | Accommodations and Group Living | Bed and breakfast | P | P | P | | | P | | P | | 36.2-405 | Campground | | | S | S | | | S | S | | | Group living | S | S | P | P | P | S | | P | P | | Hotel or motel | | P | P | P | P | P | | P | P | | Short-term rental | P | P | P | P | P | P | | P | P | Sec. 36.2-405 | Commercial Uses: Office a",
+        "section_ref": "Sec. 36.2-315",
+        "jurisdiction_id": "roanoke-va",
+        "url": "https://library.municode.com/va/roanoke/codes/code_of_ordinances?nodeId=CORO1979_CH36.2ZO_ART3RESPZODI_DIV2MUPUDI_S36.2-315USTAMUPUDI",
+        "effective_date": "2026-02-17",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "alexandria-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "christiansburg-va",
+        "danville-va",
+        "franklin-tn",
+        "fredericksburg-va",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "newport-news-va",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "salem-va",
+        "springfield-tn",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "roanoke-county-va-public-supported-r1-residential",
+    "project_description": "Build a new detached single-family house with two employees on site, posted operating hours, and new construction only, on a vacant lot in the R-1 low density residential district, which permits single-family detached dwellings by right.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "roanoke-county-va",
+    "jurisdiction_name": "Roanoke County, VA",
+    "normalized_address": "450 Stoneledge Drive, Roanoke, VA 24019",
+    "sources": [
+      {
+        "source_id": "roanoke-county-va-sec-30-41-2",
+        "title": "Sec. 30-41-2. - Permitted uses.",
+        "excerpt": "(A) The following uses are permitted by right subject to all other applicable requirements contained in this ordinance. An asterisk (*) indicates additional, modified or more stringent standards as listed in article IV, use and design standards, for those specific uses. 1. Agricultural and Forestry Uses. Stable, Private* 2. Residential Uses. Accessory Apartment* Home Beauty/Barber Salon * Home Occupation, Type I * Manufactured Home * Manufactured Home, Emergency * Multiple Dog Permit* Residentia",
+        "section_ref": "Sec. 30-41-2",
+        "jurisdiction_id": "roanoke-county-va",
+        "url": "https://library.municode.com/va/roanoke_county/codes/code_of_ordinances?nodeId=PTICOCO_APXAZOOR_ARTIIIDIRE_S30-41-2PEUS",
+        "effective_date": "2026-01-27",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "alexandria-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "christiansburg-va",
+        "danville-va",
+        "franklin-tn",
+        "fredericksburg-va",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "newport-news-va",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "salem-va",
+        "springfield-tn",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "roanoke-county-va-public-supported-c1-commercial",
+    "project_description": "Lease a professional office suite for an insurance agency with two employees, posted operating hours, and interior renovation only, in the C-1 low intensity commercial district, which permits general office by right.",
+    "district": "mixed-use-core",
+    "jurisdiction_id": "roanoke-county-va",
+    "jurisdiction_name": "Roanoke County, VA",
+    "normalized_address": "5413 Merriman Road, Roanoke, VA 24018",
+    "sources": [
+      {
+        "source_id": "roanoke-county-va-sec-30-53-2",
+        "title": "Sec. 30-53-2. - Permitted Uses.",
+        "excerpt": "(A) The following uses are permitted by right subject to all other applicable requirements contained in this ordinance. An asterisk (*) indicates additional, modified or more stringent standards as listed in article IV, use and design standards, for those specific uses. 1. Residential Uses Accessory Apartment * Home Beauty/Barber Salon * Home Occupation, Type I * Multi-Family Dwelling * Two-Family Dwelling * 2. Civic Uses. Administrative Services Clubs Cultural Services Day Care Center * Educati",
+        "section_ref": "Sec. 30-53-2",
+        "jurisdiction_id": "roanoke-county-va",
+        "url": "https://library.municode.com/va/roanoke_county/codes/code_of_ordinances?nodeId=PTICOCO_APXAZOOR_ARTIIIDIRE_S30-53-2PEUS",
+        "effective_date": "2026-01-27",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "alexandria-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "christiansburg-va",
+        "danville-va",
+        "franklin-tn",
+        "fredericksburg-va",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "newport-news-va",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "salem-va",
+        "springfield-tn",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "goodlettsville-source-indexed-served",
+    "project_description": "Open a small cafe with two employees, posted operating hours, and interior renovation plans.",
+    "district": "unknown",
+    "jurisdiction_id": "goodlettsville-tn",
+    "jurisdiction_name": "Goodlettsville, TN",
+    "normalized_address": "105 South Main Street, Goodlettsville, TN 37072",
+    "sources": [
+      {
+        "source_id": "goodlettsville-tn-sec-14-205",
+        "title": "Sec. 14-205. - Residential district regulations.",
+        "excerpt": "(1) Statement of purpose. The residential districts established in this title are designed to promote and protect the health, safety, morals, convenience, order, prosperity, and other aspects of the general welfare. These general goals include, among others, the following more specific purposes: (a) To provide sufficient space in appropriate locations for residential developments to adequately meet the housing needs of the present and expected future population of the urban area, with due allowa",
+        "section_ref": "Sec. 14-205",
+        "jurisdiction_id": "goodlettsville-tn",
+        "url": "https://library.municode.com/tn/goodlettsville/codes/code_of_ordinances?nodeId=TIT14ZOLAUSCO_CH2ZOOR_S14-205REDIRE",
+        "effective_date": "2025-08-14",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "unknown"
+      ],
+      "statuses": [
+        "low_confidence"
+      ],
+      "min_citations": 1,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [
+        "Preliminary coverage"
+      ],
+      "forbidden_citation_jurisdiction_ids": [
+        "blacksburg-va",
+        "montgomery-county-va"
       ]
     }
   }

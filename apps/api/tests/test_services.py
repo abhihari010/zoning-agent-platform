@@ -169,24 +169,14 @@ def _mock_google_address(monkeypatch: pytest.MonkeyPatch, payload: dict) -> None
     ("formatted_address", "components", "expected_id", "expected_name"),
     [
         (
-            "215 Church Ave SW, Roanoke, VA 24011, USA",
+            "105 S Main St, Goodlettsville, TN 37072, USA",
             [
-                {"long_name": "Roanoke", "types": ["locality"]},
-                {"long_name": "Roanoke City", "types": ["administrative_area_level_2"]},
-                {"long_name": "VA", "types": ["administrative_area_level_1"]},
+                {"long_name": "Goodlettsville", "types": ["locality"]},
+                {"long_name": "Davidson County", "types": ["administrative_area_level_2"]},
+                {"long_name": "TN", "types": ["administrative_area_level_1"]},
             ],
-            "roanoke-va",
-            "Roanoke, VA",
-        ),
-        (
-            "5204 Bernard Dr, Roanoke, VA 24018, USA",
-            [
-                {"long_name": "Cave Spring", "types": ["locality"]},
-                {"long_name": "Roanoke County", "types": ["administrative_area_level_2"]},
-                {"long_name": "VA", "types": ["administrative_area_level_1"]},
-            ],
-            "roanoke-county-va",
-            "Roanoke County, VA",
+            "goodlettsville-tn",
+            "Goodlettsville, TN",
         ),
     ],
 )
