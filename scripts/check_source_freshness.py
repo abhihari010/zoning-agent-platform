@@ -17,6 +17,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_REGISTRY = REPO_ROOT / "apps" / "api" / "app" / "data" / "source_registry.json"
 SOURCE_PACK_ROOT = REPO_ROOT / "apps" / "api" / "app" / "data" / "source_packs"
+JURISDICTIONS = REPO_ROOT / "apps" / "api" / "app" / "data" / "jurisdictions.json"
 PUBLIC_SUPPORTED = "public_supported"
 
 
@@ -43,9 +44,21 @@ def load_sources() -> list[SourceRef]:
                 )
             )
 
+    # jurisdictions.json is what decides a city is live; a pack manifest's own
+    # coverage_status is set at scrape time and is usually still source_indexed.
+    live = {
+        j["jurisdiction_id"]
+        for j in json.loads(JURISDICTIONS.read_text(encoding="utf-8"))
+        if j.get("coverage_status") == PUBLIC_SUPPORTED
+    }
     for manifest_path in sorted(SOURCE_PACK_ROOT.glob("*/*/manifest.json")):
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        pack_status = str(manifest.get("jurisdiction", {}).get("coverage_status") or "")
+        jurisdiction = manifest.get("jurisdiction", {})
+        pack_status = (
+            PUBLIC_SUPPORTED
+            if jurisdiction.get("jurisdiction_id") in live
+            else str(jurisdiction.get("coverage_status") or "")
+        )
         for item in manifest.get("sources", []):
             refs.append(
                 SourceRef(

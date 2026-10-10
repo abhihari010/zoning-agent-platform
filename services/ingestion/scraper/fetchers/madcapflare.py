@@ -65,8 +65,15 @@ _JS_STRING_RE = re.compile(r"'((?:[^'\\]|\\.)*)'")
 # "1.2.1. General Authority ..." -> "1.2.1".
 _SECTION_NUM_RE = re.compile(r"^\s*(\d+(?:\.\d+)*)\.?\s+\S")
 
-_HEADING_OPEN_RE = re.compile(r"<h[1-6]\b", re.IGNORECASE)
-_HEADING_TAG_RE = re.compile(r"<h([1-6])[^>]*>.*?</h\1>", re.DOTALL | re.IGNORECASE)
+# Exports put a numbered heading either in an ``<hN>`` or -- Norfolk's re-export
+# since 2026-10 -- in a one-row ``<table>`` whose cells carry ``AutoNumber_hN``.
+# Matching only ``<hN>`` there backed every anchor up to the page's one ``<h2>``,
+# collapsing a whole topic into a single section (343 -> 53).
+_HEADING_OPEN_RE = re.compile(r"<h[1-6]\b|<table\b(?=(?:(?!</table>).)*?AutoNumber_h)", re.IGNORECASE | re.DOTALL)
+_HEADING_TAG_RE = re.compile(
+    r"<h([1-6])[^>]*>.*?</h\1>|<table\b(?:(?!</table>).)*?AutoNumber_h.*?</table>",
+    re.DOTALL | re.IGNORECASE,
+)
 
 # Every heading is preceded by an in-page breadcrumb paragraph of
 # ``<MadCap:xref class="H1_H2_Ref">`` links (whose numbering is the stale
