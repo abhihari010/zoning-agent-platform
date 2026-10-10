@@ -51,3 +51,18 @@ def test_unknown_locality_is_not_recognized():
     # Falls through to the unsupported us-va-* synthetic, never a real supported record.
     assert match.jurisdiction_id in (None,) or match.jurisdiction_id.startswith("us-va-")
     assert not match.supported
+
+
+def test_entry_listing_only_the_state_abbreviation_resolves():
+    # Google returns long_name "Tennessee" / short_name "TN". brentwood-tn lists only
+    # "TN", and comparing the long name alone sent every real Brentwood address to
+    # the unsupported fallback while address-string evals kept passing.
+    components = [
+        {"long_name": "Brentwood", "types": ["locality"]},
+        {"long_name": "Williamson County", "types": ["administrative_area_level_2"]},
+        {"long_name": "Tennessee", "short_name": "TN", "types": ["administrative_area_level_1"]},
+        {"long_name": "United States", "short_name": "US", "types": ["country"]},
+    ]
+    match = detect_jurisdiction("1500 Murray Ln, Brentwood, TN 37027, USA", components)
+    assert match.jurisdiction_id == "brentwood-tn"
+    assert match.coverage_status == "public_supported"

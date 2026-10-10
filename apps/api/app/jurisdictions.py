@@ -154,6 +154,9 @@ def detect_jurisdiction(
     locality = _component_name(address_components, "locality").lower()
     county = _component_name(address_components, "administrative_area_level_2").lower()
     state = _component_name(address_components, "administrative_area_level_1").lower()
+    # Google gives both "Tennessee" and "TN"; an entry may list either, so accept both.
+    # Comparing only the long name left five TN cities listing just "TN" unreachable.
+    states = {state, _component_name(address_components, "administrative_area_level_1", short=True).lower()} - {""}
     country = _component_name(address_components, "country", short=True).upper()
     formatted = formatted_address.lower()
 
@@ -172,8 +175,8 @@ def detect_jurisdiction(
             county_match = county in county_names if county else any(name in formatted for name in county_names)
 
         state_match = (
-            state in state_names
-            if state
+            bool(states & state_names)
+            if states
             else any(name in formatted for name in state_names)
         )
         if jurisdiction.match_strategy == "county":
