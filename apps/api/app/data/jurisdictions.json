@@ -1066,7 +1066,7 @@
     ],
     "official_source_urls": [],
     "zoning_map_url": null,
-    "planning_contact": null,
+    "planning_contact": {},
     "last_verified_at": "2026-10-09"
   },
   {
@@ -1092,7 +1092,7 @@
     ],
     "official_source_urls": [],
     "zoning_map_url": null,
-    "planning_contact": null,
+    "planning_contact": {},
     "last_verified_at": "2026-10-09"
   },
   {
@@ -1118,7 +1118,7 @@
     ],
     "official_source_urls": [],
     "zoning_map_url": null,
-    "planning_contact": null,
+    "planning_contact": {},
     "last_verified_at": "2026-10-09"
   },
   {
@@ -1144,7 +1144,7 @@
     ],
     "official_source_urls": [],
     "zoning_map_url": null,
-    "planning_contact": null,
+    "planning_contact": {},
     "last_verified_at": "2026-10-09"
   }
 ]
