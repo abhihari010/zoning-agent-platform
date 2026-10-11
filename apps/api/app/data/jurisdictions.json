@@ -1155,8 +1155,8 @@
     "county_fips": "059",
     "place_fips": null,
     "jurisdiction_type": "county",
-    "coverage_status": "source_indexed",
-    "supported": false,
+    "coverage_status": "public_supported",
+    "supported": true,
     "match_strategy": "county",
     "locality_names": [
       "Annandale",
@@ -1187,7 +1187,7 @@
     "planning_contact": {
       "url": "https://www.fairfaxcounty.gov/planning-development/"
     },
-    "last_verified_at": "2026-10-10",
+    "last_verified_at": "2026-10-11",
     "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
   }
 ]
