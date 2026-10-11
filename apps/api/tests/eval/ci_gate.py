@@ -463,6 +463,11 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # Article 4 use tables tagged principal_uses, decision accuracy 1.000. Every
     # scenario address is verified against the county's own zoning layer.
     "fairfax-county-va": 0.55,
+    # 2026-10-11 (#247): arlington-county-va measured 0.800 (8 of 10) with the five
+    # "... Districts Use Tables" sections tagged principal_uses. Its ordinance is a
+    # PDF; the use tables are rebuilt from the rotated column labels, and every
+    # scenario address is verified against the county's own zoning layer.
+    "arlington-county-va": 0.70,
 }
 # chesapeake-va's use tables rank poorly on keyword score alone, which is why
 # they need a reserved slot rather than a better query. The table refs held
