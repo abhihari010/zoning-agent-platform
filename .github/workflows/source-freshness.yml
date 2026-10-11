@@ -5,6 +5,10 @@ on:
     - cron: "0 14 * * 1"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   source-freshness:
     name: Weekly source freshness
@@ -16,3 +20,24 @@ jobs:
           python-version: "3.11"
       - name: Check source freshness
         run: python scripts/check_source_freshness.py --max-age-days 90 --check-urls
+      # CI's Source quality gate fails every open PR at 90 days. This trips at 76,
+      # which leaves two weeks to run scripts/refresh_source_pack.py first.
+      - name: Warn two weeks before expiry
+        run: python scripts/check_source_freshness.py --max-age-days 76
+      # A red scheduled run notifies no one: this job crashed every week from
+      # 2026-08-31 to 2026-10-05 unseen, through the cliff it exists to warn about.
+      - name: Open an issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Source freshness: sources expire within two weeks or are unreachable"
+          open=$(gh issue list --state open --search "in:title \"$title\"" --json number --jq 'length')
+          if [ "$open" = "0" ]; then
+            gh issue create --title "$title" --body "The weekly freshness check failed: $RUN_URL
+
+          Sources older than 76 days in a public_supported city fail CI's Source quality gate at 90. Rescrape them with \`scripts/batch_scrape.py\` and merge with \`scripts/refresh_source_pack.py\`; dead URLs need their pack entry fixed."
+          else
+            echo "An open issue already tracks this."
+          fi

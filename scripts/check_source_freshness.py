@@ -7,6 +7,7 @@ import argparse
 import json
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
@@ -150,6 +151,10 @@ def _parse_date(value: str | None) -> date | None:
 
 
 def _url_reachable(url: str, timeout: float) -> bool:
+    # Norfolk's export has a literal space in a page name ("9_3 Other_Approved...");
+    # urlopen rejects that with InvalidURL, which crashed the whole weekly check
+    # every run from 2026-08-31 until this fix.
+    url = urllib.parse.quote(url, safe=":/?#[]@!$&'()*+,;=%~")
     for method in ("HEAD", "GET"):
         try:
             request = urllib.request.Request(url, method=method, headers={"User-Agent": "zoning-agent-source-check/1.0"})
