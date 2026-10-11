@@ -38,7 +38,7 @@ a draft into the curated tree happens later, after district mapping + golden QA.
 | Flag | Default | Purpose |
 | --- | --- | --- |
 | `--city` / `--state` | required | Jurisdiction name + 2-letter state code |
-| `--fetcher` | `municode` | `municode`, `generic_html`, `flippingbook`, `municipalcodeonline`, `ecode360`, or `amlegal` |
+| `--fetcher` | `municode` | `municode`, `generic_html`, `flippingbook`, `municipalcodeonline`, `ecode360`, `amlegal`, `encodeplus`, `madcapflare`, or `pdf` |
 | `--url` | – | Official URL(s); required for `generic_html`, optional override otherwise |
 | `--host-slug` | – | `municipalcodeonline` subdomain slug (default: first word of `--city`) |
 | `--chapters` | – | `municipalcodeonline` chapter node id(s) to fetch (repeatable) |
@@ -69,6 +69,7 @@ services/ingestion/scraper/
     amlegal.py          # American Legal Publishing (clients/code-toc/section-toc/render-section JSON)
     flippingbook.py     # FlippingBook publication fetcher
     generic_html.py     # FALLBACK: fetch an official page, clean HTML → coarse sections
+    pdf.py              # one ordinance PDF split on its §-numbered TOC; rebuilds rotated-label use tables (needs pdfplumber)
   tests/
     fixtures/           # saved real Municode/MCO/eCode360/AmLegal JSON + HTML (NO live network in tests)
     test_html_cleaner.py

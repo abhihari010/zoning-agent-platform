@@ -3173,5 +3173,151 @@
         "winchester-va"
       ]
     }
+  },
+  {
+    "id": "arlington-county-va-public-supported-r-6-residential",
+    "project_description": "Build a new detached single-family house with two employees on site, posted operating hours, and new construction only, on a vacant lot in the R-6 one-family dwelling district, where the residential use table permits one-family detached dwellings by right.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "arlington-county-va",
+    "jurisdiction_name": "Arlington County, VA",
+    "normalized_address": "219 North Evergreen Street, Arlington, VA",
+    "sources": [
+      {
+        "source_id": "arlington-county-va-5-1",
+        "title": "§5.1. Residential (R) Districts Use Tables",
+        "excerpt": "KEY: P = allowed by-right; U = requires use permit approval; S = requires site plan approval; Blank cell = not permitted | Use Category | Specific Use Types | R-20 | R-10 | R-10T | R-8 | R-6 | R-5 | R15-30T | R2-7 | Use Standards | | Household Living (See §12.2.3.A) | One-family detached | P | P | P | P | P | P | P | P | §12.3.10 |",
+        "section_ref": "§5.1",
+        "jurisdiction_id": "arlington-county-va",
+        "url": "https://www.arlingtonva.us/files/sharedassets/public/v/2/building/documents/codes-and-ordinances/aczo_effective_06.13.2026.pdf#page=45",
+        "effective_date": "2026-06-13",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "alexandria-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "christiansburg-va",
+        "clarksville-tn",
+        "danville-va",
+        "fairfax-county-va",
+        "franklin-tn",
+        "fredericksburg-va",
+        "goodlettsville-tn",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "nashville-davidson-tn",
+        "newport-news-va",
+        "nolensville-tn",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "roanoke-county-va",
+        "roanoke-va",
+        "salem-va",
+        "springfield-tn",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "arlington-county-va-public-supported-c-1-restaurant",
+    "project_description": "Open a full-service restaurant with twelve employees, posted operating hours, and interior renovation only, in the C-1 local commercial district, where the commercial use table permits restaurants by right.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "arlington-county-va",
+    "jurisdiction_name": "Arlington County, VA",
+    "normalized_address": "2647 North Pershing Drive, Arlington, VA",
+    "sources": [
+      {
+        "source_id": "arlington-county-va-7-1",
+        "title": "§7.1. Commercial/Mixed Use (C) Districts Use Tables",
+        "excerpt": "KEY: P = allowed by-right; U = requires use permit approval; S = requires site plan approval; Blank cell = not permitted | Use Category | Specific Use Types | RA4.8 | R-C | RA-H | RA-H-3.2 | C-1-R | C-1 | MU-VS | C-1-O | C-O-1.0 | C-O-1.5 | C-O-2.5 | C-O | C-O-A | C-O ROSSLYN | C-O CRYSTAL CITY | C-2 | C-TH | C-3 | C-R | Use Standards | | Food Establishments (See | Restaurants | S | S | | S | P | P | P | | S | S | S | S | P | S | S | P | P | P | P | |",
+        "section_ref": "§7.1",
+        "jurisdiction_id": "arlington-county-va",
+        "url": "https://www.arlingtonva.us/files/sharedassets/public/v/2/building/documents/codes-and-ordinances/aczo_effective_06.13.2026.pdf#page=85",
+        "effective_date": "2026-06-13",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "alexandria-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "christiansburg-va",
+        "clarksville-tn",
+        "danville-va",
+        "fairfax-county-va",
+        "franklin-tn",
+        "fredericksburg-va",
+        "goodlettsville-tn",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "nashville-davidson-tn",
+        "newport-news-va",
+        "nolensville-tn",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "roanoke-county-va",
+        "roanoke-va",
+        "salem-va",
+        "springfield-tn",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
   }
 ]
