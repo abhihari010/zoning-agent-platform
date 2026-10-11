@@ -269,9 +269,10 @@ export function ProjectIntakePanel({
               {intake?.supportStatus === "unsupported" && (
                 <div className="mt-4 rounded-sm border border-rule bg-sheet p-4 text-ink">
                   <p className="font-medium">
-                    {intake.jurisdictionName ?? "This jurisdiction"} is recognized, but its
-                    coverage is {coverageLabel(intake.coverageStatus).toLowerCase()} rather
-                    than public-supported.
+                    {/* "unsupported" read as "its coverage is not covered rather than public-supported". */}
+                    {intake.coverageStatus && intake.coverageStatus !== "unsupported"
+                      ? `${intake.jurisdictionName ?? "This jurisdiction"} is recognized, but its coverage is ${coverageLabel(intake.coverageStatus).toLowerCase()} rather than public-supported.`
+                      : `${intake.jurisdictionName ?? "This jurisdiction"} isn't covered yet.`}
                   </p>
                   <button
                     type="button"
