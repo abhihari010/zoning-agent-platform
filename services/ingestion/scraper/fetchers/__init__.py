@@ -11,6 +11,7 @@ from .generic_html import GenericHtmlFetcher
 from .madcapflare import MadCapFlareFetcher
 from .municipalcodeonline import MunicipalCodeOnlineFetcher
 from .municode import MunicodeFetcher
+from .pdf import PdfFetcher
 
 __all__ = [
     "FetchResult",
@@ -24,4 +25,5 @@ __all__ = [
     "MadCapFlareFetcher",
     "MunicipalCodeOnlineFetcher",
     "MunicodeFetcher",
+    "PdfFetcher",
 ]

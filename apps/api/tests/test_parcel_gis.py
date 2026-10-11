@@ -29,11 +29,12 @@ def _enable_gis_with_a_clean_cache(monkeypatch):
 
 
 def _stub_get(monkeypatch, payload, *, capture: dict | None = None):
-    def fake_get(url, params=None, timeout=None):
+    def fake_get(url, params=None, timeout=None, headers=None):
         if capture is not None:
             capture["url"] = url
             capture["params"] = params
             capture["timeout"] = timeout
+            capture["headers"] = headers
         return httpx.Response(200, json=payload, request=httpx.Request("GET", url))
 
     monkeypatch.setattr(parcel_gis.httpx, "get", fake_get)
@@ -61,6 +62,8 @@ def test_lookup_maps_zoning_code_to_district(monkeypatch):
         "spatialReference": {"wkid": 4326},
     }
     assert captured["params"]["spatialRel"] == "esriSpatialRelIntersects"
+    # Arlington's server 404s httpx's default User-Agent.
+    assert not captured["headers"]["User-Agent"].startswith("python-httpx")
 
 
 def test_lookup_folds_separator_differences_between_layer_and_ordinance(monkeypatch):
@@ -92,7 +95,7 @@ def test_lookup_reports_an_unmapped_code_without_guessing(monkeypatch):
 
 
 def test_lookup_returns_none_when_upstream_fails(monkeypatch):
-    def boom(url, params=None, timeout=None):
+    def boom(url, params=None, timeout=None, headers=None):
         raise httpx.ConnectTimeout("upstream down")
 
     monkeypatch.setattr(parcel_gis.httpx, "get", boom)
@@ -107,7 +110,7 @@ def test_lookup_returns_none_on_an_arcgis_error_payload(monkeypatch):
 
 
 def test_lookup_skips_unconfigured_jurisdictions_and_missing_coordinates(monkeypatch):
-    def unexpected(url, params=None, timeout=None):  # pragma: no cover - must not run
+    def unexpected(url, params=None, timeout=None, headers=None):  # pragma: no cover - must not run
         raise AssertionError("no network call expected")
 
     monkeypatch.setattr(parcel_gis.httpx, "get", unexpected)
@@ -117,7 +120,7 @@ def test_lookup_skips_unconfigured_jurisdictions_and_missing_coordinates(monkeyp
 
 
 def test_lookup_is_disabled_by_settings(monkeypatch):
-    def unexpected(url, params=None, timeout=None):  # pragma: no cover - must not run
+    def unexpected(url, params=None, timeout=None, headers=None):  # pragma: no cover - must not run
         raise AssertionError("no network call expected")
 
     monkeypatch.setattr(parcel_gis.httpx, "get", unexpected)
@@ -129,7 +132,7 @@ def test_lookup_is_disabled_by_settings(monkeypatch):
 def test_lookup_caches_repeat_requests(monkeypatch):
     calls = {"n": 0}
 
-    def counting_get(url, params=None, timeout=None):
+    def counting_get(url, params=None, timeout=None, headers=None):
         calls["n"] += 1
         return httpx.Response(
             200,
@@ -164,7 +167,7 @@ def test_parcel_tool_uses_gis_when_no_fixture_matches(monkeypatch):
 
 
 def test_parcel_tool_prefers_a_fixture_over_the_network(monkeypatch):
-    def unexpected(url, params=None, timeout=None):  # pragma: no cover - must not run
+    def unexpected(url, params=None, timeout=None, headers=None):  # pragma: no cover - must not run
         raise AssertionError("no network call expected")
 
     monkeypatch.setattr(parcel_gis.httpx, "get", unexpected)

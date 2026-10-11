@@ -932,6 +932,45 @@
         "M2": "industrial-zone",
         "MR": "residential-low-density"
       }
+    },
+    "arlington-county-va": {
+      "provider": "arcgis",
+      "url": "https://arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0",
+      "attribution": "Arlington County, VA zoning districts",
+      "zoning_field": "ZN_DESIG",
+      "district_categories": {
+        "C-1": "commercial-employment",
+        "C-1-O": "commercial-employment",
+        "C-1-R": "commercial-employment",
+        "C-2": "commercial-employment",
+        "C-3": "commercial-employment",
+        "C-O": "mixed-use-core",
+        "C-O-1.0": "mixed-use-core",
+        "C-O-1.5": "mixed-use-core",
+        "C-O-2.5": "mixed-use-core",
+        "C-O-A": "mixed-use-core",
+        "C-R": "commercial-employment",
+        "C-TH": "commercial-employment",
+        "CM": "industrial-zone",
+        "M-1": "industrial-zone",
+        "M-2": "industrial-zone",
+        "MU-VS": "mixed-use-core",
+        "R-10": "residential-low-density",
+        "R-10T": "residential-low-density",
+        "R-20": "residential-low-density",
+        "R-5": "residential-low-density",
+        "R-6": "residential-low-density",
+        "R-8": "residential-low-density",
+        "R15-30T": "residential-low-density",
+        "R2-7": "residential-low-density",
+        "RA-H": "residential-low-density",
+        "RA-H-3.2": "residential-low-density",
+        "RA14-26": "residential-low-density",
+        "RA4.8": "residential-low-density",
+        "RA6-15": "residential-low-density",
+        "RA7-16": "residential-low-density",
+        "RA8-18": "residential-low-density"
+      }
     }
   }
 }

@@ -1197,5 +1197,115 @@
     "method": "gis_verified",
     "zoning_code": "R-A",
     "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.976052 lon:-77.308054 returning ZONECODE='R-A', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "219 n evergreen st",
+    "jurisdiction_id": "arlington-county-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R-6",
+    "source": "Arlington County Zoning (arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0) spatial intersect at lat:38.869702 lon:-77.11972 returning ZN_DESIG='R-6'; address point from Open_Data/od_Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "3730 25th st n",
+    "jurisdiction_id": "arlington-county-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R-10",
+    "source": "Arlington County Zoning (arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0) spatial intersect at lat:38.904087 lon:-77.103451 returning ZN_DESIG='R-10'; address point from Open_Data/od_Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "3727 6th rd n",
+    "jurisdiction_id": "arlington-county-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R2-7",
+    "source": "Arlington County Zoning (arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0) spatial intersect at lat:38.879222 lon:-77.103232 returning ZN_DESIG='R2-7'; address point from Open_Data/od_Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "1320 n hudson st",
+    "jurisdiction_id": "arlington-county-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R-5",
+    "source": "Arlington County Zoning (arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0) spatial intersect at lat:38.888211 lon:-77.098308 returning ZN_DESIG='R-5'; address point from Open_Data/od_Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "6700 29th st n",
+    "jurisdiction_id": "arlington-county-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R-8",
+    "source": "Arlington County Zoning (arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0) spatial intersect at lat:38.895037 lon:-77.163926 returning ZN_DESIG='R-8'; address point from Open_Data/od_Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "2647 n pershing dr",
+    "jurisdiction_id": "arlington-county-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "C-1",
+    "source": "Arlington County Zoning (arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0) spatial intersect at lat:38.880971 lon:-77.090276 returning ZN_DESIG='C-1'; address point from Open_Data/od_Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "4625 old dominion dr",
+    "jurisdiction_id": "arlington-county-va",
+    "parcel_id": null,
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "C-2",
+    "source": "Arlington County Zoning (arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0) spatial intersect at lat:38.898824 lon:-77.120833 returning ZN_DESIG='C-2'; address point from Open_Data/od_Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "544 12th st s",
+    "jurisdiction_id": "arlington-county-va",
+    "parcel_id": null,
+    "zoning_district": "mixed-use-core",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "C-O-2.5",
+    "source": "Arlington County Zoning (arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0) spatial intersect at lat:38.862884 lon:-77.05518 returning ZN_DESIG='C-O-2.5'; address point from Open_Data/od_Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "4625 34th st s",
+    "jurisdiction_id": "arlington-county-va",
+    "parcel_id": null,
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "RA14-26",
+    "source": "Arlington County Zoning (arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0) spatial intersect at lat:38.834759 lon:-77.091992 returning ZN_DESIG='RA14-26'; address point from Open_Data/od_Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "2645 shirlington rd",
+    "jurisdiction_id": "arlington-county-va",
+    "parcel_id": null,
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "M-2",
+    "source": "Arlington County Zoning (arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/od_Zoning_Polygons/FeatureServer/0) spatial intersect at lat:38.844866 lon:-77.083465 returning ZN_DESIG='M-2'; address point from Open_Data/od_Address_Points/FeatureServer/0"
   }
 ]

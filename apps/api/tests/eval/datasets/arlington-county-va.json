@@ -1,0 +1,179 @@
+[
+  {
+    "id": "arlington-county-va-r-6-single-family",
+    "address": "219 N Evergreen St, Arlington, VA 22203",
+    "project_description": "Build a new detached single-family home on a vacant residential lot; owner-occupied, no employees, no business hours.",
+    "jurisdiction_id": "arlington-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "§5.1"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "arlington-county-va-r-10-child-care",
+    "address": "3730 25th St N, Arlington, VA 22207",
+    "project_description": "Open a child care center for 40 children in a converted building; 8 employees, open 7am to 6pm weekdays, interior renovation only.",
+    "jurisdiction_id": "arlington-county-va",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "§5.1"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "arlington-county-va-r2-7-duplex",
+    "address": "3727 6th Rd N, Arlington, VA 22203",
+    "project_description": "Build a new duplex (two-family dwelling) on a residential lot; owner-occupied, no employees, no business hours.",
+    "jurisdiction_id": "arlington-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "§5.1"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "arlington-county-va-r-5-medical-office",
+    "address": "1320 N Hudson St, Arlington, VA 22201",
+    "project_description": "Open a medical and dental clinic in a new building; 6 employees, open 8am to 5pm weekdays, new construction.",
+    "jurisdiction_id": "arlington-county-va",
+    "expect": {
+      "decision_in": [
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "§5.1"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "arlington-county-va-r-8-retail",
+    "address": "6700 29th St N, Arlington, VA 22213",
+    "project_description": "Open a retail clothing store; 4 employees, open 10am to 8pm daily, interior renovation of an existing building.",
+    "jurisdiction_id": "arlington-county-va",
+    "expect": {
+      "decision_in": [
+        "restricted"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "§5.1"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "arlington-county-va-c-1-restaurant",
+    "address": "2647 N Pershing Dr, Arlington, VA 22201",
+    "project_description": "Open a sit-down restaurant with 60 seats; 12 employees, open 11am to 10pm daily, interior renovation of an existing storefront.",
+    "jurisdiction_id": "arlington-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "§7.1"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "arlington-county-va-c-2-retail",
+    "address": "4625 Old Dominion Dr, Arlington, VA 22207",
+    "project_description": "Open a retail hardware store; 6 employees, open 8am to 8pm daily, interior renovation of an existing storefront.",
+    "jurisdiction_id": "arlington-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "§7.1"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "arlington-county-va-c-o-2-5-office",
+    "address": "544 12th St S, Arlington, VA 22202",
+    "project_description": "Lease space for a business and professional office (accounting firm); 25 employees, open 8am to 6pm weekdays, interior renovation only.",
+    "jurisdiction_id": "arlington-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "§7.1"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "arlington-county-va-ra14-26-apartments",
+    "address": "4625 34th St S, Arlington, VA 22206",
+    "project_description": "Build a new multiple-family apartment building with 24 units; 2 employees for property management, office hours 9am to 5pm, new construction.",
+    "jurisdiction_id": "arlington-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "§6.1"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "arlington-county-va-m-2-warehouse",
+    "address": "2645 Shirlington Rd, Arlington, VA 22206",
+    "project_description": "Operate a wholesale storage warehouse; 10 employees, open 7am to 4pm weekdays, interior renovation of an existing building.",
+    "jurisdiction_id": "arlington-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "§8.1"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]

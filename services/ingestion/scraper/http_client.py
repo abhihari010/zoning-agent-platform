@@ -186,11 +186,21 @@ class PoliteHttpClient:
         if cached is not None:
             return cached
 
-        text = self._get_with_retries(url)
+        text = self._get_with_retries(url).text
         self._write_cache(cache_path, text)
         return text
 
-    def _get_with_retries(self, url: str) -> str:
+    def get_bytes(self, url: str, *, cache_suffix: str = ".bin") -> bytes:
+        """GET ``url`` returning the raw body (a PDF), using the on-disk cache first."""
+        cache_path = self._cache_path(url, cache_suffix)
+        if cache_path is not None and cache_path.exists():
+            return cache_path.read_bytes()
+        data = self._get_with_retries(url).content
+        if cache_path is not None:
+            cache_path.write_bytes(data)
+        return data
+
+    def _get_with_retries(self, url: str):
         last_error: Exception | None = None
         for attempt in range(self.config.max_retries):
             self._respect_rate_limit()
@@ -211,7 +221,7 @@ class PoliteHttpClient:
                 elif status >= 400:
                     response.raise_for_status()
                 else:
-                    return response.text
+                    return response
             finally:
                 self._last_request_ts = time.monotonic()
 
