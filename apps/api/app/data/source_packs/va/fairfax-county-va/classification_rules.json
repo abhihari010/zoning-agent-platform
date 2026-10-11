@@ -1,0 +1,16 @@
+{
+  "schema_version": "source-classification-rules/v1",
+  "_notes": "Human-authored 2026-10-10 (#242). Tagged the two Article 4 use tables (Table 4101.1 residential/commercial/industrial and the planned-development table) [\"general\", \"principal_uses\"] so _ensure_use_table_rows reserves a retrieval slot for them, as in clarksville-tn and nashville-davidson-tn.",
+  "rules": [
+    {
+      "title_contains": "Use Table for",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    }
+  ]
+}

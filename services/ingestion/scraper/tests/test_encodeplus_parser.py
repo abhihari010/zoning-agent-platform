@@ -315,3 +315,43 @@ def test_fetch_with_unparseable_toc_raises(monkeypatch):
     fetcher = EncodePlusFetcher(regs_slug="fake-va-zo")
     with pytest.raises(ValueError, match="table of contents"):
         fetcher.fetch(city="Fake", state="VA")
+
+
+# Fairfax County's landing page arrives collapsed: a Table of Contents leaf plus the
+# unselected root folder, so there is no selected node to read children from.
+_FAKE_COLLAPSED_LANDING = """
+<div id="toc-list">
+    <ul class='toc-level0' >
+<li id='secid-x-1'><i class='fa fa-file-text-o' aria-hidden='true'></i><span class='toc-item'>Table of Contents</span></li>
+    <li id="secid-x2214" class="tocLink "><a href="#" onclick="ZP.TOCView.Expand('001'); return false;" role="button"></a>
+        <span class="toc-item">Fake County Zoning Ordinance</span></li>
+    </ul>
+</div>
+"""
+
+
+def test_fetch_expands_a_collapsed_root(monkeypatch):
+    class _CollapsedClient(_FakeClient):
+        def get_text(self, url: str, cache_suffix: str = "") -> str:
+            if "doc-viewer.aspx?secid=1" in url:
+                type(self).calls.append(url)
+                return _FAKE_COLLAPSED_LANDING
+            if "toc-view.aspx?tocid=001&" in url:
+                type(self).calls.append(url)
+                return _FAKE_LANDING  # the root, now selected, with its chapters
+            return super().get_text(url, cache_suffix)
+
+    _CollapsedClient.calls = []
+    monkeypatch.setattr(encodeplus, "PoliteHttpClient", _CollapsedClient)
+    result = EncodePlusFetcher(regs_slug="fake-county-va").fetch(city="Fake", state="VA")
+
+    assert [s.section_ref for s in result.sections] == ["1.01", "1.02"]
+
+
+def test_parse_section_page_abbreviation_leaf_takes_its_own_line_as_title():
+    # Fairfax files each abbreviation as its own leaf; a 2-character title fails
+    # SourceRegistryEntry (min_length=3) and aborted the whole pack import.
+    html = "<section class='doc-section' data-secid='2275'><p>1.</p><p>ac – acre</p></section>"
+    record = parse_section_page(html, deep_link=_DEEP_LINK, breadcrumb=["Article 8"], fallback_title="ac")
+    assert record is not None
+    assert record.heading == "ac – acre"

@@ -326,3 +326,26 @@ def test_parcel_tool_flags_a_parcel_the_layer_puts_outside_the_jurisdiction(monk
     assert result.method == "gis_outside_jurisdiction"
     assert result.zoning_district is None
     assert result.zoning_code == "Satellite City"
+
+
+def test_lookup_flags_a_town_the_county_layer_names(monkeypatch):
+    # Fairfax County's layer also carries the Towns of Herndon and Vienna, which zone
+    # their own land; a "Vienna, VA" postal address may be either.
+    monkeypatch.setitem(
+        parcel_gis.load_gis_sources(),
+        "fake-county-va",
+        {
+            "url": "https://example.test/Zoning/FeatureServer/0",
+            "zoning_field": "ZONECODE",
+            "jurisdiction_field": "JURISDICTION",
+            "jurisdiction_value": "FAKE COUNTY",
+            "outside_jurisdiction_values": ["TOWN OF VIENNA"],
+        },
+    )
+    _stub_get(monkeypatch, _arcgis_payload(ZONECODE="AC", JURISDICTION="TOWN OF VIENNA"))
+    town = parcel_gis.lookup("fake-county-va", 38.9012, -77.2653)
+    assert town is not None and town.outside_jurisdiction and town.zoning_code == "TOWN OF VIENNA"
+
+    parcel_gis.clear_cache()
+    _stub_get(monkeypatch, _arcgis_payload(ZONECODE="AC", JURISDICTION="SOME OTHER PLACE"))
+    assert parcel_gis.lookup("fake-county-va", 38.9012, -77.2653) is None

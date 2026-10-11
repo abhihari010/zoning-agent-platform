@@ -1146,5 +1146,48 @@
     "zoning_map_url": null,
     "planning_contact": {},
     "last_verified_at": "2026-10-09"
+  },
+  {
+    "jurisdiction_id": "fairfax-county-va",
+    "name": "Fairfax County, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "059",
+    "place_fips": null,
+    "jurisdiction_type": "county",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "county",
+    "locality_names": [
+      "Annandale",
+      "Springfield",
+      "Reston",
+      "McLean",
+      "Centreville",
+      "Chantilly",
+      "Burke",
+      "Lorton",
+      "Great Falls",
+      "Oakton",
+      "Fairfax Station"
+    ],
+    "county_names": [
+      "Fairfax County"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://online.encodeplus.com/regs/fairfaxcounty-va/doc-viewer.aspx",
+      "https://www.fairfaxcounty.gov/dpz/zoning-ordinance",
+      "https://www.fairfaxcounty.gov/planning-development/"
+    ],
+    "zoning_map_url": "https://www.fairfaxcounty.gov/maps/",
+    "planning_contact": {
+      "url": "https://www.fairfaxcounty.gov/planning-development/"
+    },
+    "last_verified_at": "2026-10-10",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
   }
 ]

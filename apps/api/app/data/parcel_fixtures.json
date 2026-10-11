@@ -1087,5 +1087,115 @@
     "method": "gis_verified",
     "zoning_code": "IR",
     "source": "Metro Nashville Zoning (maps.nashville.gov/arcgis/rest/services/Zoning/Zoning/MapServer/0) spatial intersect at lat:36.205798 lon:-86.885667 returning ZONE_DESC='IR'; address point from Addressing/AddressPoints/MapServer/0"
+  },
+  {
+    "address_pattern": "3023 miller heights rd",
+    "jurisdiction_id": "fairfax-county-va",
+    "parcel_id": "0471 06  0056",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R-1",
+    "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.883969 lon:-77.327087 returning ZONECODE='R-1', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "1703 bushrod rd",
+    "jurisdiction_id": "fairfax-county-va",
+    "parcel_id": "1112 02020011",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R-3",
+    "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.714129 lon:-77.060469 returning ZONECODE='R-3', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "5914 erving st",
+    "jurisdiction_id": "fairfax-county-va",
+    "parcel_id": "0803 02200008",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R-4",
+    "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.789604 lon:-77.191786 returning ZONECODE='R-4', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "7315 hayfield rd",
+    "jurisdiction_id": "fairfax-county-va",
+    "parcel_id": "0913 1121    A1",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "PDH-4",
+    "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.757371 lon:-77.146395 returning ZONECODE='PDH-4', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "1909 hyannis ct",
+    "jurisdiction_id": "fairfax-county-va",
+    "parcel_id": "0392 01  0072",
+    "zoning_district": "residential-low-density",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R-20",
+    "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.916749 lon:-77.211549 returning ZONECODE='R-20', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "6123a backlick rd",
+    "jurisdiction_id": "fairfax-county-va",
+    "parcel_id": "0804 01  0003",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "C-6",
+    "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.783646 lon:-77.184746 returning ZONECODE='C-6', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "5707 seminary rd",
+    "jurisdiction_id": "fairfax-county-va",
+    "parcel_id": "0623 02      C",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "C-8",
+    "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.846527 lon:-77.124563 returning ZONECODE='C-8', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "3300 woodburn rd",
+    "jurisdiction_id": "fairfax-county-va",
+    "parcel_id": "0592 01  0001D1",
+    "zoning_district": "commercial-employment",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "C-3",
+    "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.855072 lon:-77.224632 returning ZONECODE='C-3', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "7516a fullerton rd",
+    "jurisdiction_id": "fairfax-county-va",
+    "parcel_id": "0991 09  0001",
+    "zoning_district": "industrial-zone",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "I-5",
+    "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.743092 lon:-77.201452 returning ZONECODE='I-5', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
+  },
+  {
+    "address_pattern": "10500 leesburg pike",
+    "jurisdiction_id": "fairfax-county-va",
+    "parcel_id": "0124 01  0066",
+    "zoning_district": "agricultural",
+    "overlays": [],
+    "confidence": 0.9,
+    "method": "gis_verified",
+    "zoning_code": "R-A",
+    "source": "Fairfax County Zoning (services1.arcgis.com/ioennV6PpG5Xodq0/arcgis/rest/services/Zoning/FeatureServer/0) spatial intersect at lat:38.976052 lon:-77.308054 returning ZONECODE='R-A', JURISDICTION='FAIRFAX COUNTY'; address point from Address_Points/FeatureServer/0"
   }
 ]

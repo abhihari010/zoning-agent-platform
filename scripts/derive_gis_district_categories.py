@@ -109,7 +109,13 @@ def family(text: str) -> str | None:
     return hits[0] if len(hits) == 1 else None
 
 
+# A dotted section number is numbering however it ends: "4102.5.II Retail Sales,
+# Large" is subsection II of 4102.5, not a heading about Fairfax's I-I district.
+DOTTED_NUMBER = re.compile(r"^\s*\d+(?:\.[0-9A-Za-z]+)+\s+")
+
+
 def _strip_numbering(heading: str) -> str:
+    heading = DOTTED_NUMBER.sub("", heading, count=1)
     previous = None
     while previous != heading:
         previous = heading
@@ -118,6 +124,11 @@ def _strip_numbering(heading: str) -> str:
 
 
 def _leads_heading(heading: str, code: str) -> bool:
+    # Checked before numbering is stripped: LEAD reads a leading "I-" as a roman
+    # numeral, which turned "I-2 Low Intensity Industrial District" into "2 Low ...".
+    raw = [t for t in SPLIT.split(heading.strip()) if t]
+    if raw and normalize(raw[0].strip(".-/")) == normalize(code):
+        return True
     tokens = [t for t in SPLIT.split(_strip_numbering(heading).strip()) if t]
     return bool(tokens) and normalize(tokens[0].strip(".-/")) == normalize(code)
 
@@ -328,6 +339,17 @@ def _derive_from_codes(
         if len({f for f, _ in matched}) == 1:
             categories[code] = next(iter(matched))[0]
             evidence[code] = "ordinance heading: " + sorted(h for _, h in matched)[0]
+            continue
+        # A density-suffixed code is its district at that density: Fairfax maps
+        # PDH-4, PDH-8 ... while the ordinance defines "PDH Planned Development
+        # Housing District" once. Only a heading that leads with exactly the stem.
+        stem = re.fullmatch(r"([A-Z]{2,})-\d+", code.strip().upper())
+        if stem:
+            matched = {(family(h), h) for h in headings if _leads_heading(h, stem.group(1))}
+            matched = {(f, h) for f, h in matched if f}
+            if len({f for f, _ in matched}) == 1:
+                categories[code] = next(iter(matched))[0]
+                evidence[code] = "ordinance heading for its district: " + sorted(h for _, h in matched)[0]
 
     for code in codes:                                                # 4. named inline
         if code in categories:
