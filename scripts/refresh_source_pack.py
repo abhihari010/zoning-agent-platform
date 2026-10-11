@@ -36,8 +36,10 @@ WEAK_DATE_SOURCES = {None, "unknown", "retrieval_date"}
 
 
 def _ref(value: str | None) -> str:
-    # Older packs carry trailing-period refs ("Sec. 30-682.1."), the scraper no longer does.
-    return (value or "").strip().rstrip(".")
+    # Older packs carry trailing-period refs ("Sec. 30-682.1."), the scraper no longer
+    # does, and codes re-punctuate a number on recodification: Alexandria's "2.164.1"
+    # became "2-164.1". Only separators are folded, and an id must match as well.
+    return re.sub(r"[.\-\s]", "", (value or "").strip().rstrip("."))
 
 
 def _squash(text: str | None) -> str:
