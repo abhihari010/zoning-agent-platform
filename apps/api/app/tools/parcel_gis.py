@@ -112,6 +112,20 @@ def _lookup_cached(
         # neighbouring parcel. Answering with the wrong town's zoning is worse than
         # not answering.
         if actual != expected:
+            # Some of those other jurisdictions are ones a geocoder files under this
+            # one: Fairfax County's layer carries the Towns of Herndon and Vienna,
+            # whose postal names also cover much of the unincorporated county. The
+            # layer saying "TOWN OF VIENNA" is the only reliable signal of which
+            # ordinance governs, so say so rather than answer nothing.
+            outside = {str(v).strip().upper() for v in config.get("outside_jurisdiction_values") or []}
+            if actual in outside:
+                return ParcelGisResult(
+                    parcel_id=None,
+                    zoning_code=actual,
+                    district=None,
+                    attribution=str(config.get("attribution", "")).strip(),
+                    outside_jurisdiction=True,
+                )
             return None
 
     zoning_code = str(attributes.get(str(config.get("zoning_field", "ZONING"))) or "").strip()

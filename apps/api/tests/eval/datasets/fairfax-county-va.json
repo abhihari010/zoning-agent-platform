@@ -1,0 +1,183 @@
+[
+  {
+    "id": "fairfax-county-va-r-1",
+    "address": "3023 Miller Heights Rd, Oakton, VA 22124",
+    "project_description": "Build a new detached single-family home on a vacant residential lot; owner-occupied, no employees, no business hours.",
+    "jurisdiction_id": "fairfax-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Use Table for Residential, Commercial, and Industrial Districts"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fairfax-county-va-r-3",
+    "address": "1703 Bushrod Rd, Alexandria, VA 22308",
+    "project_description": "Build a new detached single-family house to replace an existing one on the lot; owner-occupied, no employees, no business hours.",
+    "jurisdiction_id": "fairfax-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Use Table for Residential, Commercial, and Industrial Districts"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fairfax-county-va-r-4",
+    "address": "5914 Erving St, Springfield, VA 22150",
+    "project_description": "Construct a new detached single-family dwelling on an infill lot; owner-occupied, no employees, no business hours.",
+    "jurisdiction_id": "fairfax-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Use Table for Residential, Commercial, and Industrial Districts"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fairfax-county-va-pdh-4",
+    "address": "7315 Hayfield Rd, Alexandria, VA 22315",
+    "project_description": "Build a new detached single-family home on a lot shown on the approved final development plan; owner-occupied, no employees, no business hours.",
+    "jurisdiction_id": "fairfax-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Use Table for Planned Development Districts"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fairfax-county-va-r-20",
+    "address": "1909 Hyannis Ct, Mclean, VA 22102",
+    "project_description": "Construct a 24-unit multifamily apartment building; residential only, no commercial hours or employees.",
+    "jurisdiction_id": "fairfax-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Use Table for Residential, Commercial, and Industrial Districts"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fairfax-county-va-c-6",
+    "address": "6123A Backlick Rd, Springfield, VA 22150",
+    "project_description": "Open a general retail store in an existing shopping center space after interior renovation; open 10am-9pm with 12 employees.",
+    "jurisdiction_id": "fairfax-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Use Table for Residential, Commercial, and Industrial Districts"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fairfax-county-va-c-8",
+    "address": "5707 Seminary Rd, Falls Church, VA 22041",
+    "project_description": "Open a sit-down restaurant in an existing commercial building after interior renovation; open 11am-11pm with 20 employees.",
+    "jurisdiction_id": "fairfax-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Use Table for Residential, Commercial, and Industrial Districts",
+        "4102.5"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fairfax-county-va-c-3",
+    "address": "3300 Woodburn Rd, Annandale, VA 22003",
+    "project_description": "Use an existing building as a general professional office after interior renovation; open 8am-6pm with 30 employees.",
+    "jurisdiction_id": "fairfax-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Use Table for Residential, Commercial, and Industrial Districts"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fairfax-county-va-i-5",
+    "address": "7516A Fullerton Rd, Springfield, VA 22153",
+    "project_description": "Operate a warehouse for storage of packaged goods in an existing building; open 6am-6pm with 15 employees, minor renovation.",
+    "jurisdiction_id": "fairfax-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Use Table for Residential, Commercial, and Industrial Districts"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  },
+  {
+    "id": "fairfax-county-va-r-a",
+    "address": "10500 Leesburg Pike, Vienna, VA 22182",
+    "project_description": "Build a new detached single-family home on a large rural lot; owner-occupied, no employees, no business hours.",
+    "jurisdiction_id": "fairfax-county-va",
+    "expect": {
+      "decision_in": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "permit_path_includes": [],
+      "must_cite_section_refs": [
+        "Use Table for Residential, Commercial, and Industrial Districts"
+      ],
+      "min_confidence": 0.0,
+      "should_abstain": false
+    }
+  }
+]

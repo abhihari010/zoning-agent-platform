@@ -415,6 +415,10 @@ def _validate_source(
     for field_name in ["source_id", "title", "section_ref", "jurisdiction_id", "effective_date"]:
         if field_name in source and not _text(source.get(field_name)):
             result.errors.append(SourcePackIssue(path, f"{field_name} must be non-empty."))
+    # SourceRegistryEntry requires min_length=3; a shorter title passed this script
+    # and then aborted the whole import (Fairfax's abbreviation leaves, "ac", "du").
+    if 0 < len(_text(source.get("title"))) < 3:
+        result.errors.append(SourcePackIssue(path, "title must be at least 3 characters."))
 
     source_id = _text(source.get("source_id"))
     if source_id:

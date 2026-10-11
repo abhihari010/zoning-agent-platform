@@ -230,6 +230,12 @@ def parse_section_page(
     text = clean_html(body_html)
     if not text.strip():
         return None
+    if len(heading) < 3:
+        # Fairfax files each abbreviation as its own leaf ("ac", "du", "sf"), and a
+        # title under 3 characters fails SourceRegistryEntry, which aborts the whole
+        # pack import. The entry's own line ("ac – acre") is the honest title.
+        own_line = next((ln.strip() for ln in text.splitlines() if ln.strip().startswith(heading)), "")
+        heading = own_line if len(own_line) >= 3 else heading
 
     effective = effective_date_from_html(inner) or fallback_effective_date
 
@@ -320,6 +326,13 @@ class EncodePlusFetcher:
                 cache_suffix=f".landing_{regs_slug}.html",
             )
             top = parse_toc_children(landing)
+            if not top:
+                # Fairfax's landing page arrives collapsed: a "Table of Contents"
+                # leaf plus the unselected root folder. Expanding that root yields
+                # the same selected-node markup Loudoun's landing page carries.
+                root_key = _EXPAND_KEY_RE.search(landing)
+                if root_key:
+                    top = self._expand(root_key.group(1))
             if not top:
                 raise ValueError(
                     "Could not parse the enCodePlus table of contents for "

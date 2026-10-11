@@ -3029,5 +3029,149 @@
         "winchester-va"
       ]
     }
+  },
+  {
+    "id": "fairfax-county-va-public-supported-r-4-residential",
+    "project_description": "Build a new detached single-family house with two employees on site, posted operating hours, and new construction only, on a vacant lot in the R-4 residential district, where the use table permits single-family detached dwellings by right.",
+    "district": "residential-low-density",
+    "jurisdiction_id": "fairfax-county-va",
+    "jurisdiction_name": "Fairfax County, VA",
+    "normalized_address": "5914 Erving Street, Springfield, VA",
+    "sources": [
+      {
+        "source_id": "fairfax-county-va-use-table-for-residential-commercial-and-industrial-districts",
+        "title": "Use Table for Residential, Commercial, and Industrial Districts",
+        "excerpt": "R-A | R-C | R-E | R-1 | r-2 | R-3 | R-4 | R-5 | R-8 | R-12 | R-16 | R-20 | R-30 | | C-1 | C-2 | C-3 | C-4 | C-5 | C-6 | C-7 | C-8 | I-I | I-2 | I-3 | I-4 | I-5 | I-6 | Dwelling, Single-Family Detached | P | P | P | P | P | P | P | P | P | | | | | P | | | | | | | | | | | | | | | |",
+        "section_ref": "Use Table for Residential, Commercial, and Industrial Districts",
+        "jurisdiction_id": "fairfax-county-va",
+        "url": "https://online.encodeplus.com/regs/fairfaxcounty-va/doc-viewer.aspx?secid=2545",
+        "effective_date": "2026-10-11",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "alexandria-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "christiansburg-va",
+        "clarksville-tn",
+        "danville-va",
+        "franklin-tn",
+        "fredericksburg-va",
+        "goodlettsville-tn",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "nashville-davidson-tn",
+        "newport-news-va",
+        "nolensville-tn",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "roanoke-county-va",
+        "roanoke-va",
+        "salem-va",
+        "springfield-tn",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
+  },
+  {
+    "id": "fairfax-county-va-public-supported-c-8-restaurant",
+    "project_description": "Open a sit-down restaurant with 20 employees, operating hours of 11am to 11pm, and interior renovation of an existing building in the C-8 highway commercial district, where the use table permits restaurants by right.",
+    "district": "commercial-employment",
+    "jurisdiction_id": "fairfax-county-va",
+    "jurisdiction_name": "Fairfax County, VA",
+    "normalized_address": "5707 Seminary Road, Falls Church, VA",
+    "sources": [
+      {
+        "source_id": "fairfax-county-va-use-table-for-residential-commercial-and-industrial-districts",
+        "title": "Use Table for Residential, Commercial, and Industrial Districts",
+        "excerpt": "R-A | R-C | R-E | R-1 | r-2 | R-3 | R-4 | R-5 | R-8 | R-12 | R-16 | R-20 | R-30 | | C-1 | C-2 | C-3 | C-4 | C-5 | C-6 | C-7 | C-8 | I-I | I-2 | I-3 | I-4 | I-5 | I-6 | Restaurant | | | | | | | | | | | | A+ | A+ | | A+ | SE A+ | P | P | P | P | P | P | | SE A+ | SE A+ | SE A+ | SE A+ | SE A+ | 4102.5.G 4102.1.G |",
+        "section_ref": "Use Table for Residential, Commercial, and Industrial Districts",
+        "jurisdiction_id": "fairfax-county-va",
+        "url": "https://online.encodeplus.com/regs/fairfaxcounty-va/doc-viewer.aspx?secid=2545",
+        "effective_date": "2026-10-11",
+        "districts": [
+          "unknown"
+        ],
+        "uses": [
+          "general"
+        ]
+      }
+    ],
+    "expect": {
+      "decisions": [
+        "likely_allowed",
+        "conditional"
+      ],
+      "statuses": [
+        "success"
+      ],
+      "min_citations": 1,
+      "min_confidence": 0.5,
+      "jurisdiction_supported": true,
+      "required_warning_substrings": [],
+      "forbidden_citation_jurisdiction_ids": [
+        "albemarle-county-va",
+        "alexandria-va",
+        "blacksburg-va",
+        "brentwood-tn",
+        "chesapeake-va",
+        "christiansburg-va",
+        "clarksville-tn",
+        "danville-va",
+        "franklin-tn",
+        "fredericksburg-va",
+        "goodlettsville-tn",
+        "hampton-va",
+        "henrico-county-va",
+        "loudoun-county-va",
+        "lynchburg-va",
+        "manassas-va",
+        "montgomery-county-va",
+        "nashville-davidson-tn",
+        "newport-news-va",
+        "nolensville-tn",
+        "norfolk-va",
+        "portsmouth-va",
+        "prince-william-county-va",
+        "richmond-va",
+        "roanoke-county-va",
+        "roanoke-va",
+        "salem-va",
+        "springfield-tn",
+        "staunton-va",
+        "suffolk-va",
+        "virginia-beach-va",
+        "winchester-va"
+      ]
+    }
   }
 ]
