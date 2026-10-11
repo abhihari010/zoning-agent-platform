@@ -35,6 +35,9 @@ class ParcelGisResult:
     zoning_code: str
     district: str | None
     attribution: str
+    # The layer itself says this parcel is outside the jurisdiction it was queried
+    # for -- Metro Nashville marks its satellite cities ZONE_DESC "Satellite City".
+    outside_jurisdiction: bool = False
 
 
 @lru_cache(maxsize=1)
@@ -128,6 +131,7 @@ def _lookup_cached(
         zoning_code=zoning_code,
         district=district,
         attribution=str(config.get("attribution", "")).strip(),
+        outside_jurisdiction=zoning_code in (config.get("outside_jurisdiction_codes") or []),
     )
 
 

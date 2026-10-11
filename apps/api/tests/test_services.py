@@ -536,3 +536,37 @@ def test_source_pack_manifests_validate_and_import() -> None:
     assert any(entry.jurisdiction_id == "christiansburg-va" for entry in entries)
     assert all(entry.url for entry in entries)
     assert all(entry.effective_date for entry in entries)
+
+
+def test_normalize_address_rejects_a_satellite_city_parcel_labelled_nashville(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Google labels this Belle Meade parcel "Nashville", so detection lands on Metro;
+    # Metro's own zoning layer is what says Metro does not zone it.
+    from app.models import ParcelResult
+    from app.tools.parcel_tool import ParcelTool
+
+    monkeypatch.setenv("GOOGLE_MAPS_API_KEY", "demo-key")
+    _mock_google_address(
+        monkeypatch,
+        {
+            "formatted_address": "4705 Harding Pike, Nashville, TN 37205, USA",
+            "place_id": "place-belle-meade",
+            "address_components": [
+                {"long_name": "Nashville", "types": ["locality"]},
+                {"long_name": "Davidson County", "types": ["administrative_area_level_2"]},
+                {"long_name": "Tennessee", "short_name": "TN", "types": ["administrative_area_level_1"]},
+                {"long_name": "United States", "short_name": "US", "types": ["country"]},
+            ],
+            "geometry": {"location": {"lat": 36.12039, "lng": -86.85235}},
+        },
+    )
+    outside = ParcelResult(zoning_code="Satellite City", method="gis_outside_jurisdiction")
+    monkeypatch.setattr(ParcelTool, "lookup", lambda *args, **kwargs: outside)
+
+    result = services.normalize_address("4705 Harding Pike, Nashville, TN 37205")
+
+    assert result.is_valid is False
+    assert result.support_status == "unsupported"
+    assert result.zoning_code == "Satellite City"
+    assert result.jurisdiction_name == "A municipality inside Nashville-Davidson County (Metro), TN"

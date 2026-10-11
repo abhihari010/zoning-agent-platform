@@ -314,3 +314,15 @@ def test_layer_per_district_declines_when_two_layers_claim_the_point(monkeypatch
     )
 
     assert parcel_gis.lookup("springfield-tn", 36.509, -86.885) is None
+
+
+def test_parcel_tool_flags_a_parcel_the_layer_puts_outside_the_jurisdiction(monkeypatch):
+    # Metro Nashville's layer marks Belle Meade, Berry Hill, Forest Hills and Oak Hill
+    # "Satellite City": inside Davidson County, but zoned by their own councils.
+    _stub_get(monkeypatch, _arcgis_payload(ZONE_DESC="Satellite City"))
+
+    result = ParcelTool().lookup("4705 Harding Pike, Nashville, TN", 36.12039, -86.85235, "nashville-davidson-tn")
+
+    assert result.method == "gis_outside_jurisdiction"
+    assert result.zoning_district is None
+    assert result.zoning_code == "Satellite City"

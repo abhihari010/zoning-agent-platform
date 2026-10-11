@@ -552,7 +552,10 @@
         "SCC": "commercial-employment",
         "SCN": "commercial-employment",
         "SCR": "commercial-employment"
-      }
+      },
+      "outside_jurisdiction_codes": [
+        "Satellite City"
+      ]
     },
     "newport-news-va": {
       "provider": "arcgis",

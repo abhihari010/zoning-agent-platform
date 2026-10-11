@@ -37,6 +37,16 @@ class ParcelTool:
         gis = parcel_gis.lookup(jurisdiction_id, lat, lng)
         if gis is not None:
             attribution = f" ({gis.attribution})" if gis.attribution else ""
+            if gis.outside_jurisdiction:
+                return ParcelResult(
+                    parcel_id=gis.parcel_id,
+                    zoning_code=gis.zoning_code,
+                    method="gis_outside_jurisdiction",
+                    warnings=[
+                        f"The zoning map{attribution} marks this parcel '{gis.zoning_code}': "
+                        "it is zoned by a separate municipality, not this jurisdiction.",
+                    ],
+                )
             if gis.district:
                 return ParcelResult(
                     parcel_id=gis.parcel_id,

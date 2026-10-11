@@ -238,6 +238,28 @@ def normalize_address(address: str) -> AddressNormalizationResult:
         address_result.lng,
         jurisdiction.jurisdiction_id or "",
     )
+    if parcel.method == "gis_outside_jurisdiction":
+        # Geocoders label satellite-city addresses with the surrounding city's name
+        # ("Belle Meade" comes back as "Nashville"), so only the jurisdiction's own
+        # zoning layer can say the parcel is governed by a different ordinance.
+        return AddressNormalizationResult(
+            normalized_address=address_result.normalized_address,
+            district="unknown",
+            place_id=address_result.place_id,
+            latitude=address_result.lat,
+            longitude=address_result.lng,
+            is_valid=False,
+            warnings=[
+                *parcel.warnings,
+                "This tool does not yet support zoning review for that municipality; "
+                "check with its own planning office.",
+            ],
+            support_status="unsupported",
+            jurisdiction_name=f"A municipality inside {jurisdiction.jurisdiction_name}",
+            coverage_status="unsupported",
+            zoning_code=parcel.zoning_code,
+            parcel_id=parcel.parcel_id,
+        )
     district = parcel.zoning_district or _extract_district_from_components(address_result.address_components)
     district_confidence = parcel.confidence if parcel.zoning_district else 0.3 if district != "unknown" else 0.0
     district_method = parcel.method if parcel.zoning_district else "component_rule" if district != "unknown" else "unknown"
