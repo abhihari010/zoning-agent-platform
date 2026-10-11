@@ -459,6 +459,10 @@ CI_RECALL_FLOORS: dict[str, float] = {
     # 0.929 (13 of 14). Every scenario address is verified against Metro's own
     # zoning layer, and expected decisions come from that table's cells.
     "nashville-davidson-tn": 0.85,
+    # 2026-10-10 (#242): fairfax-county-va measured 0.636 (7 of 11) with both
+    # Article 4 use tables tagged principal_uses, decision accuracy 1.000. Every
+    # scenario address is verified against the county's own zoning layer.
+    "fairfax-county-va": 0.55,
 }
 # chesapeake-va's use tables rank poorly on keyword score alone, which is why
 # they need a reserved slot rather than a better query. The table refs held
