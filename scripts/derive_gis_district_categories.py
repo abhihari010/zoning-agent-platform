@@ -49,6 +49,8 @@ DATA = REPO / "apps" / "api" / "app" / "data"
 SOURCES_PATH = DATA / "parcel_gis_sources.json"
 EVIDENCE_PATH = DATA / "parcel_gis_district_evidence.json"
 PACKS = DATA / "source_packs"
+# Same identity as the runtime lookup: Arlington's server 404s httpx's default UA.
+HEADERS = {"User-Agent": "zoning-agent/1.0 (+https://github.com/abhihari010/zoning-agent-platform)"}
 
 # The vocabulary the source packs are tagged with, and the ordinance words that name
 # each family. Order matters: "DOWNTOWN"/"CENTRAL BUSINESS" also contain "BUSINESS",
@@ -72,6 +74,7 @@ FAMILIES: list[tuple[str, tuple[str, ...]]] = [
 # column only repeats the code, or holds rezoning history, are simply absent here.
 NAME_FIELDS = {
     "albemarle-county-va": "Zoning",
+    "arlington-county-va": "LABEL",
     "clarksville-tn": None,
     "danville-va": "ZONE_DESC",
     "loudoun-county-va": "ZD_ZONE_NAME",
@@ -222,7 +225,7 @@ def established_table(sources: list[dict], codes: list[str]) -> dict[str, tuple[
 
 
 def arcgis(url: str, params: dict[str, str], timeout: float = 90) -> dict:
-    response = httpx.get(url.rstrip("/") + "/query", params=params, timeout=timeout)
+    response = httpx.get(url.rstrip("/") + "/query", params=params, timeout=timeout, headers=HEADERS)
     response.raise_for_status()
     payload = response.json()
     if payload.get("error"):
@@ -260,7 +263,7 @@ def symbology(url: str) -> tuple[str, dict[str, str]]:
     ordinance heading is the authority when the two disagree.
     """
     try:
-        renderer = (httpx.get(url, params={"f": "json"}, timeout=30).json()
+        renderer = (httpx.get(url, params={"f": "json"}, timeout=30, headers=HEADERS).json()
                     .get("drawingInfo") or {}).get("renderer") or {}
     except Exception:  # noqa: BLE001 - symbology is a bonus, never a requirement
         return "", {}

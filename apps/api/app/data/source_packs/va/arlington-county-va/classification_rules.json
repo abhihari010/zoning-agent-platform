@@ -1,0 +1,16 @@
+{
+  "schema_version": "source-classification-rules/v1",
+  "_notes": "Human-authored 2026-10-11 (#247). Tagged the per-article use tables (§4.1, §5.1, §6.1, §7.1, §8.1 \"... Districts Use Tables\") [\"general\", \"principal_uses\"] so _ensure_use_table_rows reserves a retrieval slot for them, as in fairfax-county-va and nashville-davidson-tn. Every district section defers its uses to that table (\"Uses shall be as specified in §5.1\").",
+  "rules": [
+    {
+      "title_contains": "Districts Use Tables",
+      "districts": [
+        "unknown"
+      ],
+      "uses": [
+        "general",
+        "principal_uses"
+      ]
+    }
+  ]
+}

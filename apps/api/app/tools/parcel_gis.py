@@ -27,6 +27,9 @@ from app.settings import get_settings
 logger = logging.getLogger(__name__)
 
 GIS_SOURCES_PATH = Path(__file__).resolve().parents[1] / "data" / "parcel_gis_sources.json"
+# Arlington County's ArcGIS server answers httpx's default User-Agent with a 404, so
+# every lookup identifies itself instead.
+HEADERS = {"User-Agent": "zoning-agent/1.0 (+https://github.com/abhihari010/zoning-agent-platform)"}
 
 
 @dataclass(frozen=True)
@@ -177,7 +180,7 @@ def _lookup_layer_per_district(
         "f": "json",
     }
     response = httpx.get(str(config.get("url", "")).rstrip("/") + "/query",
-                         params=params, timeout=timeout_seconds)
+                         params=params, timeout=timeout_seconds, headers=HEADERS)
     response.raise_for_status()
     payload = response.json()
     if isinstance(payload, dict) and payload.get("error"):
@@ -241,7 +244,7 @@ def _query_arcgis(
     }
 
     url = str(config.get("url", "")).rstrip("/") + "/query"
-    response = httpx.get(url, params=params, timeout=timeout_seconds)
+    response = httpx.get(url, params=params, timeout=timeout_seconds, headers=HEADERS)
     response.raise_for_status()
     payload = response.json()
 

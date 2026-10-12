@@ -39,6 +39,7 @@ if __package__ in (None, ""):
         MadCapFlareFetcher,
         MunicipalCodeOnlineFetcher,
         MunicodeFetcher,
+        PdfFetcher,
     )
     from services.ingestion.scraper.fetchers.base import Fetcher
     from services.ingestion.scraper.http_client import FetchBlockedError
@@ -53,6 +54,7 @@ else:  # pragma: no cover - exercised via module execution
         MadCapFlareFetcher,
         MunicipalCodeOnlineFetcher,
         MunicodeFetcher,
+        PdfFetcher,
     )
     from .fetchers.base import Fetcher
     from .http_client import FetchBlockedError
@@ -158,6 +160,21 @@ def _build_fetcher(args: argparse.Namespace, *, raw_dir: Path) -> Fetcher:
             site_url=args.url[0],
             impersonate=impersonate,
         )
+    if args.fetcher == "pdf":
+        if not args.url or len(args.url) != 1:
+            raise SystemExit("--fetcher pdf requires exactly one --url (the ordinance PDF).")
+        impersonate = (
+            None
+            if str(args.impersonate).strip().lower() in {"none", "off", ""}
+            else args.impersonate
+        )
+        return PdfFetcher(
+            args.url[0],
+            cache_dir=raw_dir,
+            request_delay=args.delay,
+            max_sections=args.max_sections,
+            impersonate=impersonate,
+        )
     raise SystemExit(f"Unknown fetcher: {args.fetcher}")
 
 
@@ -236,6 +253,7 @@ def build_parser() -> argparse.ArgumentParser:
             "amlegal",
             "encodeplus",
             "madcapflare",
+            "pdf",
         ],
         default="municode",
         help="Which fetcher to use (default: municode).",

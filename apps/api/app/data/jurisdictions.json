@@ -1189,5 +1189,37 @@
     },
     "last_verified_at": "2026-10-11",
     "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
+  },
+  {
+    "jurisdiction_id": "arlington-county-va",
+    "name": "Arlington County, VA",
+    "state": "VA",
+    "state_fips": "51",
+    "county_fips": "013",
+    "place_fips": null,
+    "jurisdiction_type": "county",
+    "coverage_status": "source_indexed",
+    "supported": false,
+    "match_strategy": "county",
+    "locality_names": [
+      "Arlington"
+    ],
+    "county_names": [
+      "Arlington County"
+    ],
+    "state_names": [
+      "VA",
+      "Virginia"
+    ],
+    "official_source_urls": [
+      "https://www.arlingtonva.us/files/sharedassets/public/v/2/building/documents/codes-and-ordinances/aczo_effective_06.13.2026.pdf",
+      "https://www.arlingtonva.us/Government/Programs/Building/Codes-Ordinances/Zoning"
+    ],
+    "zoning_map_url": "https://arlgis.arlingtonva.us/web_files/Maps/Standard_Maps/Zoning_Map.pdf",
+    "planning_contact": {
+      "url": "https://www.arlingtonva.us/Government/Programs/Building/Codes-Ordinances/Zoning"
+    },
+    "last_verified_at": "2026-10-11",
+    "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
   }
 ]

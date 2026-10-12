@@ -34,6 +34,11 @@ monitoring = [
 scraper-impersonation = [
   "curl_cffi>=0.7"
 ]
+# Optional PDF parser for the scraper's `pdf` fetcher (Arlington County publishes
+# its ordinance only as a PDF). Imported lazily, only when that fetcher runs.
+scraper-pdf = [
+  "pdfplumber>=0.11"
+]
 # Optional Google GenAI SDK for the async Gemini Batch API embedding path
 # (scripts/reindex_prod.py --batch). Embeds the full corpus offline at half price
 # ($0.075 vs $0.15 per 1M tokens). Lazily imported in app/ai/gemini_batch_embedding.py;
