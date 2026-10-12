@@ -198,3 +198,31 @@ _DISTRICT_CATEGORIES = {
     "agricultural",
     "mixed-use-core",
 }
+
+
+def test_legend_prose_does_not_fill_the_use_table_reserve() -> None:
+    """A use-table section's legend prose is tagged like its table, and outranks it.
+
+    Arlington's live eval (2026-10-11): two "A 'P' indicates..." chunks of §7.1
+    filled both reserve slots, so the Restaurants row never reached the model
+    and it answered "unknown". The reserve must prefer the row naming the use
+    under the parcel's district column, over a sibling table that lacks it.
+    """
+    from app.ai.hybrid_local_retriever import _ensure_use_table_rows
+
+    tagged = ["general", "principal_uses"]
+    legend = [_chunk(f"legend-{i}", f"A P indicates a use permitted by-right {i}.", "§7.1", tagged) for i in range(2)]
+    other_table = _chunk("ra-table", "| Use | RA-6 | RA-8 |\n| Restaurants | U | U |", "§6.1", tagged)
+    row = _chunk("c-row", "| Use | C-1 | C-2 |\n| Restaurants | P | P |", "§7.1", tagged)
+    ranked = [(4.1, legend[0]), (4.0, legend[1]), (3.99, other_table), (3.9, row)]
+    request = RetrievalProviderRequest(
+        district="commercial-employment",
+        inferred_use="general",
+        project_description="Open a sit-down restaurant with 60 seats.",
+        jurisdiction_id="testville",
+        district_code="C1",
+    )
+
+    top = _ensure_use_table_rows(ranked[:2], ranked, request=request)
+
+    assert [c.chunk_id for _, c in top][2:] == ["c-row", "ra-table"]

@@ -270,7 +270,7 @@ class HybridLocalRetrievalProvider:
         # are pure functions of ``ranked``, so they need no vector hits. (The
         # third reserve, _ensure_district_definitions, is keyed on the district
         # query's vector hits and has no SQL analogue, so it stays Qdrant-only.)
-        top = _ensure_use_table_rows(top, ranked)
+        top = _ensure_use_table_rows(top, ranked, request=request)
         top = _ensure_use_table_rows(top, ranked, marker="use_standards", reserve=1)
         top = _ensure_dimensional_rows(top, ranked, request)
         return RetrievalProviderResult(
@@ -413,7 +413,7 @@ class HybridLocalRetrievalProvider:
         # Guarantee the permitted-use table row for the inferred use survives: it
         # is the primary evidence for the decision but shares a section_ref with
         # the chapter narrative, so the per-section diversify cap can drop it.
-        top = _ensure_use_table_rows(top, ranked)
+        top = _ensure_use_table_rows(top, ranked, request=request)
         # Guarantee the accessory / additional-standards section that qualifies the
         # use survives too: it is what separates "allowed" from "allowed, but".
         top = _ensure_use_table_rows(top, ranked, marker="use_standards", reserve=1)
@@ -523,6 +523,7 @@ def _ensure_use_table_rows(
     *,
     marker: str = "principal_uses",
     reserve: int = 2,
+    request: "RetrievalProviderRequest | None" = None,
 ) -> list[tuple[float, "SourceChunk"]]:
     """Guarantee the permitted-use table row(s) for the inferred use are present.
 
@@ -544,6 +545,21 @@ def _ensure_use_table_rows(
     scenario needs one standards section, and every sibling in the family ties on
     district and use, so token overlap alone picks the topical one.
     """
+    if request is not None and marker == "principal_uses":
+        # A use-table section also carries its legend prose ("A 'P' indicates..."),
+        # tagged like the table, and prose outranks a pipe-diluted row -- so two
+        # legend chunks filled the reserve and the row answering the question
+        # never reached the model. Prefer the chunk whose table has the parcel's
+        # district column and a row naming the use.
+        fit = _table_row_fit(request)
+        rows = sorted(
+            ((score, chunk) for score, chunk in ranked if marker in chunk.uses and fit(chunk) > (0, 0)),
+            key=lambda item: fit(item[1]),
+            reverse=True,  # stable: ties keep rank order
+        )
+        if rows:
+            existing = {chunk.chunk_id for _, chunk in top}
+            return list(top) + [item for item in rows[:reserve] if item[1].chunk_id not in existing]
     present = sum(1 for _, chunk in top if marker in chunk.uses)
     need = reserve - present
     if need <= 0:
@@ -664,6 +680,30 @@ def _tokens(text: str) -> set[str]:
 def _fold(code: str) -> str:
     """Fold separators so a GIS ``R1`` matches an ordinance ``R-1``, but not ``RM1``."""
     return "".join(ch for ch in code.upper() if ch.isalnum())
+
+
+def _stem(token: str) -> str:
+    return token[:-1] if token.endswith("s") and not token.endswith("ss") else token
+
+
+def _table_row_fit(request: RetrievalProviderRequest):
+    """(has the parcel's district column, use words its rows share with the project).
+
+    ponytail: bag-of-words over row text, plural-folded; a real use-name matcher
+    if a generic word ("open", "store") starts winning ties.
+    """
+    wanted = {_stem(t) for t in _tokens(request.project_description) if len(t) >= 4}
+    code = _fold(request.district_code) if request.district_code else None
+
+    def fit(chunk: SourceChunk) -> tuple[int, int]:
+        lines = [line for line in chunk.chunk_text.splitlines() if line.count("|") >= 2]
+        if not lines:
+            return (0, 0)
+        cells = {_fold(cell) for line in lines for cell in line.split("|")}
+        words = {_stem(t) for line in lines for t in _tokens(line)}
+        return (int(bool(code) and code in cells), len(wanted & words))
+
+    return fit
 
 
 def _code_matches(district_code: str | None, districts: list[str]) -> bool:
