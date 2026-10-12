@@ -300,6 +300,27 @@ def test_every_table_chunk_carries_its_header_row():
         assert f"Use Number {i} | | P |" in lines
 
 
+def test_two_line_table_header_travels_whole():
+    """A row of column groups over the row naming each column is one header.
+
+    fairfax's use table opens "Use | Residential Districts | Commercial Districts"
+    and only the NEXT line names R-1 ... C-6; re-seeding just the group row left
+    later chunks unable to say which column was C-6.
+    """
+    groups = "| Use | Residential | Commercial |"
+    columns = "| | R-1 | R-2 | C-1 | C-6 |"
+    rows = [f"| Use {i} | P | | | P |" for i in range(60)]
+    chunks = _chunk_text("\n".join([groups, columns, *rows]), max_chars=300)
+
+    assert len(chunks) > 1
+    for chunk in chunks:
+        assert chunk.startswith(f"{groups}\n{columns}\n")
+        assert chunk.count(columns) == 1
+    lines = [line for chunk in chunks for line in chunk.split("\n")]
+    for i in range(60):
+        assert f"| Use {i} | P | | | P |" in lines
+
+
 def test_table_header_reseeding_follows_the_nearest_band():
     """Codes that restate the header per band must attribute rows to their own.
 
