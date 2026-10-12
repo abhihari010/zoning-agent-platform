@@ -98,21 +98,63 @@ def _table_header_by_line(lines: list[str]) -> list[str | None]:
     through a long use table (clarksville's ``3.4`` restates the 27-column
     header for each of its use categories) attributes each row to the header
     actually above it rather than to the first header in the section.
+
+    A header can take two lines: a row of column groups ("Residential Districts |
+    Commercial Districts") over the row that names each column ("R-1 | ... | C-6").
+    When the run's second line has more cells than its first, it is that column
+    row and joins the header. Re-seeding only the group row left fairfax and
+    nashville chunks with ~30 values under ~5 labels, and the model answered
+    "restricted" for districts whose column it could no longer find.
+
+    A line with a single ``|`` inside a run is a category banner spanning the table
+    ("Agricultural and Related Uses |" in fairfax): it continues the run rather than
+    ending it, or every later band would lose the header naming its columns.
     """
     headers: list[str | None] = []
     run_header: str | None = None
+    header_open = False  # the run's header may still take its column row
     for line in lines:
-        if line.count("|") >= 2:
+        pipes = line.count("|")
+        if pipes >= 2:
+            # A row at least twice the header's width is a new, wider table that
+            # follows without prose between (nashville's 3-column key, then its
+            # 35-column use table).
+            if run_header is not None and not header_open \
+                    and pipes >= 2 * run_header.split("\n")[-1].count("|"):
+                run_header = None
             if run_header is None:
                 # This line opens the run, so it *is* the header.
                 headers.append(None)
-                run_header = line
+                run_header = _seed_line(line)
+                header_open = True
+            elif header_open and pipes > run_header.count("|"):
+                headers.append(None)
+                run_header = f"{run_header}\n{_seed_line(line)}"
+                header_open = False
             else:
                 headers.append(run_header)
+                header_open = False
+        elif pipes == 1 and run_header is not None:
+            headers.append(run_header)
+            header_open = False
         else:
             headers.append(None)
             run_header = None
     return headers
+
+
+def _seed_line(line: str) -> str:
+    """A header line as re-seeded into later chunks.
+
+    The first cell titles the row-label column; nashville's holds the whole
+    permission key (~150 chars), which pushed its header past the chunk size so
+    no chunk got one. Past 60 characters that title is dropped from the copy.
+    """
+    cells = line.split("|")
+    lead = 1 if cells and not cells[0].strip() else 0
+    if len(cells) > lead and len(cells[lead].strip()) > 60:
+        cells[lead] = " "
+    return "|".join(cells)
 
 
 def _chunk_text(text: str, max_chars: int = DEFAULT_CHUNK_MAX_CHARS) -> list[str]:
@@ -143,11 +185,11 @@ def _chunk_text(text: str, max_chars: int = DEFAULT_CHUNK_MAX_CHARS) -> list[str
             if current and len(candidate) > max_chars:
                 chunks.append(current)
                 # Seed only when the header still leaves room for the row, so a
-                # pathologically wide header cannot starve the chunk.
-                if header and len(header) + 1 + len(piece) <= max_chars:
-                    current = f"{header}\n{piece}"
-                else:
-                    current = piece
+                # pathologically wide header cannot starve the chunk. A two-line
+                # header that will not fit falls back to its column row.
+                seed = next((h for h in (header, (header or "").split("\n")[-1])
+                             if h and len(h) + 1 + len(piece) <= max_chars), None)
+                current = f"{seed}\n{piece}" if seed else piece
             else:
                 current = candidate
     if current:
