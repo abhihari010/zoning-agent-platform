@@ -148,6 +148,7 @@ class StoreRepository(Protocol):
         district: str | None = None,
         use: str | None = None,
         source_type: str | None = None,
+        use_tag: str | None = None,
     ) -> list[SourceChunk]: ...
 
     def get_source_chunks_by_ids(self, chunk_ids: list[str]) -> list[SourceChunk]: ...
@@ -1132,6 +1133,7 @@ class SQLAlchemyStore:
         district: str | None = None,
         use: str | None = None,
         source_type: str | None = None,
+        use_tag: str | None = None,
     ) -> list[SourceChunk]:
         try:
             with self.engine.connect() as connection:
@@ -1172,6 +1174,10 @@ class SQLAlchemyStore:
                         )
                     )
 
+                if use_tag:
+                    # Strict: only chunks carrying the tag itself, no "general" wildcard.
+                    stmt = stmt.where(source_chunks.c.uses_csv.like(f"%,{use_tag},%"))
+
                 rows = connection.execute(stmt).all()
         except SQLAlchemyError as exc:
             raise DatabaseStorageError(f"Could not filter source chunks: {exc}") from exc
@@ -1196,6 +1202,8 @@ class SQLAlchemyStore:
             ):
                 continue
             if use and use not in chunk.uses and "general" not in chunk.uses:
+                continue
+            if use_tag and use_tag not in chunk.uses:
                 continue
             filtered.append(chunk)
         return filtered
