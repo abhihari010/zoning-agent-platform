@@ -570,8 +570,21 @@ def _ensure_use_table_rows(
             reverse=True,  # stable: ties keep rank order
         )
         if rows:
+            # The row's P/PC/SE mean nothing without the table's key ("P = permitted"),
+            # which sits in its own chunk -- bring each reserved row's key along.
+            sections = {chunk.section_ref for _, chunk in rows[:reserve]}
+            keys = [
+                (score, chunk)
+                for score, chunk in ranked
+                if marker in chunk.uses and chunk.section_ref in sections and _TABLE_KEY_PATTERN.search(chunk.chunk_text)
+            ]
             existing = {chunk.chunk_id for _, chunk in top}
-            return list(top) + [item for item in rows[:reserve] if item[1].chunk_id not in existing]
+            augmented = list(top)
+            for item in [*rows[:reserve], *keys]:
+                if item[1].chunk_id not in existing:
+                    augmented.append(item)
+                    existing.add(item[1].chunk_id)
+            return augmented
     present = sum(1 for _, chunk in top if marker in chunk.uses)
     need = reserve - present
     if need <= 0:
@@ -694,6 +707,13 @@ def _fold(code: str) -> str:
     return "".join(ch for ch in code.upper() if ch.isalnum())
 
 
+# A use table's key: "P = permitted", "P—Permitted", '"P" indicates that a use is permitted'.
+_TABLE_KEY_PATTERN = re.compile(
+    r"(?<![A-Za-z])[\"“”]?P[\"“”]?\s*(?:=|—|–|:|\||indicates)\s*(?:that\s+)?(?:a\s+use\s+is\s+)?permitted",
+    re.IGNORECASE,
+)
+
+
 def _stem(token: str) -> str:
     return token[:-1] if token.endswith("s") and not token.endswith("ss") else token
 
@@ -706,7 +726,7 @@ def _table_row_fit(request: RetrievalProviderRequest, chunks: list[SourceChunk])
     beats "Garden Center" for a general retail store in a shopping center. Labels
     only: the header seeded onto every chunk would otherwise match everywhere.
     """
-    wanted = {_stem(t) for t in _tokens(request.project_description) if len(t) >= 4}
+    wanted = {_stem(t) for t in _tokens(request.project_description) if len(t) >= 3}
     code = _fold(request.district_code) if request.district_code else None
 
     def rows(chunk: SourceChunk) -> list[set[str]]:

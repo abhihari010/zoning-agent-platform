@@ -252,3 +252,24 @@ def test_reserve_prefers_the_row_naming_the_use_over_a_shared_generic_word() -> 
     top = _ensure_use_table_rows([], ranked, request=request)
 
     assert top[0][1].chunk_id == "retail"
+
+
+def test_reserved_row_brings_its_table_key() -> None:
+    """A row's "PC" is unreadable without its key chunk ("P = permitted ...");
+    Nashville's MUN office case answered "unknown" for want of it."""
+    from app.ai.hybrid_local_retriever import _ensure_use_table_rows
+
+    tagged = ["general", "principal_uses"]
+    key = _chunk("key", "Key: P—Permitted; PC—Permitted with conditions.", "17.08.030", tagged)
+    row = _chunk("row", "| Use | MUN | OR20 |\n| General office | PC | P |", "17.08.030", tagged)
+    request = RetrievalProviderRequest(
+        district="mixed-use",
+        inferred_use="general",
+        project_description="Convert part of a building into a general office.",
+        jurisdiction_id="testville",
+        district_code="MUN",
+    )
+
+    top = _ensure_use_table_rows([], [(4.0, row), (3.0, key)], request=request)
+
+    assert [c.chunk_id for _, c in top] == ["row", "key"]
