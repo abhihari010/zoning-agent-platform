@@ -1198,8 +1198,8 @@
     "county_fips": "013",
     "place_fips": null,
     "jurisdiction_type": "county",
-    "coverage_status": "source_indexed",
-    "supported": false,
+    "coverage_status": "public_supported",
+    "supported": true,
     "match_strategy": "county",
     "locality_names": [
       "Arlington"
@@ -1219,7 +1219,7 @@
     "planning_contact": {
       "url": "https://www.arlingtonva.us/Government/Programs/Building/Codes-Ordinances/Zoning"
     },
-    "last_verified_at": "2026-10-11",
+    "last_verified_at": "2026-10-12",
     "district_mapping_strategy": "source_indexed_until_city_zoning_code_and_gis_layers_qa_pass"
   }
 ]
