@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 import hashlib
 import json
 import re
@@ -413,7 +414,18 @@ class HybridLocalRetrievalProvider:
         # Guarantee the permitted-use table row for the inferred use survives: it
         # is the primary evidence for the decision but shares a section_ref with
         # the chapter narrative, so the per-section diversify cap can drop it.
-        top = _ensure_use_table_rows(top, ranked, request=request)
+        # A table's row chunks are mostly P/S symbols and rarely make the vector
+        # top-k, so the row for the use may not be a hit at all -- offer the
+        # reserve every tagged table chunk in the jurisdiction (a few dozen).
+        seen = {chunk.chunk_id for _, chunk in ranked}
+        tables = [
+            (_score_chunk(chunk, request, query_tokens), chunk)
+            for chunk in self.source_store.list_source_chunks_filtered(
+                jurisdiction_id=request.jurisdiction_id, district=request.district, use_tag="principal_uses"
+            )
+            if chunk.chunk_id not in seen
+        ]
+        top = _ensure_use_table_rows(top, ranked + tables, request=request)
         # Guarantee the accessory / additional-standards section that qualifies the
         # use survives too: it is what separates "allowed" from "allowed, but".
         top = _ensure_use_table_rows(top, ranked, marker="use_standards", reserve=1)
@@ -551,9 +563,9 @@ def _ensure_use_table_rows(
         # legend chunks filled the reserve and the row answering the question
         # never reached the model. Prefer the chunk whose table has the parcel's
         # district column and a row naming the use.
-        fit = _table_row_fit(request)
+        fit = _table_row_fit(request, [chunk for _, chunk in ranked if marker in chunk.uses])
         rows = sorted(
-            ((score, chunk) for score, chunk in ranked if marker in chunk.uses and fit(chunk) > (0, 0)),
+            ((score, chunk) for score, chunk in ranked if marker in chunk.uses and fit(chunk) > (0, 0.0)),
             key=lambda item: fit(item[1]),
             reverse=True,  # stable: ties keep rank order
         )
@@ -686,22 +698,29 @@ def _stem(token: str) -> str:
     return token[:-1] if token.endswith("s") and not token.endswith("ss") else token
 
 
-def _table_row_fit(request: RetrievalProviderRequest):
-    """(has the parcel's district column, use words its rows share with the project).
+def _table_row_fit(request: RetrievalProviderRequest, chunks: list[SourceChunk]):
+    """(has the parcel's district column, how well its best row label names the use).
 
-    ponytail: bag-of-words over row text, plural-folded; a real use-name matcher
-    if a generic word ("open", "store") starts winning ties.
+    A row's label is its first two cells; it scores the project words it shares,
+    each weighted 1/(rows among ``chunks`` carrying it), so "Retail Sales, General"
+    beats "Garden Center" for a general retail store in a shopping center. Labels
+    only: the header seeded onto every chunk would otherwise match everywhere.
     """
     wanted = {_stem(t) for t in _tokens(request.project_description) if len(t) >= 4}
     code = _fold(request.district_code) if request.district_code else None
 
-    def fit(chunk: SourceChunk) -> tuple[int, int]:
-        lines = [line for line in chunk.chunk_text.splitlines() if line.count("|") >= 2]
-        if not lines:
-            return (0, 0)
-        cells = {_fold(cell) for line in lines for cell in line.split("|")}
-        words = {_stem(t) for line in lines for t in _tokens(line)}
-        return (int(bool(code) and code in cells), len(wanted & words))
+    def rows(chunk: SourceChunk) -> list[set[str]]:
+        lines = (line.strip().strip("|").split("|") for line in chunk.chunk_text.splitlines() if line.count("|") >= 2)
+        return [wanted & {_stem(t) for t in _tokens(" ".join(cells[:2]))} for cells in lines]
+
+    df = Counter(word for chunk in chunks for row in rows(chunk) for word in row)
+
+    def fit(chunk: SourceChunk) -> tuple[int, float]:
+        labels = rows(chunk)
+        if not labels:
+            return (0, 0.0)
+        has_code = bool(code) and any(_fold(cell) == code for line in chunk.chunk_text.splitlines() for cell in line.split("|"))
+        return (int(has_code), max(sum(1 / df[w] for w in row) for row in labels))
 
     return fit
 

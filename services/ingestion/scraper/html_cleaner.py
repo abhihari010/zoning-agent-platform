@@ -68,12 +68,33 @@ def _image_symbol(attrs: list[tuple[str, str | None]]) -> str:
     return stem if _SYMBOL_RE.match(stem) else ""
 
 
+def _span(value: str | None) -> int:
+    try:
+        return max(1, int(value or 1))
+    except ValueError:
+        return 1
+
+
 class _TextExtractor(HTMLParser):
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self._parts: list[str] = []
         self._skip_depth = 0
         self._cell_depth = 0
+        # A rowspan cell owns its column in the rows below, which carry no cell
+        # for it -- a two-row use-table header (a "Use" cell spanning both rows)
+        # left the district-code row one cell short, every code shifted off its
+        # P/SE.  The rows below emit an empty cell in its place: {column: rows left}.
+        self._col = 0
+        self._spans: dict[int, int] = {}
+
+    def _fill_spans(self) -> None:
+        while self._col in self._spans:
+            self._spans[self._col] -= 1
+            if not self._spans[self._col]:
+                del self._spans[self._col]
+            self._parts.append(_CELL_SEP)
+            self._col += 1
 
     def _break(self) -> None:
         # Inside a cell a block tag must not end the row's line.
@@ -83,8 +104,22 @@ class _TextExtractor(HTMLParser):
         if tag in _SKIP_TAGS:
             self._skip_depth += 1
         elif tag in _CELL_TAGS:
+            if not self._cell_depth:
+                self._fill_spans()
+                attr = dict(attrs)
+                width = _span(attr.get("colspan"))
+                rows = _span(attr.get("rowspan"))
+                for col in range(self._col, self._col + width):
+                    if rows > 1:
+                        self._spans[col] = rows - 1
+                self._col += width
             self._cell_depth += 1
+        elif tag == "tr":
+            self._col = 0
+            self._break()
         elif tag in _BLOCK_TAGS:
+            if tag == "table":
+                self._spans = {}
             self._break()
         elif tag == "img" and self._skip_depth == 0:
             self._parts.append(_image_symbol(attrs))
@@ -101,6 +136,9 @@ class _TextExtractor(HTMLParser):
         elif tag in _CELL_TAGS:
             self._cell_depth = max(0, self._cell_depth - 1)
             self._parts.append(_CELL_SEP)
+        elif tag == "tr":
+            self._fill_spans()  # a span closing the row (a trailing "Standards" column)
+            self._break()
         elif tag in _BLOCK_TAGS:
             self._break()
 

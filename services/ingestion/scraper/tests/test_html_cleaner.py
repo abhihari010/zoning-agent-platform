@@ -84,3 +84,22 @@ def test_non_symbol_images_are_still_dropped():
     html = '<p>Intent.<img src="/assets/city-seal-large.png" alt="City of Example seal"></p>'
     out = clean_html(html)
     assert out == "Intent."
+
+
+def test_rowspan_header_cell_keeps_the_row_below_aligned():
+    # Fairfax's use table: "Use" and "Standards" span both header rows, so the
+    # district-code row had one cell fewer than the data rows and every code
+    # sat one column left of its P/SE.
+    html = (
+        "<table>"
+        "<tr><th rowspan='2'>Use</th><th colspan='2'>Commercial</th><th rowspan='2'>Standards</th></tr>"
+        "<tr><th>C-5</th><th>C-6</th></tr>"
+        "<tr><td>Retail Sales, General</td><td>P</td><td>P</td><td>4102.5.HH</td></tr>"
+        "</table>"
+    )
+
+    lines = [line for line in clean_html(html).splitlines() if line]
+
+    assert lines[1].count("|") == lines[2].count("|")
+    assert lines[1].split("|")[2].strip() == "C-6"
+    assert lines[2].split("|")[2].strip() == "P"

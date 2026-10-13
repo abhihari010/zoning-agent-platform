@@ -226,3 +226,29 @@ def test_legend_prose_does_not_fill_the_use_table_reserve() -> None:
     top = _ensure_use_table_rows(ranked[:2], ranked, request=request)
 
     assert [c.chunk_id for _, c in top][2:] == ["c-row", "ra-table"]
+
+
+def test_reserve_prefers_the_row_naming_the_use_over_a_shared_generic_word() -> None:
+    """"Garden Center" must not tie "Retail Sales, General" for a retail store in a
+    shopping center: a word many rows carry ("center") counts for less."""
+    from app.ai.hybrid_local_retriever import _ensure_use_table_rows
+
+    tagged = ["general", "principal_uses"]
+    header = "| Use | C-5 | C-6 |\n"
+    centers = [
+        _chunk(f"c{i}", f"{header}| {name} | P | P |", "Use Table", tagged)
+        for i, name in enumerate(["Garden Center", "Child Care Center", "Retreat Center"])
+    ]
+    retail = _chunk("retail", f"{header}| Retail Sales, General | P | P |", "Use Table", tagged)
+    ranked = [(4.0 - i / 10, c) for i, c in enumerate([*centers, retail])]
+    request = RetrievalProviderRequest(
+        district="commercial-employment",
+        inferred_use="general",
+        project_description="Open a general retail store in a shopping center space.",
+        jurisdiction_id="testville",
+        district_code="C-6",
+    )
+
+    top = _ensure_use_table_rows([], ranked, request=request)
+
+    assert top[0][1].chunk_id == "retail"
